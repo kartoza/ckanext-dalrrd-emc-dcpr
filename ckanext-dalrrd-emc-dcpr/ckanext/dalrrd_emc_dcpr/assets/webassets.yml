@@ -1,0 +1,14 @@
+# dalrrd_emc_dcpr-js:
+#   filter: rjsmin
+#   output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.js
+#   contents:
+#     - js/dalrrd_emc_dcpr.js
+#   extra:
+#     preload:
+#       - base/main
+
+# dalrrd_emc_dcpr-css:
+#   filter: cssrewrite
+#   output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.css
+#   contents:
+#     - css/dalrrd_emc_dcpr.css
