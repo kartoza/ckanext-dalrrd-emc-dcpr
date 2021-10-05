@@ -6,8 +6,9 @@ from urllib.request import urlopen
 
 _CONTAINER_NAME = "smoketester"
 _HOST_PORT = "8080"
+_CONTAINER_PORT = "5000"
 
-check_call(f"docker run --rm --name={_CONTAINER_NAME} -p {_HOST_PORT}:80 -d httpd".split())
+check_call(f"docker run --rm --name={_CONTAINER_NAME} -p {_HOST_PORT}:{_CONTAINER_PORT} -d httpd".split())
 
 
 # Wait for server to start. A better implementation would use polling

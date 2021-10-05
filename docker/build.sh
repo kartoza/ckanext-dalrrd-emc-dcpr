@@ -1,6 +1,6 @@
 set -euo pipefail
 
-IMAGE_NAME=registry.dockerhub.com/kartoza/ckanext-dalrrd-emc-dcpr
+IMAGE_NAME=index.docker.io/kartoza/ckanext-dalrrd-emc-dcpr
 
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT=$(git rev-parse --short HEAD)
@@ -20,11 +20,12 @@ docker image build \
     --build-arg BUILDKIT_INLINE_CACHE=1 \
     --build-arg git-commit=$GIT_COMMIT \
     --cache-from=$IMAGE_NAME:$DEFAULT_BRANCH \
-    --cache-from=$IMAGE_NAME:$GIT_GIT_BRANCH \
+    --cache-from=$IMAGE_NAME:$GIT_BRANCH \
     ..
 
-python smoketest.py $IMAGE_NAME:$GIT_GIT_BRANCH
+# run the smoketests:
+python smoketest.py $IMAGE_NAME:$GIT_BRANCH
 
 # push to the registry:
-docker push "$IMAGE_NAME:GIT_BRANCH"
-docker push "$IMAGE_NAME:GIT_COMMIT"
+#docker push "$IMAGE_NAME:GIT_BRANCH"
+#docker push "$IMAGE_NAME:GIT_COMMIT"
