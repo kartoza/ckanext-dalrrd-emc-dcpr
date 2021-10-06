@@ -4,50 +4,78 @@ version = "0.1.0"
 description = "A CKAN extension that implements SA DALRRD EMC/DCPR"
 authors = ["Ricardo Garcia Silva <ricardo@kartoza.com>"]
 license = "mit"
+packages = [
+    { include = "ckanext" },
+]
+
+[tool.poetry.scripts]
+docker_entrypoint = "ckanext.dalrrd_emc_dcpr.cli.docker_entrypoint:cli"
+
+[tool.poetry.plugins."ckan.plugins"]
+dalrrd_emc_dcpr = "ckanext.dalrrd_emc_dcpr.plugin:DalrrdEmcDcprPlugin"
+
+[tool.poetry.plugins."babel.extractors"]
+ckan = "ckan.lib.extract:extract_ckan"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-# NOTE: These are ckan 2.9.4 dependencies, as reported in ckan's
-# `requirements.in` file. When updating the ckan version you will need to
-# check if these dependencies have been changed and update this accordingly.
-# Then you'll need to run `poetry update --lock` to update the lock file
-alembic = "1.0.0"
+# NOTE1: When updating this file manually, also be sure to run
+# `poetry update --lock` to also update poetry's lock file
+
+# NOTE2: Below are ckan 2.9.4 dependencies.
+# ckan does not list its dependencies on the setup.py `install_requires`
+# field, which means it cannot just be installed by getting the code and
+# using pip install. Therefore we install the dependencies ahead of
+# We are not using the exact set of
+# dependencies specified in ckan's `ckan-2.9.4` release tag, but rather those
+# coming from a more recent version of ckan's `master` branch - specifically
+# from:
+# - https://github.com/ckan/ckan/commit/c95ca83ad90887999bbbafe6d43cb7f81ecbec00
+# - https://github.com/ckan/ckan/commit/5d8b1dc9da3a90ba95480fe379e3d642d8d74853
+# - https://github.com/ckan/ckan/commit/472af3bf5a40cfa7ab23cee337462c18c7cf2060
+# The reason for this behavior is to overcome some dificulties when installing
+# the `zope.interface` dependency that was specified in ckan's `requirements.in`
+# file of the 2.9.4 tag. This version was causing ckan to depend on an older
+# version of setuptools, which poetry was not being able to sort out correctly
+alembic = "1.6.5"
 Babel = "2.7.0"
 Beaker = "1.11.0"
 bleach = "3.1.4"
-click = "7.1.2"
-dominate = "2.4.0"
+click = "8.0.1"
+dominate = "2.6.0"
 fanstatic = "1.1"
 feedgen = "0.9.0"
-Flask = "1.1.1"
+Flask = "2.0.1"
 Flask-Babel = "1.0.0"
 flask-multistatic = "1.0"
-Jinja2 = "2.10.1"
-PyJWT = "1.7.1"
-Markdown = "2.6.7"
-passlib = "1.6.5"
-polib = "1.0.7"
-psycopg2 = "2.8.2"
-python-magic = "0.4.15"
+Jinja2 = "3.0.1"
+PyJWT = "2.1.0"
+Markdown = "3.3.4"
+passlib = "1.7.4"
+polib = "1.1.1"
+psycopg2 = "2.9.1"
+python-magic = "0.4.24"
 pysolr = "3.6.0"
-python-dateutil = ">=1.5.0"
-pytz = "2016.7"
-PyUtilib = "5.7.1"
+python-dateutil = "2.8.1"
+pytz = "2021.1"
+PyUtilib = "6.0.0"
 pyyaml = "5.4.1"
 "repoze.who" = "2.3"
 requests = "2.25.1"
-rq = "1.0"
-setuptools = "44.1.0"
-simplejson = "3.10.0"
+Routes = "1.13"
+rq = "1.9.0"
+simplejson = "3.17.2"
 SQLAlchemy = "1.3.5"
-sqlparse = "0.2.2"
-tzlocal = "1.3"
-unicodecsv = ">=0.9"
+sqlparse = "0.4.1"
+tzlocal = "2.1"
+unicodecsv = "0.14.1"
 watchdog = "2.1.5"
-webassets = "0.12.1"
-Werkzeug = {extras = ["watchdog"], version = "1.0.0"}
-"zope.interface" = "4.3.2"
+webassets = "2.0"
+Werkzeug = {extras = ["watchdog"], version = "2.0.1"}
+"zope.interface" = "5.4.0"  # changed by us to allow poetry to build
 
+ckan = {git = "https://github.com/ckan/ckan.git", rev = "ckan-2.9.4" }
+gunicorn = "^20.1.0"
 
 
 [tool.poetry.dev-dependencies]

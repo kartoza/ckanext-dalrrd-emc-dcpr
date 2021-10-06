@@ -7,6 +7,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install --yes --no-install-recommends tini && \
     # these are ckan dependencies, as reported in the ckan Dockerfile
     apt-get install --yes --no-install-recommends \
+      libmagic1 \
       libpq-dev \
       libxml2-dev \
       libxslt-dev \
@@ -34,7 +35,7 @@ RUN python -c "import compileall; compileall.compile_path(maxlevels=10)"
 USER appuser
 
 RUN mkdir /home/appuser/app  && \
-    mkdir /home/appuser/third-party && \
+#    mkdir /home/appuser/third-party && \
     python opt/get-poetry.py --yes --version 1.1.11
 
 ENV PATH="$PATH:/home/appuser/.poetry/bin"
@@ -45,15 +46,15 @@ COPY --chown=appuser:appuser pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 
 # get ckan
-WORKDIR /home/appuser/third-party
-RUN curl --silent --show-error --location \
-    https://github.com/ckan/ckan/archive/refs/tags/ckan-2.9.4.tar.gz > ckan-2.9.4.tar.gz && \
-    tar --extract --verbose --file=ckan-2.9.4.tar.gz
+#WORKDIR /home/appuser/third-party
+#RUN curl --silent --show-error --location \
+#    https://github.com/ckan/ckan/archive/refs/tags/ckan-2.9.4.tar.gz > ckan-2.9.4.tar.gz && \
+#    tar --extract --verbose --file=ckan-2.9.4.tar.gz
 
 WORKDIR /home/appuser/app
 
 # Install ckan
-RUN poetry add ../third-party/ckan-ckan-2.9.4
+#RUN poetry add ../third-party/ckan-ckan-2.9.4
 
 # Now install our code
 COPY --chown=appuser:appuser . .
@@ -64,14 +65,17 @@ EXPOSE 5000
 # This allows us to get traces whenever some C code segfaults
 ENV PYTHONFAULTHANDLER=1
 
-# use tini as the init process
-ENTRYPOINT ["tini", "-g", "--", "poetry", "run", "/entrypoint.sh"]
-
 # Write git commit identifier into the image
-ARG git_commit
-ENV git_commit=$git_commit
-RUN echo $git_commit > /home/appuser/git-commit.txt
+ARG GIT_COMMIT
+ENV GIT_COMMIT=$GIT_COMMIT
+RUN echo $GIT_COMMIT > /home/appuser/git-commit.txt
 
-# TODO: compile stuff installed by poetry
+ENV CKAN_INI=/home/appuser/ckan.ini
+
 # Compile python stuff to bytecode to improve startup times
-RUN python -m compileall /app/
+RUN poetry run python -c "import compileall; compileall.compile_path(maxlevels=10)"
+
+# use tini as the init process
+ENTRYPOINT ["tini", "-g", "--", "poetry", "run", "docker_entrypoint"]
+
+CMD ["launch-gunicorn"]
