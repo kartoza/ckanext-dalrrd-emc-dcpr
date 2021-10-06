@@ -35,7 +35,7 @@ RUN python -c "import compileall; compileall.compile_path(maxlevels=10)"
 USER appuser
 
 RUN mkdir /home/appuser/app  && \
-#    mkdir /home/appuser/third-party && \
+    mkdir /home/appuser/data && \
     python opt/get-poetry.py --yes --version 1.1.11
 
 ENV PATH="$PATH:/home/appuser/.poetry/bin"

@@ -54,6 +54,14 @@ six = ">=1.9.0"
 webencodings = "*"
 
 [[package]]
+name = "blinker"
+version = "1.4"
+description = "Fast, simple object-to-object and broadcast signaling"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "certifi"
 version = "2021.5.30"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -178,6 +186,20 @@ Babel = ">=2.3"
 Flask = "*"
 Jinja2 = ">=2.5"
 pytz = "*"
+
+[[package]]
+name = "flask-debugtoolbar"
+version = "0.11.0"
+description = "A toolbar overlay for debugging Flask applications."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Blinker = "*"
+Flask = ">=0.8"
+itsdangerous = "*"
+werkzeug = "*"
 
 [[package]]
 name = "flask-multistatic"
@@ -644,7 +666,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9e42457f16788f7d608dd982e3044b11f99e02964ecae2456bd078c5d62d357b"
+content-hash = "154c9b915cae3dffb505f8832399dd891ca72a6a555e5845afeaa093a9bae517"
 
 [metadata.files]
 alembic = [
@@ -661,6 +683,9 @@ beaker = [
 bleach = [
     {file = "bleach-3.1.4-py2.py3-none-any.whl", hash = "sha256:cc8da25076a1fe56c3ac63671e2194458e0c4d9c7becfd52ca251650d517903c"},
     {file = "bleach-3.1.4.tar.gz", hash = "sha256:e78e426105ac07026ba098f04de8abe9b6e3e98b5befbf89b51a5ef0a4292b03"},
+]
+blinker = [
+    {file = "blinker-1.4.tar.gz", hash = "sha256:471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6"},
 ]
 certifi = [
     {file = "certifi-2021.5.30-py2.py3-none-any.whl", hash = "sha256:50b1e4f8446b06f41be7dd6338db18e0990601dce795c2b1686458aa7e8fa7d8"},
@@ -696,6 +721,10 @@ flask = [
 flask-babel = [
     {file = "Flask-Babel-1.0.0.tar.gz", hash = "sha256:d6a70468f9a8919d59fba2a291a003da3a05ff884275dddbd965f3b98b09ab3e"},
     {file = "Flask_Babel-1.0.0-py3-none-any.whl", hash = "sha256:247f4ec34cf605d03781f480bccb1a5acb719df1d1a2a743c091ab3db5d5fde2"},
+]
+flask-debugtoolbar = [
+    {file = "Flask-DebugToolbar-0.11.0.tar.gz", hash = "sha256:3c4e79d354ede014e6657c545a536d4fb273cc89e3fd6b4835b02e346dd3aab4"},
+    {file = "Flask_DebugToolbar-0.11.0-py2.py3-none-any.whl", hash = "sha256:0e9a80d4c599233c68376e81cc99976200b5ac5248cfb24f18935cc5b69ac5b3"},
 ]
 flask-multistatic = [
     {file = "flask-multistatic-1.0.tar.gz", hash = "sha256:f5e9c8e451dceb18dc6343a72021c93c5fc509fdf960fa41639c98cd33289b5c"},

@@ -76,6 +76,7 @@ Werkzeug = {extras = ["watchdog"], version = "2.0.1"}
 
 ckan = {git = "https://github.com/ckan/ckan.git", rev = "ckan-2.9.4" }
 gunicorn = "^20.1.0"
+Flask-DebugToolbar = "^0.11.0"
 
 
 [tool.poetry.dev-dependencies]
