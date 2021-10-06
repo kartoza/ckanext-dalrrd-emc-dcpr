@@ -6,12 +6,11 @@ GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 GIT_COMMIT=$(git rev-parse --short HEAD)
 DEFAULT_BRANCH=$(basename $(git rev-parse --abbrev-ref origin/HEAD))
 
-
-# pull previous version, and use it with --cache-now, for build caching:
+# pull previous version, and use it with --cache-now, for build caching
 docker pull $IMAGE_NAME:$DEFAULT_BRANCH || true
 docker pull $IMAGE_NAME:$GIT_BRANCH || true
 
-# use branch+commit for tagging:
+# use branch+commit for tagging
 docker image build \
     -t "$IMAGE_NAME:$GIT_BRANCH" \
     -t "$IMAGE_NAME:$GIT_COMMIT" \
@@ -23,9 +22,9 @@ docker image build \
     --cache-from=$IMAGE_NAME:$GIT_BRANCH \
     ..
 
-# run the smoketests:
+# run smoke tests
 python smoketest.py $IMAGE_NAME:$GIT_BRANCH
 
-# push to the registry:
+# push to docker registry
 #docker push "$IMAGE_NAME:GIT_BRANCH"
 #docker push "$IMAGE_NAME:GIT_COMMIT"
