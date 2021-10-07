@@ -1,0 +1,6 @@
+Dockerfile
+.dockerignore
+
+**/__pycache__
+
+.git
