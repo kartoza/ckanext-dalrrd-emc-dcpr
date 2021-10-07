@@ -13,6 +13,7 @@ import click
 
 from ckan.cli import CKANConfigLoader
 from ckan.config.environment import load_environment
+from ckan.plugins import toolkit
 
 
 @click.group()
@@ -30,19 +31,23 @@ def launch_gunicorn(ckan_ini):
         click.secho(f"About to launch gunicorn...", fg="green")
         sys.stdout.flush()
         sys.stderr.flush()
-        # TODO: modify worker class according with the ckan config
-        # TODO: modify log level according with the ckan config
-        os.execvp(
+        gunicorn_params = [
             "gunicorn",
-            [
-                "gunicorn",
-                "ckanext.dalrrd_emc_dcpr.wsgi:application",
-                f"--bind=0.0.0.0:5000",
+            "ckanext.dalrrd_emc_dcpr.wsgi:application",
+            f"--bind=0.0.0.0:5000",
+            f"--error-logfile=-",
+            f"--access-logfile=-",
+        ]
+        ckan_config = _get_ckan_config(ckan_ini)
+        debug = toolkit.asbool(ckan_config.get("debug", False))
+        if debug:
+            gunicorn_params.extend([
+                "--workers=1",
+                "--reload",
                 f"--log-level=debug",
-                f"--error-logfile=-",
-                f"--access-logfile=-",
-            ]
-        )
+            ])
+
+        os.execvp("gunicorn", gunicorn_params)
     else:
         click.secho("ckan environment is not available, aborting...", fg="red")
 
@@ -59,7 +64,7 @@ def launch_ckan_cli(ckan_ini, ckan_args):
 
 
 def _wait_for_ckan_env(
-        config_path: str, num_tries: int = 5, pause_for_seconds: int = 2) -> bool:
+        config_path: str, num_tries: int = 100, pause_for_seconds: int = 2) -> bool:
     """Try to load the ckan environment"""
     config = _get_ckan_config(config_path)
     total_tries = num_tries if num_tries > 0 else 1

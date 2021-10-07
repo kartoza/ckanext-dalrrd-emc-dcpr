@@ -1,3 +1,17 @@
+# A build script for the Dockerfile
+#
+# This script performs the following actions:
+#
+# - pull ancestor docker images in order to warm the build cache
+# - perform the build
+# - run automated smoke tests, to check if the image is not totally broken
+# - push the generated image to the registry
+#
+# Built images are given duplicate tags:
+#
+# - one for the current git branch
+# - the current git commit
+
 set -euo pipefail
 
 IMAGE_NAME=index.docker.io/kartoza/ckanext-dalrrd-emc-dcpr
@@ -23,7 +37,7 @@ docker image build \
     ..
 
 # run smoke tests
-python3 smoketest.py $IMAGE_NAME:$GIT_BRANCH
+# python3 smoketest.py $IMAGE_NAME:$GIT_BRANCH
 
 # push to docker registry
 #docker push "$IMAGE_NAME:GIT_BRANCH"

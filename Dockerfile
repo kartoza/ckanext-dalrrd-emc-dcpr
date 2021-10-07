@@ -4,7 +4,11 @@ FROM python:3.9-slim-bullseye
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get --yes upgrade && \
-    apt-get install --yes --no-install-recommends tini && \
+    # these are our own dependencies and utilities
+    apt-get install --yes --no-install-recommends \
+      net-tools \
+      procps \
+      tini && \
     # these are ckan dependencies, as reported in the ckan Dockerfile
     apt-get install --yes --no-install-recommends \
       libmagic1 \
@@ -40,37 +44,29 @@ RUN mkdir /home/appuser/app  && \
 
 ENV PATH="$PATH:/home/appuser/.poetry/bin"
 
+# This allows us to get traces whenever some C code segfaults
+ENV PYTHONFAULTHANDLER=1
+
+ENV CKAN_INI=/home/appuser/ckan.ini
+
 # Only copy the dependencies for now and install them
 WORKDIR /home/appuser/app
 COPY --chown=appuser:appuser pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 
-# get ckan
-#WORKDIR /home/appuser/third-party
-#RUN curl --silent --show-error --location \
-#    https://github.com/ckan/ckan/archive/refs/tags/ckan-2.9.4.tar.gz > ckan-2.9.4.tar.gz && \
-#    tar --extract --verbose --file=ckan-2.9.4.tar.gz
+EXPOSE 5000
 
 WORKDIR /home/appuser/app
-
-# Install ckan
-#RUN poetry add ../third-party/ckan-ckan-2.9.4
 
 # Now install our code
 COPY --chown=appuser:appuser . .
 RUN poetry install --no-dev
-
-EXPOSE 5000
-
-# This allows us to get traces whenever some C code segfaults
-ENV PYTHONFAULTHANDLER=1
 
 # Write git commit identifier into the image
 ARG GIT_COMMIT
 ENV GIT_COMMIT=$GIT_COMMIT
 RUN echo $GIT_COMMIT > /home/appuser/git-commit.txt
 
-ENV CKAN_INI=/home/appuser/ckan.ini
 
 # Compile python stuff to bytecode to improve startup times
 RUN poetry run python -c "import compileall; compileall.compile_path(maxlevels=10)"

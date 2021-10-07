@@ -3,7 +3,7 @@ version: "3.8"
 services:
 
   ckan-db:
-    image: postgis/postgis:14-3.1
+    image: postgis/postgis:13-3.1
     environment:
       POSTGRES_USER: ckan-dev
       POSTGRES_PASSWORD: ckan-dev
@@ -11,12 +11,9 @@ services:
     ports:
       - target: 5432
         published: 55432
-    networks:
-      - default
-      - tester
 
   datastore-db:
-    image: postgis/postgis:14-3.1
+    image: postgis/postgis:13-3.1
     environment:
       POSTGRES_USER: datastore-dev
       POSTGRES_PASSWORD: datastore-dev
@@ -53,22 +50,11 @@ services:
         published: 8983
     volumes:
       - solr-data:/opt/solr/server/solr/ckan/data
-    networks:
-      - default
-      - tester
 
   redis:
     image: redis:6.2
-    networks:
-      - default
-      - tester
 
 
 volumes:
   solr-data:
   ckan-storage:
-
-
-networks:
-  tester:
-    external: true
