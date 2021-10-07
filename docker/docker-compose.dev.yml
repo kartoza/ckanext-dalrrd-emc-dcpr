@@ -11,6 +11,8 @@ services:
     ports:
       - target: 5432
         published: 55432
+    volumes:
+      - ckan-db-data:/var/lib/postgresql/data
 
   datastore-db:
     image: postgis/postgis:13-3.1
@@ -21,6 +23,8 @@ services:
     ports:
       - target: 5432
         published: 55433
+    volumes:
+      - datastore-db-data:/var/lib/postgresql/data
 
   ckan-web:
     image: kartoza/ckanext-dalrrd-emc-dcpr:add-dockerfile
@@ -58,3 +62,5 @@ services:
 volumes:
   solr-data:
   ckan-storage:
+  ckan-db-data:
+  datastore-db-data:
