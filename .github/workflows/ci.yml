@@ -7,7 +7,7 @@ jobs:
     name: Continuous Integration
     runs-on: ubuntu-20.04
     env:
-      IMAGE_NAME: ${{ env.GITHUB_REPOSITORY }}
+      IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
