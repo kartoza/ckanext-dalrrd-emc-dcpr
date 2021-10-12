@@ -41,11 +41,13 @@ def launch_gunicorn(ckan_ini):
         ckan_config = _get_ckan_config(ckan_ini)
         debug = toolkit.asbool(ckan_config.get("debug", False))
         if debug:
-            gunicorn_params.extend([
-                "--workers=1",
-                "--reload",
-                f"--log-level=debug",
-            ])
+            gunicorn_params.extend(
+                [
+                    "--workers=1",
+                    "--reload",
+                    f"--log-level=debug",
+                ]
+            )
 
         os.execvp("gunicorn", gunicorn_params)
     else:
@@ -57,25 +59,24 @@ def launch_gunicorn(ckan_ini):
 @click.argument("ckan_args", nargs=-1, type=click.UNPROCESSED)
 def launch_ckan_cli(ckan_ini, ckan_args):
     click.secho("inside launch_ckan_cli", fg="red")
-    os.execvp(
-        "ckan",
-        ["ckan"] + list(ckan_args)
-    )
+    os.execvp("ckan", ["ckan"] + list(ckan_args))
 
 
 def _wait_for_ckan_env(
-        config_path: str, num_tries: int = 100, pause_for_seconds: int = 2) -> bool:
+    config_path: str, num_tries: int = 100, pause_for_seconds: int = 2
+) -> bool:
     """Try to load the ckan environment"""
     config = _get_ckan_config(config_path)
     total_tries = num_tries if num_tries > 0 else 1
     pause_for = pause_for_seconds if pause_for_seconds > 0 else 2
-    for current_attempt in range(1, total_tries+1):
+    for current_attempt in range(1, total_tries + 1):
         try:
             load_environment(config)
         except Exception as exc:
             click.secho(
                 f"({current_attempt}/{total_tries}) - ckan environment is not "
-                f"available yet: {str(exc)}", fg="red"
+                f"available yet: {str(exc)}",
+                fg="red",
             )
             click.secho(f"Retrying in {pause_for} seconds...")
             time.sleep(pause_for)

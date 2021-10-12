@@ -49,5 +49,6 @@ To temporary patch the CKAN configuration for the duration of a test you can use
 """
 import ckanext.dalrrd_emc_dcpr.plugin as plugin
 
+
 def test_plugin():
     pass
