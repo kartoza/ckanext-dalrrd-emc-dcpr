@@ -36,7 +36,7 @@ used together with docker.
   docker run \
       --rm \
       --volume=/home/myuser/my-ckan.ini:/home/appuser/ckan.ini \
-      --volume=/home/myuser/my-ckan.ini:/home/appuser/repoze.ini \
+      --volume=/home/myuser/who.ini:/home/appuser/who.ini \
       kartoza/ckanext-dalrrd-emc-dcpr:main
   ```
 
