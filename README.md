@@ -146,8 +146,14 @@ moments) on your local machine at
 
 http://localhost:5000
 
+**NOTE:** The compose file does not try to build the images. You either
+build them yourself (with the provided `build.sh` script) or they are pulled
+from the registry (if they exist remotely).
+
 
 ### First run
+
+#### Initialize CKAN database
 
 The first time you launch it you will need to set up the ckan database (since
 the ckan image's entrypoint explicitly does not take care of this, as
@@ -167,9 +173,19 @@ flask app):
 docker exec -ti emc-dcpr_ckan-web_1 bash -c 'kill -HUP 1'
 ```
 
-**NOTE:** The compose file does not try to build the images. You either
-build them yourself (with the provided `build.sh` script) or they are pulled
-from the registry (if they exist remotely).
+
+#### Create sysadmin user
+
+After having initialized the database you can now create the first CKAN
+sysadmin user.
+
+```
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan sysadmin add admin
+```
+
+Answer the prompts in order to provide the details for this new user.
+After its successful creation you can login to the CKAN site with the `admin`
+user.
 
 
 ### Using CKAN commands
