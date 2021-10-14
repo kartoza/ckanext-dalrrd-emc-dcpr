@@ -128,17 +128,20 @@ file for development. It sets the following up:
 
 - Makes it straightforward to run tests
 
-You may use the provided `docker/compose-up.sh` and `docker/compose-down.sh`
-helper scripts to stand up and wind down the stack.
+Additionally, we suggest you use the provided `docker/compose.py` helper script
+to stand up and wind down the stack.
 
 ```
 cd docker
 
 # bring the stack up
-./compose-up.sh
+./compose.py up
 
 # shut it down
-./compose-down.sh
+./compose.py down
+
+# restart services (for example the ckan-web service)
+./compose.py restart ckan-web
 ```
 
 After starting the stack, the ckan web interface is available (after a few
