@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-     - name: publish image to dockerhub
-       run: |
-         docker push $IMAGE_NAME:$GIT_BRANCH_NAME
-         docker push $IMAGE_NAME:$TRIMMED_SHA
+      - name: publish image to dockerhub
+        run: |
+          docker push $IMAGE_NAME:$GIT_BRANCH_NAME
+          docker push $IMAGE_NAME:$TRIMMED_SHA
