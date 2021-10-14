@@ -1,6 +1,25 @@
+# NOTE: this file expects to find the $CKAN_IMAGE_TAG variable in its environment
+
 version: "3.8"
 
 services:
+
+  ckan-web:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    volumes:
+      - type: bind
+        source: $PWD/..
+        target: /home/appuser/app
+      - type: bind
+        source: $PWD/ckan-dev-settings.ini
+        target: /home/appuser/ckan.ini
+      - type: bind
+        source: $PWD/who.ini
+        target: /home/appuser/who.ini
+      - ckan-storage:/home/appuser/data
+    ports:
+      - target: 5000
+        published: 5000
 
   ckan-db:
     image: postgis/postgis:13-3.1
@@ -25,23 +44,6 @@ services:
         published: 55433
     volumes:
       - datastore-db-data:/var/lib/postgresql/data
-
-  ckan-web:
-    image: kartoza/ckanext-dalrrd-emc-dcpr:add-dockerfile
-    volumes:
-      - type: bind
-        source: $PWD/..
-        target: /home/appuser/app
-      - type: bind
-        source: $PWD/ckan-dev-settings.ini
-        target: /home/appuser/ckan.ini
-      - type: bind
-        source: $PWD/who.ini
-        target: /home/appuser/who.ini
-      - ckan-storage:/home/appuser/data
-    ports:
-      - target: 5000
-        published: 5000
 
   # NOTE: ckan/solr uses solr v 6.6 which is pretty old (EOL even), but as of CKAN 2.9.x it is
   # unfortunately still the most recent supported version. More info:
