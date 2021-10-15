@@ -50,6 +50,7 @@ jobs:
       - name: publish to dockerhub
         run: |
           images_to_push=$(docker images kartoza/ckanext-dalrrd-emc-dcpr --format "{{ .Repository }}:{{ .Tag }}")
-          for image in images_to_push
-              do docker push $image
+          for image in $images_to_push
+          do
+              docker push $image
           done

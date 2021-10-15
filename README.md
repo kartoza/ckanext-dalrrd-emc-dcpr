@@ -12,25 +12,25 @@ used together with docker.
 
 ### docker standalone installation
 
-- Either pull the `main` or the latest release (not the `latest` tag) of the
-  project from the docker registry:
+Ideally, you should be able to pull prebuilt images from dockerhub:
 
-  ```
-  docker pull kartoza/ckanext-dalrrd-emc-dcpr:main
-  ```
+https://hub.docker.com/r/kartoza/ckanext-dalrrd-emc-dcpr
 
-  Alternatively, you can also build the image locally by using the provided
-  build script:
+```
+docker pull kartoza/ckanext-dalrrd-emc-dcpr:main
+```
 
-  ```
-  cd docker
-  ./build.sh
-  ```
+Alternatively, you can also build the image locally by using the provided
+build script:
 
-- Use the docker image by providing two volumes with the CKAN configuration
-  files. In order to be properly recognized, your config files must be
-  mounted at `/home/appuser/ckan.ini` and `/home/appuser/who.ini`. For
-  example, when running standalone:
+```
+cd docker
+./build.sh
+```
+
+After having the image, use it to create containers. In order to be properly
+recognized, your config files must be mounted at `/home/appuser/ckan.ini`
+and `/home/appuser/who.ini`. For example, when running standalone:
 
   ```
   docker run \
