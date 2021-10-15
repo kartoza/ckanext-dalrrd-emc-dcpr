@@ -1,0 +1,55 @@
+name: Handle PR artifacts
+
+on:
+  workflow_run:
+    workflows:
+      - "Receive PR"
+    types:
+      - completed
+
+jobs:
+  push-image:
+    runs-on: ubuntu-20.04
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Download artifact
+        uses: actions/github-script@v3.1.0
+        with:
+          script: |
+            var artifacts = await github.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{github.event.workflow_run.id}},
+            });
+            var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "pr"
+            })[0];
+            var download = await github.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: matchArtifact.id,
+              archive_format: 'zip',
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
+
+      - name: Unzip downloaded artifact
+        run: unzip pr.zip
+
+      - name: load built docker images contained in artifact
+        run: docker load --input ./pr/built_docker_image.tar.gz
+
+      - name: Login to dockerhub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: publish to dockerhub
+        run: |
+          images_to_push=$(docker images kartoza/ckanext-dalrrd-emc-dcpr --format "{{ .Repository }}:{{ .Tag }}")
+          for image in images_to_push
+              do docker push $image
+          done
