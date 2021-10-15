@@ -39,7 +39,7 @@ jobs:
         run: unzip pr.zip
 
       - name: load built docker images contained in artifact
-        run: docker load --input ./pr/built_docker_image.tar.gz
+        run: docker load --input ./built_docker_image.tar.gz
 
       - name: Login to dockerhub
         uses: docker/login-action@v1
