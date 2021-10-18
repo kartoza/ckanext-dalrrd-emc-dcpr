@@ -45,12 +45,12 @@ jobs:
             ..
 
       - name: run unit tests
-        run: >
-          docker run
-            --rm
-            --name tester
-            -ti $IMAGE_NAME:$GIT_BRANCH_NAME
-            --entrypoint=/bin/bash
+        run: |
+          docker run \
+            --rm \
+            --name tester \
+            -ti $IMAGE_NAME:$GIT_BRANCH_NAME \
+            --entrypoint=/bin/bash \
             -c 'poetry install && poetry run pytest --cov'
 
       - name: Login to dockerhub
