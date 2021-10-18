@@ -4,6 +4,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
 from .commands.test import test_ckan_cmd
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,7 +22,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def get_commands(self):
         return [test_ckan_cmd]
 
-# IAuthFunctions
+    # IAuthFunctions
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
         return {
@@ -37,12 +38,12 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
 
 def authorize_package_publish(
-        context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict[str, bool]:
     # in here we can inspect the context and the data_dict in order to
     # decide whether to authorize access or not
     user_name = context.get("user")
-    owner_org = data_dict.get('owner_org') or data_dict.get('group_id')
+    owner_org = data_dict.get("owner_org") or data_dict.get("group_id")
 
     members = toolkit.get_action("member_list")(
         data_dict={"id": owner_org, "object_type": "user"}
@@ -60,6 +61,7 @@ def authorize_package_publish(
     else:
         logger.debug(f"Inside authorize_package_publish function: {locals()}")
         return {"success": False, "msg": "You are not authorized to publish a package"}
+
 
 # IActions
 
@@ -79,7 +81,6 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     return package_publish_check(original_action, context, data_dict)
-
 
 
 @toolkit.chained_action
