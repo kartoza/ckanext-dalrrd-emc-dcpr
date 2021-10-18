@@ -73,7 +73,7 @@ jobs:
             --name tester \
             -t \
             $IMAGE_NAME:$GIT_BRANCH_NAME \
-            entrypoint=/bin/bash \
+            --entrypoint=/bin/bash \
             -c 'poetry install && poetry run pytest --cov'
 
       - name: Save PR number
