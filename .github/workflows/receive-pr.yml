@@ -68,8 +68,12 @@ jobs:
 
       - name: run unit tests
         run: >
-          docker run --name tester -ti $IMAGE_NAME:$GIT_BRANCH_NAME
-          bash -c 'poetry install && poetry run pytest --cov'
+          docker run
+            --rm
+            --name tester
+            -ti $IMAGE_NAME:$GIT_BRANCH_NAME
+            entrypoint=/bin/bash
+            -c 'poetry install && poetry run pytest --cov'
 
       - name: Save PR number
         run: |
