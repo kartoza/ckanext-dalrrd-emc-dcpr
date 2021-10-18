@@ -71,7 +71,8 @@ jobs:
           docker run \
             --rm \
             --name tester \
-            -ti $IMAGE_NAME:$GIT_BRANCH_NAME \
+            -t \
+            $IMAGE_NAME:$GIT_BRANCH_NAME \
             entrypoint=/bin/bash \
             -c 'poetry install && poetry run pytest --cov'
 
