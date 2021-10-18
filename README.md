@@ -234,8 +234,10 @@ pip install -r dev-requirements.txt
 ```
 
 
-## Tests
+## Testing
 
-To run the tests, do:
+To run the tests execute `pytest`:
 
-    pytest --ckan-ini=test.ini
+    poetry run pytest --cov
+
+This shall run the automated test suite and then print a coverage report

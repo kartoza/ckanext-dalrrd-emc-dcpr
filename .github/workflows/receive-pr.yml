@@ -66,6 +66,16 @@ jobs:
             --cache-from=$IMAGE_NAME:$GIT_BRANCH_NAME \
             ..
 
+      - name: run unit tests
+        run: |
+          docker run \
+            --rm \
+            --name tester \
+            -t \
+            --entrypoint=/bin/bash \
+            $IMAGE_NAME:$GIT_BRANCH_NAME \
+            -c 'poetry install && poetry run pytest --cov'
+
       - name: Save PR number
         run: |
           mkdir -p ./pr
