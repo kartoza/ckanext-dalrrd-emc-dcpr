@@ -24,6 +24,11 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
       wget \
       curl && \
     apt-get --yes clean && \
+    # these are ckanext-spatial dependencies \
+    apt-get install --yes --no-install-recommends \
+      python-dev \
+      libxslt1-dev \
+      libgeos-c1 && \
     rm -rf /var/lib/apt/lists/*
 
 # download poetry
