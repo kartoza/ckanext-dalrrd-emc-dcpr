@@ -22,8 +22,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def get_commands(self):
         return [test_ckan_cmd]
 
-    # IAuthFunctions
-
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
         return {
             "package_publish": authorize_package_publish,
@@ -59,11 +57,7 @@ def authorize_package_publish(
     if user_id in admin_member_ids:
         return {"success": True}
     else:
-        logger.debug(f"Inside authorize_package_publish function: {locals()}")
         return {"success": False, "msg": "You are not authorized to publish a package"}
-
-
-# IActions
 
 
 @toolkit.chained_action
