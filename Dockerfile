@@ -28,7 +28,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install --yes --no-install-recommends \
       python-dev \
       libxslt1-dev \
-      libgeos-c1 && \
+      libgeos-c1v5 && \
     rm -rf /var/lib/apt/lists/*
 
 # download poetry
