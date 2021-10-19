@@ -232,6 +232,15 @@ http://localhost:5000/harvest
 See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
 
 
+#### Setup datastore db
+
+The datastore database can only be used after setting up its permission. Run the below command to 
+set permission on the datastore database.
+```
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan datastore set-permissions | sudo -u postgres psql --set ON_ERROR_STOP=1
+```
+
+
 ### Bootstrap ckanext-spatial extension
 
 The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
