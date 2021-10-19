@@ -23,6 +23,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
       git-core \
       wget \
       curl && \
+    # ckan harvest plugin dependencies \
+    apt-get install --yes --no-install-recommends \
+      redis-server && \
     apt-get --yes clean && \
     rm -rf /var/lib/apt/lists/*
 
