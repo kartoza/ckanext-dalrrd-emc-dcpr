@@ -110,7 +110,7 @@
     {% endblock %}
     {% endif %}
 
-    {% if not user_can_publish_dataset %}
+    {% if not show_visibility_selector %}
       <input name="private" value=True type="hidden"/>
     {% endif %}
 
