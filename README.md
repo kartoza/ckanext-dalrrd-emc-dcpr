@@ -1,5 +1,8 @@
 # ckanext-dalrrd-emc-dcpr
 
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/kartoza/ckanext-dalrrd-emc-dcpr/Local%20CI/main)
+![Docker Image Version (latest by date)](https://img.shields.io/docker/v/kartoza/ckanext-dalrrd-emc-dcpr)
+
 This is a [ckan](https://ckan.org) extension that implements the Electronic
 Metadata Catalog for South Africa's Department of Agriculture, Land Reform
 and Rural Development (DALRRD). It also contains additional utilities,
