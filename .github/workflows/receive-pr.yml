@@ -74,7 +74,7 @@ jobs:
             -t \
             --entrypoint=/bin/bash \
             $IMAGE_NAME:$GIT_BRANCH_NAME \
-            -c 'poetry install && poetry run pytest --cov'
+            -c 'poetry install && poetry run pytest -m unit --cov'
 
       - name: Save PR number
         run: |

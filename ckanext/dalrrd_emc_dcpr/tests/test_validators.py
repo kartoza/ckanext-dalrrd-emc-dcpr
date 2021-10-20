@@ -3,6 +3,8 @@ from ckan.lib.navl.dictization_functions import missing
 
 from ..plugin import value_or_true_validator
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.mark.parametrize(
     "value, expected",
