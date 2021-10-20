@@ -67,6 +67,7 @@
   {% set user_can_update_owner_org = h.can_update_owner_org(data, organizations_available) %}
   {% set user_is_sysadmin = h.check_access('sysadmin') %}
   {% set show_organizations_selector = organizations_available and user_can_update_owner_org %}
+  {{ data.update({"owner_org": dataset_has_organization}) }}
   {% set user_can_publish_dataset = h.check_access('package_publish', data) %}
   {% set show_visibility_selector =  ( dataset_has_organization or (organizations_available and
     (user_is_sysadmin or dataset_is_draft))) and user_can_publish_dataset %}
@@ -107,6 +108,10 @@
       </div>
     </div>
     {% endblock %}
+    {% endif %}
+
+    {% if not user_can_publish_dataset %}
+      <input name="private" value=True type="hidden"/>
     {% endif %}
 
     {% if show_organizations_selector and show_visibility_selector %}

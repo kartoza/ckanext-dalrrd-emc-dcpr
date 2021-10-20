@@ -41,7 +41,7 @@ def authorize_package_publish(
     # in here we can inspect the context and the data_dict in order to
     # decide whether to authorize access or not
     user_name = context.get("user")
-    owner_org = data_dict.get("owner_org") or data_dict.get("group_id")
+    owner_org = data_dict.get("owner_org")
 
     members = toolkit.get_action("member_list")(
         data_dict={"id": owner_org, "object_type": "user"}
@@ -87,11 +87,10 @@ def package_patch(original_action, context, data_dict):
 
 def package_publish_check(action, context, data):
     remains_private = toolkit.asbool(data.get("private", True))
-    result = None
+
     if remains_private:
-        # make sure private state is updated, then assign result
-        data.update({"private": remains_private})
         result = action(context, data)
     else:
-        toolkit.check_access("package_publish", context, data)
+        access = toolkit.check_access("package_publish", context, data)
+        result = action(context, data) if access else None
     return result
