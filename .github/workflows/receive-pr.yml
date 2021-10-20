@@ -1,0 +1,92 @@
+# Github does not allow workflows initiated by PRs that come from a fork to
+# have access to secrets or to have `write` access to the repo. As such, we
+# employ the strategy described in:
+#
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+#
+# which basically uses two workflows:
+#
+# - First workflow (this one) is triggered by the PR and proceeds to check the
+# code and build whatever artifacts (in this repo we are building docker images).
+# Since this first workflow is (potentially) initiated by forks submitting a PR,
+# it will most likely not have access to the repo secrets. This means, for example,
+# that it cannot login to dockerhub to push a built docker image (as credentials
+# are stored as secrets). This workflow builds the image and then stores it as an
+# artifact;
+#
+# - Second workflow (handle-pr-artifacts.yml) is triggered by the first one's successful
+# completion. This workflow does have access to secrets. As such, it can retrieve the
+# built artifact and push it
+
+name: Receive PR
+
+on:
+  - pull_request
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-20.04
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Check code formatting with black
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-action@v1.6.0
+
+      - name: Get current git commit hash
+        uses: priyesh2609/sha-trim-action@v1.1.1
+
+      - name: Get current git branch name
+        uses: EthanSK/git-branch-name-action@v1
+
+      - name: Build docker image
+        working-directory: ./docker
+        shell: bash
+        env:
+          DEFAULT_BRANCH: main
+        run: |
+          docker pull $IMAGE_NAME:$DEFAULT_BRANCH || true
+          docker pull $IMAGE_NAME:$GIT_BRANCH_NAME || true
+          docker image build \
+            --tag "$IMAGE_NAME:$GIT_BRANCH_NAME" \
+            --tag "$IMAGE_NAME:$TRIMMED_SHA" \
+            --label git-commit=$TRIMMED_SHA \
+            --label git-branch=$GIT_BRANCH_NAME \
+            --build-arg "BUILDKIT_INLINE_CACHE=1" \
+            --build-arg "GIT_COMMIT=$TRIMMED_SHA" \
+            --cache-from=$IMAGE_NAME:$DEFAULT_BRANCH \
+            --cache-from=$IMAGE_NAME:$GIT_BRANCH_NAME \
+            ..
+
+      - name: run unit tests
+        run: |
+          docker run \
+            --rm \
+            --name tester \
+            -t \
+            --entrypoint=/bin/bash \
+            $IMAGE_NAME:$GIT_BRANCH_NAME \
+            -c 'poetry install && poetry run pytest --cov'
+
+      - name: Save PR number
+        run: |
+          mkdir -p ./pr
+          echo ${{ github.event.number }} > ./pr/NR
+
+      - name: Save docker image and tags
+        run: |
+          docker save "$IMAGE_NAME:$GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
+
+      - name: Persist artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pr
+          path: pr/

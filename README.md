@@ -12,25 +12,25 @@ used together with docker.
 
 ### docker standalone installation
 
-- Either pull the `main` or the latest release (not the `latest` tag) of the
-  project from the docker registry:
+Ideally, you should be able to pull prebuilt images from dockerhub:
 
-  ```
-  docker pull kartoza/ckanext-dalrrd-emc-dcpr:main
-  ```
+https://hub.docker.com/r/kartoza/ckanext-dalrrd-emc-dcpr
 
-  Alternatively, you can also build the image locally by using the provided
-  build script:
+```
+docker pull kartoza/ckanext-dalrrd-emc-dcpr:main
+```
 
-  ```
-  cd docker
-  ./build.sh
-  ```
+Alternatively, you can also build the image locally by using the provided
+build script:
 
-- Use the docker image by providing two volumes with the CKAN configuration
-  files. In order to be properly recognized, your config files must be
-  mounted at `/home/appuser/ckan.ini` and `/home/appuser/who.ini`. For
-  example, when running standalone:
+```
+cd docker
+./build.sh
+```
+
+After having the image, use it to create containers. In order to be properly
+recognized, your config files must be mounted at `/home/appuser/ckan.ini`
+and `/home/appuser/who.ini`. For example, when running standalone:
 
   ```
   docker run \
@@ -128,17 +128,20 @@ file for development. It sets the following up:
 
 - Makes it straightforward to run tests
 
-You may use the provided `docker/compose-up.sh` and `docker/compose-down.sh`
-helper scripts to stand up and wind down the stack.
+Additionally, we suggest you use the provided `docker/compose.py` helper script
+to stand up and wind down the stack.
 
 ```
 cd docker
 
 # bring the stack up
-./compose-up.sh
+./compose.py up
 
 # shut it down
-./compose-down.sh
+./compose.py down
+
+# restart services (for example the ckan-web service)
+./compose.py restart ckan-web
 ```
 
 After starting the stack, the ckan web interface is available (after a few
@@ -231,8 +234,10 @@ pip install -r dev-requirements.txt
 ```
 
 
-## Tests
+## Testing
 
-To run the tests, do:
+To run the tests execute `pytest`:
 
-    pytest --ckan-ini=test.ini
+    poetry run pytest --cov
+
+This shall run the automated test suite and then print a coverage report
