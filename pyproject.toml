@@ -89,3 +89,10 @@ mock = "^4.0.3"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+markers = [
+    "unit: Unit tests (which are fast to run and do not require CKAN DB)",
+    "integration: Integration tests (which are slower to run and require CKAN DB)"
+]
+addopts = "--verbose --exitfirst"
