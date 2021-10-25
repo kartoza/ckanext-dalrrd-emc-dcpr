@@ -58,14 +58,11 @@ def run_compose_restart(args):
     _run_docker_compose(f"restart {' '.join(args.service)}", args.compose_file)
 
 
-def _get_compose_command(
-        fragment: str, compose_file: str) -> str:
+def _get_compose_command(fragment: str, compose_file: str) -> str:
     template = (
         "docker-compose " "--project-name={project} " "--file={file_} " "{fragment}"
     )
-    return template.format(
-        project="emc-dcpr", file_=compose_file, fragment=fragment
-    )
+    return template.format(project="emc-dcpr", file_=compose_file, fragment=fragment)
 
 
 def _get_image_tag_name() -> typing.Optional[str]:
@@ -97,10 +94,9 @@ def _get_exec_environment(image_tag: str) -> typing.Dict[str, str]:
 
 
 def _run_docker_compose(
-        command_fragment: str,
-        compose_file: str,
-        environment: typing.Optional[typing.Dict[str, str]] = None,
-
+    command_fragment: str,
+    compose_file: str,
+    environment: typing.Optional[typing.Dict[str, str]] = None,
 ):
     env = environment or os.environ.copy()
     command = _get_compose_command(command_fragment, compose_file)
