@@ -193,6 +193,20 @@ Answer the prompts in order to provide the details for this new user.
 After its successful creation you can login to the CKAN site with the `admin`
 user.
 
+### Bootstrap ckanext-harvest extension
+The project uses the resource harvesting extension
+to harvest and manage remote resources.
+
+Run the following command to initialize the harvest database
+```
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+```
+
+If the above command runs successfully "DB tables created" message will be displayed
+and the harvest source listing will be available under
+http://localhost:5000/harvest
+
+See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
 
 ### Using CKAN commands
 
@@ -222,6 +236,7 @@ poetry shell
 
 ckan --help
 ```
+
 
 
 ### Development in standalone (non-docker) mode
