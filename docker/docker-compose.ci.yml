@@ -1,0 +1,44 @@
+# NOTE: this file expects to find the $GIT_BRANCH_NAME variable in its environment
+# under normal circumstances, this is run in the CI environment, and that variable
+# has been made available by a previous step
+
+version: "3.8"
+
+services:
+
+  ckan-web:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${GIT_BRANCH_NAME}
+    volumes:
+      - type: bind
+        source: $PWD/ckan-ci-settings.ini
+        target: /home/appuser/ckan.ini
+      - type: bind
+        source: $PWD/who.ini
+        target: /home/appuser/who.ini
+    ports:
+      - target: 5000
+        published: 5000
+
+  ckan-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ckan-ci
+      POSTGRES_PASSWORD: ckan-ci
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  datastore-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: datastore-ci
+      POSTGRES_PASSWORD: datastore-ci
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  # NOTE: ckan/solr uses solr v 6.6 which is pretty old (EOL even), but as of CKAN 2.9.x it is
+  # unfortunately still the most recent supported version. More info:
+  # - https://github.com/ckan/ckan/issues/5585
+  # - https://github.com/ckan/ckan/pull/5143
+  solr:
+    image: ckan/solr
+
+  redis:
+    image: redis:6.2

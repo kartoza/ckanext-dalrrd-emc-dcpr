@@ -17,6 +17,7 @@ _FALLBACK_GIT_BRANCH = "main"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--compose-file", default="docker-compose.dev.yml")
     subparsers = parser.add_subparsers()
     compose_up_parser = subparsers.add_parser("up")
     compose_up_parser.set_defaults(func=run_compose_up)
@@ -35,7 +36,7 @@ def run_compose_up(args):
     if image_tag is not None:
         exec_env = _get_exec_environment(image_tag)
         logger.info(f"Using {image_tag!r} as the tag for the CKAN image...")
-        _run_docker_compose("up --detach", exec_env)
+        _run_docker_compose("up --detach", args.compose_file, exec_env)
     else:
         raise SystemExit(
             f"There is no docker image for the current git branch yet, and neither "
@@ -50,19 +51,20 @@ def run_compose_down(args):
         exec_env = _get_exec_environment(image_tag)
     else:
         exec_env = os.environ.copy()
-    _run_docker_compose("down", exec_env)
+    _run_docker_compose("down", args.compose_file, exec_env)
 
 
 def run_compose_restart(args):
-    _run_docker_compose(f"restart {' '.join(args.service)}")
+    _run_docker_compose(f"restart {' '.join(args.service)}", args.compose_file)
 
 
-def _get_compose_command(fragment: str) -> str:
+def _get_compose_command(
+        fragment: str, compose_file: str) -> str:
     template = (
         "docker-compose " "--project-name={project} " "--file={file_} " "{fragment}"
     )
     return template.format(
-        project="emc-dcpr", file_="docker-compose.dev.yml", fragment=fragment
+        project="emc-dcpr", file_=compose_file, fragment=fragment
     )
 
 
@@ -95,10 +97,13 @@ def _get_exec_environment(image_tag: str) -> typing.Dict[str, str]:
 
 
 def _run_docker_compose(
-    command_fragment: str, environment: typing.Optional[typing.Dict[str, str]] = None
+        command_fragment: str,
+        compose_file: str,
+        environment: typing.Optional[typing.Dict[str, str]] = None,
+
 ):
     env = environment or os.environ.copy()
-    command = _get_compose_command(command_fragment)
+    command = _get_compose_command(command_fragment, compose_file)
     logger.debug(
         f"About to replace the current process with the one that results from running "
         f"{command!r} with an environment of {env}"
