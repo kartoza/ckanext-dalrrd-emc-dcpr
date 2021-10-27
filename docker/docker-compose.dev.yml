@@ -45,6 +45,19 @@ services:
     volumes:
       - datastore-db-data:/var/lib/postgresql/data
 
+  # this is used for running automated integration tests
+  ckan-tests-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ckan-test
+      POSTGRES_PASSWORD: ckan-test
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - target: 5432
+        published: 55434
+    volumes:
+      - ckan-db-data:/var/lib/postgresql/data
+
   # NOTE: ckan/solr uses solr v 6.6 which is pretty old (EOL even), but as of CKAN 2.9.x it is
   # unfortunately still the most recent supported version. More info:
   # - https://github.com/ckan/ckan/issues/5585

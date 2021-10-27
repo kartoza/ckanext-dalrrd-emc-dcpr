@@ -90,6 +90,7 @@ def _get_image_tag_name() -> typing.Optional[str]:
 def _get_exec_environment(image_tag: str) -> typing.Dict[str, str]:
     env = os.environ.copy()
     env["CKAN_IMAGE_TAG"] = image_tag
+    env["GIT_BRANCH_NAME"] = image_tag
     return env
 
 
