@@ -208,6 +208,37 @@ http://localhost:5000/harvest
 
 See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
 
+
+### Bootstrap ckanext-spatial extension
+
+The ckanext-spatial extension adds geospatial capabilities to the CKAN instance.
+When installed the extension alters the main CKAN database to include spatial configruations
+that will be used when managing geospatial data.
+
+After launching the CKAN instance run the below commands to add the required database 
+configurations for the extension to work.
+
+The below commands will create tables that will be used for the PostGIS queries.
+
+```
+docker exec -ti  emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -f /usr/share/postgresql/13/contrib/postgis-3.1/postgis.sql
+docker exec -ti  emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -f /usr/share/postgresql/13/contrib/postgis-3.1/spatial_ref_sys.sql
+```
+
+After configuring tables for the PostGIS operations, run the below commands to enable the
+CKAN db user to have access on the Database spatial tables and views.
+
+```
+docker exec -ti emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -c 'ALTER VIEW geometry_columns OWNER TO "ckan-dev";'
+docker exec -ti emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -c 'ALTER TABLE spatial_ref_sys OWNER TO "ckan-dev";'
+```
+
+Note: the above commands use `ckan-dev` user and `ckan-dev` database which are defined in the database
+settings in`docker-compose.dev.yml`
+
+Restart ckan  to recreate the spatial tables required for the extension to work.
+For more information about the extension see https://docs.ckan.org/projects/ckanext-spatial/en/latest/index.html
+
 ### Using CKAN commands
 
 You can issue ckan commands inside the container by making sure they are run
