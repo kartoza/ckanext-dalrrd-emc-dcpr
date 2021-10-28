@@ -89,8 +89,6 @@ ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v
 # lxml and pyproj versions have been changed to workaround
 # a poetry issue when installing the packages
 
-argparse = "1.4.0"
-GeoAlchemy = "^0.6"
 GeoAlchemy2 = "0.5.0"
 lxml = "4.6.3"
 OWSLib = "0.18.0"
