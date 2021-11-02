@@ -17,7 +17,9 @@ _FALLBACK_GIT_BRANCH = "main"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--verbose", action="store_true")
-    parser.add_argument("--compose-file", default="docker-compose.dev.yml")
+    parser.add_argument(
+        "--compose-file", action="append", default=["docker-compose.dev.yml"]
+    )
     subparsers = parser.add_subparsers()
     compose_up_parser = subparsers.add_parser("up")
     compose_up_parser.set_defaults(func=run_compose_up)
@@ -58,11 +60,10 @@ def run_compose_restart(args):
     _run_docker_compose(f"restart {' '.join(args.service)}", args.compose_file)
 
 
-def _get_compose_command(fragment: str, compose_file: str) -> str:
-    template = (
-        "docker-compose " "--project-name={project} " "--file={file_} " "{fragment}"
-    )
-    return template.format(project="emc-dcpr", file_=compose_file, fragment=fragment)
+def _get_compose_command(fragment: str, compose_file: typing.List[str]) -> str:
+    files_fragment = " ".join(f"--file={path}" for path in compose_file)
+    template = "docker-compose --project-name={project} {files} {fragment}"
+    return template.format(project="emc-dcpr", files=files_fragment, fragment=fragment)
 
 
 def _get_image_tag_name() -> typing.Optional[str]:
@@ -96,7 +97,7 @@ def _get_exec_environment(image_tag: str) -> typing.Dict[str, str]:
 
 def _run_docker_compose(
     command_fragment: str,
-    compose_file: str,
+    compose_file: typing.List[str],
     environment: typing.Optional[typing.Dict[str, str]] = None,
 ):
     env = environment or os.environ.copy()

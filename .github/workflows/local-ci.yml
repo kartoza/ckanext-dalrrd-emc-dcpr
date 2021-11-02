@@ -58,10 +58,14 @@ jobs:
       - name: run integration tests
         working-directory: docker
         run: |
-          python3 compose.py --compose-file=docker-compose.ci.yml up
+          python3 compose.py --compose-file=docker-compose.dev.yml --compose-file=docker-compose.ci.yml up
           docker exec -t emc-dcpr_ckan-web_1 poetry install
           docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db init
-          docker exec -t emc-dcpr_ckan-web_1 poetry run pytest -m integration --cov
+          docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+          docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
+              --ckan-ini docker/ckan-ci-settings.ini \
+              -m integration \
+              --cov
 
       - name: Login to dockerhub
         uses: docker/login-action@v1
