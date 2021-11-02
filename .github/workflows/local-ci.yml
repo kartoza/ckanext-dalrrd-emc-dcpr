@@ -54,7 +54,7 @@ jobs:
           docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
 
       - name: wait for test db
-        uses: iFaxity/wait-on-action
+        uses: iFaxity/wait-on-action@v1
         with:
           resource: tcp:localhost:55432
 
