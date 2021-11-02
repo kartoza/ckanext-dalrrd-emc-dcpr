@@ -66,29 +66,34 @@ jobs:
             --cache-from=$IMAGE_NAME:$GIT_BRANCH_NAME \
             ..
 
-      - name: run unit tests
-        run: |
-          docker run \
-            --rm \
-            --name tester \
-            -t \
-            --volume=$(PWD)/docker/ckan-ci-settings.ini:/home/appuser/ckan.ini \
-            --volume=$(PWD)/docker/who.ini:/home/appuser/who.ini \
-            --entrypoint=/bin/bash \
-            $IMAGE_NAME:$GIT_BRANCH_NAME \
-            -c 'poetry install && poetry run pytest -m unit --cov'
-
-      - name: run integration tests
+      - name: stand up ckan stack
         working-directory: docker
         run: |
           python3 compose.py --compose-file=docker-compose.dev.yml --compose-file=docker-compose.ci.yml up
           docker exec -t emc-dcpr_ckan-web_1 poetry install
           docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db init
           docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+
+      - name: run unit tests
+        working-directory: docker
+        run: |
+          docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
+              --ckan-ini docker/ckan-ci-settings.ini \
+              -m unit \
+              --cov
+
+      - name: run integration tests
+        working-directory: docker
+        run: |
           docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
               --ckan-ini docker/ckan-ci-settings.ini \
               -m integration \
               --cov
+
+      - name: wind down ckan stack
+        working-directory: docker
+        run: |
+          python3 compose.py --compose-file=docker-compose.dev.yml --compose-file=docker-compose.ci.yml down
 
       - name: Save PR number
         run: |
