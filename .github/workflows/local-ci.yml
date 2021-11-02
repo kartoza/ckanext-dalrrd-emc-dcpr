@@ -51,6 +51,8 @@ jobs:
             --rm \
             --name tester \
             -t \
+            --volume=$(PWD)/docker/ckan-ci-settings.ini:/home/appuser/ckan.ini \
+            --volume=$(PWD)/docker/who.ini:/home/appuser/who.ini \
             --entrypoint=/bin/bash \
             $IMAGE_NAME:$GIT_BRANCH_NAME \
             -c 'poetry install && poetry run pytest -m unit --cov'
