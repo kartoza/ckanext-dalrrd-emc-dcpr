@@ -17,7 +17,6 @@ services:
         published: 5000
 
   ckan-db:
-    image: postgis/postgis:13-3.1
     environment:
       POSTGRES_USER: ckan-ci
       POSTGRES_PASSWORD: ckan-ci
