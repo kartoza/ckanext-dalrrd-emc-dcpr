@@ -43,6 +43,7 @@ runs:
 
     - name: Stand up CI CKAN stack
       working-directory: docker
+      shell: bash
       run: |
         python3 compose.py \
             --compose-file=docker-compose.yml \
@@ -50,12 +51,14 @@ runs:
             up
 
     - name: Bootstrap CI CKAN stack
+      shell: bash
       run: |
         docker exec -t emc-dcpr_ckan-web_1 poetry install
         docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db init
         docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
 
     - name: Run unit tests
+      shell: bash
       run: |
         docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
             --ckan-ini /home/appuser/app/docker/ckan-ci-settings.ini \
@@ -63,6 +66,7 @@ runs:
             --cov
 
     - name: Run integration tests
+      shell: bash
       run: |
         docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
             --ckan-ini /home/appuser/app/docker/ckan-ci-settings.ini \
@@ -70,6 +74,7 @@ runs:
             --cov
 
     - name: Wind down ckan stack
+      shell: bash
       working-directory: docker
       run: |
         python3 compose.py \
