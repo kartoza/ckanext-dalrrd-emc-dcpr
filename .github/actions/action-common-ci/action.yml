@@ -49,6 +49,7 @@ runs:
         python3 compose.py \
             --compose-file=docker-compose.yml \
             --compose-file=docker-compose.ci.yml \
+            --image-tag=$GIT_BRANCH_NAME \
             up
 
     - name: Bootstrap CI CKAN stack
@@ -81,4 +82,5 @@ runs:
         python3 compose.py \
             --compose-file=docker-compose.yml \
             --compose-file=docker-compose.ci.yml \
+            --image-tag=$GIT_BRANCH_NAME \
             down

@@ -99,8 +99,8 @@ guide to install CKAN, then follow the below steps:
 
 ## Development
 
-It is strongly suggested that you use the provided `docker-compose.dev.yml`
-file for development. It sets the following up:
+It is strongly suggested that you use the provided docker-compose related
+files for development. They set the following up:
 
 - Bind mounts the code inside the relevant container(s) so that changes are
   instantly available inside them;
@@ -138,10 +138,10 @@ to stand up and wind down the stack.
 cd docker
 
 # bring the stack up
-./compose.py up
+./compose.py --compose-file docker-compose.yml --compose-file docker-compose.dev.yml up
 
 # shut it down
-./compose.py down
+./compose.py --compose-file docker-compose.yml --compose-file docker-compose.dev.yml down
 
 # restart services (for example the ckan-web service)
 ./compose.py restart ckan-web

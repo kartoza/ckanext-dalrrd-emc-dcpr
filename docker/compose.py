@@ -17,6 +17,7 @@ _FALLBACK_GIT_BRANCH = "main"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--image-tag")
     parser.add_argument(
         "--compose-file", action="append", default=["docker-compose.yml"]
     )
@@ -34,7 +35,7 @@ def main():
 
 
 def run_compose_up(args):
-    image_tag = _get_image_tag_name()
+    image_tag = args.image_tag if args.image_tag else _get_image_tag_name()
     if image_tag is not None:
         exec_env = _get_exec_environment(image_tag)
         logger.info(f"Using {image_tag!r} as the tag for the CKAN image...")
@@ -48,7 +49,7 @@ def run_compose_up(args):
 
 
 def run_compose_down(args):
-    image_tag = _get_image_tag_name()
+    image_tag = args.image_tag if args.image_tag else _get_image_tag_name()
     if image_tag is not None:
         exec_env = _get_exec_environment(image_tag)
     else:
@@ -75,10 +76,10 @@ def _get_image_tag_name() -> typing.Optional[str]:
         shlex.split(f"docker images {image_name} --format '{{{{.Tag}}}}'"), text=True
     ).split("\n")
     if current_git_branch in existing_image_tags:
-        logger.debug("The current branch already has a built tag, lets use that")
+        logger.info("The current branch already has a built tag, lets use that")
         result = current_git_branch
     elif "main" in existing_image_tags:
-        logger.debug(
+        logger.info(
             f"The current branch does not have a built tag yet, lets use the "
             f"{_FALLBACK_GIT_BRANCH!r} image tag"
         )
