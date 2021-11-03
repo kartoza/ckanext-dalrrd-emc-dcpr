@@ -61,7 +61,7 @@ runs:
       shell: bash
       run: |
         docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
-            --ckan-ini /home/appuser/app/docker/ckan-ci-settings.ini \
+            --ckan-ini docker/ckan-ci-settings.ini \
             -m unit \
             --cov
 
@@ -69,7 +69,7 @@ runs:
       shell: bash
       run: |
         docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
-            --ckan-ini /home/appuser/app/docker/ckan-ci-settings.ini \
+            --ckan-ini docker/ckan-ci-settings.ini \
             -m integration \
             --cov
 
