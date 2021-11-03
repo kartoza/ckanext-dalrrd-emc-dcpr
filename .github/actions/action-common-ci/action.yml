@@ -28,8 +28,9 @@ runs:
       env:
         DEFAULT_BRANCH: main
       run: |
-        docker pull ${{ inputs.image-name }}:$DEFAULT_BRANCH || true
-        docker pull ${{ inputs.image-name }}:$GIT_BRANCH_NAME || true
+        docker pull ${{ inputs.image-name }}:$GIT_BRANCH_NAME || \
+        docker pull ${{ inputs.image-name }}:$DEFAULT_BRANCH || \
+        true
         docker image build \
           --tag "${{ inputs.image-name }}:$GIT_BRANCH_NAME" \
           --tag "${{ inputs.image-name }}:$TRIMMED_SHA" \
@@ -37,8 +38,8 @@ runs:
           --label git-branch=$GIT_BRANCH_NAME \
           --build-arg "BUILDKIT_INLINE_CACHE=1" \
           --build-arg "GIT_COMMIT=$TRIMMED_SHA" \
-          --cache-from=${{ inputs.image-name }}:$DEFAULT_BRANCH \
           --cache-from=${{ inputs.image-name }}:$GIT_BRANCH_NAME \
+          --cache-from=${{ inputs.image-name }}:$DEFAULT_BRANCH \
           ..
 
     - name: Stand up CI CKAN stack
