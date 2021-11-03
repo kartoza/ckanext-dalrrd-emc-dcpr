@@ -87,7 +87,6 @@ ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v
 
 gunicorn = "^20.1.0"
 Flask-DebugToolbar = "^0.11.0"
-pytest-raises = "^0.11"
 
 
 [tool.poetry.dev-dependencies]
@@ -96,6 +95,7 @@ pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 factory-boy = "^3.2.0"
 mock = "^4.0.3"
+pytest-raises = "^0.11"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
