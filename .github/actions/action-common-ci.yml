@@ -1,0 +1,78 @@
+name: 'Common CI'
+description: 'Run common CI steps'
+inputs:
+  image-name:
+    description: 'name of docker image that will be built'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Check code formatting with black
+      uses: psf/black@stable
+      with:
+        options: "--check --verbose"
+
+    - name: Setup docker buildx
+      uses: docker/setup-buildx-action@v1.6.0
+
+    - name: Get current git commit hash
+      id: get-git-commit-hash
+      uses: priyesh2609/sha-trim-action@v1.1.1
+
+    - name: Get current git branch name
+      uses: EthanSK/git-branch-name-action@v1
+
+    - name: Build docker image
+      working-directory: ./docker
+      shell: bash
+      env:
+        DEFAULT_BRANCH: main
+      run: |
+        docker pull ${{ inputs.image-name }}:$DEFAULT_BRANCH || true
+        docker pull ${{ inputs.image-name }}:$GIT_BRANCH_NAME || true
+        docker image build \
+          --tag "${{ inputs.image-name }}:$GIT_BRANCH_NAME" \
+          --tag "${{ inputs.image-name }}:$TRIMMED_SHA" \
+          --label git-commit=$TRIMMED_SHA \
+          --label git-branch=$GIT_BRANCH_NAME \
+          --build-arg "BUILDKIT_INLINE_CACHE=1" \
+          --build-arg "GIT_COMMIT=$TRIMMED_SHA" \
+          --cache-from=${{ inputs.image-name }}:$DEFAULT_BRANCH \
+          --cache-from=${{ inputs.image-name }}:$GIT_BRANCH_NAME \
+          ..
+
+    - name: Stand up CI CKAN stack
+      working-directory: docker
+      run: |
+        python3 compose.py \
+            --compose-file=docker-compose.yml \
+            --compose-file=docker-compose.ci.yml \
+            up
+
+    - name: Bootstrap CI CKAN stack
+      run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry install
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db init
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+
+    - name: Run unit tests
+      run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
+            --ckan-ini /home/appuser/app/docker/ckan-ci-settings.ini \
+            -m unit \
+            --cov
+
+    - name: Run integration tests
+      run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
+            --ckan-ini /home/appuser/app/docker/ckan-ci-settings.ini \
+            -m integration \
+            --cov
+
+    - name: Wind down ckan stack
+      working-directory: docker
+      run: |
+        python3 compose.py \
+            --compose-file=docker-compose.yml \
+            --compose-file=docker-compose.ci.yml \
+            down
