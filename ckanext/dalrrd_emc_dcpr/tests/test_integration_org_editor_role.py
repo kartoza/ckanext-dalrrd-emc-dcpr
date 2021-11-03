@@ -13,13 +13,27 @@ pytestmark = pytest.mark.integration
     "data_dict, org_role",
     [
         pytest.param(
+            {"name": "test_package4"},
+            "member",
+            marks=pytest.mark.raises(exception=NotAuthorized),
+            id="member-cannot-create-package",
+        ),
+        pytest.param(
             {"name": "test-package1"}, "editor", id="editor-can-create-private-package"
         ),
         pytest.param(
-            {"name": "test-package1", "private": "false"},
+            {"name": "test-package2", "private": "false"},
             "editor",
             marks=pytest.mark.raises(exception=NotAuthorized),
             id="editor-cannot-create-public-package",
+        ),
+        pytest.param(
+            {"name": "test_package3"}, "admin", id="admin-can-create-private-package"
+        ),
+        pytest.param(
+            {"name": "test_package3", "private": "false"},
+            "admin",
+            id="admin-can-create-public-package",
         ),
     ],
 )
