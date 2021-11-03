@@ -27,8 +27,6 @@ jobs:
   ci:
     name: Continuous Integration
     runs-on: ubuntu-20.04
-    env:
-      IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -36,7 +34,7 @@ jobs:
       - name: Run common CI
         uses: ./.github/actions/action-common-ci
         with:
-          image-name: ${{ IMAGE_NAME }}
+          image-name: ${{ github.repository }}
 
       - name: Save PR number
         run: |
@@ -50,6 +48,8 @@ jobs:
         uses: EthanSK/git-branch-name-action@v1
 
       - name: Save docker image and tags
+        env:
+          IMAGE_NAME: ${{ github.repository }}
         run: |
           docker save "$IMAGE_NAME:$GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
 
