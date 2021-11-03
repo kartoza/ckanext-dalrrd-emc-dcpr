@@ -23,7 +23,7 @@ runs:
       uses: EthanSK/git-branch-name-action@v1
 
     - name: Build docker image
-      working-directory: ./docker
+      working-directory: docker
       shell: bash
       env:
         DEFAULT_BRANCH: main

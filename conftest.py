@@ -1,4 +1,3 @@
-import psycopg2.errors
 import pytest
 import sqlalchemy.exc
 
