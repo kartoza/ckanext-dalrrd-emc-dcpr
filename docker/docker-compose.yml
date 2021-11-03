@@ -1,0 +1,28 @@
+# NOTE: this file expects to find the $CKAN_IMAGE_TAG variable in its environment
+
+version: "3.8"
+
+services:
+
+  ckan-web:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+
+  ckan-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  datastore-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  # NOTE: ckan/solr uses solr v 6.6 which is pretty old (EOL even), but as of CKAN 2.9.x it is
+  # unfortunately still the most recent supported version. More info:
+  # - https://github.com/ckan/ckan/issues/5585
+  # - https://github.com/ckan/ckan/pull/5143
+  solr:
+    image: ckan/solr
+
+  redis:
+    image: redis:6.2

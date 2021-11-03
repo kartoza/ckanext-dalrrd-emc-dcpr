@@ -5,7 +5,6 @@ version: "3.8"
 services:
 
   ckan-web:
-    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
     volumes:
       - type: bind
         source: $PWD/..
@@ -22,11 +21,9 @@ services:
         published: 5000
 
   ckan-db:
-    image: postgis/postgis:13-3.1
     environment:
       POSTGRES_USER: ckan-dev
       POSTGRES_PASSWORD: ckan-dev
-      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - target: 5432
         published: 55432
@@ -34,35 +31,39 @@ services:
       - ckan-db-data:/var/lib/postgresql/data
 
   datastore-db:
-    image: postgis/postgis:13-3.1
     environment:
       POSTGRES_USER: datastore-dev
       POSTGRES_PASSWORD: datastore-dev
-      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - target: 5432
         published: 55433
     volumes:
       - datastore-db-data:/var/lib/postgresql/data
 
-  # NOTE: ckan/solr uses solr v 6.6 which is pretty old (EOL even), but as of CKAN 2.9.x it is
-  # unfortunately still the most recent supported version. More info:
-  # - https://github.com/ckan/ckan/issues/5585
-  # - https://github.com/ckan/ckan/pull/5143
+  # this is used for running automated integration tests
+  ckan-test-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ckan-test
+      POSTGRES_PASSWORD: ckan-test
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - target: 5432
+        published: 55434
+    volumes:
+      - ckan-test-db-data:/var/lib/postgresql/data
+
   solr:
-    image: ckan/solr
     ports:
       - target: 8983
         published: 8983
     volumes:
       - solr-data:/opt/solr/server/solr/ckan/data
 
-  redis:
-    image: redis:6.2
-
 
 volumes:
   solr-data:
   ckan-storage:
   ckan-db-data:
+  ckan-test-db-data:
   datastore-db-data:

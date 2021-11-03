@@ -89,6 +89,7 @@ def value_or_true_validator(value: typing.Union[str, Missing]):
     This shall enforce creating private packages by default.
 
     """
+
     logger.debug(f"inside value_or_true. Original value: {value!r}")
     return value if value != toolkit.missing else True
 
@@ -96,8 +97,6 @@ def value_or_true_validator(value: typing.Union[str, Missing]):
 def authorize_package_publish(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict[str, bool]:
-    # in here we can inspect the context and the data_dict in order to
-    # decide whether to authorize access or not
     user_name = context.get("user")
     owner_org = data_dict.get("owner_org")
 

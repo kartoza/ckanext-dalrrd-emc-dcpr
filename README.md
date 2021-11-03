@@ -99,8 +99,8 @@ guide to install CKAN, then follow the below steps:
 
 ## Development
 
-It is strongly suggested that you use the provided `docker-compose.dev.yml`
-file for development. It sets the following up:
+It is strongly suggested that you use the provided docker-compose related
+files for development. They set the following up:
 
 - Bind mounts the code inside the relevant container(s) so that changes are
   instantly available inside them;
@@ -138,10 +138,10 @@ to stand up and wind down the stack.
 cd docker
 
 # bring the stack up
-./compose.py up
+./compose.py --compose-file docker-compose.yml --compose-file docker-compose.dev.yml up
 
 # shut it down
-./compose.py down
+./compose.py --compose-file docker-compose.yml --compose-file docker-compose.dev.yml down
 
 # restart services (for example the ckan-web service)
 ./compose.py restart ckan-web
@@ -254,8 +254,37 @@ pip install -r dev-requirements.txt
 
 ## Testing
 
-To run the tests execute `pytest`:
+Testing uses some additional configuration:
 
-    poetry run pytest --cov
+- The `docker/docker-compose.dev.yml` file has an additional `ckan-tests-db` service, with a DB that is uses solely
+  for automated testing.
+- The  `docker/ckan-test-settings.ini` file defines the test settings. It must be explicitly passed as the config
+  file to use when running the tests
 
-This shall run the automated test suite and then print a coverage report
+To run the tests you will need to:
+
+1. Install the development dependencies beforehand, as the docker images do not have them. Run:
+
+   ```
+   docker exec -ti {container-name} poetry install
+   ```
+
+1. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
+
+   ```
+   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini db init
+   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
+   ```
+
+1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
+
+   ```
+   # run all tests
+   poetry run pytest --ckan-ini docker/ckan-test-settings.ini
+
+   # run only unit tests
+   poetry run pytest --ckan-ini docker/ckan-test-settings.ini -m unit
+
+   # run only integration tests
+   poetry run pytest --ckan-ini docker/ckan-test-settings.ini -m integration
+   ```

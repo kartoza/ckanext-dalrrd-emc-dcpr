@@ -27,19 +27,19 @@ jobs:
   ci:
     name: Continuous Integration
     runs-on: ubuntu-20.04
-    env:
-      IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: Check code formatting with black
-        uses: psf/black@stable
+      - name: Run common CI
+        uses: ./.github/actions/action-common-ci
         with:
-          options: "--check --verbose"
+          image-name: ${{ github.repository }}
 
-      - name: Setup docker buildx
-        uses: docker/setup-buildx-action@v1.6.0
+      - name: Save PR number
+        run: |
+          mkdir -p ./pr
+          echo ${{ github.event.number }} > ./pr/NR
 
       - name: Get current git commit hash
         uses: priyesh2609/sha-trim-action@v1.1.1
@@ -47,41 +47,9 @@ jobs:
       - name: Get current git branch name
         uses: EthanSK/git-branch-name-action@v1
 
-      - name: Build docker image
-        working-directory: ./docker
-        shell: bash
-        env:
-          DEFAULT_BRANCH: main
-        run: |
-          docker pull $IMAGE_NAME:$DEFAULT_BRANCH || true
-          docker pull $IMAGE_NAME:$GIT_BRANCH_NAME || true
-          docker image build \
-            --tag "$IMAGE_NAME:$GIT_BRANCH_NAME" \
-            --tag "$IMAGE_NAME:$TRIMMED_SHA" \
-            --label git-commit=$TRIMMED_SHA \
-            --label git-branch=$GIT_BRANCH_NAME \
-            --build-arg "BUILDKIT_INLINE_CACHE=1" \
-            --build-arg "GIT_COMMIT=$TRIMMED_SHA" \
-            --cache-from=$IMAGE_NAME:$DEFAULT_BRANCH \
-            --cache-from=$IMAGE_NAME:$GIT_BRANCH_NAME \
-            ..
-
-      - name: run unit tests
-        run: |
-          docker run \
-            --rm \
-            --name tester \
-            -t \
-            --entrypoint=/bin/bash \
-            $IMAGE_NAME:$GIT_BRANCH_NAME \
-            -c 'poetry install && poetry run pytest -m unit --cov'
-
-      - name: Save PR number
-        run: |
-          mkdir -p ./pr
-          echo ${{ github.event.number }} > ./pr/NR
-
       - name: Save docker image and tags
+        env:
+          IMAGE_NAME: ${{ github.repository }}
         run: |
           docker save "$IMAGE_NAME:$GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
 

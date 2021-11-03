@@ -17,6 +17,10 @@ _FALLBACK_GIT_BRANCH = "main"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--image-tag")
+    parser.add_argument(
+        "--compose-file", action="append", default=["docker-compose.yml"]
+    )
     subparsers = parser.add_subparsers()
     compose_up_parser = subparsers.add_parser("up")
     compose_up_parser.set_defaults(func=run_compose_up)
@@ -31,11 +35,11 @@ def main():
 
 
 def run_compose_up(args):
-    image_tag = _get_image_tag_name()
+    image_tag = args.image_tag if args.image_tag else _get_image_tag_name()
     if image_tag is not None:
         exec_env = _get_exec_environment(image_tag)
         logger.info(f"Using {image_tag!r} as the tag for the CKAN image...")
-        _run_docker_compose("up --detach", exec_env)
+        _run_docker_compose("up --detach", args.compose_file, exec_env)
     else:
         raise SystemExit(
             f"There is no docker image for the current git branch yet, and neither "
@@ -45,25 +49,22 @@ def run_compose_up(args):
 
 
 def run_compose_down(args):
-    image_tag = _get_image_tag_name()
+    image_tag = args.image_tag if args.image_tag else _get_image_tag_name()
     if image_tag is not None:
         exec_env = _get_exec_environment(image_tag)
     else:
         exec_env = os.environ.copy()
-    _run_docker_compose("down", exec_env)
+    _run_docker_compose("down", args.compose_file, exec_env)
 
 
 def run_compose_restart(args):
-    _run_docker_compose(f"restart {' '.join(args.service)}")
+    _run_docker_compose(f"restart {' '.join(args.service)}", args.compose_file)
 
 
-def _get_compose_command(fragment: str) -> str:
-    template = (
-        "docker-compose " "--project-name={project} " "--file={file_} " "{fragment}"
-    )
-    return template.format(
-        project="emc-dcpr", file_="docker-compose.dev.yml", fragment=fragment
-    )
+def _get_compose_command(fragment: str, compose_file: typing.List[str]) -> str:
+    files_fragment = " ".join(f"--file={path}" for path in compose_file)
+    template = "docker-compose --project-name={project} {files} {fragment}"
+    return template.format(project="emc-dcpr", files=files_fragment, fragment=fragment)
 
 
 def _get_image_tag_name() -> typing.Optional[str]:
@@ -75,10 +76,10 @@ def _get_image_tag_name() -> typing.Optional[str]:
         shlex.split(f"docker images {image_name} --format '{{{{.Tag}}}}'"), text=True
     ).split("\n")
     if current_git_branch in existing_image_tags:
-        logger.debug("The current branch already has a built tag, lets use that")
+        logger.info("The current branch already has a built tag, lets use that")
         result = current_git_branch
     elif "main" in existing_image_tags:
-        logger.debug(
+        logger.info(
             f"The current branch does not have a built tag yet, lets use the "
             f"{_FALLBACK_GIT_BRANCH!r} image tag"
         )
@@ -91,14 +92,17 @@ def _get_image_tag_name() -> typing.Optional[str]:
 def _get_exec_environment(image_tag: str) -> typing.Dict[str, str]:
     env = os.environ.copy()
     env["CKAN_IMAGE_TAG"] = image_tag
+    env["GIT_BRANCH_NAME"] = image_tag
     return env
 
 
 def _run_docker_compose(
-    command_fragment: str, environment: typing.Optional[typing.Dict[str, str]] = None
+    command_fragment: str,
+    compose_file: typing.List[str],
+    environment: typing.Optional[typing.Dict[str, str]] = None,
 ):
     env = environment or os.environ.copy()
-    command = _get_compose_command(command_fragment)
+    command = _get_compose_command(command_fragment, compose_file)
     logger.debug(
         f"About to replace the current process with the one that results from running "
         f"{command!r} with an environment of {env}"
