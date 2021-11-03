@@ -269,7 +269,7 @@ To run the tests you will need to:
    docker exec -ti {container-name} poetry install
    ```
 
-1. Initialize the db
+1. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
 
    ```
    docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini db init

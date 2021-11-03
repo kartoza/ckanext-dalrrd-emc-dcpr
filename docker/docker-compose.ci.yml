@@ -7,8 +7,10 @@ version: "3.8"
 services:
 
   ckan-web:
-    image: kartoza/ckanext-dalrrd-emc-dcpr:${GIT_BRANCH_NAME}
     volumes:
+      - type: bind
+        source: $PWD/ckan-ci-settings.ini
+        target: /home/appuser/ckan.ini
       - type: bind
         source: $PWD/who.ini
         target: /home/appuser/who.ini
@@ -20,4 +22,6 @@ services:
     environment:
       POSTGRES_USER: ckan-ci
       POSTGRES_PASSWORD: ckan-ci
-      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - target: 5432
+        published: 55432

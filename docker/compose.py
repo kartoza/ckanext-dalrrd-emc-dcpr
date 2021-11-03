@@ -18,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument(
-        "--compose-file", action="append", default=["docker-compose.dev.yml"]
+        "--compose-file", action="append", default=["docker-compose.yml"]
     )
     subparsers = parser.add_subparsers()
     compose_up_parser = subparsers.add_parser("up")
