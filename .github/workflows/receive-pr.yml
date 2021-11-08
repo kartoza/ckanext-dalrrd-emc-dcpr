@@ -34,7 +34,7 @@ jobs:
       - name: Run common CI
         uses: ./.github/actions/action-common-ci
         with:
-          image-name: ${{ github.repository }}
+          image-name: kartoza/ckanext-dalrrd-emc-dcpr
 
       - name: Save PR number
         run: |
