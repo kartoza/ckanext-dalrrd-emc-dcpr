@@ -31,7 +31,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
       libgeos-c1v5  \
       zlib1g-dev && \
     apt-get --yes clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
 
 # download poetry
 RUN curl --silent --show-error --location \
@@ -49,12 +49,11 @@ RUN mkdir /home/appuser/app  && \
     mkdir /home/appuser/data && \
     python opt/get-poetry.py --yes --version 1.1.11
 
-ENV PATH="$PATH:/home/appuser/.poetry/bin"
-
-# This allows us to get traces whenever some C code segfaults
-ENV PYTHONFAULTHANDLER=1
-
-ENV CKAN_INI=/home/appuser/ckan.ini
+ENV PATH="$PATH:/home/appuser/.poetry/bin" \
+    # This allows us to get traces whenever some C code segfaults
+    PYTHONFAULTHANDLER=1 \
+    CKAN_INI=/home/appuser/ckan.ini \
+    CKAN_INSTALL_TAG="ckan-2.9.4"
 
 # Only copy the dependencies for now and install them
 WORKDIR /home/appuser/app
@@ -62,8 +61,6 @@ COPY --chown=appuser:appuser pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 
 EXPOSE 5000
-
-WORKDIR /home/appuser/app
 
 # Now install our code
 COPY --chown=appuser:appuser . .

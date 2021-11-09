@@ -7,8 +7,8 @@
 #     preload:
 #       - base/main
 
-# dalrrd_emc_dcpr-css:
-#   filter: cssrewrite
-#   output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.css
-#   contents:
-#     - css/dalrrd_emc_dcpr.css
+dalrrd-emc-dcpr-css:
+  output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.css
+  contents:
+    - css/dalrrd-emc-dcpr.css
+  filter: cssrewrite

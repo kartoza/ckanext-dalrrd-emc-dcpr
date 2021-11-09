@@ -441,3 +441,13 @@ To run the tests you will need to:
   - Update frequency: `Manual`
   - Configuration: `{"default_tags": ["csw", "harvest"]}`
   - Organization: `test-org-1`
+
+## frontend work
+
+Run the provided `docker/prepare-for-frontend-dev.sh` script
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 bash docker/prepare-for-frontent-dev.sh
+```
+
+Then start the gulp watch command
