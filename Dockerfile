@@ -31,7 +31,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
       libgeos-c1v5  \
       zlib1g-dev && \
     apt-get --yes clean && \
-    rm -rf /var/lib/apt/lists/* \
+    rm -rf /var/lib/apt/lists/*
 
 # download poetry
 RUN curl --silent --show-error --location \
