@@ -23,3 +23,5 @@ nvm install v13
 
 # install ckan frontend dependencies, as specified in the `package.json` file
 npm install
+
+npm run docker-watch

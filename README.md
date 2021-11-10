@@ -448,24 +448,18 @@ To run the tests you will need to:
 ### CSS
 
 CKAN's main CSS is generated with [less](https://lesscss.org/) and what is distributed are the compiled `.css` files.
-In order to hook into those and have an easier way to define global variables and styles we need to install some
-additional dependencies and set up a CSS building pipeline.
+In order to hook into those less files and have an easier way to define global variables and styles we need to install
+some additional dependencies and set up a CSS building pipeline.
 
 This is done by following the steps below:
 
 - Start the docker-compose stack with the development files
 - Run the provided `docker/prepare-for-frontend-dev.sh` script. This will install `node.js`[https://nodejs.org/en/]
-  inside a running container and then use npm to install the dependencies mentioned in the `package.json` file:
+  inside the running container, then use npm to install the dependencies mentioned in the `package.json` file and
+  immediately start watching for changes:
 
   ```bash
   docker exec -ti emc-dcpr_ckan-web_1 bash docker/prepare-for-frontent-dev.sh
-  ```
-
-- Then run `npm run watch` in order to spawn a process that is continuously checking if the source less files change
-  and recompiling them to css:
-
-  ```bash
-  docker exec -ti emc-dcpr_ckan-web_1 bash -i -c 'npm run docker-watch'
   ```
 
 - Now you may edit the `public/base/less` files and reload your web browser to see the changes
