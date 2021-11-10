@@ -443,11 +443,33 @@ To run the tests you will need to:
   - Organization: `test-org-1`
 
 ## frontend work
+## Frontend work
 
-Run the provided `docker/prepare-for-frontend-dev.sh` script
+### CSS
 
-```bash
-docker exec -ti emc-dcpr_ckan-web_1 bash docker/prepare-for-frontent-dev.sh
-```
+CKAN's main CSS is generated with [less](https://lesscss.org/) and what is distributed are the compiled `.css` files.
+In order to hook into those and have an easier way to define global variables and styles we need to install some
+additional dependencies and set up a CSS building pipeline.
 
-Then start the gulp watch command
+This is done by following the steps below:
+
+- Start the docker-compose stack with the development files
+- Run the provided `docker/prepare-for-frontend-dev.sh` script. This will install `node.js`[https://nodejs.org/en/]
+  inside a running container and then use npm to install the dependencies mentioned in the `package.json` file:
+
+  ```bash
+  docker exec -ti emc-dcpr_ckan-web_1 bash docker/prepare-for-frontent-dev.sh
+  ```
+
+- Then run `npm run watch` in order to spawn a process that is continuously checking if the source less files change
+  and recompiling them to css:
+
+  ```bash
+  docker exec -ti emc-dcpr_ckan-web_1 bash -i -c 'npm run docker-watch'
+  ```
+
+- Now you may edit the `public/base/less` files and reload your web browser to see the changes
+
+There is also the `assets/css/dalrrd-emc-dcpr.css` file, which you can use to write custom CSS directly. Editing this
+file can be done when the changes do not involve modifying the less variables - it also does not required nodejs to be
+installed

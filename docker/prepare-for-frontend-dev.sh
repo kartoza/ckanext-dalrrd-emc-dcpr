@@ -1,14 +1,16 @@
 # A script for setting up the environment for frontend work
 
+# unfortunately we cannot set -eu due to a bug with nvm:
+#    https://github.com/nvm-sh/nvm/issues/1526
 # set -euo pipefail
 
-PYTHON_VERSION=$(echo $(poetry run python --version | cut -f 2 -d ' ') | cut -f 1-2 -d '.')
-CKAN_INSTALL_PATH=$(poetry env info -p)/lib/python${PYTHON_VERSION}/site-packages/ckan
+_PYTHON_VERSION=$(echo $(poetry run python --version | cut -f 2 -d ' ') | cut -f 1-2 -d '.')
+_CKAN_INSTALL_PATH=$(poetry env info -p)/lib/python${_PYTHON_VERSION}/site-packages/ckan
 
 # copy over the relevant dirs to a known-location
 mkdir --parents ~/ckan-frontend
-cp --recursive ${CKAN_INSTALL_PATH}/public/base/vendor ~/ckan-frontend
-cp --recursive ${CKAN_INSTALL_PATH}/public/base/less ~/ckan-frontend
+cp --recursive ${_CKAN_INSTALL_PATH}/public/base/vendor ~/ckan-frontend
+cp --recursive ${_CKAN_INSTALL_PATH}/public/base/less ~/ckan-frontend
 
 # install nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
