@@ -7143,7 +7143,7 @@ a.tag:hover {
   top: 15px;
   right: -35px;
   width: 80px;
-  color: #ff0;
+  color: #fff;
   background-color: #005d7a;
   padding: 1px 20px;
   font-size: 11px;
@@ -7825,7 +7825,7 @@ select[data-module="autocomplete"] {
   background-color: #f3f3f3;
 }
 .control-custom.disabled .checkbox {
-  color: yellow;
+  color: #444;
   text-decoration: none;
 }
 .control-custom .checkbox.btn {
@@ -8474,7 +8474,7 @@ fieldset[disabled] .control-custom.disabled .checkbox.btn.focus {
   height: 50px;
   overflow: hidden;
   margin-right: 10px;
-  color: yellow;
+  color: #444;
   background-color: #eee;
   border-radius: 3px;
 }
@@ -8495,7 +8495,7 @@ fieldset[disabled] .control-custom.disabled .checkbox.btn.focus {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: yellow;
+  color: #444;
 }
 .view-list li a.active,
 .view-list li a:hover {
@@ -8664,7 +8664,7 @@ td.diff_header {
   width: auto;
 }
 .search-form .filter-list {
-  color: yellow;
+  color: #444;
   line-height: 32px;
   margin: 10px 0 0 0;
 }
@@ -9652,7 +9652,7 @@ h4 small {
   float: left;
   width: 50%;
   margin: 5px 0 0 0;
-  color: yellow;
+  color: #444;
 }
 .context-info .nums dl dt {
   display: block;
@@ -9693,7 +9693,7 @@ h4 small {
 }
 .homepage .module-search {
   padding: 5px;
-  color: #ff0;
+  color: #fff;
   background: #fff;
 }
 .homepage .module-search .search-giant {
@@ -9811,7 +9811,7 @@ h4 small {
 }
 .account-masthead {
   min-height: 30px;
-  color: #ff0;
+  color: #fff;
   background: #003647 url("../../../base/images/bg.png");
 }
 .account-masthead:before,
@@ -9856,7 +9856,7 @@ h4 small {
 }
 .account-masthead .account ul li a {
   display: block;
-  color: #bfd71f;
+  color: #bfd7de;
   font-size: 13px;
   font-weight: bold;
   padding: 0 10px;
@@ -9872,7 +9872,7 @@ h4 small {
   left: -9999px;
 }
 .account-masthead .account ul li a:hover {
-  color: #d9e712;
+  color: #d9e7eb;
   background-color: #00232e;
   text-decoration: none;
 }
@@ -9890,14 +9890,14 @@ h4 small {
   background-color: #00232e;
   border-radius: 4px;
   text-shadow: none;
-  color: #bfd71f;
+  color: #bfd7de;
 }
 .account-masthead .account .notifications a:hover span {
-  color: #ff0;
+  color: #fff;
   background-color: #000f14;
 }
 .account-masthead .account .notifications.notifications-important a span.badge {
-  color: #ff0;
+  color: #fff;
   background-color: #C9403A;
 }
 .account-masthead .account.authed .image {
@@ -9909,7 +9909,7 @@ h4 small {
 .masthead {
   margin-bottom: initial;
   padding: 10px 0;
-  color: #ff0;
+  color: #fff;
   background: #005d7a url("../../../base/images/bg.png");
 }
 .masthead:before,
@@ -9932,7 +9932,7 @@ h4 small {
   position: relative;
 }
 .masthead a {
-  color: #ff0;
+  color: #fff;
 }
 .masthead hgroup h1,
 .masthead hgroup h2 {
@@ -10064,7 +10064,7 @@ h4 small {
 .site-footer {
   margin-bottom: initial;
   padding: 10px 0;
-  color: #ff0;
+  color: #fff;
   background: #005d7a url("../../../base/images/bg.png");
   padding: 20px 0;
 }
@@ -10088,7 +10088,7 @@ h4 small {
   position: relative;
 }
 .site-footer a {
-  color: #ff0;
+  color: #fff;
 }
 .site-footer hgroup h1,
 .site-footer hgroup h2 {
@@ -10400,7 +10400,7 @@ h4 small {
 .popover .popover-content {
   font-size: 14px;
   line-height: 1.42857143;
-  color: yellow;
+  color: #444;
   word-break: break-all;
 }
 .popover .popover-content dl {
