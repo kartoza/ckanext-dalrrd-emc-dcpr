@@ -232,12 +232,24 @@ http://localhost:5000/harvest
 See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
 
 
+
 #### Setup datastore db
 
 The datastore database can only be used after setting up its permission. Run the below command to 
 set permission on the datastore database.
+The datastore database can only be used after creating a read only a user and setting 
+the required user permissions in the database.
+
+The below command creates a user with credentials as defined in the `ckan.datastore.read_url` ckan configuration settings.
 ```
-docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan datastore set-permissions | sudo -u postgres psql --set ON_ERROR_STOP=1
+ docker exec -it emc-dcpr_ckan-web_1 poetry run ckan create-datastore-user
+
+```
+
+Run the below command to set user permissions on the datastore database.
+
+```
+docker exec -t emc-dcpr_ckan-web_1 poetry run ckan datastore set-permissions |  docker exec -t emc-dcpr_datastore-db_1 psql -U datastore-dev --set ON_ERROR_STOP=1
 ```
 
 
