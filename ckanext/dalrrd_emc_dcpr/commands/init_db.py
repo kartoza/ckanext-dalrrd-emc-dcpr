@@ -15,21 +15,13 @@ def create_datastore_user():
         setting in CKAN configurations.
     """
     db = create_engine(toolkit.config['ckan.datastore.write_url'])
-
-    db_write_url_parts = model.parse_db_config('ckan.datastore.write_url')
     db_read_url_parts = model.parse_db_config('ckan.datastore.read_url')
 
     user_name = db_read_url_parts["db_user"]
     user_password = db_read_url_parts["db_pass"]
 
-    admin_user = db_write_url_parts["db_user"]
-
     try:
         sql = f"CREATE USER \"{user_name}\" WITH PASSWORD '%s'" % user_password
-        db.execute(sql)
-
-        sql = f"GRANT CONNECT ON DATABASE \"{admin_user}\" " \
-              f"TO \"{user_name}\""
         db.execute(sql)
 
     except ProgrammingError as error:
