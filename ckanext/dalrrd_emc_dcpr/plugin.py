@@ -1,5 +1,10 @@
+import json
 import logging
 import typing
+from functools import partial
+
+from shapely import geometry
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckan.lib.navl.dictization_functions import (
@@ -18,6 +23,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.IValidators)
+    plugins.implements(plugins.ITemplateHelpers)
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
@@ -54,6 +60,13 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def package_types(self) -> typing.List:
         return []
+
+    def get_helpers(self):
+        return {
+            "dalrrd_emc_dcpr_default_spatial_search_extent": partial(
+                get_default_spatial_search_extent, 0.001
+            ),
+        }
 
 
 def _set_schema_for_package_creation_private_field(
@@ -150,3 +163,28 @@ def package_publish_check(action, context, data):
         access = toolkit.check_access("package_publish", context, data)
         result = action(context, data) if access else None
     return result
+
+
+def get_default_spatial_search_extent(
+    padding_degrees: typing.Optional[float] = None,
+) -> str:
+    """
+    Return GeoJSON polygon with bbox to use for default view of spatial search map widget.
+    """
+    configured_extent = toolkit.config.get(
+        "ckan.dalrrd_emc_dcpr.default_spatial_search_extent"
+    )
+    if padding_degrees and configured_extent:
+        parsed_extent = json.loads(configured_extent)
+        padded = _pad_geospatial_extent(parsed_extent, padding_degrees)
+        result = json.dumps(padded)
+    else:
+        result = configured_extent
+    return result
+
+
+def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
+    geom = geometry.shape(extent)
+    padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)
+    oriented_padded = geometry.polygon.orient(padded)
+    return geometry.mapping(oriented_padded)

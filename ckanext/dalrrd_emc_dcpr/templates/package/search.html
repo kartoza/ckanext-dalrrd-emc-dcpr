@@ -70,7 +70,7 @@
 
 
 {% block secondary_content %}
-  {% snippet "spatial/snippets/spatial_query.html" %}
+  {% snippet "spatial/snippets/spatial_query.html", default_extent=h.dalrrd_emc_dcpr_default_spatial_search_extent() %}
   <div class="filters">
     <div>
       {% for facet in facet_titles %}

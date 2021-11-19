@@ -120,3 +120,4 @@ markers = [
     "integration: Integration tests (which are slower to run and require CKAN DB)"
 ]
 addopts = "--verbose --exitfirst"
+filterwarnings = "ignore::DeprecationWarning"
