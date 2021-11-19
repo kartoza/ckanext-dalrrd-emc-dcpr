@@ -193,7 +193,9 @@ Answer the prompts in order to provide the details for this new user.
 After its successful creation you can login to the CKAN site with the `admin`
 user.
 
+
 ### Bootstrap ckanext-harvest extension
+
 The project uses the resource harvesting extension
 to harvest and manage remote resources.
 
@@ -211,33 +213,18 @@ See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension b
 
 ### Bootstrap ckanext-spatial extension
 
-The ckanext-spatial extension adds geospatial capabilities to the CKAN instance.
-When installed the extension alters the main CKAN database to include spatial configruations
-that will be used when managing geospatial data.
+The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
+automatically.
 
-After launching the CKAN instance run the below commands to add the required database 
-configurations for the extension to work.
+#### Note
 
-The below commands will create tables that will be used for the PostGIS queries.
+The spatial extension documentation seems to be outdated when it comes to running its custom CKAN CLI commands. Instead
+of the older `paster`-based incantation, they should rather be ran like:
 
-```
-docker exec -ti  emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -f /usr/share/postgresql/13/contrib/postgis-3.1/postgis.sql
-docker exec -ti  emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -f /usr/share/postgresql/13/contrib/postgis-3.1/spatial_ref_sys.sql
+```sh
+poetry run ckan spatial <command>
 ```
 
-After configuring tables for the PostGIS operations, run the below commands to enable the
-CKAN db user to have access on the Database spatial tables and views.
-
-```
-docker exec -ti emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -c 'ALTER VIEW geometry_columns OWNER TO "ckan-dev";'
-docker exec -ti emc-dcpr_ckan-db_1 psql -U ckan-dev -d ckan-dev -c 'ALTER TABLE spatial_ref_sys OWNER TO "ckan-dev";'
-```
-
-Note: the above commands use `ckan-dev` user and `ckan-dev` database which are defined in the database
-settings in`docker-compose.dev.yml`
-
-Restart ckan  to recreate the spatial tables required for the extension to work.
-For more information about the extension see https://docs.ckan.org/projects/ckanext-spatial/en/latest/index.html
 
 ### Using CKAN commands
 
