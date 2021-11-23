@@ -97,6 +97,27 @@ guide to install CKAN, then follow the below steps:
    ```
 
 
+## Operations
+
+- Rebuild solr index
+
+  ```
+  # check if there are any datasets that are not indexed
+  ckan search-index check
+
+  # re-index
+  ckan search-index rebuild
+  ```
+
+- Update extents of spatial datasets
+
+  ```
+  ckan spatial extents
+  ```
+
+
+
+
 ## Development
 
 It is strongly suggested that you use the provided docker-compose related
@@ -193,7 +214,9 @@ Answer the prompts in order to provide the details for this new user.
 After its successful creation you can login to the CKAN site with the `admin`
 user.
 
+
 ### Bootstrap ckanext-harvest extension
+
 The project uses the resource harvesting extension
 to harvest and manage remote resources.
 
@@ -207,6 +230,27 @@ and the harvest source listing will be available under
 http://localhost:5000/harvest
 
 See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
+
+
+### Bootstrap ckanext-spatial extension
+
+The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
+automatically. However, you may want to bootstrap explicitly. If so, run:
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
+```
+
+
+#### Note
+
+The spatial extension documentation seems to be outdated when it comes to running its custom CKAN CLI commands. Instead
+of the older `paster`-based incantation, they should rather be ran like:
+
+```sh
+poetry run ckan spatial <command>
+```
+
 
 ### Using CKAN commands
 

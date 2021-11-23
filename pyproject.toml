@@ -85,6 +85,19 @@ six = "^1.12.0"
 
 ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.3.3" }
 
+# ckanext spatial v1.0.0 dependencies
+# lxml and pyproj versions have been changed to workaround
+# a poetry issue when installing the packages
+
+GeoAlchemy2 = "0.5.0"
+lxml = "4.6.3"
+OWSLib = "0.18.0"
+pyparsing = "^2.1.10"
+pyproj = "3.2.1"
+Shapely = "^1.2.13"
+
+ckanext-spatial = {git = "https://github.com/ckan/ckanext-spatial.git", rev = "v1.0.0"}
+
 gunicorn = "^20.1.0"
 Flask-DebugToolbar = "^0.11.0"
 
@@ -107,3 +120,4 @@ markers = [
     "integration: Integration tests (which are slower to run and require CKAN DB)"
 ]
 addopts = "--verbose --exitfirst"
+filterwarnings = "ignore::DeprecationWarning"

@@ -23,6 +23,13 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
       git-core \
       wget \
       curl && \
+    # these are ckanext-spatial dependencies \
+    apt-get install --yes --no-install-recommends \
+      proj-bin \
+      python-dev \
+      libxslt1-dev \
+      libgeos-c1v5  \
+      zlib1g-dev && \
     apt-get --yes clean && \
     rm -rf /var/lib/apt/lists/*
 

@@ -23,6 +23,10 @@ services:
   # - https://github.com/ckan/ckan/pull/5143
   solr:
     image: ckan/solr
+    volumes:
+      - type: bind
+        source: $PWD/solr/schema.xml
+        target: /opt/solr/server/solr/ckan/conf/schema.xml
 
   redis:
     image: redis:6.2
