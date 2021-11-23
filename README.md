@@ -97,6 +97,27 @@ guide to install CKAN, then follow the below steps:
    ```
 
 
+## Operations
+
+- Rebuild solr index
+
+  ```
+  # check if there are any datasets that are not indexed
+  ckan search-index check
+
+  # re-index
+  ckan search-index rebuild
+  ```
+
+- Update extents of spatial datasets
+
+  ```
+  ckan spatial extents
+  ```
+
+
+
+
 ## Development
 
 It is strongly suggested that you use the provided docker-compose related
@@ -214,7 +235,12 @@ See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension b
 ### Bootstrap ckanext-spatial extension
 
 The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
-automatically.
+automatically. However, you may want to bootstrap explicitly. If so, run:
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
+```
+
 
 #### Note
 
