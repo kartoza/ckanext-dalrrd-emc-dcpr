@@ -8,6 +8,17 @@ Metadata Catalog for South Africa's Department of Agriculture, Land Reform
 and Rural Development (DALRRD). It also contains additional utilities,
 useful for running the full EMC.
 
+## Deployment
+
+This project is deployed onto the following environments:
+
+- **testing :orange_circle:** - https://testing.emc.kartoza.com
+- **staging**: TBD
+- **production**: TBD
+
+Deployment details are kept elsewhere.
+
+
 ## Installation
 
 While this project can be installed standalone, it is primarily meant to be
@@ -215,45 +226,27 @@ After its successful creation you can login to the CKAN site with the `admin`
 user.
 
 
-### Bootstrap ckanext-harvest extension
-
-The project uses the resource harvesting extension
-to harvest and manage remote resources.
-
-Run the following command to initialize the harvest database
-```
-docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
-```
-
-If the above command runs successfully "DB tables created" message will be displayed
-and the harvest source listing will be available under
-http://localhost:5000/harvest
-
-See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
-
-
-
 #### Setup datastore db
 
-The datastore database can only be used after setting up its permission. Run the below command to 
-set permission on the datastore database.
-The datastore database can only be used after creating a read only a user and setting 
-the required user permissions in the database.
+The datastore DB requires the creation of a readonly user. The commands to do this are sent directly to
+the `datastore-db` service by means of mounting a custom script inside the
+container's `/docker-entrypoint-initdb.d` directory. This means that the DB is initialized automatically
+when the container is created.
 
-The below command creates a user with credentials as defined in the `ckan.datastore.read_url` ckan configuration settings.
+
+##### NOTE
+
+As mentioned in the [postgres docker docs](https://hub.docker.com/_/postgres), the DB initialization
+script is only ran if the container's data directory is empty. This means that if there is already
+a pre-existing DB, the script will not be executed. If needed, remove the volume that has the DB's
+data directory and then initialize the container again - THIS WILL TRASH YOUR DB!
+
 ```
- docker exec -it emc-dcpr_ckan-web_1 poetry run ckan create-datastore-user
-
-```
-
-Run the below command to set user permissions on the datastore database.
-
-```
-docker exec -t emc-dcpr_ckan-web_1 poetry run ckan datastore set-permissions |  docker exec -t emc-dcpr_datastore-db_1 psql -U datastore-dev --set ON_ERROR_STOP=1
+docker volume rm emc-dcpr_datastore-db-data
 ```
 
 
-### Bootstrap ckanext-spatial extension
+#### Bootstrap ckanext-spatial extension
 
 The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
 automatically. However, you may want to bootstrap explicitly. If so, run:
