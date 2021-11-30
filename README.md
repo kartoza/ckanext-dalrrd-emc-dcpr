@@ -8,6 +8,17 @@ Metadata Catalog for South Africa's Department of Agriculture, Land Reform
 and Rural Development (DALRRD). It also contains additional utilities,
 useful for running the full EMC.
 
+## Deployment
+
+This project is deployed onto the following environments:
+
+- **testing :orange_circle:** - https://testing.emc.kartoza.com
+- **staging**: TBD
+- **production**: TBD
+
+Deployment details are kept elsewhere.
+
+
 ## Installation
 
 While this project can be installed standalone, it is primarily meant to be
@@ -215,24 +226,27 @@ After its successful creation you can login to the CKAN site with the `admin`
 user.
 
 
-### Bootstrap ckanext-harvest extension
+#### Setup datastore db
 
-The project uses the resource harvesting extension
-to harvest and manage remote resources.
+The datastore DB requires the creation of a readonly user. The commands to do this are sent directly to
+the `datastore-db` service by means of mounting a custom script inside the
+container's `/docker-entrypoint-initdb.d` directory. This means that the DB is initialized automatically
+when the container is created.
 
-Run the following command to initialize the harvest database
+
+##### NOTE
+
+As mentioned in the [postgres docker docs](https://hub.docker.com/_/postgres), the DB initialization
+script is only ran if the container's data directory is empty. This means that if there is already
+a pre-existing DB, the script will not be executed. If needed, remove the volume that has the DB's
+data directory and then initialize the container again - THIS WILL TRASH YOUR DB!
+
 ```
-docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+docker volume rm emc-dcpr_datastore-db-data
 ```
 
-If the above command runs successfully "DB tables created" message will be displayed
-and the harvest source listing will be available under
-http://localhost:5000/harvest
 
-See https://github.com/ckan/ckanext-harvest for more ckanext-harvest extension backend configurations.
-
-
-### Bootstrap ckanext-spatial extension
+#### Bootstrap ckanext-spatial extension
 
 The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
 automatically. However, you may want to bootstrap explicitly. If so, run:

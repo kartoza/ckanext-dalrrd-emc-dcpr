@@ -11,7 +11,7 @@ from ckan.lib.navl.dictization_functions import (
     Missing,
 )  # note: imported for type hints only
 
-from .commands.test import test_ckan_cmd
+from . import commands
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_resource("fanstatic", "dalrrd_emc_dcpr")
 
     def get_commands(self):
-        return [test_ckan_cmd]
+        return [
+            commands.dalrrd_emc_dcpr,
+        ]
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
         return {

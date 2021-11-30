@@ -53,6 +53,23 @@ services:
     volumes:
       - ckan-test-db-data:/var/lib/postgresql/data
 
+  # this is used for running automated integration tests
+  datastore-test-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ckan-datastore-test
+      POSTGRES_PASSWORD: ckan-datastore-test
+      DATASTORE_READONLY_USER: datastore-test-default
+      DATASTORE_READONLY_USER_PASSWORD: datastore-test-default
+    ports:
+      - target: 5432
+        published: 55435
+    volumes:
+      - datastore-test-db-data:/var/lib/postgresql/data
+      - type: bind
+        source: $PWD/datastore-db
+        target: /docker-entrypoint-initdb.d
+
   solr:
     ports:
       - target: 8983
@@ -67,3 +84,4 @@ volumes:
   ckan-db-data:
   ckan-test-db-data:
   datastore-db-data:
+  datastore-test-db-data:
