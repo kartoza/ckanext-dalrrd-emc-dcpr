@@ -14,14 +14,15 @@ services:
       - type: bind
         source: $PWD/who.ini
         target: /home/appuser/who.ini
-    ports:
-      - target: 5000
-        published: 5000
 
   ckan-db:
     environment:
       POSTGRES_USER: ckan-ci
       POSTGRES_PASSWORD: ckan-ci
-    ports:
-      - target: 5432
-        published: 55432
+
+  datastore-db:
+    environment:
+      POSTGRES_USER: datastore-ci
+      POSTGRES_PASSWORD: datastore-ci
+      DATASTORE_READONLY_USER: datastore-ci-default
+      DATASTORE_READONLY_USER_PASSWORD: datastore-ci-default
