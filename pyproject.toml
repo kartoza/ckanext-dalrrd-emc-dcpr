@@ -98,6 +98,9 @@ Shapely = "^1.2.13"
 
 ckanext-spatial = {git = "https://github.com/ckan/ckanext-spatial.git", rev = "v1.0.0"}
 
+# ckanext-geoview v0.0.18 dependencies are already met (requests, ckantoolkit)
+ckanext-geoview = {git = "https://github.com/ckan/ckanext-geoview.git", rev = "v0.0.18"}
+
 gunicorn = "^20.1.0"
 Flask-DebugToolbar = "^0.11.0"
 
