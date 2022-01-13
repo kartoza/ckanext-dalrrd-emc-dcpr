@@ -3,6 +3,7 @@ import logging
 import typing
 from functools import partial
 
+from flask import Blueprint
 from shapely import geometry
 
 import ckan.plugins as plugins
@@ -11,7 +12,14 @@ from ckan.lib.navl.dictization_functions import (
     Missing,
 )  # note: imported for type hints only
 
-from . import commands
+from . import (
+    blueprint,
+    commands,
+)
+from .logic.action import ckan as ckan_actions
+from .logic.action import dcpr as dcpr_actions
+from .logic import auth
+from .logic.auth import dcpr as dcpr_auth
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +32,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IBlueprint)
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
@@ -37,14 +46,16 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
         return {
-            "package_publish": authorize_package_publish,
+            "package_publish": auth.authorize_package_publish,
+            "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
         return {
-            "package_create": package_create,
-            "package_update": package_update,
-            "package_patch": package_patch,
+            "package_create": ckan_actions.package_create,
+            "package_update": ckan_actions.package_update,
+            "package_patch": ckan_actions.package_patch,
+            "dcpr_request_list": dcpr_actions.dcpr_request_list,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
@@ -69,6 +80,11 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 get_default_spatial_search_extent, 0.001
             ),
         }
+
+    def get_blueprint(self) -> typing.List[Blueprint]:
+        return [
+            blueprint.dcpr_blueprint,
+        ]
 
 
 def _set_schema_for_package_creation_private_field(
@@ -107,64 +123,6 @@ def value_or_true_validator(value: typing.Union[str, Missing]):
 
     logger.debug(f"inside value_or_true. Original value: {value!r}")
     return value if value != toolkit.missing else True
-
-
-def authorize_package_publish(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
-) -> typing.Dict[str, bool]:
-    user_name = context.get("user")
-    owner_org = data_dict.get("owner_org")
-
-    members = toolkit.get_action("member_list")(
-        data_dict={"id": owner_org, "object_type": "user"}
-    )
-    admin_member_ids = [
-        member_tuple[0] for member_tuple in members if member_tuple[2] == "Admin"
-    ]
-    convert_user_name_or_id_to_id = toolkit.get_converter(
-        "convert_user_name_or_id_to_id"
-    )
-    user_id = convert_user_name_or_id_to_id(user_name, context)
-
-    if user_id in admin_member_ids:
-        return {"success": True}
-    else:
-        return {"success": False, "msg": "You are not authorized to publish a package"}
-
-
-@toolkit.chained_action
-def package_create(original_action, context, data_dict):
-    """
-    Intercepts the core `package_create` action to check if package
-     is being published after being created.
-    """
-    return package_publish_check(original_action, context, data_dict)
-
-
-@toolkit.chained_action
-def package_update(original_action, context, data_dict):
-    """
-    Intercepts the core `package_update` action to check if package is being published.
-    """
-    return package_publish_check(original_action, context, data_dict)
-
-
-@toolkit.chained_action
-def package_patch(original_action, context, data_dict):
-    """
-    Intercepts the core `package_patch` action to check if package is being published.
-    """
-    return package_publish_check(original_action, context, data_dict)
-
-
-def package_publish_check(action, context, data):
-    remains_private = toolkit.asbool(data.get("private", True))
-    if remains_private:
-        result = action(context, data)
-    else:
-        access = toolkit.check_access("package_publish", context, data)
-        result = action(context, data) if access else None
-    return result
 
 
 def get_default_spatial_search_extent(
