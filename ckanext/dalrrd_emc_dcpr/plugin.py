@@ -16,6 +16,7 @@ from . import (
     blueprint,
     commands,
 )
+from .constants import SASDI_THEMES_VOCABULARY_NAME
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
 from .logic import auth
@@ -33,6 +34,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IBlueprint)
+    plugins.implements(plugins.IFacets)
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
@@ -63,9 +65,35 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "value_or_true": value_or_true_validator,
         }
 
-    def create_package_schema(self) -> typing.Dict[str, typing.List]:
+    def create_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
         original_schema = super().create_package_schema()
-        schema = _set_schema_for_package_creation_private_field(original_schema)
+        schema = _modify_package_schema(original_schema)
+        schema = _set_schema_for_package_creation_private_field(schema)
+        return schema
+
+    def update_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
+        original_schema = super().update_package_schema()
+        schema = _modify_package_schema(original_schema)
+        return schema
+
+    def show_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
+        schema = super().show_package_schema()
+
+        # Don't show vocab tags mixed in with normal 'free' tags
+        # (e.g. on dataset pages, or on the search page)
+        schema["tags"]["__extras"].append(toolkit.get_converter("free_tags_only"))
+
+        # Add our custom sasdi_theme metadata field to the schema.
+        schema.update(
+            {
+                "sasdi_theme": [
+                    toolkit.get_converter("convert_from_tags")(
+                        SASDI_THEMES_VOCABULARY_NAME
+                    ),
+                    toolkit.get_validator("ignore_missing"),
+                ]
+            }
+        )
         return schema
 
     def is_fallback(self) -> bool:
@@ -79,12 +107,37 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dalrrd_emc_dcpr_default_spatial_search_extent": partial(
                 get_default_spatial_search_extent, 0.001
             ),
+            "sasdi_themes": get_sasdi_themes,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
         return [
             blueprint.dcpr_blueprint,
         ]
+
+    def dataset_facets(self, facets_dict: typing.OrderedDict, package_type: str):
+        facets_dict[f"vocab_{SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._("SASDI theme")
+        return facets_dict
+
+
+def get_sasdi_themes() -> typing.List:
+    try:
+        sasdi_themes = toolkit.get_action("tag_list")(
+            data_dict={"vocabulary_id": SASDI_THEMES_VOCABULARY_NAME}
+        )
+    except toolkit.ObjectNotFound:
+        sasdi_themes = []
+    return sasdi_themes
+
+
+def _modify_package_schema(
+    schema: typing.Dict[str, typing.List[typing.Callable]]
+) -> typing.Dict[str, typing.List[typing.Callable]]:
+    schema["sasdi_theme"] = [
+        toolkit.get_validator("ignore_missing"),
+        toolkit.get_converter("convert_to_tags")(SASDI_THEMES_VOCABULARY_NAME),
+    ]
+    return schema
 
 
 def _set_schema_for_package_creation_private_field(

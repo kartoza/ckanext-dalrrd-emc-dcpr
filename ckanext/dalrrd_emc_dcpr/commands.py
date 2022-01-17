@@ -6,6 +6,8 @@ import click
 
 from ckan.plugins import toolkit
 
+from .constants import SASDI_THEMES_VOCABULARY_NAME
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,27 +38,29 @@ def create_sasdi_themes():
 
     """
 
-    vocabulary_name = "sasdi_themes"
     click.secho(
-        f"Creating {vocabulary_name!r} CKAN tag vocabulary and adding configured SASDI "
-        f"themes to it..."
+        f"Creating {SASDI_THEMES_VOCABULARY_NAME!r} CKAN tag vocabulary and adding "
+        f"configured SASDI themes to it..."
     )
 
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     context = {"user": user["name"]}
     vocab_list = toolkit.get_action("vocabulary_list")(context)
     for voc in vocab_list:
-        if voc["name"] == vocabulary_name:
+        if voc["name"] == SASDI_THEMES_VOCABULARY_NAME:
             vocabulary = voc
             click.secho(
-                f"Vocabulary {vocabulary_name!r} already exists, skipping creation...",
+                (
+                    f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} already exists, "
+                    f"skipping creation..."
+                ),
                 fg="yellow",
             )
             break
     else:
-        click.echo(f"Creating vocabulary {vocabulary_name!r}...")
+        click.echo(f"Creating vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}...")
         vocabulary = toolkit.get_action("vocabulary_create")(
-            context, {"name": vocabulary_name}
+            context, {"name": SASDI_THEMES_VOCABULARY_NAME}
         )
 
     for theme_name in toolkit.config.get(
@@ -66,14 +70,18 @@ def create_sasdi_themes():
             already_exists = theme_name in [tag["name"] for tag in vocabulary["tags"]]
             if not already_exists:
                 click.echo(
-                    f"Adding tag {theme_name!r} to vocabulary {vocabulary_name!r}..."
+                    f"Adding tag {theme_name!r} to "
+                    f"vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}..."
                 )
                 toolkit.get_action("tag_create")(
                     context, {"name": theme_name, "vocabulary_id": vocabulary["id"]}
                 )
             else:
                 click.secho(
-                    f"Tag {theme_name!r} is already part of the {vocabulary_name!r} vocabulary, skipping...",
+                    (
+                        f"Tag {theme_name!r} is already part of the "
+                        f"{SASDI_THEMES_VOCABULARY_NAME!r} vocabulary, skipping..."
+                    ),
                     fg="yellow",
                 )
     click.secho("Done!", fg="green")
@@ -93,24 +101,30 @@ def delete_sasdi_themes():
 
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     context = {"user": user["name"]}
-    vocabulary_name = "sasdi_themes"
     vocabulary_list = toolkit.get_action("vocabulary_list")(context)
-    if vocabulary_name in [voc["name"] for voc in vocabulary_list]:
+    if SASDI_THEMES_VOCABULARY_NAME in [voc["name"] for voc in vocabulary_list]:
         click.secho(
-            f"Deleting {vocabulary_name!r} CKAN tag vocabulary and respective tags... "
+            f"Deleting {SASDI_THEMES_VOCABULARY_NAME!r} CKAN tag vocabulary and "
+            f"respective tags... "
         )
         existing_tags = toolkit.get_action("tag_list")(
-            context, {"vocabulary_id": vocabulary_name}
+            context, {"vocabulary_id": SASDI_THEMES_VOCABULARY_NAME}
         )
         for tag_name in existing_tags:
             click.secho(f"Deleting tag {tag_name!r}...")
             toolkit.get_action("tag_delete")(
-                context, {"id": tag_name, "vocabulary_id": vocabulary_name}
+                context, {"id": tag_name, "vocabulary_id": SASDI_THEMES_VOCABULARY_NAME}
             )
-        click.echo(f"Deleting vocabulary {vocabulary_name!r}...")
-        toolkit.get_action("vocabulary_delete")(context, {"id": vocabulary_name})
+        click.echo(f"Deleting vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}...")
+        toolkit.get_action("vocabulary_delete")(
+            context, {"id": SASDI_THEMES_VOCABULARY_NAME}
+        )
     else:
         click.secho(
-            f"Vocabulary {vocabulary_name!r} does not exist, nothing to do", fg="yellow"
+            (
+                f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} does not exist, "
+                f"nothing to do"
+            ),
+            fg="yellow",
         )
     click.secho(f"Done!", fg="green")
