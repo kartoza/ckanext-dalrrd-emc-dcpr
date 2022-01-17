@@ -115,8 +115,22 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             blueprint.dcpr_blueprint,
         ]
 
-    def dataset_facets(self, facets_dict: typing.OrderedDict, package_type: str):
+    def dataset_facets(
+        self, facets_dict: typing.OrderedDict, package_type: str
+    ) -> typing.OrderedDict:
         facets_dict[f"vocab_{SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._("SASDI theme")
+        return facets_dict
+
+    def group_facets(
+        self, facets_dict: typing.OrderedDict, group_type: str, package_type: str
+    ) -> typing.OrderedDict:
+        """IFacets interface requires reimplementation of all facets-related methods
+
+        In this case we do not really need to override this method, but need to satisfy
+        IFacets.
+
+        """
+
         return facets_dict
 
 
