@@ -87,7 +87,7 @@ def create_sasdi_themes():
     click.secho("Done!", fg="green")
 
 
-@bootstrap.command(short_help="Example bootstrap command")
+@bootstrap.command()
 def delete_sasdi_themes():
     """Delete SASDI themes
 
@@ -128,3 +128,46 @@ def delete_sasdi_themes():
             fg="yellow",
         )
     click.secho(f"Done!", fg="green")
+
+
+@bootstrap.command()
+def create_organizations():
+    """Create main SASDI organizations
+
+    This command creates the main SASDI organizations: NSIF, CSI.
+
+    It can safely be called multiple times - it will only ever create the
+    organizations once, if they do not exist already.
+
+    """
+    organizations = [
+        {
+            "name": "NSIF",
+            "description": "This is the NSIF organization",
+            "image": None,
+            "custom_fields": [],
+            "members": [
+                {
+                    "id": None,
+                    "role": "admin",
+                }
+            ],
+        },
+    ]
+    for org_details in organizations:
+        try:
+            current_org = toolkit.get_action("organization_show")(
+                context={},
+                data_dict={
+                    "id": org_details["name"],
+                    "include_datasets": False,
+                    "include_dataset_count": False,
+                    "include_extras": True,
+                    "include_users": True,
+                    "include_groups": True,
+                    "include_tags": True,
+                },
+            )
+            click.echo(f"current_org: {current_org}")
+        except toolkit.ObjectNotFound:
+            click.echo(f"Could not find org {org_details['name']!r}")
