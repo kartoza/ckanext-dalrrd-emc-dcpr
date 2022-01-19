@@ -1,13 +1,23 @@
+import typing
+
 import pytest
 
 from ckan.tests.helpers import CKANCliRunner
 
-from .. import commands
+from ..cli import commands
 
 pytestmark = pytest.mark.unit
 
 
-def test_cli_command():
+@pytest.mark.parametrize(
+    "command",
+    [
+        pytest.param(commands.bootstrap),
+        pytest.param(commands.load_sample_data),
+        pytest.param(commands.delete_data),
+    ],
+)
+def test_group_commands(command: typing.Callable):
     runner = CKANCliRunner()
-    result = runner.invoke(commands.test_ckan_command)
-    assert result.output.strip() == "Hi world!"
+    result = runner.invoke(command)
+    assert result.exit_code == 0

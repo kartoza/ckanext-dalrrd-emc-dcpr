@@ -12,10 +12,8 @@ from ckan.lib.navl.dictization_functions import (
     Missing,
 )  # note: imported for type hints only
 
-from . import (
-    blueprint,
-    commands,
-)
+from . import blueprint
+from .cli import commands
 from .constants import SASDI_THEMES_VOCABULARY_NAME
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions

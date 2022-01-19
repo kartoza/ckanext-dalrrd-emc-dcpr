@@ -3,14 +3,14 @@
 import dataclasses
 import logging
 import typing
-from functools import partial
 from pathlib import Path
 
 import click
 
 from ckan.plugins import toolkit
+from ckan import model
 
-from .constants import SASDI_THEMES_VOCABULARY_NAME
+from ..constants import SASDI_THEMES_VOCABULARY_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,13 @@ class _CkanBootstrapOrganization:
     @property
     def name(self):
         return self.title.replace(" ", "-").lower()[:100]
+
+
+@dataclasses.dataclass
+class _CkanBootstrapUser:
+    name: str
+    email: str
+    password: str
 
 
 _SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
@@ -60,8 +67,47 @@ _SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
     ),
 ]
 
+_SAMPLE_USER_PASSWORD: typing.Final[str] = "12345678"
 
-@click.group(short_help="Commands related to the dalrrd-emc-dcpr extension.")
+_SAMPLE_USERS: typing.Final[_CkanBootstrapUser] = [
+    _CkanBootstrapUser("tester1", "tester1@fake.mail", _SAMPLE_USER_PASSWORD),
+    _CkanBootstrapUser("tester2", "tester2@fake.mail", _SAMPLE_USER_PASSWORD),
+    _CkanBootstrapUser("tester3", "tester3@fake.mail", _SAMPLE_USER_PASSWORD),
+    _CkanBootstrapUser("tester4", "tester4@fake.mail", _SAMPLE_USER_PASSWORD),
+    _CkanBootstrapUser("tester5", "tester5@fake.mail", _SAMPLE_USER_PASSWORD),
+    _CkanBootstrapUser("tester6", "tester6@fake.mail", _SAMPLE_USER_PASSWORD),
+]
+
+_SAMPLE_ORG_DESCRIPTION: typing.Final[str] = (
+    "This is a sample organization. It is meant for aiding the development and "
+    "testing purposes"
+)
+
+_SAMPLE_ORGANIZATIONS: typing.Final[
+    typing.List[
+        typing.Tuple[_CkanBootstrapOrganization, typing.List[typing.Tuple[str, str]]]
+    ]
+] = [
+    (
+        _CkanBootstrapOrganization("Sample org 1", _SAMPLE_ORG_DESCRIPTION),
+        [
+            ("tester1", "member"),
+            ("tester2", "editor"),
+            ("tester3", "publisher"),
+        ],
+    ),
+    (
+        _CkanBootstrapOrganization("Sample org 2", _SAMPLE_ORG_DESCRIPTION),
+        [
+            ("tester4", "member"),
+            ("tester5", "editor"),
+            ("tester6", "publisher"),
+        ],
+    ),
+]
+
+
+@click.group()
 def dalrrd_emc_dcpr():
     """Commands related to the dalrrd-emc-dcpr extension."""
 
@@ -69,6 +115,11 @@ def dalrrd_emc_dcpr():
 @dalrrd_emc_dcpr.group()
 def bootstrap():
     """Commands for bootstrapping the dalrrd-emc-dcpr extension"""
+
+
+@dalrrd_emc_dcpr.group()
+def delete_data():
+    """Commands for deleting bootstrapped and sample data"""
 
 
 @bootstrap.command()
@@ -132,7 +183,7 @@ def create_sasdi_themes():
     click.secho("Done!", fg=_SUCCESS_COLOR)
 
 
-@bootstrap.command()
+@delete_data.command()
 def delete_sasdi_themes():
     """Delete SASDI themes
 
@@ -198,12 +249,11 @@ def create_sasdi_organizations():
         },
     )
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-    create_action: typing.Callable = partial(toolkit.get_action("organization_create"))
     for org_details in _SASDI_ORGANIZATIONS:
         if org_details.name not in existing_organizations:
             click.secho(f"Creating organization {org_details.name!r}...")
             try:
-                create_action(
+                toolkit.get_action("organization_create")(
                     context={
                         "user": user["name"],
                         "return_id_only": True,
@@ -223,7 +273,7 @@ def create_sasdi_organizations():
     click.secho("Done!", fg=_SUCCESS_COLOR)
 
 
-@bootstrap.command()
+@delete_data.command()
 def delete_sasdi_organizations():
     """Delete the main SASDI organizations.
 
@@ -249,3 +299,110 @@ def delete_sasdi_organizations():
                 fg=_INFO_COLOR,
             )
     click.secho(f"Done!", fg=_SUCCESS_COLOR)
+
+
+@dalrrd_emc_dcpr.group()
+def load_sample_data():
+    """Commands for loading sample data into non-production deployments"""
+
+
+@load_sample_data.command()
+def create_sample_organizations():
+    """Create sample organizations and members"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    create_user_action = toolkit.get_action("user_create")
+    click.secho(f"Creating sample users ...")
+    for user_details in _SAMPLE_USERS:
+        click.secho(f"Creating {user_details.name!r}...")
+        try:
+            create_user_action(
+                context={
+                    "user": user["name"],
+                },
+                data_dict={
+                    "name": user_details.name,
+                    "email": user_details.email,
+                    "password": user_details.password,
+                },
+            )
+        except toolkit.ValidationError as exc:
+            click.secho(
+                f"Could not create user {user_details.name!r}: {exc}", fg=_INFO_COLOR
+            )
+            click.secho(
+                f"Attempting to re-enable possibly deleted user...", fg=_INFO_COLOR
+            )
+            sample_user = model.User.get(user_details.name)
+            if sample_user is None:
+                click.secho(
+                    f"Could not find sample_user {user_details.name!r}", fg=_ERROR_COLOR
+                )
+                continue
+            else:
+                sample_user.undelete()
+                model.repo.commit()
+
+    create_org_action = toolkit.get_action("organization_create")
+    create_org_member_action = toolkit.get_action("organization_member_create")
+    click.secho(f"Creating sample organizations ...")
+    for org_details, memberships in _SAMPLE_ORGANIZATIONS:
+        click.secho(f"Creating {org_details.name!r}...")
+        try:
+            create_org_action(
+                context={
+                    "user": user["name"],
+                },
+                data_dict={
+                    "name": org_details.name,
+                    "title": org_details.title,
+                    "description": org_details.description,
+                    "image_url": org_details.image_url,
+                },
+            )
+        except toolkit.ValidationError as exc:
+            click.secho(
+                f"Could not create organization {org_details.name!r}: {exc}",
+                fg=_ERROR_COLOR,
+            )
+        for user_name, role in memberships:
+            click.secho(f"Creating membership {user_name!r} ({role!r})...")
+            create_org_member_action(
+                context={
+                    "user": user["name"],
+                },
+                data_dict={
+                    "id": org_details.name,
+                    "username": user_name,
+                    "role": role if role != "publisher" else "admin",
+                },
+            )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@delete_data.command()
+def delete_sample_organizations():
+    """Delete sample organizations and members"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    delete_user_action = toolkit.get_action("user_delete")
+    click.secho(f"Deleting sample users ...")
+    for user_details in _SAMPLE_USERS:
+        click.secho(f"Deleting {user_details.name!r}...")
+        delete_user_action(
+            context={"user": user["name"]},
+            data_dict={"id": user_details.name},
+        )
+    purge_org_action = toolkit.get_action("organization_purge")
+    click.secho(f"Purging sample organizations ...")
+    for org_details, memberships in _SAMPLE_ORGANIZATIONS:
+        click.secho(f"Deleting {org_details.name!r}...")
+        try:
+            purge_org_action(
+                context={"user": user["name"]},
+                data_dict={"id": org_details.name},
+            )
+        except toolkit.ObjectNotFound:
+            click.secho(
+                f"Organization {org_details.name} does not exist, skipping...",
+                fg=_INFO_COLOR,
+            )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
