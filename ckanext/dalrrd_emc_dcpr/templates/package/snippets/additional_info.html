@@ -1,0 +1,14 @@
+{% ckan_extends %}
+
+{% block package_additional_info %}
+
+    {% if pkg_dict.sasdi_theme %}
+        <tr>
+            <th scope="row" class="dataset-label">{{ _("SASDI Theme") }}</th>
+            <td class="dataset-details">{{ pkg_dict.sasdi_theme[0] }}</td>
+        </tr>
+    {% endif %}
+
+    {{ super() }}
+
+{% endblock %}

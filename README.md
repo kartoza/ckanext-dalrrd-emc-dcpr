@@ -126,6 +126,13 @@ guide to install CKAN, then follow the below steps:
   ckan spatial extents
   ```
 
+- Create bootstrap items
+
+  ```
+  ckan dalrrd-emc-dcpr bootstrap create-sasdi-themes
+  ckan dalrrd-emc-dcpr bootstrap create-organizations
+  ```
+
 
 
 
@@ -258,12 +265,19 @@ docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
 
 #### Note
 
-The spatial extension documentation seems to be outdated when it comes to running its custom CKAN CLI commands. Instead
+The spatial extension documentation seems to be outdated when it comes to
+running its custom CKAN CLI commands. Instead
 of the older `paster`-based incantation, they should rather be ran like:
 
 ```sh
 poetry run ckan spatial <command>
 ```
+
+
+### Bootstrap the system
+
+Create the default items required by the EMC/DCPR system by running the
+bootstrap commands as described in the [Operations section](#operations)
 
 
 ### Using CKAN commands
