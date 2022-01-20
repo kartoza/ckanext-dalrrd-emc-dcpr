@@ -133,7 +133,14 @@ guide to install CKAN, then follow the below steps:
   ckan dalrrd-emc-dcpr bootstrap create-organizations
   ```
 
+- Update page view tracking - This needs to be run
+  periodically (once per day is enough). Be sure to
+  run both commands depicted below.
 
+  ```
+  ckan tracking update
+  ckan search-index rebuild --refresh
+  ```
 
 
 ## Development
