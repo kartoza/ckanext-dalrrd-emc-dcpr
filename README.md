@@ -142,6 +142,17 @@ guide to install CKAN, then follow the below steps:
   ckan search-index rebuild --refresh
   ```
 
+- Operate harvesters
+
+  You may use the various `ckan harvester <command>` commands to operate existing
+  harvesters
+
+  - create a job
+
+    ```
+    docker exec -ti emc_dcpr-ckan_harvesting-runner poetry run ckan harvester job <source-id>
+    ```
+
 
 ## Development
 
@@ -367,3 +378,19 @@ To run the tests you will need to:
    # run only integration tests
    poetry run pytest --ckan-ini docker/ckan-test-settings.ini -m integration
    ```
+
+
+## Harvesting
+
+- Using [httpie](https://httpie.io/) to check for existing records on the local pycsw test service:
+
+  ```
+  http localhost:55436 \
+      service==CSW \
+      version==2.0.2 \
+      request==GetRecords \
+      resulttype==results \
+      typenames=gmd:MD_Metadata \
+      outputschema==http://www.isotc211.org/2005/gmd \
+      elementsetname==brief
+  ```
