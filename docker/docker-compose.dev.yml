@@ -117,6 +117,9 @@ services:
       - type: bind
         source: $PWD/csw-harvest-target/pycsw-config.cfg
         target: /etc/pycsw/pycsw.cfg
+      - type: bind
+        source: $PWD/csw-harvest-target/apiso-repository.db
+        target: /etc/pycsw/apiso-repository.db
 
 
 volumes:

@@ -394,3 +394,11 @@ To run the tests you will need to:
       outputschema==http://www.isotc211.org/2005/gmd \
       elementsetname==brief
   ```
+
+- Create a CKAN harvester for the local docker-based pycsw service:
+
+  - URL: `http://csw-harvest-target:8000`
+  - Source type: `CSW Server`
+  - Update frequency: `Manual`
+  - Configuration: `{"default_tags": ["csw", "harvest"]}`
+  - Organization: `test-org-1`
