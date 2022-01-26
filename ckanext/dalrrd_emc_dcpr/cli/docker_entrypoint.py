@@ -59,7 +59,11 @@ def launch_gunicorn(ckan_ini):
 @click.argument("ckan_args", nargs=-1, type=click.UNPROCESSED)
 def launch_ckan_cli(ckan_ini, ckan_args):
     click.secho("inside launch_ckan_cli", fg="red")
-    os.execvp("ckan", ["ckan"] + list(ckan_args))
+    available = _wait_for_ckan_env(ckan_ini)
+    if available:
+        os.execvp("ckan", ["ckan"] + list(ckan_args))
+    else:
+        click.secho("ckan environment is not available, aborting...", fg="red")
 
 
 def _wait_for_ckan_env(

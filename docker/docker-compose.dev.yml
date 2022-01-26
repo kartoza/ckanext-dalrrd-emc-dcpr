@@ -2,23 +2,54 @@
 
 version: "3.8"
 
+# The definitions below, whose name starts with `x-` make use of
+# docker-compose's extension fields, as defined in:
+#
+# https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
+#
+# Briefly, it is a way to keep the docker-compose file DRY. We define common
+# blocks with a name like `x-something`. Then we mark these as being YAML anchors.
+# Later in the file we refer to them using YAML aliases.
+
+# centralized definition of published ports, in order to avoid clashes
+x-ckan-web-published-port: &ckan-web-published-port 5000
+x-ckan-db-published-port: &ckan-db-published-port 55432
+x-datastore-db-published-port: &datastore-db-published-port 55433
+x-ckan-test-db-published-port: &ckan-test-db-published-port 55434
+x-datastore-test-db-published-port: &datastore-test-db-published-port 55435
+x-solr-published-port: &solr-published-port 8983
+x-csw-harvest-target-published-port: &csw-harvest-target-published-port 55436
+
+# Base volumes for all services based on CKAN (web app, harvesting, etc.)
+x-partial-ckan-volumes: &partial-ckan-volumes
+  volumes:
+    - type: bind
+      source: $PWD/..
+      target: /home/appuser/app
+    - type: bind
+      source: $PWD/ckan-dev-settings.ini
+      target: /home/appuser/ckan.ini
+    - type: bind
+      source: $PWD/who.ini
+      target: /home/appuser/who.ini
+    - ckan-storage:/home/appuser/data
+
 services:
 
   ckan-web:
-    volumes:
-      - type: bind
-        source: $PWD/..
-        target: /home/appuser/app
-      - type: bind
-        source: $PWD/ckan-dev-settings.ini
-        target: /home/appuser/ckan.ini
-      - type: bind
-        source: $PWD/who.ini
-        target: /home/appuser/who.ini
-      - ckan-storage:/home/appuser/data
+    <<: *partial-ckan-volumes
     ports:
       - target: 5000
-        published: 5000
+        published: *ckan-web-published-port
+
+  ckan-harvesting-fetcher:
+    <<: *partial-ckan-volumes
+
+  ckan-harvesting-gatherer:
+    <<: *partial-ckan-volumes
+
+  ckan-harvesting-runner:
+    <<: *partial-ckan-volumes
 
   ckan-db:
     environment:
@@ -26,7 +57,7 @@ services:
       POSTGRES_PASSWORD: ckan-dev
     ports:
       - target: 5432
-        published: 55432
+        published: *ckan-db-published-port
     volumes:
       - ckan-db-data:/var/lib/postgresql/data
 
@@ -36,7 +67,7 @@ services:
       POSTGRES_PASSWORD: datastore-dev
     ports:
       - target: 5432
-        published: 55433
+        published: *datastore-db-published-port
     volumes:
       - datastore-db-data:/var/lib/postgresql/data
 
@@ -49,7 +80,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - target: 5432
-        published: 55434
+        published: *ckan-test-db-published-port
     volumes:
       - ckan-test-db-data:/var/lib/postgresql/data
 
@@ -63,7 +94,7 @@ services:
       DATASTORE_READONLY_USER_PASSWORD: datastore-test-default
     ports:
       - target: 5432
-        published: 55435
+        published: *datastore-test-db-published-port
     volumes:
       - datastore-test-db-data:/var/lib/postgresql/data
       - type: bind
@@ -73,9 +104,22 @@ services:
   solr:
     ports:
       - target: 8983
-        published: 8983
+        published: *solr-published-port
     volumes:
       - solr-data:/opt/solr/server/solr/ckan/data
+
+  csw-harvest-target:
+    image: geopython/pycsw:2.6.1
+    ports:
+      - target: 8000
+        published: *csw-harvest-target-published-port
+    volumes:
+      - type: bind
+        source: $PWD/csw-harvest-target/pycsw-config.cfg
+        target: /etc/pycsw/pycsw.cfg
+      - type: bind
+        source: $PWD/csw-harvest-target/apiso-repository.db
+        target: /etc/pycsw/apiso-repository.db
 
 
 volumes:

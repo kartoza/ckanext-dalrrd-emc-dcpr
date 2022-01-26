@@ -1,6 +1,7 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
 import dataclasses
+import json
 import logging
 import typing
 from pathlib import Path
@@ -9,6 +10,7 @@ import click
 
 from ckan.plugins import toolkit
 from ckan import model
+from ckanext.harvest import model as harvest_model
 
 from ..constants import SASDI_THEMES_VOCABULARY_NAME
 
@@ -36,6 +38,15 @@ class _CkanBootstrapUser:
     name: str
     email: str
     password: str
+
+
+@dataclasses.dataclass
+class _CkanBootstrapHarvester:
+    name: str
+    url: str
+    source_type: str
+    update_frequency: str
+    configuration: typing.Dict
 
 
 _SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
@@ -69,7 +80,7 @@ _SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
 
 _SAMPLE_USER_PASSWORD: typing.Final[str] = "12345678"
 
-_SAMPLE_USERS: typing.Final[_CkanBootstrapUser] = [
+_SAMPLE_USERS: typing.Final[typing.List[_CkanBootstrapUser]] = [
     _CkanBootstrapUser("tester1", "tester1@fake.mail", _SAMPLE_USER_PASSWORD),
     _CkanBootstrapUser("tester2", "tester2@fake.mail", _SAMPLE_USER_PASSWORD),
     _CkanBootstrapUser("tester3", "tester3@fake.mail", _SAMPLE_USER_PASSWORD),
@@ -85,7 +96,11 @@ _SAMPLE_ORG_DESCRIPTION: typing.Final[str] = (
 
 _SAMPLE_ORGANIZATIONS: typing.Final[
     typing.List[
-        typing.Tuple[_CkanBootstrapOrganization, typing.List[typing.Tuple[str, str]]]
+        typing.Tuple[
+            _CkanBootstrapOrganization,
+            typing.List[typing.Tuple[str, str]],
+            typing.List[_CkanBootstrapHarvester],
+        ]
     ]
 ] = [
     (
@@ -95,6 +110,15 @@ _SAMPLE_ORGANIZATIONS: typing.Final[
             ("tester2", "editor"),
             ("tester3", "publisher"),
         ],
+        [
+            _CkanBootstrapHarvester(
+                name="local-pycsw",
+                url="http://csw-harvest-target:8000",
+                source_type="csw",
+                update_frequency="MANUAL",
+                configuration={"default_tags": ["csw", "harvest"]},
+            )
+        ],
     ),
     (
         _CkanBootstrapOrganization("Sample org 2", _SAMPLE_ORG_DESCRIPTION),
@@ -103,6 +127,7 @@ _SAMPLE_ORGANIZATIONS: typing.Final[
             ("tester5", "editor"),
             ("tester6", "publisher"),
         ],
+        [],
     ),
 ]
 
@@ -307,8 +332,7 @@ def load_sample_data():
 
 
 @load_sample_data.command()
-def create_sample_organizations():
-    """Create sample organizations and members"""
+def create_sample_users():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     create_user_action = toolkit.get_action("user_create")
     click.secho(f"Creating sample users ...")
@@ -342,10 +366,16 @@ def create_sample_organizations():
                 sample_user.undelete()
                 model.repo.commit()
 
+
+@load_sample_data.command()
+def create_sample_organizations():
+    """Create sample organizations and members"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     create_org_action = toolkit.get_action("organization_create")
     create_org_member_action = toolkit.get_action("organization_member_create")
+    create_harvester_action = toolkit.get_action("harvest_source_create")
     click.secho(f"Creating sample organizations ...")
-    for org_details, memberships in _SAMPLE_ORGANIZATIONS:
+    for org_details, memberships, harvesters in _SAMPLE_ORGANIZATIONS:
         click.secho(f"Creating {org_details.name!r}...")
         try:
             create_org_action(
@@ -376,12 +406,47 @@ def create_sample_organizations():
                     "role": role if role != "publisher" else "admin",
                 },
             )
+        for harvester_details in harvesters:
+            click.secho(f"Creating harvest source {harvester_details.name!r}...")
+            try:
+                create_harvester_action(
+                    context={"user": user["name"]},
+                    data_dict={
+                        "name": harvester_details.name,
+                        "url": harvester_details.url,
+                        "source_type": harvester_details.source_type,
+                        "frequency": harvester_details.update_frequency,
+                        "config": json.dumps(harvester_details.configuration),
+                        "owner_org": org_details.name,
+                    },
+                )
+            except toolkit.ValidationError as exc:
+                click.secho(
+                    (
+                        f"Could not create harvest source "
+                        f"{harvester_details.name!r}: {exc}"
+                    ),
+                    fg=_INFO_COLOR,
+                )
+                click.secho(
+                    f"Attempting to re-enable possibly deleted harvester source...",
+                    fg=_INFO_COLOR,
+                )
+                sample_harvester = model.Package.get(harvester_details.name)
+                if sample_harvester is None:
+                    click.secho(
+                        f"Could not find harvester source {harvester_details.name!r}",
+                        fg=_ERROR_COLOR,
+                    )
+                    continue
+                else:
+                    sample_harvester.state = model.State.ACTIVE
+                    model.repo.commit()
     click.secho("Done!", fg=_SUCCESS_COLOR)
 
 
 @delete_data.command()
-def delete_sample_organizations():
-    """Delete sample organizations and members"""
+def delete_sample_users():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     delete_user_action = toolkit.get_action("user_delete")
     click.secho(f"Deleting sample users ...")
@@ -391,18 +456,56 @@ def delete_sample_organizations():
             context={"user": user["name"]},
             data_dict={"id": user_details.name},
         )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@delete_data.command()
+def delete_sample_organizations():
+    """Delete sample organizations and members"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    org_show_action = toolkit.get_action("organization_show")
     purge_org_action = toolkit.get_action("organization_purge")
+    package_search_action = toolkit.get_action("package_search")
+    dataset_purge_action = toolkit.get_action("dataset_purge")
+    harvest_source_list_action = toolkit.get_action("harvest_source_list")
+    harvest_source_delete_action = toolkit.get_action("harvest_source_delete")
     click.secho(f"Purging sample organizations ...")
-    for org_details, memberships in _SAMPLE_ORGANIZATIONS:
-        click.secho(f"Deleting {org_details.name!r}...")
+    for org_details, _, _ in _SAMPLE_ORGANIZATIONS:
         try:
-            purge_org_action(
-                context={"user": user["name"]},
-                data_dict={"id": org_details.name},
+            org = org_show_action(
+                context={"user": user["name"]}, data_dict={"id": org_details.name}
             )
+            click.secho(f"{org = }", fg=_INFO_COLOR)
         except toolkit.ObjectNotFound:
             click.secho(
                 f"Organization {org_details.name} does not exist, skipping...",
                 fg=_INFO_COLOR,
+            )
+        else:
+            packages = package_search_action(
+                context={"user": user["name"]},
+                data_dict={"fq": f"owner_org:{org['id']}"},
+            )
+            click.secho(f"{packages = }", fg=_INFO_COLOR)
+            for package in packages["results"]:
+                click.secho(f"Purging package {package['id']}...")
+                dataset_purge_action(
+                    context={"user": user["name"]}, data_dict={"id": package["id"]}
+                )
+            harvest_sources = harvest_source_list_action(
+                context={"user": user["name"]}, data_dict={"organization_id": org["id"]}
+            )
+            click.secho(f"{ harvest_sources = }", fg=_INFO_COLOR)
+            for harvest_source in harvest_sources:
+                click.secho(f"Deleting harvest_source {harvest_source['name']}...")
+                harvest_source_delete_action(
+                    context={"user": user["name"], "clear_source": True},
+                    data_dict={"id": harvest_source["id"]},
+                )
+            click.secho(f"Purging {org_details.name!r}...")
+            purge_org_action(
+                context={"user": user["name"]},
+                data_dict={"id": org["id"]},
             )
     click.secho("Done!", fg=_SUCCESS_COLOR)
