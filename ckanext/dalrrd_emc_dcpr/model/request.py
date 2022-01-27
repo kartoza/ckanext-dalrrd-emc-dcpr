@@ -8,7 +8,7 @@ from sqlalchemy import orm, types, Column, Table, ForeignKey
 
 from ckan.model import core, domain_object, meta, types as _types, Session
 
-from request_dataset import (
+from ckanext.dalrrd_emc_dcpr.model.request_dataset import (
     define_table as define_dataset_table,
     create_table as create_dataset_table,
 )
