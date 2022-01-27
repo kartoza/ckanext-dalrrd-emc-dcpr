@@ -74,7 +74,7 @@ webassets = "2.0"
 Werkzeug = {extras = ["watchdog"], version = "2.0.1"}
 "zope.interface" = "5.4.0"  # changed by us to allow poetry to build
 
-ckan = {git = "https://github.com/ckan/ckan.git", rev = "ckan-2.9.4" }
+ckan = {git = "https://github.com/ckan/ckan.git", rev = "ckan-2.9.5"}
 
 # ckan harvest plugin dependencies
 ckantoolkit = "0.0.3"
