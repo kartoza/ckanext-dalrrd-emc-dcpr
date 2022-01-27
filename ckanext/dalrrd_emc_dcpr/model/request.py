@@ -8,6 +8,11 @@ from sqlalchemy import orm, types, Column, Table, ForeignKey
 
 from ckan.model import core, domain_object, meta, types as _types, Session
 
+from request_dataset import (
+    define_table as define_dataset_table,
+    create_table as create_dataset_table,
+)
+
 __all__ = [
     "Request",
     "request_table",
@@ -93,17 +98,6 @@ def define_tables():
         Column("additional_documents", types.UnicodeText),
         Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
         Column("submission_date", types.DateTime, default=datetime.datetime.utcnow),
-        Column("dataset_custodian", types.Boolean, default=False),
-        Column("data_type", types.UnicodeText),
-        Column("purposed_dataset_title", types.UnicodeText),
-        Column("purposed_abstract", types.UnicodeText),
-        Column("dataset_purpose", types.UnicodeText),
-        Column("lineage_statement", types.UnicodeText),
-        Column("associated_attributes", types.UnicodeText),
-        Column("feature_description", types.UnicodeText),
-        Column("data_usage_restrictions", types.UnicodeText),
-        Column("capture_method", types.UnicodeText),
-        Column("capture_method_detail", types.UnicodeText),
     )
 
     request_csi_moderator_table = Table(
@@ -152,6 +146,8 @@ def define_tables():
     meta.mapper(RequestNSIFReview, request_nsif_reviewer_table)
     meta.mapper(RequestUser, request_user_table)
 
+    define_dataset_table()
+
 
 def setup():
 
@@ -166,6 +162,7 @@ def setup():
             request_notification_target_table.create()
             request_nsif_reviewer_table.create()
             request_user_table.create()
+            create_dataset_table()
         except Exception as e:
             if request_table.exists():
                 Session.execute("DROP TABLE request")
