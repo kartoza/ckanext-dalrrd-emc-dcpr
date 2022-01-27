@@ -16,6 +16,7 @@ from request_dataset import (
 __all__ = [
     "Request",
     "request_table",
+    "request_notification_target_table",
     "request_nsif_reviewer_table",
     "request_csi_moderator_table",
 ]
