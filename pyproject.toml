@@ -83,7 +83,7 @@ pyOpenSSL = "18.0.0"
 redis = "3.5.3"
 six = "^1.12.0"
 
-ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.3.3" }
+ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.3.4"}
 
 # ckanext spatial v1.0.0 dependencies
 # lxml and pyproj versions have been changed to workaround

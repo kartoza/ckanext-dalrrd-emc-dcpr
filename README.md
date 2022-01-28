@@ -281,7 +281,7 @@ docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
 ```
 
 
-#### Note
+##### Note
 
 The spatial extension documentation seems to be outdated when it comes to
 running its custom CKAN CLI commands. Instead
@@ -289,6 +289,15 @@ of the older `paster`-based incantation, they should rather be ran like:
 
 ```sh
 poetry run ckan spatial <command>
+```
+
+#### Bootstrap the harvesting extension
+
+Run the following command in order to have the harvesting tables be created
+on the CKAN DB:
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
 ```
 
 
