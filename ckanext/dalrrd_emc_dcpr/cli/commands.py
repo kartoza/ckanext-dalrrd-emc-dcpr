@@ -139,12 +139,12 @@ def dalrrd_emc_dcpr():
 
 @dalrrd_emc_dcpr.group()
 def bootstrap():
-    """Commands for bootstrapping the dalrrd-emc-dcpr extension"""
+    """Bootstrap the dalrrd-emc-dcpr extension"""
 
 
 @dalrrd_emc_dcpr.group()
 def delete_data():
-    """Commands for deleting bootstrapped and sample data"""
+    """Delete dalrrd-emc-dcpr bootstrapped and sample data"""
 
 
 @bootstrap.command()
@@ -328,7 +328,7 @@ def delete_sasdi_organizations():
 
 @dalrrd_emc_dcpr.group()
 def load_sample_data():
-    """Commands for loading sample data into non-production deployments"""
+    """Load sample data into non-production deployments"""
 
 
 @load_sample_data.command()
@@ -447,6 +447,7 @@ def create_sample_organizations():
 
 @delete_data.command()
 def delete_sample_users():
+    """Delete sample users."""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     delete_user_action = toolkit.get_action("user_delete")
     click.secho(f"Deleting sample users ...")
@@ -461,7 +462,7 @@ def delete_sample_users():
 
 @delete_data.command()
 def delete_sample_organizations():
-    """Delete sample organizations and members"""
+    """Delete sample organizations."""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
 
     org_show_action = toolkit.get_action("organization_show")
@@ -498,7 +499,7 @@ def delete_sample_organizations():
             )
             click.secho(f"{ harvest_sources = }", fg=_INFO_COLOR)
             for harvest_source in harvest_sources:
-                click.secho(f"Deleting harvest_source {harvest_source['name']}...")
+                click.secho(f"Deleting harvest_source {harvest_source['title']}...")
                 harvest_source_delete_action(
                     context={"user": user["name"], "clear_source": True},
                     data_dict={"id": harvest_source["id"]},

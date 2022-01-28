@@ -164,7 +164,7 @@ resolved_reference = "a1a17202510c442a1f7cf95ed09d7984484d9764"
 
 [[package]]
 name = "ckanext-harvest"
-version = "1.3.3"
+version = "1.3.4"
 description = "Harvesting interface plugin for CKAN"
 category = "main"
 optional = false
@@ -174,8 +174,8 @@ develop = false
 [package.source]
 type = "git"
 url = "https://github.com/ckan/ckanext-harvest.git"
-reference = "v1.3.3"
-resolved_reference = "e2e8acbb6d87d44663e92c5ff5cbd67401588c2d"
+reference = "v1.3.4"
+resolved_reference = "694a8cc139f42dce4c38eca3cf69b24ff3df347b"
 
 [[package]]
 name = "ckanext-spatial"
@@ -1191,7 +1191,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "90fd370daccc3f41a6ac967154f23f527219a54665be6677ca5a7b2ce908f1b8"
+content-hash = "b5e31c37fff3160f1c975c0fb8cf90fa2d7c4c7c66c75e962b39eb5c56e7dc48"
 
 [metadata.files]
 alembic = [
