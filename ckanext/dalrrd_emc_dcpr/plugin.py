@@ -1,10 +1,8 @@
-import json
 import logging
 import typing
 from functools import partial
 
 from flask import Blueprint
-from shapely import geometry
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
@@ -12,9 +10,12 @@ from ckan.lib.navl.dictization_functions import (
     Missing,
 )  # note: imported for type hints only
 
-from . import blueprint
+from . import (
+    blueprint,
+    constants,
+    helpers,
+)
 from .cli import commands
-from .constants import SASDI_THEMES_VOCABULARY_NAME
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
 from .logic import auth
@@ -86,7 +87,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             {
                 "sasdi_theme": [
                     toolkit.get_converter("convert_from_tags")(
-                        SASDI_THEMES_VOCABULARY_NAME
+                        constants.SASDI_THEMES_VOCABULARY_NAME
                     ),
                     toolkit.get_validator("ignore_missing"),
                 ]
@@ -103,9 +104,10 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def get_helpers(self):
         return {
             "dalrrd_emc_dcpr_default_spatial_search_extent": partial(
-                get_default_spatial_search_extent, 0.001
+                helpers.get_default_spatial_search_extent, 0.001
             ),
-            "sasdi_themes": get_sasdi_themes,
+            "sasdi_themes": helpers.get_sasdi_themes,
+            "iso_topic_categories": helpers.get_iso_topic_categories,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
@@ -116,7 +118,16 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def dataset_facets(
         self, facets_dict: typing.OrderedDict, package_type: str
     ) -> typing.OrderedDict:
-        facets_dict[f"vocab_{SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._("SASDI theme")
+        facets_dict.update(
+            {
+                f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}": toolkit._(
+                    "SASDI theme"
+                ),
+                f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}": toolkit._(
+                    "ISO Topic Category"
+                ),
+            }
+        )
         return facets_dict
 
     def group_facets(
@@ -132,23 +143,38 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return facets_dict
 
 
-def get_sasdi_themes() -> typing.List:
-    try:
-        sasdi_themes = toolkit.get_action("tag_list")(
-            data_dict={"vocabulary_id": SASDI_THEMES_VOCABULARY_NAME}
-        )
-    except toolkit.ObjectNotFound:
-        sasdi_themes = []
-    return sasdi_themes
-
-
 def _modify_package_schema(
     schema: typing.Dict[str, typing.List[typing.Callable]]
 ) -> typing.Dict[str, typing.List[typing.Callable]]:
     schema["sasdi_theme"] = [
         toolkit.get_validator("ignore_missing"),
-        toolkit.get_converter("convert_to_tags")(SASDI_THEMES_VOCABULARY_NAME),
+        toolkit.get_converter("convert_to_tags")(
+            constants.SASDI_THEMES_VOCABULARY_NAME
+        ),
     ]
+    # schema.update(
+    #     sasdi_theme=[
+    #     toolkit.get_validator("ignore_missing"),
+    #     toolkit.get_converter("convert_to_tags")(SASDI_THEMES_VOCABULARY_NAME),
+    #     ],
+    #     dataset_reference_date=[],
+    #     dataset_responsible_party=[],  # needs to be made mandatory
+    #     geographic_location_bbox=[],  # needs to harmonize with ckan-spatial
+    #     geographic_location_geographic_identifier=[],  # needs to harmonize with ckan-spatial
+    #     dataset_language=[],
+    #     dataset_character_set=[],
+    #     topic_category=[],
+    #     spatial_resolution=[],
+    #     abstract=[], # needs to be made mandatory
+    #     distribution_format=[],
+    #     spatial_representation_type=[],
+    #     reference_system=[],
+    #     lineage=[],
+    #     metadata_standard_name=[],
+    #     metadata_standard_version=[],
+    #     metadata_language=[],
+    #     metadata_character_set=[],
+    # )
     return schema
 
 
@@ -188,28 +214,3 @@ def value_or_true_validator(value: typing.Union[str, Missing]):
 
     logger.debug(f"inside value_or_true. Original value: {value!r}")
     return value if value != toolkit.missing else True
-
-
-def get_default_spatial_search_extent(
-    padding_degrees: typing.Optional[float] = None,
-) -> str:
-    """
-    Return GeoJSON polygon with bbox to use for default view of spatial search map widget.
-    """
-    configured_extent = toolkit.config.get(
-        "ckan.dalrrd_emc_dcpr.default_spatial_search_extent"
-    )
-    if padding_degrees and configured_extent:
-        parsed_extent = json.loads(configured_extent)
-        padded = _pad_geospatial_extent(parsed_extent, padding_degrees)
-        result = json.dumps(padded)
-    else:
-        result = configured_extent
-    return result
-
-
-def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
-    geom = geometry.shape(extent)
-    padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)
-    oriented_padded = geometry.polygon.orient(padded)
-    return geometry.mapping(oriented_padded)
