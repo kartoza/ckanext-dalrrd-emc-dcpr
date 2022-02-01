@@ -12,7 +12,11 @@ from ckan.plugins import toolkit
 from ckan import model
 from ckanext.harvest import model as harvest_model
 
-from ..constants import SASDI_THEMES_VOCABULARY_NAME
+from ..constants import (
+    ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
+    ISO_TOPIC_CATEGORIES,
+    SASDI_THEMES_VOCABULARY_NAME,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -244,6 +248,106 @@ def delete_sasdi_themes():
         click.secho(
             (
                 f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} does not exist, "
+                f"nothing to do"
+            ),
+            fg=_INFO_COLOR,
+        )
+    click.secho(f"Done!", fg=_SUCCESS_COLOR)
+
+
+@bootstrap.command()
+def create_iso_topic_categories():
+    """Create ISO Topic Categories.
+
+    This command adds a CKAN vocabulary for the ISO Topic Categories and creates each
+    topic category as a CKAN tag.
+
+    This command can safely be called multiple times - it will only ever create the
+    vocabulary and themes once.
+
+    """
+
+    click.secho(
+        f"Creating ISO Topic Categories CKAN tag vocabulary and adding "
+        f"the relevant categories..."
+    )
+
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    context = {"user": user["name"]}
+    vocab_list = toolkit.get_action("vocabulary_list")(context)
+    for voc in vocab_list:
+        if voc["name"] == ISO_TOPIC_CATEGOY_VOCABULARY_NAME:
+            vocabulary = voc
+            click.secho(
+                (
+                    f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} already exists, "
+                    f"skipping creation..."
+                ),
+                fg=_INFO_COLOR,
+            )
+            break
+    else:
+        click.echo(f"Creating vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
+        vocabulary = toolkit.get_action("vocabulary_create")(
+            context, {"name": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
+        )
+
+    for theme_name, _ in ISO_TOPIC_CATEGORIES:
+        if theme_name != "":
+            already_exists = theme_name in [tag["name"] for tag in vocabulary["tags"]]
+            if not already_exists:
+                click.echo(
+                    f"Adding tag {theme_name!r} to "
+                    f"vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}..."
+                )
+                toolkit.get_action("tag_create")(
+                    context, {"name": theme_name, "vocabulary_id": vocabulary["id"]}
+                )
+            else:
+                click.secho(
+                    (
+                        f"Tag {theme_name!r} is already part of the "
+                        f"{SASDI_THEMES_VOCABULARY_NAME!r} vocabulary, skipping..."
+                    ),
+                    fg=_INFO_COLOR,
+                )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@delete_data.command()
+def delete_iso_topic_categories():
+    """Delete ISO Topic Categories.
+
+    This command can safely be called multiple times - it will only ever delete the
+    vocabulary and themes once, if they exist.
+
+    """
+
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    context = {"user": user["name"]}
+    vocabulary_list = toolkit.get_action("vocabulary_list")(context)
+    if ISO_TOPIC_CATEGOY_VOCABULARY_NAME in [voc["name"] for voc in vocabulary_list]:
+        click.secho(
+            f"Deleting {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} CKAN tag vocabulary and "
+            f"respective tags... "
+        )
+        existing_tags = toolkit.get_action("tag_list")(
+            context, {"vocabulary_id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
+        )
+        for tag_name in existing_tags:
+            click.secho(f"Deleting tag {tag_name!r}...")
+            toolkit.get_action("tag_delete")(
+                context,
+                {"id": tag_name, "vocabulary_id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME},
+            )
+        click.echo(f"Deleting vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
+        toolkit.get_action("vocabulary_delete")(
+            context, {"id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
+        )
+    else:
+        click.secho(
+            (
+                f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} does not exist, "
                 f"nothing to do"
             ),
             fg=_INFO_COLOR,
