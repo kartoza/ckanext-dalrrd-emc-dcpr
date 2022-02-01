@@ -103,6 +103,7 @@ ckanext-geoview = {git = "https://github.com/ckan/ckanext-geoview.git", rev = "v
 
 gunicorn = "^20.1.0"
 Flask-DebugToolbar = "^0.11.0"
+ckanext-scheming = {git = "https://github.com/ckan/ckanext-scheming.git", rev = "79270b1"}
 
 
 [tool.poetry.dev-dependencies]
