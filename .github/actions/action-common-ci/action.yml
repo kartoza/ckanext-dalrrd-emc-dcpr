@@ -12,6 +12,11 @@ runs:
       with:
         options: "--check --verbose"
 
+    - name: Lint code with mypy
+      uses: jpetrucciani/mypy-check@master
+      with:
+        path: "ckanext"
+
     - name: Setup docker buildx
       uses: docker/setup-buildx-action@v1.6.0
 

@@ -10,7 +10,6 @@ import click
 
 from ckan.plugins import toolkit
 from ckan import model
-from ckanext.harvest import model as harvest_model
 
 from ..constants import (
     ISO_TOPIC_CATEGOY_VOCABULARY_NAME,

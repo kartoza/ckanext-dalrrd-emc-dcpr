@@ -5,9 +5,9 @@ import ckan.plugins.toolkit as toolkit
 
 def authorize_package_publish(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
-) -> typing.Dict[str, bool]:
+) -> typing.Dict[str, typing.Union[bool, str]]:
     user_name = context.get("user")
-    owner_org = data_dict.get("owner_org")
+    owner_org = data_dict.get("owner_org") if data_dict is not None else None
 
     members = toolkit.get_action("member_list")(
         data_dict={"id": owner_org, "object_type": "user"}
