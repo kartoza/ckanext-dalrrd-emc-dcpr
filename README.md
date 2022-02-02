@@ -130,7 +130,8 @@ guide to install CKAN, then follow the below steps:
 
   ```
   ckan dalrrd-emc-dcpr bootstrap create-sasdi-themes
-  ckan dalrrd-emc-dcpr bootstrap create-organizations
+  ckan dalrrd-emc-dcpr bootstrap create-iso-topic-categories
+  ckan dalrrd-emc-dcpr bootstrap create-sasdi-organizations
   ```
 
 - Update page view tracking - This needs to be run

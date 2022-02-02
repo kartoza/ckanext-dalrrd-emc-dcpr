@@ -4,7 +4,7 @@
 
 scheming_version: 2
 dataset_type: dataset
-about: A reimplementation of the default CKAN dataset schema
+about: CKAN schema for the SASDI EMC. This schema holds SANS1878-related fields
 
 
 dataset_fields:
@@ -33,6 +33,8 @@ dataset_fields:
     label: Topic Category
     preset: select
     choices_helper: iso_topic_categories
+    required: true
+    help_text: ISO 19115 Topic Category for the dataset - This is a SANS 1878 mandatory field
 
   - field_name: tag_string
     label: Tags
@@ -54,10 +56,53 @@ dataset_fields:
     display_property: foaf:homepage
     display_snippet: link.html
 
+  - field_name: reference_date
+    label: Reference date
+    required: true
+    preset: date
+    help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
+
   - field_name: version
     label: Version
     validators: ignore_missing unicode package_version_validator
     form_placeholder: '1.0'
+
+  - field_name: dataset_language
+    label: Dataset language
+    required: true
+    choices:
+      - value: en
+        label: English
+    preset: select
+    help_text: Language for the dataset - This is a SANS 1878 mandatory field
+
+  - field_name: metadata_language
+    label: Metadata language
+    required: true
+    choices:
+      - value: en
+        label: English
+    preset: select
+    help_text: Language for the metadata - This is a SANS 1878 mandatory field
+
+  - field_name: dataset_character_set
+    label: Dataset character set
+    required: true
+    choices:
+      - value: utf-8
+        label: UTF-8
+    preset: select
+    help_text: Character set of the dataset - This is a SANS 1878 mandatory field
+
+  # TODO: this should be set automatically
+  - field_name: metadata_character_set
+    label: Metadata character set
+    required: true
+    choices:
+      - value: utf-8
+        label: UTF-8
+    preset: select
+    help_text: Character set of the metadata - This is a SANS 1878 mandatory field
 
   - field_name: author
     label: Author
