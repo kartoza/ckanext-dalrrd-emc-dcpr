@@ -158,24 +158,12 @@ def _modify_package_schema(
     #     toolkit.get_converter("convert_to_tags")(SASDI_THEMES_VOCABULARY_NAME),
     #     ],
 
-    #     dataset_reference_date=[],
-    #     dataset_language=[],
-    #     dataset_character_set=[],
-    #     metadata_language=[],
+    # these shall be added by the system automatically, but they can be added
+    # as hidden fields so that they are not requested from user
     #     metadata_character_set=[],
-
-    #     dataset_responsible_party=[],  # needs to be made mandatory
-    #     geographic_location_bbox=[],  # needs to harmonize with ckan-spatial
-    #     geographic_location_geographic_identifier=[],  # needs to harmonize with ckan-spatial
-    #     topic_category=[],
-    #     spatial_resolution=[],
-    #     abstract=[], # needs to be made mandatory
-    #     distribution_format=[],
-    #     spatial_representation_type=[],
-    #     reference_system=[],
-    #     lineage=[],
     #     metadata_standard_name=[],
     #     metadata_standard_version=[],
+
     # )
     return schema
 

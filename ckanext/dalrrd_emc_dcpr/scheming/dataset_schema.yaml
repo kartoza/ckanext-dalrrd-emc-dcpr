@@ -1,0 +1,298 @@
+# custom dataset schema, as used by the ckanext-scheming extension:
+#
+# https://github.com/ckan/ckanext-scheming
+
+scheming_version: 2
+dataset_type: dataset
+about: CKAN schema for the SASDI EMC. This schema holds SANS1878-related fields
+
+
+dataset_fields:
+
+  - field_name: title
+    label: Title
+    help_text: Name by which the cited resource is known - This is a SANS 1878 mandatory field
+    preset: title
+    required: true
+    form_placeholder: eg. A descriptive title
+
+  - field_name: name
+    label: URL
+    preset: dataset_slug
+    form_placeholder: eg. my-dataset
+
+  - field_name: notes
+    label: Description
+    required: true
+    form_snippet: markdown.html
+    form_placeholder: eg. Some useful notes about the data
+    help_text: Brief narrative summary of the content of the resource - This is a SANS 1878 mandatory field
+
+  - field_name: reference_date
+    label: Reference date
+    required: true
+    preset: date
+    help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
+
+  - field_name: iso_topic_category
+    label: Topic Category
+    preset: topic_categories
+#    choices_helper: iso_topic_categories
+#    create_validators: >-
+#      ignore_missing
+#      convert_to_tags(iso_topic_categories)
+#    output_validators: convert_from_tags(iso_topic_categories) tag_string_convert ignore_missing
+    required: true
+    help_text: ISO 19115 Topic Category for the dataset - This is a SANS 1878 mandatory field
+
+#  - field_name: iso_topic_category
+#    label: Topic Category
+#    preset: select
+#    choices_helper: iso_topic_categories
+#    create_validators: >-
+#      ignore_missing
+#      convert_to_tags(iso_topic_categories)
+#    output_validators: convert_from_tags(iso_topic_categories) tag_string_convert ignore_missing
+#    required: true
+#    help_text: ISO 19115 Topic Category for the dataset - This is a SANS 1878 mandatory field
+
+#  - field_name: sasdi_theme
+#    label: SASDI Theme
+#    help_text: South African Spatial Data Infrastructure Theme
+#    preset: select
+#    choices_helper: sasdi_themes
+#    create_validators: >-
+#      convert_to_tags(sasdi_themes)
+#      ignore_missing
+#    output_validators: >-
+#      convert_from_tags(sasdi_themes)
+#      tag_string_convert
+#      ignore_missing
+
+  - field_name: tag_string
+    label: Tags
+    preset: tag_string_autocomplete
+    help_text: >-
+      Additional keywords useful for describing the dataset. In order to optimize searchability, it is
+      recommended to add at least three keywords
+    form_placeholder: eg. economy, mental health, government
+
+  - field_name: license_id
+    label: License
+    form_snippet: license.html
+    help_text: License definitions and additional information can be found at http://opendefinition.org/
+
+  - field_name: owner_org
+    label: Organization
+    required: true
+    preset: dataset_organization
+    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
+
+  - field_name: url
+    label: Source
+    form_placeholder: http://example.com/dataset.json
+    display_property: foaf:homepage
+    display_snippet: link.html
+
+  - field_name: version
+    label: Version
+    validators: ignore_missing unicode package_version_validator
+    form_placeholder: '1.0'
+
+  - field_name: dataset_language
+    label: Dataset language
+    required: true
+    choices:
+      - value: en
+        label: English
+    preset: select
+    help_text: Language for the dataset - This is a SANS 1878 mandatory field
+
+  - field_name: metadata_language
+    label: Metadata language
+    required: true
+    choices:
+      - value: en
+        label: English
+    preset: select
+    help_text: Language for the metadata - This is a SANS 1878 mandatory field
+
+  - field_name: dataset_character_set
+    label: Dataset character set
+    required: true
+    choices:
+      - value: ucs-2
+        label: UCS-2
+      - value: ucs-4
+        label: UCS-4
+      - value: utf-7
+        label: UTF-7
+      - value: utf-8
+        label: UTF-8
+      - value: utf-16
+        label: UTF-16
+      - value: 8859part1
+        label: 8859-1
+      - value: 8859part2
+        label: 8859-2
+      - value: 8859part3
+        label: 8859-3
+      - value: 8859part4
+        label: 8859-4
+      - value: 8859part5
+        label: 8859-5
+      - value: 8859part6
+        label: 8859-6
+      - value: 8859part7
+        label: 8859-7
+      - value: 8859part8
+        label: 8859-8
+      - value: 8859part9
+        label: 8859-9
+      - value: 8859part10
+        label: 8859-10
+      - value: 8859part11
+        label: 8859-11
+      - value: 8859part13
+        label: 8859-13
+      - value: 8859part14
+        label: 8859-14
+      - value: 8859part15
+        label: 8859-15
+      - value: 8859part16
+        label: 8859-16
+      - value: jis
+        label: jis
+      - value: shiftJIS
+        label: shiftJIS
+      - value: eucJP
+        label: eucJP
+      - value: usAscii
+        label: ASCII
+      - value: ebcdic
+        label: ebcdic
+      - value: eucKR
+        label: eucKR
+      - value: big5
+        label: big5
+      - value: GB2312
+        label: GB2312
+    preset: select
+    help_text: >-
+      Full name of the character coding standard used for the dataset -
+      This is a SANS 1878 mandatory field
+
+  - field_name: lineage
+    label: Lineage
+    form_snippet: markdown.html
+    required: true
+    help_text: >-
+        General explanation of the data producer's knowledge about the lineage of
+        a dataset - This is a SANS 1878 mandatory field
+
+#  - field_name: author
+#    label: Author
+#    form_placeholder: Joe Bloggs
+#    display_property: dc:creator
+#
+#  - field_name: author_email
+#    label: Author Email
+#    form_placeholder: joe@example.com
+#    display_property: dc:creator
+#    display_snippet: email.html
+#    display_email_name_field: author
+
+  - field_name: maintainer_name
+    label: Maintainer
+    required: true
+    form_placeholder: Joe Bloggs
+    display_property: dc:contributor
+    help_text: >-
+        "Name of the individual responsible for the dataset. Provide it in the following
+        format: surname, given name, title separated by a delimiter - This is a SANS 1878 mandatory field"
+
+  - field_name: maintainer_email
+    label: Maintainer Email
+    form_placeholder: joe@example.com
+    display_property: dc:contributor
+    display_snippet: email.html
+    display_email_name_field: maintainer
+
+    # TODO: Add a map widget to ease filling this value in
+  - field_name: spatial
+    label: Geographic location bounding box
+    required: true
+    preset: json_object
+
+    # TODO: Add a more pleasant widget, like the one used for the dataset URL, which would show 1/<value>
+  - field_name: equivalent_scale
+    label: Spatial resolution
+    required: true
+    help_text: >-
+      Level of detail expressed as the scale of a comparable hardcopy map or
+      chart. Provide it as the denominator of a representative fraction,
+      i.e. the number below the line in a vulgar fraction - This is a
+      SANS 1878 mandatory field
+
+  - field_name: spatial_representation_type
+    label: Spatial representation type
+    required: true
+    help_text: >-
+        Method used to spatially represent geographic information - This is
+        a SANS 1878 mandatory field
+    choices:
+      - value: "001"
+        label: Vector (vector data is used to represent geographic data)
+      - value: "002"
+        label: Grid (grid data is used to represent geographic data)
+      - value: "003"
+        label: Text table (textual or tabular data is used to represent geographic data)
+      - value: "004"
+        label: Triangulated Irregular Network (TIN)
+      - value: "005"
+        label: >-
+          Stereo Model (Three-dimensional view formed by the intersecting homologous rays of  an
+          overlapping pair of images)
+      - value: "006"
+        label: Video (Scene from a video recording)
+      - value: "007"
+        label: Image (Image formats, e.g. Tiff/BMP/JPEG/SID, etc. - Not a grid)
+    preset: select
+
+  - field_name: spatial_reference_system
+    label: Spatial Reference System Identifier
+    required: true
+    help_text: >-
+      "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
+      respective code for the dataset's spatial coordinate
+      reference system. It is recommended to use the EPSG spatial catalogue codes whenever possible
+      (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
+      www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
+      coordinate reference systems  - This is a SANS 1878 mandatory field"
+
+
+resource_fields:
+
+  - field_name: url
+    label: URL
+    preset: resource_url_upload
+
+  - field_name: name
+    label: Name
+    form_placeholder: eg. January 2011 Gold Prices
+
+  - field_name: description
+    label: Description
+    form_snippet: markdown.html
+    form_placeholder: Some useful notes about the data
+
+  - field_name: format
+    label: Format
+    required: true
+    preset: resource_format_autocomplete
+    help_text: Name of the data transfer format - This is a SANS 1878 mandatory field
+
+  - field_name: format_version
+    label: Format Version
+    required: true
+    help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
