@@ -22,6 +22,7 @@ def get_sasdi_themes(*args, **kwargs) -> typing.List[typing.Dict[str, str]]:
 
 
 def get_iso_topic_categories(*args, **kwargs) -> typing.List[typing.Dict[str, str]]:
+    logger.debug(f"inside get_iso_topic_categories {args=} {kwargs=}")
     return [
         {"value": cat[0], "label": cat[1]} for cat in constants.ISO_TOPIC_CATEGORIES
     ]

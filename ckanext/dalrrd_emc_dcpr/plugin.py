@@ -6,9 +6,6 @@ from flask import Blueprint
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-from ckan.lib.navl.dictization_functions import (
-    Missing,
-)  # note: imported for type hints only
 
 from . import (
     blueprint,
@@ -18,7 +15,11 @@ from . import (
 from .cli import commands
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
-from .logic import auth
+from .logic import (
+    auth,
+    converters,
+    validators,
+)
 from .logic.auth import dcpr as dcpr_auth
 
 logger = logging.getLogger(__name__)
@@ -61,39 +62,51 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
         return {
-            "value_or_true": value_or_true_validator,
+            "value_or_true": validators.emc_value_or_true_validator,
+            "emc_convert_to_tags": converters.emc_convert_to_tags,
+            "emc_convert_from_tags": converters.emc_convert_from_tags,
         }
 
-    def create_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
-        original_schema = super().create_package_schema()
-        schema = _modify_package_schema(original_schema)
-        schema = _set_schema_for_package_creation_private_field(schema)
-        return schema
+    # FIXME: because we are saying that packages of type 'dataset' are handled by ckanext-scheming, this method is not read at all
+    # def create_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
+    #     original_schema = super().create_package_schema()
+    #     schema = _modify_package_schema(original_schema)
+    #     schema = _set_schema_for_package_creation_private_field(schema)
+    #     return schema
 
-    def update_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
-        original_schema = super().update_package_schema()
-        schema = _modify_package_schema(original_schema)
-        return schema
+    # FIXME: because we are saying that packages of type 'dataset' are handled by ckanext-scheming, this method is not read at all
+    # def update_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
+    #     original_schema = super().update_package_schema()
+    #     schema = _modify_package_schema(original_schema)
+    #     return schema
 
-    def show_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
-        schema = super().show_package_schema()
+    # FIXME: because we are saying that packages of type 'dataset' are handled by ckanext-scheming, this method is not read at all
+    # def show_package_schema(self) -> typing.Dict[str, typing.List[typing.Callable]]:
+    #     schema = super().show_package_schema()
+    #
+    #     # Don't show vocab tags mixed in with normal 'free' tags
+    #     # (e.g. on dataset pages, or on the search page)
+    #     schema["tags"]["__extras"].append(toolkit.get_converter("free_tags_only"))
+    #
+    #     # # Add our custom sasdi_theme metadata field to the schema.
+    #     # schema.update(
+    #     #     {
+    #     #         "sasdi_theme": [
+    #     #             toolkit.get_converter("convert_from_tags")(
+    #     #                 constants.SASDI_THEMES_VOCABULARY_NAME
+    #     #             ),
+    #     #             toolkit.get_validator("ignore_missing"),
+    #     #         ]
+    #     #     }
+    #     # )
+    #     return schema
 
-        # Don't show vocab tags mixed in with normal 'free' tags
-        # (e.g. on dataset pages, or on the search page)
-        schema["tags"]["__extras"].append(toolkit.get_converter("free_tags_only"))
-
-        # Add our custom sasdi_theme metadata field to the schema.
-        schema.update(
-            {
-                "sasdi_theme": [
-                    toolkit.get_converter("convert_from_tags")(
-                        constants.SASDI_THEMES_VOCABULARY_NAME
-                    ),
-                    toolkit.get_validator("ignore_missing"),
-                ]
-            }
-        )
-        return schema
+    # FIXME: because we are saying that packages of type 'dataset' are handled by ckanext-scheming, this method is not read at all
+    # def validate(self, context, data_dict, schema, action):
+    #     logger.debug("************************************Inside our validate")
+    #     logger.debug(f"{schema=}")
+    #     logger.debug("Now calling the sueprclass' validate...")
+    #     return super().validate(context, data_dict, schema, action)
 
     def is_fallback(self) -> bool:
         return True
@@ -191,16 +204,3 @@ def _set_schema_for_package_creation_private_field(
     private_field_validators.insert(0, toolkit.get_validator("value_or_true"))
     schema.update({_PRIVATE_FIELD: private_field_validators})
     return schema
-
-
-def value_or_true_validator(value: typing.Union[str, Missing]):
-    """Validator that provides a default value of `True` when the input is None.
-
-    This was designed with a package's `private` field in mind. We want it to be
-    assigned a value of True when it is not explicitly provided on package creation.
-    This shall enforce creating private packages by default.
-
-    """
-
-    logger.debug(f"inside value_or_true. Original value: {value!r}")
-    return value if value != toolkit.missing else True

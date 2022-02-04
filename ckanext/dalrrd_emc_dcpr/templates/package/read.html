@@ -1,11 +1,33 @@
 {% ckan_extends %}
 
-{% block primary_content_inner %}
-  {{ super() }}
+{% block package_tags %}
+    {#
+        note: the package_tags block is overridden in order to only show free tags (i.e. those that did not
+        come from a vocabulary)
+    #}
+    {% set free_tags = pkg.tags|selectattr("vocabulary_id", "none")|list %}
+    {% if free_tags|length > 0 %}
+        {% snippet "package/snippets/tags.html", tags=free_tags %}
+    {% endif %}
 
-  {% set dataset_extent = h.get_pkg_dict_extra(c.pkg_dict, 'spatial', '') %}
-  {% if dataset_extent %}
-    {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent %}
-  {% endif %}
+    <section class="iso-topic-category">
+        <h3> {{ _("ISO Topic Category") }}</h3>
+        <p>{{ pkg.iso_topic_category|first }}</p>
+    </section>
+    {% if pkg.sasdi_theme|length > 0 %}
+        <section class="sasdi-theme">
+            <h3> {{ _("SASDI Theme") }}</h3>
+            <p>{{ pkg.sasdi_theme|first }}</p>
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+    {{ super() }}
+
+    {% if pkg.spatial %}
+        <h3>bbox: {{ pkg.spatial }}</h3>
+        {% snippet "spatial/snippets/dataset_map.html", extent=pkg.spatial %}
+    {% endif %}
 
 {% endblock %}

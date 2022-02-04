@@ -5,6 +5,6 @@ about: Additional ckanext-scheming presets for SASDI EMC
 about_url: "http://github.com/ckan/ckanext-scheming#preset"
 
 presets:
-  preset_name: topic_categories
-  values:
-    validators: convert_from_tags(iso_topic_categories) tag_string_convert ignore_missing
+  - preset_name: topic_categories_select
+    values:
+      validators: convert_from_tags(iso_topic_categories) tag_string_convert ignore_missing
