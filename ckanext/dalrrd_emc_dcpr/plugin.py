@@ -119,8 +119,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dalrrd_emc_dcpr_default_spatial_search_extent": partial(
                 helpers.get_default_spatial_search_extent, 0.001
             ),
-            "sasdi_themes": helpers.get_sasdi_themes,
-            "iso_topic_categories": helpers.get_iso_topic_categories,
+            "emc_sasdi_themes": helpers.get_sasdi_themes,
+            "emc_iso_topic_categories": helpers.get_iso_topic_categories,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

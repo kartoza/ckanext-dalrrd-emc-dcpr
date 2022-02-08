@@ -38,16 +38,12 @@ dataset_fields:
     label: Topic Category
     help_text: ISO 19115 Topic Category for the dataset - This is a SANS 1878 mandatory field
     required: true
-    choices_helper: iso_topic_categories
-    create_validators: >-
-      scheming_required
-      scheming_choices
+    choices_helper: emc_iso_topic_categories
+    validators: >-
       ignore_missing
-      emc_convert_to_tags(iso_topic_categories)
+      convert_to_tags(iso_topic_categories)
     output_validators: >-
-      scheming_required
-      scheming_choices
-      emc_convert_from_tags(iso_topic_categories)
+      convert_from_tags(iso_topic_categories)
       ignore_missing
     form_snippet: "vocab_select.html"
     display_snippet: "vocab_tag_display.html"
@@ -56,16 +52,14 @@ dataset_fields:
   - field_name: sasdi_theme
     label: SASDI Theme
     help_text: South African Spatial Data Infrastructure Theme
-    choices_helper: sasdi_themes
-    create_validators: >-
-      scheming_required
-      scheming_choices
+    choices_helper: emc_sasdi_themes
+    validators: >-
       ignore_missing
-      emc_convert_to_tags(sasdi_themes)
+      convert_to_tags(sasdi_themes)
     output_validators: >-
       scheming_required
       scheming_choices
-      emc_convert_from_tags(sasdi_themes)
+      convert_from_tags(sasdi_themes)
       ignore_missing
     form_snippet: vocab_select.html
     display_snippet: vocab_tag_display.html
@@ -73,7 +67,8 @@ dataset_fields:
 
   - field_name: tag_string
     label: Tags
-    preset: tag_string_autocomplete
+    preset: emc_free_tags_tag_string_autocomplete
+    form_snippet: tag_select.html
     help_text: >-
       Additional keywords useful for describing the dataset. In order to optimize searchability, it is
       recommended to add at least three keywords
