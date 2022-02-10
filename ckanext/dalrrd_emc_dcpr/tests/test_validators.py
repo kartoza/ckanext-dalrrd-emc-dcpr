@@ -1,7 +1,7 @@
 import pytest
 from ckan.lib.navl.dictization_functions import missing
 
-from ..plugin import value_or_true_validator
+from ..logic import validators
 
 pytestmark = pytest.mark.unit
 
@@ -18,5 +18,5 @@ pytestmark = pytest.mark.unit
     ],
 )
 def test_value_or_true_validator(value, expected):
-    result = value_or_true_validator(value)
+    result = validators.emc_value_or_true_validator(value)
     assert result == expected
