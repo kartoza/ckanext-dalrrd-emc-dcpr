@@ -199,7 +199,7 @@ dataset_fields:
 #    display_snippet: email.html
 #    display_email_name_field: author
 
-  - field_name: maintainer_name
+  - field_name: maintainer
     label: Maintainer
     required: true
     form_placeholder: Joe Bloggs
