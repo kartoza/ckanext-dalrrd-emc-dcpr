@@ -17,7 +17,6 @@ from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
 from .logic import (
     auth,
-    converters,
     validators,
 )
 from .logic.auth import dcpr as dcpr_auth
@@ -39,7 +38,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
         toolkit.add_public_directory(config_, "public")
-        toolkit.add_resource("fanstatic", "dalrrd_emc_dcpr")
+        toolkit.add_resource("assets", "dalrrd_emc_dcpr")
 
     def get_commands(self):
         return [
@@ -63,8 +62,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
         return {
             "value_or_true": validators.emc_value_or_true_validator,
-            "emc_convert_to_tags": converters.emc_convert_to_tags,
-            "emc_convert_from_tags": converters.emc_convert_from_tags,
+            "emc_srs_validator": validators.emc_srs_validator,
         }
 
     # FIXME: because we are saying that packages of type 'dataset' are handled by ckanext-scheming, this method is not read at all

@@ -226,6 +226,7 @@ dataset_fields:
   - field_name: equivalent_scale
     label: Spatial resolution
     required: true
+    validators: natural_number_validator
     help_text: >-
       Level of detail expressed as the scale of a comparable hardcopy map or
       chart. Provide it as the denominator of a representative fraction,
@@ -260,6 +261,7 @@ dataset_fields:
   - field_name: spatial_reference_system
     label: Spatial Reference System Identifier
     required: true
+    validators: emc_srs_validator
     help_text: >-
       "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
       respective code for the dataset's spatial coordinate
