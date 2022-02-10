@@ -21,13 +21,3 @@
         </section>
     {% endif %}
 {% endblock %}
-
-{% block primary_content_inner %}
-    {{ super() }}
-
-    {% if pkg.spatial %}
-        <h3>bbox: {{ pkg.spatial }}</h3>
-        {% snippet "spatial/snippets/dataset_map.html", extent=pkg.spatial %}
-    {% endif %}
-
-{% endblock %}
