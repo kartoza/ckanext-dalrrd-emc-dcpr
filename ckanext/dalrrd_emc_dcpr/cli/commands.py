@@ -191,7 +191,7 @@ def create_iso_topic_categories():
             if not already_exists:
                 click.echo(
                     f"Adding tag {theme_name!r} to "
-                    f"vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}..."
+                    f"vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}..."
                 )
                 toolkit.get_action("tag_create")(
                     context, {"name": theme_name, "vocabulary_id": vocabulary["id"]}
@@ -200,7 +200,7 @@ def create_iso_topic_categories():
                 click.secho(
                     (
                         f"Tag {theme_name!r} is already part of the "
-                        f"{SASDI_THEMES_VOCABULARY_NAME!r} vocabulary, skipping..."
+                        f"{ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} vocabulary, skipping..."
                     ),
                     fg=_INFO_COLOR,
                 )

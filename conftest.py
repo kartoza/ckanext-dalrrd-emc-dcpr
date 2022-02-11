@@ -1,5 +1,9 @@
+"""pytest configuration file"""
+
 import pytest
+import shlex
 import sqlalchemy.exc
+import subprocess
 
 import ckan.model
 
@@ -39,3 +43,13 @@ def emc_clean_db():
         else:
             session.commit()
     session.flush()
+
+
+@pytest.fixture
+def emc_create_sasdi_themes(request):
+    ckan_ini = request.config.getoption("--ckan-ini")
+    subprocess.run(
+        shlex.split(
+            f"poetry run ckan --config {ckan_ini} dalrrd-emc-dcpr bootstrap create-iso-topic-categories"
+        )
+    )

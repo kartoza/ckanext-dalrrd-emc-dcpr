@@ -73,7 +73,7 @@ class _CkanBootstrapEmcDataset:
     maintainer_email: typing.Optional[str] = None
     type: typing.Optional[str] = "dataset"
     sasdi_theme: typing.Optional[str] = None
-    tags: typing.Optional[str] = dataclasses.field(default_factory=list)
+    tags: typing.List[str] = dataclasses.field(default_factory=list)
 
     def to_data_dict(self) -> typing.Dict:
         result = {}
@@ -90,7 +90,7 @@ def _to_data_dict(value: typing.Any):
         try:
             result = [i.to_data_dict() for i in value]
         except AttributeError:
-            result = value
+            result = list(value)
     elif getattr(value, "to_data_dict", None) is not None:
         result = value.to_data_dict()
     else:

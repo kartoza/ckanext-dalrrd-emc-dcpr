@@ -79,10 +79,12 @@ dataset_fields:
     form_snippet: license.html
     help_text: License definitions and additional information can be found at http://opendefinition.org/
 
+  # owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
+  # vanilla ckanext-scheming too
   - field_name: owner_org
     label: Organization
     required: true
-    preset: dataset_organization
+    preset: emc_dataset_organization
     help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
 
   - field_name: url

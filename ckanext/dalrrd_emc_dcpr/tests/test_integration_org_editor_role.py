@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from ckan.tests import (
@@ -10,35 +11,40 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize(
-    "data_dict, org_role",
+    "name, private, org_role",
     [
         pytest.param(
-            {"name": "test_package4"},
+            "test_package4",
+            True,
             "member",
             marks=pytest.mark.raises(exception=NotAuthorized),
             id="member-cannot-create-package",
         ),
         pytest.param(
-            {"name": "test-package1"}, "editor", id="editor-can-create-private-package"
+            "test-package1", True, "editor", id="editor-can-create-private-package"
         ),
         pytest.param(
-            {"name": "test-package2", "private": "false"},
+            "test-package2",
+            False,
             "editor",
             marks=pytest.mark.raises(exception=NotAuthorized),
             id="editor-cannot-create-public-package",
         ),
         pytest.param(
-            {"name": "test_package3"}, "admin", id="admin-can-create-private-package"
+            "test_package3", True, "admin", id="admin-can-create-private-package"
         ),
         pytest.param(
-            {"name": "test_package3", "private": "false"},
+            "test_package3",
+            False,
             "admin",
             id="admin-can-create-public-package",
         ),
     ],
 )
-@pytest.mark.usefixtures("emc_clean_db", "with_plugins", "with_request_context")
-def test_create_package(data_dict, org_role):
+@pytest.mark.usefixtures(
+    "emc_clean_db", "with_plugins", "with_request_context", "emc_create_sasdi_themes"
+)
+def test_create_package(name, private, org_role):
     user = factories.User()
     owner_organization = factories.Organization()
     helpers.call_action(
@@ -47,9 +53,40 @@ def test_create_package(data_dict, org_role):
         username=user["name"],
         role=org_role,
     )
-    data_dict.update(owner_org=owner_organization["id"])
+    data_dict = {
+        "name": name,
+        "private": private,
+        "title": name,
+        "notes": f"notes for {name}",
+        "reference_date": "2020-01-01",
+        "iso_topic_category": "biota",
+        "owner_org": owner_organization["id"],
+        "dataset_language": "en",
+        "metadata_language": "en",
+        "dataset_character_set": "utf-8",
+        "lineage": f"lineage for {name}",
+        "maintainer": "Surname, Name, title.",
+        "spatial": json.dumps(
+            {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [10.0, 10.0],
+                        [10.31, 10.0],
+                        [10.31, 10.44],
+                        [10.0, 10.44],
+                        [10.0, 10.0],
+                    ]
+                ],
+            }
+        ),
+        "equivalent_scale": "500",
+        "spatial_representation_type": "001",
+        "spatial_reference_system": "EPSG:4326",
+    }
+
     helpers.call_action(
         "package_create",
         context={"ignore_auth": False, "user": user["name"]},
-        **data_dict
+        **data_dict,
     )
