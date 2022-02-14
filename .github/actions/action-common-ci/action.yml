@@ -16,7 +16,7 @@ runs:
       uses: jpetrucciani/mypy-check@master
       with:
         path: "ckanext"
-        mypy_flags: "--install-types"
+        mypy_flags: "--install-types --non-interactive"
 
     - name: Setup docker buildx
       uses: docker/setup-buildx-action@v1.6.0
