@@ -210,7 +210,7 @@ cd docker
 ./compose.py --compose-file docker-compose.yml --compose-file docker-compose.dev.yml down
 
 # restart services (for example the ckan-web service)
-./compose.py restart ckan-web
+./compose.py --compose-file docker-compose.yml --compose-file docker-compose.dev.yml restart ckan-web
 ```
 
 After starting the stack, the ckan web interface is available (after a few
@@ -219,7 +219,7 @@ moments) on your local machine at
 http://localhost:5000
 
 **NOTE:** The compose file does not try to build the images. You either
-build them yourself (with the provided `build.sh` script) or they are pulled
+build them yourself (with the provided `build.sh` script, as mentioned above) or they are pulled
 from the registry (if they exist remotely).
 
 
@@ -358,6 +358,27 @@ cd ckanext-dalrrd-emc-dcpr
 python setup.py develop
 pip install -r dev-requirements.txt
 ```
+
+
+### Continuous Integration and git pre-commit
+
+This project uses a Continuous Integration strategy whereby each commit (either to `main` or via some PR)
+is checked by an automated github workflow. This performs several checks:
+
+- Lint the code with [black](https://black.readthedocs.io/en/stable/)
+- Perform static analysis by running the code through [mypy](http://mypy-lang.org/)
+- Build the docker image
+- Run automated tests
+
+Generally, in order for a PR to be accepted it must pass these automated checks.
+
+In order to avoid waiting around for the pipeline to find issues, it is advisable to install
+[pre-commit](https://pre-commit.com/) and use the provided `.pre-commit-config.yaml` file to ensure that
+at least the linting and static analysis checks are run as git pre-commit hooks. It is also advisable to run
+the tests locally, before pushing your changes to github (see the next section for instructions on running tests).
+
+This project also uses a Continuous Deployment pipeline where each commit to the `main` branch results in
+the redeployment of our testing environment.
 
 
 ## Testing
