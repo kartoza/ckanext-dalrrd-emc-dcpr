@@ -6,6 +6,7 @@ from shapely import geometry
 from ckan.plugins import toolkit
 
 from . import constants
+from .logic.action.emc import show_version
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,10 @@ def get_default_spatial_search_extent(
     else:
         result = configured_extent
     return result
+
+
+def helper_show_version(*args, **kwargs) -> typing.Dict:
+    return show_version()
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:

@@ -6,6 +6,7 @@ import ckan.plugins.toolkit as toolkit
 logger = logging.getLogger(__name__)
 
 
+@toolkit.side_effect_free
 def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
     logger.debug("Inside the dcpr_request_list action")
     access_result = toolkit.check_access(
