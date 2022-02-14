@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 from shapely import geometry
 
-from .. import plugin
+from ckanext.dalrrd_emc_dcpr import helpers
 
 pytestmark = pytest.mark.unit
 
@@ -53,7 +53,7 @@ pytestmark = pytest.mark.unit
     ],
 )
 def test_pad_geospatial_extent(coords, padding, expected_geom):
-    result = plugin._pad_geospatial_extent(
+    result = helpers._pad_geospatial_extent(
         {"type": "Polygon", "coordinates": [coords]}, padding
     )
     result_geom = geometry.shape(result)
@@ -93,6 +93,6 @@ def test_get_default_spatial_search_extent(
         monkeypatch.setitem(
             ckan_config, "ckan.dalrrd_emc_dcpr.default_spatial_search_extent", extent
         )
-        result = plugin.get_default_spatial_search_extent(padding_degrees=padding)
+        result = helpers.get_default_spatial_search_extent(padding_degrees=padding)
         result_geom = geometry.shape(json.loads(result))
         assert result_geom.almost_equals(expected)

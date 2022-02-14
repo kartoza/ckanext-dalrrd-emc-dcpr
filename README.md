@@ -8,6 +8,14 @@ Metadata Catalog for South Africa's Department of Agriculture, Land Reform
 and Rural Development (DALRRD). It also contains additional utilities,
 useful for running the full EMC.
 
+
+## Dataset metadata fields
+
+Dataset fields are defined with the help of the [ckan scheming extension](https://github.com/ckan/ckanext-scheming).
+The dataset schema file can be found in `ckanext/dalrrd_emc_dcpr/scheming/dataset_schema.yaml`. It has the definition
+of the EMC dataset metadata fields, which conform with the South African spatial metadata standard (SANS1878)
+
+
 ## Deployment
 
 This project is deployed onto the following environments:
@@ -130,7 +138,8 @@ guide to install CKAN, then follow the below steps:
 
   ```
   ckan dalrrd-emc-dcpr bootstrap create-sasdi-themes
-  ckan dalrrd-emc-dcpr bootstrap create-organizations
+  ckan dalrrd-emc-dcpr bootstrap create-iso-topic-categories
+  ckan dalrrd-emc-dcpr bootstrap create-sasdi-organizations
   ```
 
 - Update page view tracking - This needs to be run

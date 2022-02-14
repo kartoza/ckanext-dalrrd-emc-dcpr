@@ -103,6 +103,7 @@ ckanext-geoview = {git = "https://github.com/ckan/ckanext-geoview.git", rev = "v
 
 gunicorn = "^20.1.0"
 Flask-DebugToolbar = "^0.11.0"
+ckanext-scheming = {git = "https://github.com/ckan/ckanext-scheming.git", rev = "79270b1"}
 
 
 [tool.poetry.dev-dependencies]
@@ -112,6 +113,7 @@ pytest-cov = "^3.0.0"
 factory-boy = "^3.2.0"
 mock = "^4.0.3"
 pytest-raises = "^0.11"
+mypy = "^0.931"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -124,3 +126,6 @@ markers = [
 ]
 addopts = "--verbose --exitfirst"
 filterwarnings = "ignore::DeprecationWarning"
+
+[tool.mypy]
+ignore_missing_imports = true

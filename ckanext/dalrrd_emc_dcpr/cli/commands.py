@@ -1,18 +1,25 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
-import dataclasses
 import json
 import logging
 import typing
-from pathlib import Path
 
 import click
 
 from ckan.plugins import toolkit
 from ckan import model
-from ckanext.harvest import model as harvest_model
+from ckan.lib.navl import dictization_functions
 
-from ..constants import SASDI_THEMES_VOCABULARY_NAME
+from ..constants import (
+    ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
+    ISO_TOPIC_CATEGORIES,
+    SASDI_THEMES_VOCABULARY_NAME,
+)
+
+from ._bootstrap_data import SASDI_ORGANIZATIONS
+from ._sample_datasets import SAMPLE_DATASETS
+from ._sample_organizations import SAMPLE_ORGANIZATIONS
+from ._sample_users import SAMPLE_USERS
 
 logger = logging.getLogger(__name__)
 
@@ -20,116 +27,6 @@ _DEFAULT_COLOR: typing.Final[typing.Optional[str]] = None
 _SUCCESS_COLOR: typing.Final[str] = "green"
 _ERROR_COLOR: typing.Final[str] = "red"
 _INFO_COLOR: typing.Final[str] = "yellow"
-
-
-@dataclasses.dataclass
-class _CkanBootstrapOrganization:
-    title: str
-    description: str
-    image_url: typing.Optional[Path] = None
-
-    @property
-    def name(self):
-        return self.title.replace(" ", "-").lower()[:100]
-
-
-@dataclasses.dataclass
-class _CkanBootstrapUser:
-    name: str
-    email: str
-    password: str
-
-
-@dataclasses.dataclass
-class _CkanBootstrapHarvester:
-    name: str
-    url: str
-    source_type: str
-    update_frequency: str
-    configuration: typing.Dict
-
-
-_SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
-    _CkanBootstrapOrganization(
-        title="NSIF",
-        description=(
-            "The National Spatial Information Framework (NSIF) is a directorate "
-            "established in the Department of Rural Development and Land Reform, "
-            "within the Branch: National Geomatics Management Services to "
-            "facilitate the development and implementation of the South African "
-            "Spatial Data Infrastructure (SASDI), established in terms of "
-            "Section 3 of the Spatial Data Infrastructure Act (SDI Act No. 54, "
-            "2003). The NSIF also serves as secretariat to the Committee for "
-            "Spatial Information (CSI), established under Section 5 of the SDI "
-            "Act. "
-        ),
-    ),
-    _CkanBootstrapOrganization(
-        title="CSI",
-        description=(
-            "The Spatial Data Infrastructure Act (Act No. 54 of 2003) mandates "
-            "the Committee for Spatial Information (CSI) to amongst others advise "
-            "the Minister, the Director General and other Organs of State on "
-            "matters regarding the capture, management, integration, distribution "
-            "and utilisation of geo-spatial information. The CSI through its six "
-            "subcommittees developed a Programme of Work to guide the work to be "
-            "done by the CSI in achieving the objectives of SASDI."
-        ),
-    ),
-]
-
-_SAMPLE_USER_PASSWORD: typing.Final[str] = "12345678"
-
-_SAMPLE_USERS: typing.Final[typing.List[_CkanBootstrapUser]] = [
-    _CkanBootstrapUser("tester1", "tester1@fake.mail", _SAMPLE_USER_PASSWORD),
-    _CkanBootstrapUser("tester2", "tester2@fake.mail", _SAMPLE_USER_PASSWORD),
-    _CkanBootstrapUser("tester3", "tester3@fake.mail", _SAMPLE_USER_PASSWORD),
-    _CkanBootstrapUser("tester4", "tester4@fake.mail", _SAMPLE_USER_PASSWORD),
-    _CkanBootstrapUser("tester5", "tester5@fake.mail", _SAMPLE_USER_PASSWORD),
-    _CkanBootstrapUser("tester6", "tester6@fake.mail", _SAMPLE_USER_PASSWORD),
-]
-
-_SAMPLE_ORG_DESCRIPTION: typing.Final[str] = (
-    "This is a sample organization. It is meant for aiding the development and "
-    "testing purposes"
-)
-
-_SAMPLE_ORGANIZATIONS: typing.Final[
-    typing.List[
-        typing.Tuple[
-            _CkanBootstrapOrganization,
-            typing.List[typing.Tuple[str, str]],
-            typing.List[_CkanBootstrapHarvester],
-        ]
-    ]
-] = [
-    (
-        _CkanBootstrapOrganization("Sample org 1", _SAMPLE_ORG_DESCRIPTION),
-        [
-            ("tester1", "member"),
-            ("tester2", "editor"),
-            ("tester3", "publisher"),
-        ],
-        [
-            _CkanBootstrapHarvester(
-                name="local-pycsw",
-                url="http://csw-harvest-target:8000",
-                source_type="csw",
-                update_frequency="MANUAL",
-                configuration={"default_tags": ["csw", "harvest"]},
-            )
-        ],
-    ),
-    (
-        _CkanBootstrapOrganization("Sample org 2", _SAMPLE_ORG_DESCRIPTION),
-        [
-            ("tester4", "member"),
-            ("tester5", "editor"),
-            ("tester6", "publisher"),
-        ],
-        [],
-    ),
-]
 
 
 @click.group()
@@ -252,6 +149,106 @@ def delete_sasdi_themes():
 
 
 @bootstrap.command()
+def create_iso_topic_categories():
+    """Create ISO Topic Categories.
+
+    This command adds a CKAN vocabulary for the ISO Topic Categories and creates each
+    topic category as a CKAN tag.
+
+    This command can safely be called multiple times - it will only ever create the
+    vocabulary and themes once.
+
+    """
+
+    click.secho(
+        f"Creating ISO Topic Categories CKAN tag vocabulary and adding "
+        f"the relevant categories..."
+    )
+
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    context = {"user": user["name"]}
+    vocab_list = toolkit.get_action("vocabulary_list")(context)
+    for voc in vocab_list:
+        if voc["name"] == ISO_TOPIC_CATEGOY_VOCABULARY_NAME:
+            vocabulary = voc
+            click.secho(
+                (
+                    f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} already exists, "
+                    f"skipping creation..."
+                ),
+                fg=_INFO_COLOR,
+            )
+            break
+    else:
+        click.echo(f"Creating vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
+        vocabulary = toolkit.get_action("vocabulary_create")(
+            context, {"name": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
+        )
+
+    for theme_name, _ in ISO_TOPIC_CATEGORIES:
+        if theme_name != "":
+            already_exists = theme_name in [tag["name"] for tag in vocabulary["tags"]]
+            if not already_exists:
+                click.echo(
+                    f"Adding tag {theme_name!r} to "
+                    f"vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}..."
+                )
+                toolkit.get_action("tag_create")(
+                    context, {"name": theme_name, "vocabulary_id": vocabulary["id"]}
+                )
+            else:
+                click.secho(
+                    (
+                        f"Tag {theme_name!r} is already part of the "
+                        f"{ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} vocabulary, skipping..."
+                    ),
+                    fg=_INFO_COLOR,
+                )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@delete_data.command()
+def delete_iso_topic_categories():
+    """Delete ISO Topic Categories.
+
+    This command can safely be called multiple times - it will only ever delete the
+    vocabulary and themes once, if they exist.
+
+    """
+
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    context = {"user": user["name"]}
+    vocabulary_list = toolkit.get_action("vocabulary_list")(context)
+    if ISO_TOPIC_CATEGOY_VOCABULARY_NAME in [voc["name"] for voc in vocabulary_list]:
+        click.secho(
+            f"Deleting {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} CKAN tag vocabulary and "
+            f"respective tags... "
+        )
+        existing_tags = toolkit.get_action("tag_list")(
+            context, {"vocabulary_id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
+        )
+        for tag_name in existing_tags:
+            click.secho(f"Deleting tag {tag_name!r}...")
+            toolkit.get_action("tag_delete")(
+                context,
+                {"id": tag_name, "vocabulary_id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME},
+            )
+        click.echo(f"Deleting vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
+        toolkit.get_action("vocabulary_delete")(
+            context, {"id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
+        )
+    else:
+        click.secho(
+            (
+                f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} does not exist, "
+                f"nothing to do"
+            ),
+            fg=_INFO_COLOR,
+        )
+    click.secho(f"Done!", fg=_SUCCESS_COLOR)
+
+
+@bootstrap.command()
 def create_sasdi_organizations():
     """Create main SASDI organizations
 
@@ -269,12 +266,12 @@ def create_sasdi_organizations():
     existing_organizations = toolkit.get_action("organization_list")(
         context={},
         data_dict={
-            "organizations": [org.name for org in _SASDI_ORGANIZATIONS],
+            "organizations": [org.name for org in SASDI_ORGANIZATIONS],
             "all_fields": False,
         },
     )
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-    for org_details in _SASDI_ORGANIZATIONS:
+    for org_details in SASDI_ORGANIZATIONS:
         if org_details.name not in existing_organizations:
             click.secho(f"Creating organization {org_details.name!r}...")
             try:
@@ -312,7 +309,7 @@ def delete_sasdi_organizations():
     """
 
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-    for org_details in _SASDI_ORGANIZATIONS:
+    for org_details in SASDI_ORGANIZATIONS:
         click.secho(f"Purging  organization {org_details.name!r}...")
         try:
             toolkit.get_action("organization_purge")(
@@ -336,7 +333,7 @@ def create_sample_users():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     create_user_action = toolkit.get_action("user_create")
     click.secho(f"Creating sample users ...")
-    for user_details in _SAMPLE_USERS:
+    for user_details in SAMPLE_USERS:
         click.secho(f"Creating {user_details.name!r}...")
         try:
             create_user_action(
@@ -375,7 +372,7 @@ def create_sample_organizations():
     create_org_member_action = toolkit.get_action("organization_member_create")
     create_harvester_action = toolkit.get_action("harvest_source_create")
     click.secho(f"Creating sample organizations ...")
-    for org_details, memberships, harvesters in _SAMPLE_ORGANIZATIONS:
+    for org_details, memberships, harvesters in SAMPLE_ORGANIZATIONS:
         click.secho(f"Creating {org_details.name!r}...")
         try:
             create_org_action(
@@ -451,7 +448,7 @@ def delete_sample_users():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     delete_user_action = toolkit.get_action("user_delete")
     click.secho(f"Deleting sample users ...")
-    for user_details in _SAMPLE_USERS:
+    for user_details in SAMPLE_USERS:
         click.secho(f"Deleting {user_details.name!r}...")
         delete_user_action(
             context={"user": user["name"]},
@@ -472,7 +469,7 @@ def delete_sample_organizations():
     harvest_source_list_action = toolkit.get_action("harvest_source_list")
     harvest_source_delete_action = toolkit.get_action("harvest_source_delete")
     click.secho(f"Purging sample organizations ...")
-    for org_details, _, _ in _SAMPLE_ORGANIZATIONS:
+    for org_details, _, _ in SAMPLE_ORGANIZATIONS:
         try:
             org = org_show_action(
                 context={"user": user["name"]}, data_dict={"id": org_details.name}
@@ -508,5 +505,66 @@ def delete_sample_organizations():
             purge_org_action(
                 context={"user": user["name"]},
                 data_dict={"id": org["id"]},
+            )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@load_sample_data.command()
+def create_sample_datasets():
+    """Create sample datasets"""
+
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    create_dataset_action = toolkit.get_action("package_create")
+    get_dataset_action = toolkit.get_action("package_show")
+    for dataset in SAMPLE_DATASETS:
+        click.secho(f"Processing dataset {dataset.name!r}...")
+        try:
+            get_dataset_action(
+                context={"user": user["name"]}, data_dict={"id": dataset.name}
+            )
+        except toolkit.ObjectNotFound:
+            package_exists = False
+        else:
+            package_exists = True
+            click.secho(f"dataset {dataset.name!r} already exists", fg=_INFO_COLOR)
+
+        if not package_exists:
+            click.secho(
+                f"dataset {dataset.name!r} does not exist. Creating...", fg=_INFO_COLOR
+            )
+            data_dict = dataset.to_data_dict()
+            click.secho(f"{data_dict=}", fg=_INFO_COLOR)
+            try:
+                create_dataset_action(
+                    context={"user": user["name"]}, data_dict=data_dict
+                )
+            except dictization_functions.DataError as exc:
+                click.secho(f"Could not create dataset: {exc=}", fg=_ERROR_COLOR)
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@delete_data.command()
+def delete_sample_datasets():
+    """Delete sample datasets"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    purge_dataset_action = toolkit.get_action("dataset_purge")
+    get_dataset_action = toolkit.get_action("package_show")
+    for dataset in SAMPLE_DATASETS:
+        click.secho(f"Processing dataset {dataset.name!r}...")
+        try:
+            get_dataset_action(
+                context={"user": user["name"]}, data_dict={"id": dataset.name}
+            )
+        except toolkit.ObjectNotFound:
+            package_exists = False
+            click.secho(
+                f"dataset {dataset.name!r} does not exist. Skipping...", fg=_INFO_COLOR
+            )
+        else:
+            package_exists = True
+        if package_exists:
+            click.secho(f"Purging dataset {dataset.name!r}...")
+            purge_dataset_action(
+                context={"user": user["name"]}, data_dict={"id": dataset.name}
             )
     click.secho("Done!", fg=_SUCCESS_COLOR)
