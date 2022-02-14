@@ -114,6 +114,7 @@ factory-boy = "^3.2.0"
 mock = "^4.0.3"
 pytest-raises = "^0.11"
 mypy = "^0.931"
+types-setuptools = "^57.4.9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

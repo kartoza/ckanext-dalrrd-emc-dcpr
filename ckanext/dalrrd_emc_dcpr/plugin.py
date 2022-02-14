@@ -15,6 +15,7 @@ from . import (
 from .cli import commands
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
+from .logic.action import emc as emc_actions
 from .logic import (
     auth,
     validators,
@@ -57,6 +58,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_update": ckan_actions.package_update,
             "package_patch": ckan_actions.package_patch,
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
+            "emc_version": emc_actions.show_version,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
@@ -119,6 +121,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ),
             "emc_sasdi_themes": helpers.get_sasdi_themes,
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
+            "emc_show_version": helpers.helper_show_version,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
