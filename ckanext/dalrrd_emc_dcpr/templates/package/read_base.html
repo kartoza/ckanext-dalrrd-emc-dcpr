@@ -1,0 +1,20 @@
+{% ckan_extends %}
+
+{% block content_action %}
+    {{ super() }}
+    {#
+        This template is overridden in order to add a button for requesting that a public package be edited
+        Organization editors are not allowed to modify a dataset that is public.
+
+        Ideally published datasets are immutable - any modifications would be published as a new dataset, with the
+        corresponding version increased
+
+        Nevertheless, it the need to modify a public dataset arises, then this must be vetted by one of the organization
+        admins (i.e. publishers)
+
+     #}
+    {% set user_is_editor = h.emc_user_is_org_member(pkg.owner_org, g.userobj, role="editor") %}
+    {% if not pkg.private and user_is_editor and not h.check_access("package_update", {"id": pkg.id}) %}
+        {% link_for _('Request edit'), named_route="emc.request_package_maintenance", id=pkg.name, class_='btn btn-default', icon='wrench' %}
+    {% endif %}
+{% endblock %}

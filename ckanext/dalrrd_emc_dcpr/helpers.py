@@ -51,6 +51,27 @@ def helper_show_version(*args, **kwargs) -> typing.Dict:
     return show_version()
 
 
+def user_is_org_member(
+    org_id: str, user=None, role: typing.Optional[str] = None
+) -> bool:
+    """Check if user has editor role in the input organization."""
+    logger.debug(f"{locals()=}")
+    result = False
+    if user is not None:
+        member_list_action = toolkit.get_action("member_list")
+        org_members = member_list_action(
+            data_dict={"id": org_id, "object_type": "user"}
+        )
+        logger.debug(f"{user.id=}")
+        logger.debug(f"{org_members=}")
+        for member_id, _, member_role in org_members:
+            if user.id == member_id:
+                if role is None or member_role.lower() == role.lower():
+                    result = True
+                break
+    return result
+
+
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     geom = geometry.shape(extent)
     padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)

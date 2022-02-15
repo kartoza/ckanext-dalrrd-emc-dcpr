@@ -8,19 +8,20 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
 from . import (
-    blueprint,
     constants,
     helpers,
 )
+from .blueprints.dcpr import dcpr_blueprint
+from .blueprints.emc import emc_blueprint
 from .cli import commands
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
 from .logic.action import emc as emc_actions
 from .logic import (
-    auth,
     validators,
 )
 from .logic.auth import dcpr as dcpr_auth
+from .logic.auth import ckan as ckan_auth
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
         return {
-            "package_publish": auth.authorize_package_publish,
+            "package_publish": ckan_auth.authorize_package_publish,
+            "package_update": ckan_auth.package_update,
+            "package_patch": ckan_auth.package_patch,
             "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
         }
 
@@ -123,11 +126,13 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_sasdi_themes": helpers.get_sasdi_themes,
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
             "emc_show_version": helpers.helper_show_version,
+            "emc_user_is_org_member": helpers.user_is_org_member,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
         return [
-            blueprint.dcpr_blueprint,
+            dcpr_blueprint,
+            emc_blueprint,
         ]
 
     def dataset_facets(
