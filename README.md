@@ -350,8 +350,12 @@ ckan --help
 
 #### CSS
 
-CKAN's main CSS is generated with [less](https://lesscss.org/) and what is distributed are the compiled `.css` files.
-In order to hook into those less files and have an easier way to define global variables and styles we need to install
+##### Less files
+
+CKAN, the base of the SASDI EMC stack, uses [bootstrap version 3.4.1](https://getbootstrap.com/docs/3.4/). The main
+CSS file is generated with [Less](https://lesscss.org/) and what is distributed are the compiled `.css` files.
+
+In order to hook into those Less files and have an easier way to define global variables and styles we need to install
 some additional dependencies and set up a CSS building pipeline.
 
 This is done by following the steps below:
@@ -367,8 +371,11 @@ This is done by following the steps below:
 
 - Now you may edit the `public/base/less` files and reload your web browser to see the changes
 
-There is also the `assets/css/dalrrd-emc-dcpr.css` file, which you can use to write custom CSS directly. Editing this
-file can be done when the changes do not involve modifying the less variables - it also does not required nodejs to be
+
+#### Vanilla CSS files
+
+The `assets/css/dalrrd-emc-dcpr.css` file can be used to write custom CSS directly. Editing this
+file can be done when the changes do not involve modifying Less variables - it also does not require nodejs to be
 installed
 
 
