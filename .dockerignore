@@ -4,3 +4,5 @@ Dockerfile
 **/__pycache__
 
 .git
+
+node_modules

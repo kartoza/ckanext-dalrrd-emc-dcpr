@@ -346,18 +346,37 @@ ckan --help
 ```
 
 
+### Frontend work
 
-### Development in standalone (non-docker) mode
+#### CSS
 
-To install ckanext-dalrrd-emc-dcpr for development, activate your CKAN
-virtualenv and do:
+##### Less files
 
-```
-git clone https://github.com/Kartoza/ckanext-dalrrd-emc-dcpr.git
-cd ckanext-dalrrd-emc-dcpr
-python setup.py develop
-pip install -r dev-requirements.txt
-```
+CKAN, the base of the SASDI EMC stack, uses [bootstrap version 3.4.1](https://getbootstrap.com/docs/3.4/). The main
+CSS file is generated with [Less](https://lesscss.org/) and what is distributed are the compiled `.css` files.
+
+In order to hook into those Less files and have an easier way to define global variables and styles we need to install
+some additional dependencies and set up a CSS building pipeline.
+
+This is done by following the steps below:
+
+- Start the docker-compose stack with the development files
+- Run the provided `docker/prepare-for-frontend-dev.sh` script. This will install [node.js](https://nodejs.org/en/)
+  inside the running container, then use npm to install the dependencies mentioned in the `package.json` file and
+  immediately start watching for changes:
+
+  ```bash
+  docker exec -ti emc-dcpr_ckan-web_1 bash docker/prepare-for-frontent-dev.sh
+  ```
+
+- Now you may edit the `public/base/less` files and reload your web browser to see the changes
+
+
+#### Vanilla CSS files
+
+The `assets/css/dalrrd-emc-dcpr.css` file can be used to write custom CSS directly. Editing this
+file can be done when the changes do not involve modifying Less variables - it also does not require nodejs to be
+installed
 
 
 ### Continuous Integration and git pre-commit
@@ -381,7 +400,20 @@ This project also uses a Continuous Deployment pipeline where each commit to the
 the redeployment of our testing environment.
 
 
-## Testing
+### Development in standalone (non-docker) mode
+
+To install ckanext-dalrrd-emc-dcpr for development, activate your CKAN
+virtualenv and do:
+
+```
+git clone https://github.com/Kartoza/ckanext-dalrrd-emc-dcpr.git
+cd ckanext-dalrrd-emc-dcpr
+python setup.py develop
+pip install -r dev-requirements.txt
+```
+
+
+### Testing
 
 Testing uses some additional configuration:
 
