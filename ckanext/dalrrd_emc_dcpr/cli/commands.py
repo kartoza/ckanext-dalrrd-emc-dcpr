@@ -371,6 +371,11 @@ def load_sample_data():
 
 
 @load_sample_data.command()
+def create_sample_dcpr_requests():
+    pass
+
+
+@load_sample_data.command()
 def create_sample_users():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     create_user_action = toolkit.get_action("user_create")
