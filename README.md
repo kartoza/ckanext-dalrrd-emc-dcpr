@@ -441,3 +441,23 @@ To run the tests you will need to:
   - Update frequency: `Manual`
   - Configuration: `{"default_tags": ["csw", "harvest"]}`
   - Organization: `test-org-1`
+
+## Kubernetes Pod Shell
+
+To run any of the above docker commands once this is deployed into Kubernetes you can use one of 3 ways:
+
+1. By accessing Rancher:
+  1. Go to Rancher2 > Shared (in header bar) > EMC-DCPR
+  2. Go to the "ckan" Workload
+  3. On a running pod click on the menu and select "Execute Shell"
+2. By Using Lens:
+  1. Go to Workloads > Deployments.
+  2. Choose the correct namespace: "emc-dcpr"
+  3. Select the Deployment "ckan"
+  4. Scroll to Pods
+  5. Select a running one
+  6. Click on "Pod Shell".
+3. Using the Kubernetes CLI
+  1. Get the pod name: `kubectl get pods --namespace=emc-dcpr`, it should look like `ckan-<randon string>`
+  2. Run `kubectl exec -it <pod name> --namespace=emc-dcpr -- bash`
+  3. Or an all in one: `kubectl exec -it "$(kubectl get pods --namespace=emc-dcpr | grep Running | grep ckan- | grep -v postgis | cut -d' ' -f1)" --namespace=emc-dcpr -- bash`
