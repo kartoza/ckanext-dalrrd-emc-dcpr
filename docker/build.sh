@@ -16,9 +16,9 @@ set -euo pipefail
 
 IMAGE_NAME=index.docker.io/kartoza/ckanext-dalrrd-emc-dcpr
 
-GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD | tr / -)
 GIT_COMMIT=$(git rev-parse --short HEAD)
-DEFAULT_BRANCH=$(basename $(git rev-parse --abbrev-ref origin/HEAD))
+DEFAULT_BRANCH=$(basename $(git rev-parse --abbrev-ref origin/HEAD) | tr / -)
 
 # pull previous version, and use it with --cache-now, for build caching
 docker pull $IMAGE_NAME:$DEFAULT_BRANCH || true

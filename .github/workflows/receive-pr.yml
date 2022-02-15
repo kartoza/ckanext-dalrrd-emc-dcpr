@@ -47,11 +47,15 @@ jobs:
       - name: Get current git branch name
         uses: EthanSK/git-branch-name-action@v1
 
+      - name: Replace invalid chars in git branch name
+        shell: bash
+        run: echo "SLUGGED_GIT_BRANCH_NAME=$(echo $GIT_BRANCH_NAME | tr / -)" >> $GITHUB_ENV
+
       - name: Save docker image and tags
         env:
           IMAGE_NAME: ${{ github.repository }}
         run: |
-          docker save "$IMAGE_NAME:$GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
+          docker save "$IMAGE_NAME:$SLUGGED_GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
 
       - name: Persist artifacts
         uses: actions/upload-artifact@v2
