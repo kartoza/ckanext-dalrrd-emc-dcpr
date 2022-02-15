@@ -68,9 +68,11 @@ def _get_compose_command(fragment: str, compose_file: typing.List[str]) -> str:
 
 
 def _get_image_tag_name() -> typing.Optional[str]:
-    current_git_branch = check_output(
-        shlex.split("git rev-parse --abbrev-ref HEAD"), text=True
-    ).strip("\n")
+    current_git_branch = (
+        check_output(shlex.split("git rev-parse --abbrev-ref HEAD"), text=True)
+        .strip("\n")
+        .replace("/", "-")
+    )
     image_name = "kartoza/ckanext-dalrrd-emc-dcpr"
     existing_image_tags = check_output(
         shlex.split(f"docker images {image_name} --format '{{{{.Tag}}}}'"), text=True
