@@ -217,11 +217,13 @@ dataset_fields:
     display_snippet: email.html
     display_email_name_field: maintainer
 
-    # TODO: Add a map widget to ease filling this value in
   - field_name: spatial
     label: Geographic location bounding box
     required: true
-    preset: json_object
+    help_text: >-
+      Bounding box for the dataset, expressed as the geographic coordinates of the upper left and lower right
+      corners - This is a SANS 1878 mandatory field
+    preset: emc_dataset_spatial_extent
     display_snippet: null
 
     # TODO: Add a more pleasant widget, like the one used for the dataset URL, which would show 1/<value>
