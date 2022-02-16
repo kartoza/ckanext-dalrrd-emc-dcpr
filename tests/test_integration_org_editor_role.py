@@ -90,3 +90,85 @@ def test_create_package(name, private, org_role):
         context={"ignore_auth": False, "user": user["name"]},
         **data_dict,
     )
+
+
+@pytest.mark.parametrize(
+    "name, private, org_role",
+    [
+        pytest.param(
+            "test_package5",
+            True,
+            "editor",
+            id="editor-can-update-private-package",
+        ),
+        pytest.param(
+            "test_package6",
+            False,
+            "editor",
+            marks=pytest.mark.raises(exception=NotAuthorized),
+            id="editor-cannot-update-public-package",
+        ),
+    ],
+)
+@pytest.mark.usefixtures(
+    "emc_clean_db", "with_plugins", "with_request_context", "emc_create_sasdi_themes"
+)
+def test_update_package(name, private, org_role):
+    owner_organization = factories.Organization()
+    org_admin = factories.User()
+    helpers.call_action(
+        "organization_member_create",
+        id=owner_organization["id"],
+        username=org_admin["name"],
+        role="admin",
+    )
+    user = factories.User()
+    helpers.call_action(
+        "organization_member_create",
+        id=owner_organization["id"],
+        username=user["name"],
+        role=org_role,
+    )
+    data_dict = {
+        "name": name,
+        "private": private,
+        "title": name,
+        "notes": f"notes for {name}",
+        "reference_date": "2020-01-01",
+        "iso_topic_category": "biota",
+        "owner_org": owner_organization["id"],
+        "dataset_language": "en",
+        "metadata_language": "en",
+        "dataset_character_set": "utf-8",
+        "lineage": f"lineage for {name}",
+        "maintainer": "Surname, Name, title.",
+        "spatial": json.dumps(
+            {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [10.0, 10.0],
+                        [10.31, 10.0],
+                        [10.31, 10.44],
+                        [10.0, 10.44],
+                        [10.0, 10.0],
+                    ]
+                ],
+            }
+        ),
+        "equivalent_scale": "500",
+        "spatial_representation_type": "001",
+        "spatial_reference_system": "EPSG:4326",
+    }
+    helpers.call_action(
+        "package_create",
+        context={"ignore_auth": False, "user": org_admin["name"]},
+        **data_dict,
+    )
+    patched_notes = f"patched notes"
+    helpers.call_action(
+        "package_patch",
+        context={"ignore_auth": False, "user": user["name"]},
+        id=name,
+        notes=patched_notes,
+    )
