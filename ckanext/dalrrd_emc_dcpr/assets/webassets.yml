@@ -1,11 +1,23 @@
-# dalrrd_emc_dcpr-js:
-#   filter: rjsmin
-#   output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.js
-#   contents:
-#     - js/dalrrd_emc_dcpr.js
-#   extra:
-#     preload:
-#       - base/main
+# below we are including ckanext-spatial assets because we want to use leaflet, which is included
+# by ckanext-spatial
+
+dataset-spatial-extent-map-js:
+  filter: rjsmin
+  output: ckanext-dalrrd_emc_dcpr/%(version)s-datasetSpatialExtentMap.js
+  contents:
+    - js/datasetSpatialExtentMap.js
+  extra:
+    preload:
+      - ckanext-spatial/spatial_query_js
+
+dataset-spatial-extent-map-css:
+  output: ckanext-dalrrd_emc_dcpr/%(version)s-datasetSpatialExtentMap.css
+  contents:
+    - css/dataset-spatial-extent-map.css
+  filter: cssrewrite
+  extra:
+    preload:
+      - ckanext-spatial/spatial_query_css
 
 dalrrd-emc-dcpr-css:
   output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.css
