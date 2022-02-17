@@ -1,26 +1,38 @@
-# below we are including ckanext-spatial assets because we want to use leaflet, which is included
-# by ckanext-spatial
+vendorized-leaflet-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet.js
+  contents:
+    - vendor/leaflet/leaflet.js
+    - vendor/leaflet.draw/leaflet.draw-custom.js
+  filter: rjsmin
+
+vendorized-leaflet-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet.css
+  contents:
+    - vendor/leaflet/leaflet.css
+    - vendor/leaflet.draw/leaflet.draw.css
+  filter: cssrewrite
 
 dataset-spatial-extent-map-js:
-  filter: rjsmin
-  output: ckanext-dalrrd_emc_dcpr/%(version)s-datasetSpatialExtentMap.js
+  output: ckanext-dalrrdemcdcpr/%(version)s_datasetSpatialExtentMap.js
   contents:
     - js/datasetSpatialExtentMap.js
+  filter: rjsmin
   extra:
     preload:
-      - ckanext-spatial/spatial_query_js
+      - base/main
+      - ckanext-dalrrdemcdcpr/vendorized-leaflet-js
 
 dataset-spatial-extent-map-css:
-  output: ckanext-dalrrd_emc_dcpr/%(version)s-datasetSpatialExtentMap.css
+  output: ckanext-dalrrdemcdcpr/%(version)s_datasetSpatialExtentMap.css
   contents:
     - css/dataset-spatial-extent-map.css
   filter: cssrewrite
   extra:
     preload:
-      - ckanext-spatial/spatial_query_css
+      - ckanext-dalrrdemcdcpr/vendorized-leaflet-css
 
 dalrrd-emc-dcpr-css:
-  output: ckanext-dalrrd_emc_dcpr/%(version)s-dalrrd_emc_dcpr.css
+  output: ckanext-dalrrdemcdcpr/%(version)s_dalrrd_emc_dcpr.css
   contents:
     - css/dalrrd-emc-dcpr.css
   filter: cssrewrite

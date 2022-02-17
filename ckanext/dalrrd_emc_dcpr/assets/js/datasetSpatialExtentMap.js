@@ -40,33 +40,26 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
         },
 
         _onReady: function() {
-            this.map = ckan.commonLeafletMap(
-                "dataset-spatial-extent-map-container",
-                this.options.mapConfig,
-                {
-                    drawControl: true,
-                    attributionControl: false
-                }
-            )
-            this.map.on("click", this._onMapClick)
+            this.map = L.map("dataset-spatial-extent-map-container", this.options.mapConfig, {
+                attributionControl: false
+            })
+
+            // This is based on the base map used in ckanext-spatial
+            const baseLayerUrl = 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png';
+            let leafletBaseLayerOptions = {
+                subdomains: this.options.mapConfig.subdomains || "abcd",
+                attribution: this.options.mapConfig.attribution || 'Map tiles by <a href="http://stamen.com">Stamen Design</a> (<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>). Data by <a href="http://openstreetmap.org">OpenStreetMap</a> (<a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>)'
+            }
+            const baseLayer = new L.TileLayer(baseLayerUrl, leafletBaseLayerOptions)
+            this.map.addLayer(baseLayer)
+
             const ckanIcon = L.Icon.extend({options: this.options.styles.point});
             const extentLayer = L.geoJson(this.defaultExtent, {
                 style: this.options.styles.default_,
                 pointToLayer: function (feature, latLng) {
                     return new L.Marker(latLng, {icon: new ckanIcon})
                 }});
-            extentLayer.addTo(this.map);
-
-            const drawnItemsLayer = new L.FeatureGroup()
-            this.map.addLayer(drawnItemsLayer)
-
-            const drawControl = new L.Control.Draw({
-                edit: {
-                    featureGroup: drawnItemsLayer
-                }
-            })
-            this.map.addControl(drawControl)
-
+            this.map.addLayer(extentLayer)
             this.map.fitBounds(extentLayer.getBounds())
         },
     }
