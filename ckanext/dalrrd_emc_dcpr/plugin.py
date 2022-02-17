@@ -40,7 +40,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
         toolkit.add_public_directory(config_, "public")
-        toolkit.add_resource("assets", "dalrrd-emc-dcpr")
+        toolkit.add_resource("assets", "ckanext-dalrrdemcdcpr")
 
     def get_commands(self):
         return [
