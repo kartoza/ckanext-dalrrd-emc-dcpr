@@ -41,6 +41,7 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
 
         _onReady: function() {
             this.map = L.map("dataset-spatial-extent-map-container", this.options.mapConfig, {
+                drawControl: false,
                 attributionControl: false
             })
 
@@ -53,14 +54,49 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
             const baseLayer = new L.TileLayer(baseLayerUrl, leafletBaseLayerOptions)
             this.map.addLayer(baseLayer)
 
-            const ckanIcon = L.Icon.extend({options: this.options.styles.point});
-            const extentLayer = L.geoJson(this.defaultExtent, {
-                style: this.options.styles.default_,
-                pointToLayer: function (feature, latLng) {
-                    return new L.Marker(latLng, {icon: new ckanIcon})
-                }});
-            this.map.addLayer(extentLayer)
-            this.map.fitBounds(extentLayer.getBounds())
+            // const ckanIcon = L.Icon.extend({options: this.options.styles.point});
+            // const extentLayer = L.geoJson(this.defaultExtent, {
+            //     style: this.options.styles.default_,
+            //     pointToLayer: function (feature, latLng) {
+            //         return new L.Marker(latLng, {icon: new ckanIcon})
+            //     }});
+            // this.map.addLayer(extentLayer)
+
+            const rectangleLayer = L.rectangle([[54.559322, -5.767822], [56.1210604, -3.021240]])
+            rectangleLayer.editing.enable()
+            rectangleLayer.on("edit", this.handleEdits)
+
+            this.map.addLayer(rectangleLayer)
+            this.map.fitBounds(rectangleLayer.getBounds())
+            // this.map.fitBounds(extentLayer.getBounds())
+
+            // const drawnItems = new L.FeatureGroup([extentLayer])
+            // const drawControl = new L.Control.Draw({
+            //     draw: {
+            //         polyline: false,
+            //         polygon: false,
+            //         rectangle: false,
+            //         circle: false,
+            //         marker: false,
+            //         circlemarker: false,
+            //     },
+            //     edit: {
+            //         featureGroup: drawnItems,
+            //         edit: {
+            //             maintainColor: true,
+            //             opacity: 0.3
+            //         },
+            //         remove: false,
+            //         allowIntersection: false
+            //     }
+            // })
+            // this.map.addControl(drawControl)
+            // this.map.addLayer(drawnItems)
         },
+
+        handleEdits: function(event) {
+            console.log(`layer ${event.layer} has just been edited!`)
+        }
+
     }
 })
