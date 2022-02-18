@@ -47,6 +47,28 @@ def get_default_spatial_search_extent(
     return result
 
 
+def get_default_bounding_box() -> typing.List[float]:
+    """Return the default bounding box in the form min_lat, min_lon, max_lat, max_lon
+
+    This function calculates the default bounding box from the
+    `ckan.dalrrd_emc_dcpr.default_spatial_search_extent` configuration value. Note that
+    this configuration value is expected to be in GeoJSON format and in GeoJSON,
+    coordinate pairs take the form `lon, lat`.
+
+    """
+
+    configured_extent = toolkit.config.get(
+        "ckan.dalrrd_emc_dcpr.default_spatial_search_extent"
+    )
+    parsed_extent = json.loads(configured_extent)
+    coords = parsed_extent["coordinates"][0]
+    min_lon = min(c[0] for c in coords)
+    max_lon = max(c[0] for c in coords)
+    min_lat = min(c[1] for c in coords)
+    max_lat = max(c[1] for c in coords)
+    return [max_lat, min_lon, min_lat, max_lon]
+
+
 def helper_show_version(*args, **kwargs) -> typing.Dict:
     return show_version()
 
