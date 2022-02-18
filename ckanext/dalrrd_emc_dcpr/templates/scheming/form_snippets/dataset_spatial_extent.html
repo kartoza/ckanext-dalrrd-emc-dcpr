@@ -5,6 +5,7 @@
 
 {% set map_config = h.get_common_map_config() %}
 {% set default_extent = h.dalrrd_emc_dcpr_default_spatial_search_extent() %}
+{% set input_id = ["field", field.name]|join("-") %}
 
 
 {% call form.input_block(field.field_name, h.scheming_language_text(field.label), is_required=h.scheming_field_required(field)) %}
@@ -13,12 +14,13 @@
             data-module="emcDatasetSpatialExtentMap"
             data-module-map-config="{{ h.dump_json(map_config) }}"
             data-module-default-extent="{{ default_extent }}"
+            data-module-form-input-id="{{ input_id }}"
     >
         <div id="dataset-spatial-extent-map-container"></div>
         <div id="dataset-spatial-extent-map-attribution">
             {% snippet "spatial/snippets/map_attribution.html", map_config=map_config %}
         </div>
     </div>
-    <input id="field-{{ field.name }}" type="text" name="{{ name }}" value="{{ value | empty_and_escape }}" />
+    <input id="{{ input_id }}" type="text" name="{{ name }}" value="{{ value | empty_and_escape }}" />
     {%- snippet 'scheming/form_snippets/help_text.html', field=field -%}
 {% endcall %}

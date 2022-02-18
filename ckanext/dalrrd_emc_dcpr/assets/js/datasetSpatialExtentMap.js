@@ -28,6 +28,7 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
 
         initialize: function() {
             this.defaultExtent = this.options.defaultExtent
+            this.formInputElement = document.getElementById(this.options.formInputId)
 
             console.log(
                 `Hi there, I'm running inside the emcDatasetSpatialExtentMap module. ` +
@@ -95,7 +96,8 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
         },
 
         handleEdits: function(event) {
-            console.log(`layer ${event.layer} has just been edited!`)
+            console.log(`layer with a type ${event.layerType} has just been edited!`)
+            //this.formInputElement.textContent = layer.toGeoJSON()
         }
 
     }
