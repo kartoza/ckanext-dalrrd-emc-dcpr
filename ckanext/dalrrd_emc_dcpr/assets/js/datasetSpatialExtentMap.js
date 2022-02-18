@@ -27,12 +27,12 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
         },
 
         initialize: function() {
-            this.defaultExtent = this.options.defaultExtent
             this.formInputElement = document.getElementById(this.options.formInputId)
+
 
             console.log(
                 `Hi there, I'm running inside the emcDatasetSpatialExtentMap module. ` +
-                `Oh, and my bound element is ${this.el} and the Jinja template passed me this as the default extent: ${this.defaultExtent}`
+                `Oh, and my bound element is ${this.el} and the Jinja template passed me this as the default extent: ${this.options.defaultExtent}`
             )
 
             jQuery.proxyAll(this, /_on/);
@@ -42,8 +42,23 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
 
         _onReady: function() {
             this.map = L.map("dataset-spatial-extent-map-container", this.options.mapConfig, {
-                drawControl: false,
                 attributionControl: false
+            })
+            this.map.pm.addControls({
+                position: "topleft",
+                drawMarker: false,
+                drawCircleMarker: false,
+                drawPolyline: false,
+                drawRectangle: true,
+                drawPolygon: false,
+                drawCircle: false,
+                cutPolygon: false,
+                removalMode: true,
+                rotateMode: false,
+                pinningOption: false,
+                snappingOption: false,
+                splitMode: false,
+                scaleMode: false,
             })
 
             // This is based on the base map used in ckanext-spatial
@@ -55,50 +70,63 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
             const baseLayer = new L.TileLayer(baseLayerUrl, leafletBaseLayerOptions)
             this.map.addLayer(baseLayer)
 
-            // const ckanIcon = L.Icon.extend({options: this.options.styles.point});
-            // const extentLayer = L.geoJson(this.defaultExtent, {
-            //     style: this.options.styles.default_,
-            //     pointToLayer: function (feature, latLng) {
-            //         return new L.Marker(latLng, {icon: new ckanIcon})
-            //     }});
-            // this.map.addLayer(extentLayer)
+            this.rectangleLayer = L.rectangle(
+                [
+                    [this.options.defaultExtent[2], this.options.defaultExtent[1]],
+                    [this.options.defaultExtent[0], this.options.defaultExtent[3]],
+                ],
+                {pmIgnore: false}
+            )
+            this.map.on("pm:drawstart", this._onDrawStart)
+            this.map.on("pm:create", this._onCreate)
+            this.map.on("pm:remove", this._onRemove)
+            this.rectangleLayer.on("pm:edit", this._onLayerEdit)
+            this.rectangleLayer.on("pm:dragend", this._onLayerDrag)
+            this.formInputElement.addEventListener("change", this._onBoundingBoxManuallyUpdated)
 
-            const rectangleLayer = L.rectangle([[54.559322, -5.767822], [56.1210604, -3.021240]])
-            rectangleLayer.editing.enable()
-            rectangleLayer.on("edit", this.handleEdits)
+            this.map.addLayer(this.rectangleLayer)
+            this.map.fitBounds(this.rectangleLayer.getBounds())
 
-            this.map.addLayer(rectangleLayer)
-            this.map.fitBounds(rectangleLayer.getBounds())
-            // this.map.fitBounds(extentLayer.getBounds())
-
-            // const drawnItems = new L.FeatureGroup([extentLayer])
-            // const drawControl = new L.Control.Draw({
-            //     draw: {
-            //         polyline: false,
-            //         polygon: false,
-            //         rectangle: false,
-            //         circle: false,
-            //         marker: false,
-            //         circlemarker: false,
-            //     },
-            //     edit: {
-            //         featureGroup: drawnItems,
-            //         edit: {
-            //             maintainColor: true,
-            //             opacity: 0.3
-            //         },
-            //         remove: false,
-            //         allowIntersection: false
-            //     }
-            // })
-            // this.map.addControl(drawControl)
-            // this.map.addLayer(drawnItems)
         },
 
-        handleEdits: function(event) {
-            console.log(`layer with a type ${event.layerType} has just been edited!`)
-            //this.formInputElement.textContent = layer.toGeoJSON()
-        }
+        _onRemove: function (event) {
+            this.formInputElement.setAttribute("value", "")
+        },
 
+        _onCreate: function (event) {
+            console.log("Created new")
+            event.layer.on("pm:edit", this._onLayerEdit)
+            event.layer.on("pm:dragend", this._onLayerDrag)
+            this.formInputElement.setAttribute("value", this._getBboxString(event.layer.getBounds()))
+            this.rectangleLayer = event.layer
+        },
+
+        _onDrawStart: function (event) {
+            console.log("Started drawing")
+            this.map.removeLayer(this.rectangleLayer)
+        },
+
+        _onLayerEdit: function (event) {
+            this.formInputElement.setAttribute("value", this._getBboxString(event.layer.getBounds()))
+        },
+
+        _onLayerDrag: function (event) {
+            this.formInputElement.setAttribute("value", this._getBboxString(event.layer.getBounds()))
+        },
+
+        _onBoundingBoxManuallyUpdated: function (event) {
+            const userInput = event.target.value.split(",").map(Number)
+            if (!Number.isNaN(userInput[0])) {
+                const newBounds = [
+                    [userInput[0], userInput[1]],
+                    [userInput[2], userInput[3]],
+                ]
+                this.rectangleLayer.setBounds(newBounds)
+            }
+        },
+
+        _getBboxString: function (bounds) {
+            return `${bounds.getNorth()}, ${bounds.getWest()}, ${bounds.getSouth()}, ${bounds.getEast()}`
+        }
     }
 })
