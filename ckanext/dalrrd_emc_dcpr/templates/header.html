@@ -18,7 +18,7 @@
             {% block header_site_navigation_tabs %}
                 <li class="btn"><a href="{{ h.url_for('dataset.search') }}">Datasets</a></li>
                 <li class="btn"><a href="{{ h.url_for('organization.index') }}">Organizations</a></li>
-                <li class="btn"><a href="">Data Capture</a></li>
+                <li class="btn"><a href="{{ h.url_for('home.index') }}">Data Capture</a></li>
 	    {% endblock %}
         </ul>
       {% endblock %}
