@@ -12,6 +12,16 @@
       </button>
       <a class="navbar-brand" href="{{ h.url_for('home.index') }}"><img src="/images/Logo.png"></a>
     </div>
+      <div class="collapse navbar-collapse" id="main-navigation-toggle">
+      {% block header_site_navigation %}
+        <ul class="nav navbar-nav container-fluid-nav text-center">
+            {% block header_site_navigation_tabs %}
+                <li class="btn"><a href="{{ h.url_for('dataset.search') }}">Datasets</a></li>
+                <li class="btn"><a href="{{ h.url_for('organization.index') }}">Organizations</a></li>
+                <li class="btn"><a href="">Data Capture</a></li>
+	    {% endblock %}
+        </ul>
+      {% endblock %}
       <ul class="nav navbar-nav navbar-right">
         {% if c.userobj %}
             <li class="dropdown">
