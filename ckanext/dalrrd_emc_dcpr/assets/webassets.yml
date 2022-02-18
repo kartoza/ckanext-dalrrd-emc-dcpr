@@ -1,15 +1,15 @@
-vendorized-leaflet-js:
-  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet.js
+vendorized-leaflet-geoman-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet-geoman.js
   contents:
     - vendor/leaflet/leaflet.js
-    - vendor/leaflet.draw/leaflet.draw-custom.js
+    - vendor/leaflet-geoman/leaflet-geoman.min.js
   filter: rjsmin
 
-vendorized-leaflet-css:
-  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet.css
+vendorized-leaflet-geoman-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet-geoman.css
   contents:
     - vendor/leaflet/leaflet.css
-    - vendor/leaflet.draw/leaflet.draw.css
+    - vendor/leaflet-geoman/leaflet-geoman.css
   filter: cssrewrite
 
 dataset-spatial-extent-map-js:
@@ -20,7 +20,7 @@ dataset-spatial-extent-map-js:
   extra:
     preload:
       - base/main
-      - ckanext-dalrrdemcdcpr/vendorized-leaflet-js
+      - ckanext-dalrrdemcdcpr/vendorized-leaflet-geoman-js
 
 dataset-spatial-extent-map-css:
   output: ckanext-dalrrdemcdcpr/%(version)s_datasetSpatialExtentMap.css
@@ -29,7 +29,7 @@ dataset-spatial-extent-map-css:
   filter: cssrewrite
   extra:
     preload:
-      - ckanext-dalrrdemcdcpr/vendorized-leaflet-css
+      - ckanext-dalrrdemcdcpr/vendorized-leaflet-geoman-css
 
 dalrrd-emc-dcpr-css:
   output: ckanext-dalrrdemcdcpr/%(version)s_dalrrd_emc_dcpr.css
