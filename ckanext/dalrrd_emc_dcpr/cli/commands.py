@@ -30,6 +30,7 @@ from ._sample_datasets import (
 )
 from ._sample_organizations import SAMPLE_ORGANIZATIONS
 from ._sample_users import SAMPLE_USERS
+from ._sample_dcpr_request import SAMPLE_REQUESTS
 
 logger = logging.getLogger(__name__)
 
@@ -373,7 +374,6 @@ def load_sample_data():
 @load_sample_data.command()
 def create_sample_dcpr_requests():
     pass
-
 
 @load_sample_data.command()
 def create_sample_users():

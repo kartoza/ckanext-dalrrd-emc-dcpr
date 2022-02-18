@@ -96,3 +96,43 @@ def _to_data_dict(value):
     else:
         result = value
     return result
+
+
+@dataclasses.dataclass
+class _CkanBootstrapDCPRRequest:
+    status: str
+    organization_name: str
+    organization_level: str
+    organization_address: str
+    proposed_project_name: str
+    additional_project_context: str
+    capture_start_date: dt.datetime
+    capture_end_date: dt.datetime
+    request_dataset: _CkanBootstrapEmcDataset
+    cost: str
+    spatial_extent: {}
+    spatial_resolution: str
+    data_capture_urgency: str
+    additional_information: str
+    request_date: dt.datetime
+    submission_date: dt.datetime
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
+        return result
+
+
+def _to_data_dict(value: typing.Any):
+    if isinstance(value, Iterable):
+        try:
+            result = [i.to_data_dict() for i in value]
+        except AttributeError:
+            result = list(value)
+    elif getattr(value, "to_data_dict", None) is not None:
+        result = value.to_data_dict()
+    else:
+        result = value
+    return result
