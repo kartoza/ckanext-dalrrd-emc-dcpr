@@ -122,6 +122,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dalrrd_emc_dcpr_default_spatial_search_extent": partial(
                 helpers.get_default_spatial_search_extent, 0.001
             ),
+            "emc_default_bounding_box": helpers.get_default_bounding_box,
             "emc_sasdi_themes": helpers.get_sasdi_themes,
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
             "emc_show_version": helpers.helper_show_version,
