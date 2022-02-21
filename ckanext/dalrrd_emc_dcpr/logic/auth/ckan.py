@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 @toolkit.chained_auth_function
-def package_update(next_auth, context, data_dict):
+def package_update(next_auth, context, data_dict=None):
     """Custom auth for the package_update action.
 
     Packages that are public shall not be editable by users that are not org admins
@@ -16,36 +16,44 @@ def package_update(next_auth, context, data_dict):
     """
 
     user = context["auth_user_obj"]
-    package_show_action = toolkit.get_action("package_show")
-    package = package_show_action(context, data_dict)
-    if user.sysadmin:
-        result = {"success": True}
-    elif package.get("private"):
-        result = {"success": True}
-    else:
-        org_id = package.get("owner_org")
-        if org_id is not None:
-            members_action = toolkit.get_action("member_list")
-            members = members_action(data_dict={"id": org_id, "object_type": "user"})
-            for member_id, _, role in members:
-                if member_id == user.id and role.lower() == "admin":
-                    result = {"success": True}
-                    break
-            else:
-                org_name = package.get("organization", {}).get("name", "") or org_id
-                result = {
-                    "success": False,
-                    "msg": (
-                        f"Only administrators of organization {org_name!r} are "
-                        f"authorized to edit one of its public datasets"
-                    ),
-                }
-        else:
-            result = {"success": False}
-    if result["success"]:
+    if data_dict is None:
         final_result = next_auth(context, data_dict)
     else:
-        final_result = result
+        package = toolkit.get_action("package_show")(
+            context=context, data_dict=data_dict
+        )
+        if user.sysadmin:
+            result = {"success": True}
+        elif package.get("private", False):
+            result = {"success": True}
+        elif package.get("state") == "draft":
+            result = {"success": True}
+        else:
+            org_id = data_dict.get("owner_org")
+            if org_id is not None:
+                members_action = toolkit.get_action("member_list")
+                members = members_action(
+                    data_dict={"id": org_id, "object_type": "user"}
+                )
+                for member_id, _, role in members:
+                    if member_id == user.id and role.lower() == "admin":
+                        result = {"success": True}
+                        break
+                else:
+                    org_name = package.get("organization", {}).get("name", "") or org_id
+                    result = {
+                        "success": False,
+                        "msg": (
+                            f"Only administrators of organization {org_name!r} are "
+                            f"authorized to edit one of its public datasets"
+                        ),
+                    }
+            else:
+                result = {"success": False}
+        if result["success"]:
+            final_result = next_auth(context, data_dict)
+        else:
+            final_result = result
     return final_result
 
 

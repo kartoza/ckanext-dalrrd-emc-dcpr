@@ -5,6 +5,7 @@
 
 {% set map_config = h.get_common_map_config() %}
 {% set default_bounding_box = h.emc_default_bounding_box() %}
+{% set field_bounding_box = h.emc_convert_geojson_to_bounding_box(data.get(field.field_name)) %}
 {% set input_id = ["field", field.field_name]|join("-") %}
 
 {% call form.input(
@@ -13,7 +14,7 @@
     label=h.scheming_language_text(field.label),
     placeholder=h.scheming_language_text(field.form_placeholder),
     type='text',
-    value=(data.get(field.field_name) or default_bounding_box|join(",")),
+    value=(field_bounding_box|join(",") if field_bounding_box is not none else default_bounding_box|join(",")),
     error=errors[field.field_name],
     classes=['control-medium'],
     attrs=dict({"class": "form-control"}, **(field.get('form_attrs', {}))),

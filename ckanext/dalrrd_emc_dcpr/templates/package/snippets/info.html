@@ -4,12 +4,12 @@
     {{ super() }}
 
     {#
-        This template is overridden in order to show a dataet's spatial extent map on the right side, below its
+        This template is overridden in order to show a dataset's spatial extent map on the right side, below its
         heading
     #}
 
     {% if pkg.spatial %}
-        {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=pkg.spatial|tojson|forceescape %}
+        {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=pkg.spatial %}
     {% endif %}
 
 {% endblock %}

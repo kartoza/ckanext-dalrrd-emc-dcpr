@@ -27,3 +27,4 @@ presets:
   - preset_name: emc_dataset_spatial_extent
     values:
       form_snippet: "dataset_spatial_extent.html"
+      validators: emc_bbox_converter
