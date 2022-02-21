@@ -23,3 +23,8 @@ presets:
         owner_org_validator
         unicode
       form_snippet: "organization_with_visibility.html"
+
+  - preset_name: emc_dataset_spatial_extent
+    values:
+      form_snippet: "dataset_spatial_extent.html"
+      validators: emc_bbox_converter

@@ -1,0 +1,10 @@
+.dataset-spatial-extent-map {
+    padding: 0 25px;
+    margin: 20px 0;
+}
+
+.dataset-spatial-extent-map #dataset-spatial-extent-map-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
