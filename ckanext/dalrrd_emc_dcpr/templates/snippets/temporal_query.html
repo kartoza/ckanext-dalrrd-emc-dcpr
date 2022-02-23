@@ -1,0 +1,23 @@
+{#
+Displays a date selector in order to let user choose the temporal range for a search query
+#}
+
+{% set start_identifier = "ext_start_reference_date" %}
+{% set end_identifier = "ext_end_reference_date" %}
+
+<section id="temporal-search" class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+        <i class="fa fa-calendar"></i>
+        {{ _('Filter by temporal range') }}
+    </h2>
+    <div class="form-group">
+        <div class="controls">
+            <label class="control-label" for="{{ start_identifier }}">{{ _("Start date") }}</label>
+            <input type="date" id="{{ start_identifier }}" name="{{ start_identifier }}" form="dataset-search-form" />
+        </div>
+        <div class="controls">
+            <label class="control-label" for="{{ end_identifier }}">{{ _("End date") }}</label>
+            <input type="date" id="{{ end_identifier }}" name="{{ end_identifier }}" form="dataset-search-form" />
+        </div>
+    </div>
+</section>
