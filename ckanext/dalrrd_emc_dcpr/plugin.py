@@ -111,6 +111,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_publish": ckan_auth.authorize_package_publish,
             "package_update": ckan_auth.package_update,
             "package_patch": ckan_auth.package_patch,
+            "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
             "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
         }
 
@@ -119,6 +120,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_create": ckan_actions.package_create,
             "package_update": ckan_actions.package_update,
             "package_patch": ckan_actions.package_patch,
+            "dcpr_request_create": dcpr_actions.dcpr_request_create,
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
             "emc_version": emc_actions.show_version,
         }

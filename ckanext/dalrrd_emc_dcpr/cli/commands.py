@@ -374,9 +374,9 @@ def load_sample_data():
 
 @load_sample_data.command()
 def create_sample_dcpr_requests():
-
+    """Create sample DCPR requests"""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-    create_request_action = toolkit.get_action("request_create")
+    create_request_action = toolkit.get_action("dcpr_request_create")
     click.secho(f"Creating sample dcpr requests ...")
     for request in SAMPLE_REQUESTS:
         click.secho(f"Creating request with id {request.csi_reference_id!r}...")
