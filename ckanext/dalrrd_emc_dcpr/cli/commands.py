@@ -15,6 +15,7 @@ from ckan import model
 from ckan.lib.navl import dictization_functions
 
 # from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
+from ckanext.dalrrd_emc_dcpr.model.request import Request
 
 from ..constants import (
     ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
@@ -30,7 +31,7 @@ from ._sample_datasets import (
 )
 from ._sample_organizations import SAMPLE_ORGANIZATIONS
 from ._sample_users import SAMPLE_USERS
-from ._sample_dcpr_request import SAMPLE_REQUESTS
+from ._sample_dcpr_requests import SAMPLE_REQUESTS
 
 logger = logging.getLogger(__name__)
 
@@ -373,7 +374,56 @@ def load_sample_data():
 
 @load_sample_data.command()
 def create_sample_dcpr_requests():
-    pass
+
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    create_request_action = toolkit.get_action("request_create")
+    click.secho(f"Creating sample dcpr requests ...")
+    for request in SAMPLE_REQUESTS:
+        click.secho(f"Creating request with id {request.csi_reference_id!r}...")
+        try:
+            create_request_action(
+                context={
+                    "user": user["name"],
+                },
+                data_dict={
+                    "csi_reference_id": request.csi_reference_id,
+                    "status": request.status,
+                    "organization_name": request.organization_name,
+                    "organization_level": request.organization_level,
+                    "organization_address": request.organization_address,
+                    "proposed_project_name": request.proposed_project_name,
+                    "additional_project_context": request.additional_project_context,
+                    "capture_start_date": request.capture_start_date,
+                    "capture_end_date": request.capture_end_date,
+                    "request_dataset": request.request_dataset,
+                    "cost": request.cost,
+                    "spatial_extent": request.spatial_extent,
+                    "spatial_resolution": request.spatial_resolution,
+                    "data_capture_urgency": request.data_capture_urgency,
+                    "additional_information": request.additional_information,
+                    "request_date": request.request_date,
+                    "submission_date": request.submission_date,
+                },
+            )
+        except toolkit.ValidationError as exc:
+            click.secho(
+                f"Could not create request with id {request.csi_reference_id!r}: {exc}",
+                fg=_INFO_COLOR,
+            )
+            click.secho(
+                f"Attempting to re-enable possibly deleted request...", fg=_INFO_COLOR
+            )
+            sample_request = Request.get(request.id)
+            if sample_request is None:
+                click.secho(
+                    f"Could not find sample request with id {request.csi_reference_id!r}",
+                    fg=_ERROR_COLOR,
+                )
+                continue
+            else:
+                sample_request.undelete()
+                model.repo.commit()
+
 
 @load_sample_data.command()
 def create_sample_users():

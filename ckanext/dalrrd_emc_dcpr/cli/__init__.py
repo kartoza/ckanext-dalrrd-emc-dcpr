@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import typing
+import uuid
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -100,6 +101,7 @@ def _to_data_dict(value):
 
 @dataclasses.dataclass
 class _CkanBootstrapDCPRRequest:
+    csi_reference_id: uuid.UUID
     status: str
     organization_name: str
     organization_level: str
