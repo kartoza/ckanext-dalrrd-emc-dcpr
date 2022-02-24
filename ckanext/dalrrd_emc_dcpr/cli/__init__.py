@@ -84,21 +84,6 @@ class _CkanBootstrapEmcDataset:
         return result
 
 
-def _to_data_dict(value):
-    if isinstance(value, str):
-        result = value
-    elif isinstance(value, Iterable):
-        try:
-            result = [i.to_data_dict() for i in value]
-        except AttributeError:
-            result = list(value)
-    elif getattr(value, "to_data_dict", None) is not None:
-        result = value.to_data_dict()
-    else:
-        result = value
-    return result
-
-
 @dataclasses.dataclass
 class _CkanBootstrapDCPRRequest:
     csi_reference_id: uuid.UUID
@@ -108,16 +93,16 @@ class _CkanBootstrapDCPRRequest:
     organization_address: str
     proposed_project_name: str
     additional_project_context: str
-    capture_start_date: dt.datetime
-    capture_end_date: dt.datetime
+    capture_start_date: str
+    capture_end_date: str
     request_dataset: _CkanBootstrapEmcDataset
     cost: str
-    spatial_extent: {}
+    spatial_extent: str
     spatial_resolution: str
     data_capture_urgency: str
     additional_information: str
-    request_date: dt.datetime
-    submission_date: dt.datetime
+    request_date: str
+    submission_date: str
 
     def to_data_dict(self) -> typing.Dict:
         result = {}
@@ -127,8 +112,10 @@ class _CkanBootstrapDCPRRequest:
         return result
 
 
-def _to_data_dict(value: typing.Any):
-    if isinstance(value, Iterable):
+def _to_data_dict(value):
+    if isinstance(value, str):
+        result = value
+    elif isinstance(value, Iterable):
         try:
             result = [i.to_data_dict() for i in value]
         except AttributeError:

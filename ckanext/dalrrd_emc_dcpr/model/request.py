@@ -57,7 +57,7 @@ request_notification_target_table = Table(
     "notification_target",
     meta.metadata,
     Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
-    Column("request_id", ForeignKey("request.csi_reference_id")),
+    Column("request_id", ForeignKey("dcpr_request.csi_reference_id")),
     Column("user_id", ForeignKey("user.id")),
     Column("group_id", ForeignKey("group.id")),
 )

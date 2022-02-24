@@ -52,8 +52,8 @@ SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
         organization_address="organization_address",
         proposed_project_name="proposed_project_name",
         additional_project_context="additional_project_context",
-        capture_start_date=datetime.utcnow,
-        capture_end_date=datetime.utcnow,
+        capture_start_date="2022-01-01",
+        capture_end_date="2022-01-01",
         request_dataset=request_dataset,
         cost="cost",
         spatial_extent=json.dumps(
@@ -73,7 +73,7 @@ SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
         spatial_resolution="EPSG:4326",
         data_capture_urgency="data_capture_urgency",
         additional_information="additional_information",
-        request_date=datetime.utcnow,
-        submission_date=datetime.utcnow,
+        request_date="2022-01-01",
+        submission_date="2022-01-01",
     )
 ]
