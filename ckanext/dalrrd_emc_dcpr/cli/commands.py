@@ -9,6 +9,7 @@ import click
 from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
+from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
 
 from ..constants import (
     ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
@@ -32,6 +33,27 @@ _INFO_COLOR: typing.Final[str] = "yellow"
 @click.group()
 def dalrrd_emc_dcpr():
     """Commands related to the dalrrd-emc-dcpr extension."""
+
+
+@dalrrd_emc_dcpr.command()
+def send_email_notifications():
+    """Send pending email notifications to users
+
+    This command should be ran periodically.
+
+    """
+
+    # FIXME: This is failing with RuntimeError: Working outside of request context
+    # seems like we need to call this function from the API instead
+    setting_key = "ckan.activity_streams_email_notifications"
+    send_notification_emails = toolkit.asbool(toolkit.config.get(setting_key))
+    if toolkit.asbool(toolkit.config.get(setting_key)):
+        get_and_send_notifications_for_all_users()
+        click.secho("Done!", fg=_SUCCESS_COLOR)
+    else:
+        click.secho(
+            f"{setting_key} is not enabled in config. Aborting", fg=_ERROR_COLOR
+        )
 
 
 @dalrrd_emc_dcpr.group()

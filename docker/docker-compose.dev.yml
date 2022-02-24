@@ -51,6 +51,15 @@ services:
   ckan-harvesting-runner:
     <<: *partial-ckan-volumes
 
+  ckan-mail-sender:
+    <<: *partial-ckan-volumes
+    environment:
+      CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
+      CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
+      CKAN_SMTP_USER: ${CKAN_SMTP_USER}
+      CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
+      CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+
   ckan-db:
     environment:
       POSTGRES_USER: ckan-dev
