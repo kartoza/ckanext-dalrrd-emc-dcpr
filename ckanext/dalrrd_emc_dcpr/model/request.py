@@ -1,10 +1,12 @@
 import datetime
+from typing import Optional
 
 from logging import getLogger
 
 log = getLogger(__name__)
 
 from sqlalchemy import orm, types, Column, Table, ForeignKey
+from sqlalchemy.sql.expression import or_
 
 from ckan.model import core, domain_object, meta, types as _types, Session
 
@@ -85,21 +87,10 @@ class Request(core.StatefulObjectMixin, domain_object.DomainObject):
         super(Request, self).__init__(**kw)
 
     @classmethod
-    def get(cls, reference, for_update: bool = False):
-        """
-        Returns a request object referenced by its id or name.
-        Implements same approach used in the ckan package model.
-        """
-        if not reference:
-            return None
-
-        q = meta.Session.query(cls)
-        if for_update:
-            q = q.with_for_update()
-        request = q.get(reference)
-        if request == None:
-            request = cls.by_name(reference, for_update=for_update)
-        return request
+    def get(cls, reference: Optional[str]) -> Optional["Request"]:
+        query = meta.Session.query(cls).autoflush(False)
+        query = query.filter(or_(cls.name == reference, cls.id == reference))
+        return query.first()
 
 
 class RequestNotificationTarget(domain_object.DomainObject):
@@ -110,7 +101,24 @@ class RequestDataset(domain_object.DomainObject):
     pass
 
 
-meta.mapper(Request, request_table)
-meta.mapper(RequestNotificationTarget, request_notification_target_table)
+def init_request_tables():
+    meta.mapper(Request, request_table)
+    meta.mapper(RequestNotificationTarget, request_notification_target_table)
 
-meta.mapper(RequestDataset, request_dataset_table)
+    meta.mapper(RequestDataset, request_dataset_table)
+
+    if not request_table.exists():
+        log.debug("Creating DCPR request table")
+        request_table.create()
+    else:
+        log.debug("DCPR request table already exists")
+    if not request_dataset_table.exists():
+        log.debug("Creating DCPR request dataset table")
+        request_dataset_table.create()
+    else:
+        log.debug("DCPR request dataset table already exists")
+    if not request_notification_target_table.exists():
+        log.debug("Creating DCPR request notification target table")
+        request_notification_target_table.create()
+    else:
+        log.debug("DCPR request notification target table already exists")
