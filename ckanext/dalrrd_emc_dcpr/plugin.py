@@ -2,10 +2,11 @@ import logging
 import typing
 from functools import partial
 
-from flask import Blueprint
-
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import datetime as dt
+import dateutil.parser
+from flask import Blueprint
 
 from . import (
     constants,
@@ -40,27 +41,20 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IFacets)
 
     def before_search(self, search_params: typing.Dict):
-        logger.debug("inside before_search")
-        logger.debug(f"{search_params=}")
-        logger.debug(f"{search_params.get('extras')=}")
         start_date = search_params.get("extras", {}).get("ext_start_reference_date")
         end_date = search_params.get("extras", {}).get("ext_end_reference_date")
         if start_date is not None or end_date is not None:
-            parsed_start = self._parse_date(start_date) if start_date else start_date
-            parsed_end = self._parse_date(end_date) if end_date else end_date
+            parsed_start = _parse_date(start_date) if start_date else start_date
+            parsed_end = _parse_date(end_date) if end_date else end_date
             temporal_query = (
                 f"reference_date:[{parsed_start or '*'} TO {parsed_end or '*'}]"
             )
             filter_query = " ".join((search_params["fq"], temporal_query))
             search_params["fq"] = filter_query
-        logger.debug(f"returning a filter_query of {search_params['fq']=}")
-        logger.debug(f"returning a query of {search_params['q']=}")
         return search_params
 
-    def _parse_date(self, raw_date: str):
-        return f"{raw_date}T00:00:00Z"
-
     def after_search(self, search_results, search_params):
+        """IPackageController interface requires reimplementation of this method."""
         return search_results
 
     def before_view(self, pkg_dict: typing.Dict):
@@ -148,3 +142,16 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """
 
         return facets_dict
+
+
+def _parse_date(raw_date: str) -> typing.Optional[str]:
+    """Parse user-submitted date into a string usable in Solr searches."""
+    try:
+        parsed_date = dateutil.parser.parse(raw_date, ignoretz=True).replace(
+            tzinfo=dt.timezone.utc
+        )
+        result = parsed_date.isoformat().replace("+00:00", "Z")
+    except dateutil.parser.ParserError:
+        logger.exception("Could not parse date from input string")
+        result = None
+    return result
