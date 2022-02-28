@@ -35,7 +35,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 
 # download poetry
 RUN curl --silent --show-error --location \
-    https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py > /opt/get-poetry.py
+    https://install.python-poetry.org > /opt/install-poetry.py
 
 # Create a normal non-root user so that we can use it to run
 RUN useradd --create-home appuser
@@ -47,7 +47,7 @@ USER appuser
 
 RUN mkdir /home/appuser/app  && \
     mkdir /home/appuser/data && \
-    python opt/get-poetry.py --yes --version 1.1.11
+    python opt/install-poetry.py --yes --version 1.1.11
 
 ENV PATH="$PATH:/home/appuser/.poetry/bin" \
     # This allows us to get traces whenever some C code segfaults
