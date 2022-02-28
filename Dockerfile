@@ -49,7 +49,7 @@ RUN mkdir /home/appuser/app  && \
     mkdir /home/appuser/data && \
     python opt/install-poetry.py --yes --version 1.1.11
 
-ENV PATH="$PATH:/home/appuser/.poetry/bin" \
+ENV PATH="$PATH:/home/appuser/.local/bin" \
     # This allows us to get traces whenever some C code segfaults
     PYTHONFAULTHANDLER=1 \
     CKAN_INI=/home/appuser/ckan.ini \
