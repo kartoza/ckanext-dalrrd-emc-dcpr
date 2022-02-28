@@ -40,6 +40,26 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IFacets)
 
+    def after_create(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def after_delete(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def after_search(self, search_results, search_params):
+        """IPackageController interface requires reimplementation of this method."""
+        return search_results
+
+    def after_show(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def after_update(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
     def before_search(self, search_params: typing.Dict):
         start_date = search_params.get("extras", {}).get("ext_start_reference_date")
         end_date = search_params.get("extras", {}).get("ext_end_reference_date")
@@ -53,12 +73,24 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             search_params["fq"] = filter_query
         return search_params
 
-    def after_search(self, search_results, search_params):
-        """IPackageController interface requires reimplementation of this method."""
-        return search_results
-
     def before_view(self, pkg_dict: typing.Dict):
         return pkg_dict
+
+    def create(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
+
+    def edit(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
+
+    def delete(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
+
+    def read(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
