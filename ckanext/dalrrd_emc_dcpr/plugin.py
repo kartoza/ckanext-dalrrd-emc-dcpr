@@ -2,10 +2,11 @@ import logging
 import typing
 from functools import partial
 
-from flask import Blueprint
-
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+import datetime as dt
+import dateutil.parser
+from flask import Blueprint
 
 from . import (
     constants,
@@ -32,11 +33,64 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IAuthFunctions)
     plugins.implements(plugins.IClick)
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.IPackageController)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IFacets)
+
+    def after_create(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def after_delete(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def after_search(self, search_results, search_params):
+        """IPackageController interface requires reimplementation of this method."""
+        return search_results
+
+    def after_show(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def after_update(self, context, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return context, pkg_dict
+
+    def before_search(self, search_params: typing.Dict):
+        start_date = search_params.get("extras", {}).get("ext_start_reference_date")
+        end_date = search_params.get("extras", {}).get("ext_end_reference_date")
+        if start_date is not None or end_date is not None:
+            parsed_start = _parse_date(start_date) if start_date else start_date
+            parsed_end = _parse_date(end_date) if end_date else end_date
+            temporal_query = (
+                f"reference_date:[{parsed_start or '*'} TO {parsed_end or '*'}]"
+            )
+            filter_query = " ".join((search_params["fq"], temporal_query))
+            search_params["fq"] = filter_query
+        return search_params
+
+    def before_view(self, pkg_dict: typing.Dict):
+        return pkg_dict
+
+    def create(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
+
+    def edit(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
+
+    def delete(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
+
+    def read(self, entity):
+        """IPackageController interface requires reimplementation of this method."""
+        return entity
 
     def update_config(self, config_):
         toolkit.add_template_directory(config_, "templates")
@@ -100,16 +154,13 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def dataset_facets(
         self, facets_dict: typing.OrderedDict, package_type: str
     ) -> typing.OrderedDict:
-        facets_dict.update(
-            {
-                f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}": toolkit._(
-                    "SASDI theme"
-                ),
-                f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}": toolkit._(
-                    "ISO Topic Category"
-                ),
-            }
+        facets_dict[f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._(
+            "SASDI Theme"
         )
+        facets_dict[f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"] = toolkit._(
+            "ISO Topic Category"
+        )
+        facets_dict["reference_date"] = toolkit._("Reference Date")
         return facets_dict
 
     def group_facets(
@@ -123,3 +174,16 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """
 
         return facets_dict
+
+
+def _parse_date(raw_date: str) -> typing.Optional[str]:
+    """Parse user-submitted date into a string usable in Solr searches."""
+    try:
+        parsed_date = dateutil.parser.parse(raw_date, ignoretz=True).replace(
+            tzinfo=dt.timezone.utc
+        )
+        result = parsed_date.isoformat().replace("+00:00", "Z")
+    except dateutil.parser.ParserError:
+        logger.exception("Could not parse date from input string")
+        result = None
+    return result
