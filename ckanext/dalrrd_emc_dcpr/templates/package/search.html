@@ -1,5 +1,35 @@
 {% ckan_extends %}
 
+{% block breadcrumb_content %}
+    <div class="page-header">
+        <h1>Electronic Metadata Catalogue (EMC)</h1>
+        <h5>Total number of datasets: {{ page.item_count }}</h5>
+        {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + dataset_type + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
+    </div>
+{% endblock %}
+
+{% block primary_content %}
+{#    {% block form %}#}
+{#        {% set facets = {#}
+{#          'fields': fields_grouped,#}
+{#          'search': search_facets,#}
+{#          'titles': facet_titles,#}
+{#          'translated_fields': translated_fields,#}
+{#          'remove_field': remove_field }#}
+{#        %}#}
+{#        {% set sorting = [#}
+{#          (_('Relevance'), 'score desc, metadata_modified desc'),#}
+{#          (_('Name Ascending'), 'title_string asc'),#}
+{#          (_('Name Descending'), 'title_string desc'),#}
+{#          (_('Last Modified'), 'metadata_modified desc'),#}
+{#          (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false) ]#}
+{#        %}#}
+{#      {% endblock %}#}
+    {% block package_search_results_list %}
+        {{ h.snippet('snippets/package_list.html', packages=page.items) }}
+    {% endblock %}
+{% endblock %}
+
 {% block secondary_content %}
     {% snippet "spatial/snippets/spatial_query.html", default_extent=h.dalrrd_emc_dcpr_default_spatial_search_extent() %}
     {% snippet "snippets/temporal_query.html" %}
