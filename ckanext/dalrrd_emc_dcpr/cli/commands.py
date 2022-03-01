@@ -382,6 +382,12 @@ def load_sample_data():
 def create_sample_dcpr_requests():
     """Create sample DCPR requests"""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+
     create_request_action = toolkit.get_action("dcpr_request_create")
     click.secho(f"Creating sample dcpr requests ...")
     for request in SAMPLE_REQUESTS:
@@ -393,6 +399,9 @@ def create_sample_dcpr_requests():
                 },
                 data_dict={
                     "csi_reference_id": request.csi_reference_id,
+                    "owner_user": user_id,
+                    "csi_moderator": user_id,
+                    "nsif_reviewer": user_id,
                     "status": request.status,
                     "organization_name": request.organization_name,
                     "organization_level": request.organization_level,

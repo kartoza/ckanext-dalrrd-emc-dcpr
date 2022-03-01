@@ -93,7 +93,7 @@ class Request(core.StatefulObjectMixin, domain_object.DomainObject):
 
     @classmethod
     def custom_get(cls, **kw):
-        '''Finds a single entity in the register.'''
+        """Finds a single entity in the register."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
