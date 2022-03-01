@@ -128,7 +128,7 @@ def _notifications_for_activities(activities, user_dict):
         len(activities),
     ).format(site_title=toolkit.config.get("ckan.site_title"), n=len(activities))
     body = render_template(
-        "activity_streams/activity_stream_email_notifications.text",
+        "email_notifications/email_body.text",
         extra_vars={"activities": activities},
     )
     # body = base.render(
