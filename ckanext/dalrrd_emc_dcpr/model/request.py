@@ -6,7 +6,6 @@ from logging import getLogger
 log = getLogger(__name__)
 
 from sqlalchemy import orm, types, Column, Table, ForeignKey
-from sqlalchemy.sql.expression import or_
 
 from ckan.model import core, domain_object, meta, types as _types, Session
 
@@ -87,10 +86,16 @@ class Request(core.StatefulObjectMixin, domain_object.DomainObject):
         super(Request, self).__init__(**kw)
 
     @classmethod
-    def get(cls, reference: Optional[str]) -> Optional["Request"]:
+    def get(cls, request_id: Optional[str]) -> Optional["Request"]:
         query = meta.Session.query(cls).autoflush(False)
-        query = query.filter(or_(cls.name == reference, cls.id == reference))
+        query = query.filter(cls.csi_reference_id == request_id)
         return query.first()
+
+    @classmethod
+    def custom_get(cls, **kw):
+        '''Finds a single entity in the register.'''
+        query = meta.Session.query(cls).autoflush(False)
+        return query.filter_by(**kw).first()
 
 
 class RequestNotificationTarget(domain_object.DomainObject):
@@ -102,11 +107,6 @@ class RequestDataset(domain_object.DomainObject):
 
 
 def init_request_tables():
-    meta.mapper(Request, request_table)
-    meta.mapper(RequestNotificationTarget, request_notification_target_table)
-
-    meta.mapper(RequestDataset, request_dataset_table)
-
     if not request_table.exists():
         log.debug("Creating DCPR request table")
         request_table.create()
@@ -122,3 +122,9 @@ def init_request_tables():
         request_notification_target_table.create()
     else:
         log.debug("DCPR request notification target table already exists")
+
+
+meta.mapper(Request, request_table)
+meta.mapper(RequestNotificationTarget, request_notification_target_table)
+
+meta.mapper(RequestDataset, request_dataset_table)
