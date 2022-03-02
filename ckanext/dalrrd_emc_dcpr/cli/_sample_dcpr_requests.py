@@ -1,12 +1,8 @@
-import json
 import typing
 import uuid
-from datetime import datetime
 
 from . import (
     _CkanBootstrapDCPRRequest,
-    _CkanBootstrapEmcDataset,
-    _CkanBootstrapResource,
 )
 
 from ._sample_datasets import SAMPLE_DATASETS
@@ -16,7 +12,7 @@ request_dataset = SAMPLE_DATASETS[0]
 
 SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
     _CkanBootstrapDCPRRequest(
-        csi_reference_id="9d7f2249-cb25-4ef6-9188-7f8d9efc13d0",
+        csi_reference_id=uuid.UUID("9d7f2249-cb25-4ef6-9188-7f8d9efc13d0"),
         status="status",
         organization_name="organization_name",
         organization_level="organization_level",
