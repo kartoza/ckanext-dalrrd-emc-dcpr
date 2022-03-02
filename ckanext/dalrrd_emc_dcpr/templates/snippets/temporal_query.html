@@ -8,10 +8,17 @@ Displays a date selector in order to let user choose the temporal range for a se
 {% set previous_end = request.args.get(end_identifier) %}
 
 <section id="temporal-search" class="module module-narrow module-shallow">
-    <h2 class="module-heading">
-        <i class="fa fa-calendar"></i>
-        {{ _('Temporal range') }}
-    </h2>
+    <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDateRange" aria-expanded="true" aria-controls="collapseDateRange">
+          <i class="fa fa-calendar"></i>
+            {{ _('Temporal range') }}
+        </a>
+      </h4>
+    </div>
+   <div id="collapseDateRange" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
     <div class="container-fluid">
         <p>
             <div class="form-horizontal">
@@ -43,5 +50,8 @@ Displays a date selector in order to let user choose the temporal range for a se
                 </div>
             </div>
         </p>
+    </div>
+      </div>
+   </div>
     </div>
 </section>
