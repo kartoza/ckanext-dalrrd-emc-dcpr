@@ -9,43 +9,14 @@ from . import (
     _CkanBootstrapResource,
 )
 
+from ._sample_datasets import SAMPLE_DATASETS
 
-request_dataset = _CkanBootstrapEmcDataset(
-    name="sample-ds-1",
-    private=False,
-    notes="Abstract for sample-ds-1",
-    reference_date="2022-01-01",
-    iso_topic_category="biota",
-    owner_org="sample-org-1",
-    maintainer="Nobody, No One, Ms.",
-    resources=[
-        _CkanBootstrapResource("http://fake.com", format="shp", format_version="1")
-    ],
-    spatial=json.dumps(
-        {
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [10.0, 10.0],
-                    [10.31, 10.0],
-                    [10.31, 10.44],
-                    [10.0, 10.44],
-                    [10.0, 10.0],
-                ]
-            ],
-        }
-    ),
-    equivalent_scale="500",
-    spatial_representation_type="001",
-    spatial_reference_system="EPSG:4326",
-    dataset_language="en",
-    metadata_language="en",
-    dataset_character_set="utf-8",
-)
+
+request_dataset = SAMPLE_DATASETS[0]
 
 SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
     _CkanBootstrapDCPRRequest(
-        csi_reference_id=uuid.uuid4(),
+        csi_reference_id="9d7f2249-cb25-4ef6-9188-7f8d9efc13d0",
         status="status",
         organization_name="organization_name",
         organization_level="organization_level",
@@ -56,20 +27,7 @@ SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
         capture_end_date="2022-01-01",
         request_dataset=request_dataset,
         cost="cost",
-        spatial_extent=json.dumps(
-            {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [10.0, 10.0],
-                        [10.31, 10.0],
-                        [10.31, 10.44],
-                        [10.0, 10.44],
-                        [10.0, 10.0],
-                    ]
-                ],
-            }
-        ),
+        spatial_extent="spatial_extent",
         spatial_resolution="EPSG:4326",
         data_capture_urgency="data_capture_urgency",
         additional_information="additional_information",

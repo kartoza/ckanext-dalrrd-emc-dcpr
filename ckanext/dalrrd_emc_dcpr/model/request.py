@@ -54,15 +54,6 @@ request_table = Table(
     Column("submission_date", types.DateTime, default=datetime.datetime.utcnow),
 )
 
-request_notification_table = Table(
-    "dcpr_request_notification",
-    meta.metadata,
-    Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
-    Column("request_id", ForeignKey("dcpr_request.csi_reference_id")),
-    Column("user_id", ForeignKey("user.id")),
-    Column("group_id", ForeignKey("group.id")),
-)
-
 request_dataset_table = Table(
     "dcpr_request_dataset",
     meta.metadata,
@@ -78,6 +69,15 @@ request_dataset_table = Table(
     Column("data_usage_restrictions", types.UnicodeText),
     Column("capture_method", types.UnicodeText),
     Column("capture_method_detail", types.UnicodeText),
+)
+
+request_notification_table = Table(
+    "dcpr_request_notification",
+    meta.metadata,
+    Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+    Column("request_id", ForeignKey("dcpr_request.csi_reference_id")),
+    Column("user_id", ForeignKey("user.id")),
+    Column("group_id", ForeignKey("group.id")),
 )
 
 
