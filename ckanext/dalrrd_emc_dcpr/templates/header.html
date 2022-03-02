@@ -29,7 +29,7 @@
             <span class="username">{{ c.userobj.display_name }}</span></a>
                 <ul class="dropdown-menu">
                     <li> <a href="{{ h.url_for('user.read', id=c.userobj.name) }}" class="image" title="{{ _('View profile') }}">
-                        <i class="fa fa-profile" aria-hidden="true"></i>
+                        <i class="fa fa-user" aria-hidden="true"></i>
                         <span class="text">{{ _('Profile') }}</span></a></li>
                     {% set new_activities = h.new_activities() %}
                     <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
@@ -49,6 +49,14 @@
                         <span class="text">{{ _('Profile settings') }}</span>
                       </a>
                     </li>
+                    {% endblock %}
+                    {% block header_usage_stats_link %}
+                        <li>
+                            <a href="{{ h.url_for('stats.index') }}" title="{{ _('Usage statistics') }}">
+                                <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                                <span class="text">{{ _('Usage statistics') }}</span>
+                            </a>
+                        </li>
                     {% endblock %}
                         {% if c.userobj.sysadmin %}
                         <li>
