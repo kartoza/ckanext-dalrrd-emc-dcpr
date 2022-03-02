@@ -259,6 +259,7 @@ mentioned above). Run the following command:
 docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan db init
 ```
 
+
 Now you should be able to go to `http://localhost:5000` and see the ckan
 landing page. If not, you may need to reload the ckan web app after
 performing the DB initialization step. This can done by sending the `HUP`
@@ -459,6 +460,7 @@ To run the tests you will need to:
    ```
    docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini db init
    docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
+   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr bootstrap init-dcpr-requests
    ```
 
 1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
