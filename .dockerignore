@@ -3,6 +3,8 @@ Dockerfile
 
 **/__pycache__
 
+docker/.env
+
 .git
 
 node_modules

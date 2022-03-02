@@ -18,6 +18,9 @@ services:
   ckan-harvesting-runner:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
 
+  ckan-mail-sender:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+
   ckan-db:
     image: postgis/postgis:13-3.1
     environment:

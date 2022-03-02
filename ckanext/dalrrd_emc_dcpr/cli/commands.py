@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 import typing
 
 import click
@@ -10,11 +11,14 @@ from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
 
+# from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
+
 from ..constants import (
     ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
     ISO_TOPIC_CATEGORIES,
     SASDI_THEMES_VOCABULARY_NAME,
 )
+from ..email_notifications import get_and_send_notifications_for_all_users
 
 from ._bootstrap_data import SASDI_ORGANIZATIONS
 from ._sample_datasets import SAMPLE_DATASETS
@@ -32,6 +36,33 @@ _INFO_COLOR: typing.Final[str] = "yellow"
 @click.group()
 def dalrrd_emc_dcpr():
     """Commands related to the dalrrd-emc-dcpr extension."""
+
+
+@dalrrd_emc_dcpr.command()
+def send_email_notifications():
+    """Send pending email notifications to users
+
+    This command should be ran periodically.
+
+    """
+
+    setting_key = "ckan.activity_streams_email_notifications"
+    if toolkit.asbool(toolkit.config.get(setting_key)):
+        env_sentinel = "CKAN_SMTP_PASSWORD"
+        if os.getenv(env_sentinel) is not None:
+            num_sent = get_and_send_notifications_for_all_users()
+            click.secho(f"Sent {num_sent} emails")
+            click.secho("Done!", fg=_SUCCESS_COLOR)
+        else:
+            click.secho(
+                f"Could not find the {env_sentinel!r} environment variable. Email "
+                f"notifications are not configured correctly. Aborting...",
+                fg=_ERROR_COLOR,
+            )
+    else:
+        click.secho(
+            f"{setting_key} is not enabled in config. Aborting...", fg=_ERROR_COLOR
+        )
 
 
 @dalrrd_emc_dcpr.group()

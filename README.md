@@ -118,49 +118,73 @@ guide to install CKAN, then follow the below steps:
 
 ## Operations
 
-- Rebuild solr index
+#### Rebuild solr index
 
-  ```
-  # check if there are any datasets that are not indexed
-  ckan search-index check
+```
+# check if there are any datasets that are not indexed
+ckan search-index check
 
-  # re-index
-  ckan search-index rebuild
-  ```
+# re-index
+ckan search-index rebuild
+```
 
-- Update extents of spatial datasets
 
-  ```
-  ckan spatial extents
-  ```
+#### Update extents of spatial datasets
 
-- Create bootstrap items
+```
+ckan spatial extents
+```
 
-  ```
-  ckan dalrrd-emc-dcpr bootstrap create-sasdi-themes
-  ckan dalrrd-emc-dcpr bootstrap create-iso-topic-categories
-  ckan dalrrd-emc-dcpr bootstrap create-sasdi-organizations
-  ```
 
-- Update page view tracking - This needs to be run
-  periodically (once per day is enough). Be sure to
-  run both commands depicted below.
+#### Create bootstrap items
 
-  ```
-  ckan tracking update
-  ckan search-index rebuild --refresh
-  ```
+```
+ckan dalrrd-emc-dcpr bootstrap create-sasdi-themes
+ckan dalrrd-emc-dcpr bootstrap create-iso-topic-categories
+ckan dalrrd-emc-dcpr bootstrap create-sasdi-organizations
+```
 
-- Operate harvesters
 
-  You may use the various `ckan harvester <command>` commands to operate existing
-  harvesters
+#### Update page view tracking
 
-  - create a job
+This needs to be run periodically (once per day is enough). Be sure to run both commands depicted below.
 
-    ```
-    docker exec -ti emc_dcpr-ckan_harvesting-runner poetry run ckan harvester job <source-id>
-    ```
+```
+ckan tracking update
+ckan search-index rebuild --refresh
+```
+
+
+#### Operate harvesters
+
+You may use the various `ckan harvester <command>` commands to operate existing
+harvesters
+
+Create a job:
+
+```
+docker exec -ti emc_dcpr-ckan_harvesting-runner poetry run ckan harvester job <source-id>
+```
+
+
+#### Send notifications by email
+
+This needs to be run periodically (once per hour is likely enough).
+
+```
+ckan dalrrd-emc-dcpr send-email-notifications
+```
+
+Additionally, in order for notifications to work, there is some configuration:
+
+- The CKAN settings must have `ckan.activity_streams_email_notifications = true`
+- The CKAN settings must have the relevant email configuration (likely being passed
+  as environment variables)
+- Each user must manually choose to receive notification e-mails - This is done in
+  the user's profile
+- Each user must manually follow those entities (datasets, organizations, etc) that
+  it finds interesting enough in order to be notified of changes via email
+
 
 
 ## Development
