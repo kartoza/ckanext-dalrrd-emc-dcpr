@@ -11,7 +11,8 @@ def dcpr_request_create_auth(
 ) -> typing.Dict:
     logger.debug("Inside the dcpr_request_create auth")
     user = context["auth_user_obj"]
-    if user.sysadmin:
+    # Only allow creation of dcpr requests if there is a user logged in.
+    if user:
         return {"success": True}
     return {"success": False}
 
