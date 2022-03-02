@@ -85,7 +85,17 @@ def upgrade():
         sa.Column("capture_method_detail", types.UnicodeText),
     )
 
+    op.create_table(
+        "dcpr_request_notification",
+        meta.metadata,
+        sa.Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+        sa.Column("request_id", ForeignKey("dcpr_request.csi_reference_id")),
+        sa.Column("user_id", ForeignKey("user.id")),
+        sa.Column("group_id", ForeignKey("group.id")),
+    )
+
 
 def downgrade():
     op.drop_table("dcpr_request")
     op.drop_table("dcpr_request_dataset")
+    op.drop_table("dcpr_request_notification")

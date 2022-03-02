@@ -54,8 +54,8 @@ request_table = Table(
     Column("submission_date", types.DateTime, default=datetime.datetime.utcnow),
 )
 
-request_notification_target_table = Table(
-    "notification_target",
+request_notification_table = Table(
+    "dcpr_request_notification",
     meta.metadata,
     Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
     Column("request_id", ForeignKey("dcpr_request.csi_reference_id")),
@@ -117,14 +117,13 @@ def init_request_tables():
         request_dataset_table.create()
     else:
         log.debug("DCPR request dataset table already exists")
-    if not request_notification_target_table.exists():
+    if not request_notification_table.exists():
         log.debug("Creating DCPR request notification target table")
-        request_notification_target_table.create()
+        request_notification_table.create()
     else:
         log.debug("DCPR request notification target table already exists")
 
 
 meta.mapper(Request, request_table)
-meta.mapper(RequestNotificationTarget, request_notification_target_table)
-
+meta.mapper(RequestNotificationTarget, request_notification_table)
 meta.mapper(RequestDataset, request_dataset_table)
