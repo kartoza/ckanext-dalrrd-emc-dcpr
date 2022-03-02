@@ -21,19 +21,19 @@ request_table = Table(
     Column(
         "owner_user",
         types.UnicodeText,
-        ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"),
+        ForeignKey("user.id"),
         nullable=False,
     ),
     Column(
         "csi_moderator",
         types.UnicodeText,
-        ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"),
+        ForeignKey("user.id"),
         nullable=False,
     ),
     Column(
         "nsif_reviewer",
         types.UnicodeText,
-        ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"),
+        ForeignKey("user.id"),
         nullable=False,
     ),
     Column("status", types.UnicodeText),

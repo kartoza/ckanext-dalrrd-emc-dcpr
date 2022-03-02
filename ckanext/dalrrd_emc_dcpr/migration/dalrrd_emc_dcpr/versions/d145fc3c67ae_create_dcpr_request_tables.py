@@ -31,19 +31,19 @@ def upgrade():
         sa.Column(
             "owner_user",
             types.UnicodeText,
-            ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"),
+            ForeignKey("user.id"),
             nullable=False,
         ),
         sa.Column(
             "csi_moderator",
             types.UnicodeText,
-            ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"),
+            ForeignKey("user.id"),
             nullable=False,
         ),
         sa.Column(
             "nsif_reviewer",
             types.UnicodeText,
-            ForeignKey("user.id", onupdate="CASCADE", ondelete="CASCADE"),
+            ForeignKey("user.id"),
             nullable=False,
         ),
         sa.Column("status", types.UnicodeText),
