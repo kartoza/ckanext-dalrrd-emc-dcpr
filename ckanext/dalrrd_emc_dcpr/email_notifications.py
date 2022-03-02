@@ -1,7 +1,11 @@
 """Reimplementation of the core CKAN email notifications
 
-This module reimplements the core CKAN email notifications in order to provide more
-visibility on to what is going on.
+This module reimplements the core CKAN email notifications in order to:
+
+- be able to provide more visibility onto what is going on. This includes returning the
+  number of emails being sent
+
+- modify the default implementation in order to not require an active request
 
 """
 
@@ -13,9 +17,10 @@ from ckan import (
     logic,
     model,
 )
-from ckan.lib import base
+from ckan.lib import jinja_extensions
 from ckan.plugins import toolkit
-from flask import render_template
+from flask_babel import gettext as flask_ugettext, ngettext as flask_ungettext
+from jinja2 import Environment
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +35,6 @@ def get_and_send_notifications_for_all_users() -> int:
     users = logic.get_action("user_list")(context, {})
     num_sent = 0
     for user in users:
-        logger.debug(f"Processing notifications for user {user!r}...")
         num_sent += get_and_send_notifications_for_user(user)
     return num_sent
 
@@ -56,11 +60,9 @@ def get_and_send_notifications_for_user(user) -> int:
     since = max(email_notifications_since, email_last_sent, activity_stream_last_viewed)
 
     notifications = get_notifications(user, since)
-    logger.debug(f"About to send the following notifications: {notifications=}")
     num_sent = 0
     # TODO: Handle failures from send_email_notification.
     for notification in notifications:
-        logger.debug(f"Processing notification {notification=}...")
         send_notification(user, notification)
         num_sent += 1
 
@@ -109,7 +111,6 @@ def _notifications_for_activities(activities, user_dict):
     :rtype: list of dicts each with keys 'subject' and 'body'
 
     """
-    logger.debug(f"inside _notifications_for_activities. {locals()=}")
     if not activities:
         return []
 
@@ -127,17 +128,26 @@ def _notifications_for_activities(activities, user_dict):
         "{n} new activities from {site_title}",
         len(activities),
     ).format(site_title=toolkit.config.get("ckan.site_title"), n=len(activities))
-    body = render_template(
-        "email_notifications/email_body.text",
-        extra_vars={"activities": activities},
+    jinja_env = _get_jinja_env()
+    body_template = jinja_env.get_template("email_notifications/email_body.txt")
+    rendered_body = body_template.render(
+        activities=activities,
+        site_url=toolkit.config.get("ckan.site_url"),
+        site_title=toolkit.config.get("ckan.site_title"),
     )
-    # body = base.render(
-    #     'activity_streams/activity_stream_email_notifications.text',
-    #     extra_vars={'activities': activities})
-    notifications = [{"subject": subject, "body": body}]
-    logger.debug(f"Returning the following notifications: {notifications=}")
+    notifications = [{"subject": subject, "body": rendered_body}]
 
     return notifications
+
+
+def _get_jinja_env():
+    jinja_env = Environment(**jinja_extensions.get_jinja_env_options())
+    jinja_env.install_gettext_callables(flask_ugettext, flask_ungettext, newstyle=True)
+    # custom filters
+    jinja_env.policies["ext.i18n.trimmed"] = True
+    jinja_env.filters["empty_and_escape"] = jinja_extensions.empty_and_escape
+    # jinja_env.filters["ungettext"] = flask_ungettext
+    return jinja_env
 
 
 def _notifications_from_dashboard_activity_list(user_dict, since):
@@ -186,11 +196,8 @@ def get_notifications(user_dict, since):
 
     """
     notifications = []
-    since = dt.datetime(2022, 2, 21)
-    logger.warning(f"Manually overridden the 'since' param to {since!r}")
     logger.debug(f"Retrieving notifications for {user_dict['name']!r} since {since!r}")
     for function in _notifications_functions:
-        logger.debug(f"Processing notification function {function!r}...")
         notifications.extend(function(user_dict, since))
     return notifications
 

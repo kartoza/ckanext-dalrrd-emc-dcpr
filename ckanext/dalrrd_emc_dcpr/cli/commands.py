@@ -46,8 +46,6 @@ def send_email_notifications():
 
     """
 
-    # FIXME: This is failing with RuntimeError: Working outside of request context
-    # seems like we need to call this function from the API instead
     setting_key = "ckan.activity_streams_email_notifications"
     if toolkit.asbool(toolkit.config.get(setting_key)):
         env_sentinel = "CKAN_SMTP_PASSWORD"
