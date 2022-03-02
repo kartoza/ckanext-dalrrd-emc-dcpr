@@ -7,6 +7,7 @@ const rename = require("gulp-rename");
 
 const CKAN_BASE_DIR = '/home/appuser/ckan-frontend/public/base'
 const SOURCE_DIR = __dirname + '/ckanext/dalrrd_emc_dcpr/public/base'
+const TARGET_DIR = __dirname + '/ckanext/dalrrd_emc_dcpr/assets'
 
 const with_sourcemaps = () => !!process.env.DEBUG;
 const renamer = (path) => {
@@ -28,7 +29,7 @@ const build = () =>
     .pipe(less())
     .pipe(if_(with_sourcemaps(), sourcemaps.write()))
     .pipe(rename(renamer))
-    .pipe(dest(SOURCE_DIR + "/css/"));
+    .pipe(dest(TARGET_DIR + "/css/"));
 
 const watchSource = () =>
   watch(

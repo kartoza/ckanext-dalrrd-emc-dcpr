@@ -1,7 +1,8 @@
 {% ckan_extends %}
 
 {% block styles %}
-    {{ super() }}
+{#    {{ super() }}#}
+    {% asset 'ckanext-dalrrdemcdcpr/ckan-base-css' %}
     {% asset 'ckanext-dalrrdemcdcpr/dalrrd-emc-dcpr-css' %}
 
 {% endblock %}
