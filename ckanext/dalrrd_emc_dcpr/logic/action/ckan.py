@@ -3,7 +3,6 @@
 import logging
 
 import ckan.plugins.toolkit as toolkit
-import ckan.logic as logic
 
 logger = logging.getLogger(__name__)
 

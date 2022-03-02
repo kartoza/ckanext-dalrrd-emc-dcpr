@@ -17,7 +17,7 @@ def dcpr_request_create(context, data_dict):
         return
 
     csi_reference_id = str(data_dict["csi_reference_id"])
-    request = Request.custom_get(csi_reference_id=csi_reference_id)
+    request = Request.get(csi_reference_id=csi_reference_id)
 
     if request:
         raise toolkit.ValidationError({"message": "Request already exists"})

@@ -1,4 +1,5 @@
 import datetime
+import typing
 from typing import Optional
 
 from logging import getLogger
@@ -86,14 +87,8 @@ class Request(core.StatefulObjectMixin, domain_object.DomainObject):
         super(Request, self).__init__(**kw)
 
     @classmethod
-    def get(cls, request_id: Optional[str]) -> Optional["Request"]:
-        query = meta.Session.query(cls).autoflush(False)
-        query = query.filter(cls.csi_reference_id == request_id)
-        return query.first()
-
-    @classmethod
-    def custom_get(cls, **kw):
-        """Finds a single entity in the register."""
+    def get(cls, **kw) -> Optional["Request"]:
+        """Finds a single request entity in the model."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
