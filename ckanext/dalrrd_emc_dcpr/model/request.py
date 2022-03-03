@@ -117,7 +117,7 @@ class Request(core.StatefulObjectMixin, domain_object.DomainObject):
         dataset = (
             meta.Session.query(Request)
             .join(RequestDataset, RequestDataset.request_id == Request.csi_reference_id)
-            .filter(request_id == str(self.csi_reference))
+            .filter(RequestDataset.request_id == str(self.csi_reference))
             .all()
         )
 
