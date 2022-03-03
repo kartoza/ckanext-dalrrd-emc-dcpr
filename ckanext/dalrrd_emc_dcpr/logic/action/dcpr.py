@@ -3,6 +3,8 @@ import typing
 
 import ckan.plugins.toolkit as toolkit
 
+from sqlalchemy import exc
+
 from ckanext.dalrrd_emc_dcpr.model.request import Request
 
 logger = logging.getLogger(__name__)
@@ -11,10 +13,10 @@ logger = logging.getLogger(__name__)
 def dcpr_request_create(context, data_dict):
     model = context["model"]
     access = toolkit.check_access("dcpr_request_create_auth", context, data_dict)
+    logger.debug("Inside the dcpr_request_create action")
 
     if not access:
         raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
-        return
 
     csi_reference_id = str(data_dict["csi_reference_id"])
     request = Request.get(csi_reference_id=csi_reference_id)
@@ -56,8 +58,13 @@ def dcpr_request_create(context, data_dict):
             csi_moderation_date=data_dict["csi_moderation_date"],
         )
 
-    model.Session.add(request)
-    model.repo.commit()
+    try:
+        model.Session.add(request)
+        model.repo.commit()
+    except exc.InvalidRequestError as exception:
+        model.Session.rollback()
+    finally:
+        model.Session.close()
 
     return request
 

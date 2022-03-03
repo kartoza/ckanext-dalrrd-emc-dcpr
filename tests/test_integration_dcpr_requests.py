@@ -1,4 +1,4 @@
-import json
+import uuid
 import pytest
 
 from ckan.tests import (
@@ -7,7 +7,8 @@ from ckan.tests import (
 )
 
 from ckan.plugins import toolkit
-from ckan import model
+from ckan import model, logic
+from sqlalchemy import exc
 
 from ckanext.dalrrd_emc_dcpr.cli._sample_dcpr_requests import SAMPLE_REQUESTS
 
@@ -15,25 +16,55 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize(
-    "name",
+    "request_id, name, user_available, user_logged",
     [
         pytest.param(
+            uuid.uuid4(),
             "request_1",
+            True,
+            True,
             id="request-added-successfully",
+        ),
+        pytest.param(
+            uuid.uuid4(),
+            "request_2",
+            False,
+            True,
+            marks=pytest.mark.raises(exception=exc.IntegrityError),
+            id="request-can-not-be-added-integrity",
+        ),
+        pytest.param(
+            uuid.UUID("1d2b018d-3e0b-479c-938c-582376f3cd4a"),
+            "request_3",
+            True,
+            True,
+            id="request-can-be-added-custom-id",
+        ),
+        pytest.param(
+            uuid.UUID("1d2b018d-3e0b-479c-938c-582376f3cd4a"),
+            "request_3",
+            True,
+            True,
+            marks=pytest.mark.raises(exception=logic.ValidationError),
+            id="request-can-not-be-added-validation-error",
         ),
     ],
 )
-def test_create_dcpr_request(name):
+def test_create_dcpr_request(request_id, name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
 
     convert_user_name_or_id_to_id = toolkit.get_converter(
         "convert_user_name_or_id_to_id"
     )
-    user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+    user_id = (
+        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+        if user_available
+        else None
+    )
 
     for request in SAMPLE_REQUESTS:
         data_dict = {
-            "csi_reference_id": request.csi_reference_id,
+            "csi_reference_id": request_id,
             "owner_user": user_id,
             "csi_moderator": user_id,
             "nsif_reviewer": user_id,
@@ -62,8 +93,10 @@ def test_create_dcpr_request(name):
             "csi_moderation_date": request.csi_moderation_date,
         }
 
+        context = {"ignore_auth": not user_logged, "user": user["name"]}
+
         helpers.call_action(
             "dcpr_request_create",
-            context={"ignore_auth": False, "user": user["name"]},
+            context=context,
             **data_dict,
         )
