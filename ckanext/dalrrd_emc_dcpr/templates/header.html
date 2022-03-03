@@ -10,15 +10,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{{ h.url_for('home.index') }}"><img src="/images/Logo.png"></a>
+      <a class="navbar-brand" href="{{ h.url_for('home.index') }}"></a>
     </div>
       <div class="collapse navbar-collapse" id="main-navigation-toggle">
       {% block header_site_navigation %}
         <ul class="nav navbar-nav container-fluid-nav text-center">
             {% block header_site_navigation_tabs %}
-                <li class="btn"><a href="{{ h.url_for('dataset.search') }}">Datasets</a></li>
-                <li class="btn"><a href="{{ h.url_for('organization.index') }}">Organizations</a></li>
-                <li class="btn"><a href="#">Data Capture</a></li>
+                <li class="nav-item"><a href="{{ h.url_for('dataset.search') }}">Datasets</a></li>
+                <li class="nav-item"><a href="{{ h.url_for('organization.index') }}">Organizations</a></li>
+                <li class="nav-item"><a href="#">Data Capture</a></li>
 	    {% endblock %}
         </ul>
       {% endblock %}
@@ -72,9 +72,9 @@
         </li>
         {% else %}
         {% block header_account_notlogged %}
-        <li class="btn">{% link_for _('Log in'), named_route='user.login' %}</li>
+        <li class="nav-item">{% link_for _('Log in'), named_route='user.login' %}</li>
         {% if h.check_access('user_create') %}
-        <li class="btn">{% link_for _('Register'), named_route='user.register', class_='sub' %}</li>
+        <li class="nav-item">{% link_for _('Register'), named_route='user.register', class_='sub' %}</li>
         {% endif %} {% endblock %}
         {% endif %}
       </ul>
