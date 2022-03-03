@@ -1,5 +1,4 @@
 import dataclasses
-import datetime as dt
 import logging
 import typing
 from collections.abc import Iterable
@@ -44,8 +43,7 @@ class _CkanBootstrapResource:
     description: typing.Optional[str] = None
     resource_type: typing.Optional[str] = None
 
-    def to_data_dict(self):
-        logger.debug("Inside to_data_dict of the resource")
+    def to_data_dict(self) -> typing.Dict:
         result = {}
         for name, value in vars(self).items():
             if value is not None:
@@ -73,7 +71,7 @@ class _CkanBootstrapEmcDataset:
     maintainer_email: typing.Optional[str] = None
     type: typing.Optional[str] = "dataset"
     sasdi_theme: typing.Optional[str] = None
-    tags: typing.List[str] = dataclasses.field(default_factory=list)
+    tags: typing.List[typing.Dict] = dataclasses.field(default_factory=list)
 
     def to_data_dict(self) -> typing.Dict:
         result = {}
@@ -85,8 +83,10 @@ class _CkanBootstrapEmcDataset:
         return result
 
 
-def _to_data_dict(value: typing.Any):
-    if isinstance(value, Iterable):
+def _to_data_dict(value):
+    if isinstance(value, str):
+        result = value
+    elif isinstance(value, Iterable):
         try:
             result = [i.to_data_dict() for i in value]
         except AttributeError:
