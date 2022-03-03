@@ -53,6 +53,13 @@ request_table = Table(
     Column("additional_documents", types.UnicodeText),
     Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
     Column("submission_date", types.DateTime, default=datetime.datetime.utcnow),
+    Column("nsif_review_date", types.DateTime, default=datetime.datetime.utcnow),
+    Column("nsif_recommendation", types.UnicodeText),
+    Column("nsif_review_notes", types.UnicodeText),
+    Column("nsif_review_additional_documents", types.UnicodeText),
+    Column("csi_moderation_notes", types.UnicodeText),
+    Column("csi_moderation_additional_documents", types.UnicodeText),
+    Column("csi_moderation_date", types.DateTime, default=datetime.datetime.utcnow),
 )
 
 request_dataset_table = Table(
@@ -82,9 +89,23 @@ request_notification_table = Table(
 )
 
 
+class RequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):
+    def __init__(self, request=None, request_id=None):
+        super(RequestDataset, self).__init__(request, request_id)
+        self.request = request
+        self.request_id = request_id
+
+    @classmethod
+    def get(cls, **kw) -> Optional["RequestDataset"]:
+        """Finds a single request entity in the model."""
+        query = meta.Session.query(cls).autoflush(False)
+        return query.filter_by(**kw).first()
+
+
 class Request(core.StatefulObjectMixin, domain_object.DomainObject):
     def __init__(self, **kw):
         super(Request, self).__init__(**kw)
+        self.csi_reference_id = kw.get("csi_reference_id", None)
 
     @classmethod
     def get(cls, **kw) -> Optional["Request"]:
@@ -92,12 +113,18 @@ class Request(core.StatefulObjectMixin, domain_object.DomainObject):
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
+    def get_dataset_elements(self) -> Optional[RequestDataset]:
+        dataset = (
+            meta.Session.query(Request)
+            .join(RequestDataset, RequestDataset.request_id == Request.csi_reference_id)
+            .filter(request_id == str(self.csi_reference))
+            .all()
+        )
+
+        return dataset
+
 
 class RequestNotificationTarget(domain_object.DomainObject):
-    pass
-
-
-class RequestDataset(domain_object.DomainObject):
     pass
 
 

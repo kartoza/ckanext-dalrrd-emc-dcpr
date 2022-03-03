@@ -53,6 +53,13 @@ def test_create_dcpr_request(name):
             "additional_information": request.additional_information,
             "request_date": request.request_date,
             "submission_date": request.submission_date,
+            "nsif_review_date": request.nsif_review_date,
+            "nsif_recommendation": request.nsif_recommendation,
+            "nsif_review_notes": request.nsif_review_notes,
+            "nsif_review_additional_documents": request.nsif_review_additional_documents,
+            "csi_moderation_notes": request.csi_moderation_notes,
+            "csi_moderation_additional_documents": request.csi_moderation_additional_documents,
+            "csi_moderation_date": request.csi_moderation_date,
         }
 
         helpers.call_action(

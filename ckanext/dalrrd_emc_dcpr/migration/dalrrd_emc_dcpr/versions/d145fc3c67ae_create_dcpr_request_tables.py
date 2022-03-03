@@ -64,6 +64,15 @@ def upgrade():
         sa.Column("additional_documents", types.UnicodeText),
         sa.Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
         sa.Column("submission_date", types.DateTime, default=datetime.datetime.utcnow),
+        sa.Column("nsif_review_date", types.DateTime, default=datetime.datetime.utcnow),
+        sa.Column("nsif_recommendation", types.UnicodeText),
+        sa.Column("nsif_review_notes", types.UnicodeText),
+        sa.Column("nsif_review_additional_documents", types.UnicodeText),
+        sa.Column("csi_moderation_notes", types.UnicodeText),
+        sa.Column("csi_moderation_additional_documents", types.UnicodeText),
+        sa.Column(
+            "csi_moderation_date", types.DateTime, default=datetime.datetime.utcnow
+        ),
     )
 
     op.create_table(

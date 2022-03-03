@@ -103,6 +103,13 @@ class _CkanBootstrapDCPRRequest:
     additional_information: str
     request_date: str
     submission_date: str
+    nsif_review_date: str
+    nsif_recommendation: str
+    nsif_review_notes: str
+    nsif_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_moderation_additional_documents: str
+    csi_moderation_date: str
 
     def to_data_dict(self) -> typing.Dict:
         result = {}

@@ -43,6 +43,17 @@ def dcpr_request_create(context, data_dict):
             additional_information=data_dict["additional_information"],
             request_date=data_dict["request_date"],
             submission_date=data_dict["submission_date"],
+            nsif_review_date=data_dict["nsif_review_date"],
+            nsif_recommendation=data_dict["nsif_recommendation"],
+            nsif_review_notes=data_dict["nsif_review_notes"],
+            nsif_review_additional_documents=data_dict[
+                "nsif_review_additional_documents"
+            ],
+            csi_moderation_notes=data_dict["csi_moderation_notes"],
+            csi_moderation_additional_documents=data_dict[
+                "csi_moderation_additional_documents"
+            ],
+            csi_moderation_date=data_dict["csi_moderation_date"],
         )
 
     model.Session.add(request)

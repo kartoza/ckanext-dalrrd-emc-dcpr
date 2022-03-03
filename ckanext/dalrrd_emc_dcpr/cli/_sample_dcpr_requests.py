@@ -29,5 +29,12 @@ SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
         additional_information="additional_information",
         request_date="2022-01-01",
         submission_date="2022-01-01",
+        nsif_review_date="2022-01-01",
+        nsif_recommendation="nsif_recommendation",
+        nsif_review_notes="nsif_review_notes",
+        nsif_review_additional_documents="nsif_review_additional_documents",
+        csi_moderation_notes="csi_moderation_notes",
+        csi_moderation_additional_documents="csi_moderation_additional_documents",
+        csi_moderation_date="2022-01-01",
     )
 ]
