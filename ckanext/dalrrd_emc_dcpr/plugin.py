@@ -60,6 +60,10 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """IPackageController interface requires reimplementation of this method."""
         return context, pkg_dict
 
+    def before_index(self, pkg_dict):
+        """IPackageController interface requires reimplementation of this method."""
+        return pkg_dict
+
     def before_search(self, search_params: typing.Dict):
         start_date = search_params.get("extras", {}).get("ext_start_reference_date")
         end_date = search_params.get("extras", {}).get("ext_end_reference_date")

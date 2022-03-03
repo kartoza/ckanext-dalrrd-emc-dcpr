@@ -1,9 +1,12 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
+import datetime as dt
+import enum
 import json
 import logging
 import os
 import typing
+from concurrent import futures
 
 import click
 
@@ -21,7 +24,10 @@ from ..constants import (
 from ..email_notifications import get_and_send_notifications_for_all_users
 
 from ._bootstrap_data import SASDI_ORGANIZATIONS
-from ._sample_datasets import SAMPLE_DATASETS
+from ._sample_datasets import (
+    SAMPLE_DATASET_TAG,
+    generate_sample_datasets,
+)
 from ._sample_organizations import SAMPLE_ORGANIZATIONS
 from ._sample_users import SAMPLE_USERS
 
@@ -31,6 +37,11 @@ _DEFAULT_COLOR: typing.Final[typing.Optional[str]] = None
 _SUCCESS_COLOR: typing.Final[str] = "green"
 _ERROR_COLOR: typing.Final[str] = "red"
 _INFO_COLOR: typing.Final[str] = "yellow"
+
+
+class DatasetCreationResult(enum.Enum):
+    CREATED = "created"
+    NOT_CREATED_ALREADY_EXISTS = "already_exists"
 
 
 @click.group()
@@ -541,61 +552,118 @@ def delete_sample_organizations():
 
 
 @load_sample_data.command()
-def create_sample_datasets():
-    """Create sample datasets"""
-
+@click.argument("owner_org")
+@click.option("-n", "--num-datasets", default=10, show_default=True)
+@click.option("-p", "--name-prefix", default="sample-dataset", show_default=True)
+@click.option("-s", "--name-suffix")
+@click.option(
+    "-t",
+    "--temporal-range",
+    nargs=2,
+    type=click.DateTime(),
+    default=(dt.datetime(2021, 1, 1), dt.datetime(2022, 12, 31)),
+)
+@click.option("-x", "--longitude-range", nargs=2, type=float, default=(16.3, 33.0))
+@click.option("-y", "--latitude-range", nargs=2, type=float, default=(-35.0, -21.0))
+def create_sample_datasets(
+    owner_org,
+    num_datasets,
+    name_prefix,
+    name_suffix,
+    temporal_range,
+    longitude_range,
+    latitude_range,
+):
+    """Create multiple sample datasets"""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-    create_dataset_action = toolkit.get_action("package_create")
-    get_dataset_action = toolkit.get_action("package_show")
-    for dataset in SAMPLE_DATASETS:
-        click.secho(f"Processing dataset {dataset.name!r}...")
-        try:
-            get_dataset_action(
-                context={"user": user["name"]}, data_dict={"id": dataset.name}
-            )
-        except toolkit.ObjectNotFound:
-            package_exists = False
-        else:
-            package_exists = True
-            click.secho(f"dataset {dataset.name!r} already exists", fg=_INFO_COLOR)
-
-        if not package_exists:
-            click.secho(
-                f"dataset {dataset.name!r} does not exist. Creating...", fg=_INFO_COLOR
-            )
-            data_dict = dataset.to_data_dict()
-            click.secho(f"{data_dict=}", fg=_INFO_COLOR)
+    datasets = generate_sample_datasets(
+        num_datasets,
+        name_prefix,
+        owner_org,
+        name_suffix,
+        temporal_range_start=temporal_range[0],
+        temporal_range_end=temporal_range[1],
+        longitude_range_start=longitude_range[0],
+        longitude_range_end=longitude_range[1],
+        latitude_range_start=latitude_range[0],
+        latitude_range_end=latitude_range[1],
+    )
+    ready_to_create_datasets = [ds.to_data_dict() for ds in datasets]
+    workers = min(3, len(ready_to_create_datasets))
+    with futures.ThreadPoolExecutor(workers) as executor:
+        to_do = []
+        for dataset in ready_to_create_datasets:
+            future = executor.submit(_create_single_dataset, user, dataset)
+            to_do.append(future)
+        num_created = 0
+        num_already_exist = 0
+        num_failed = 0
+        for done_future in futures.as_completed(to_do):
             try:
-                create_dataset_action(
-                    context={"user": user["name"]}, data_dict=data_dict
-                )
+                result = done_future.result()
+                if result == DatasetCreationResult.CREATED:
+                    num_created += 1
+                elif result == DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS:
+                    num_already_exist += 1
             except dictization_functions.DataError as exc:
                 click.secho(f"Could not create dataset: {exc=}", fg=_ERROR_COLOR)
+                num_failed += 1
+            except ValueError as exc:
+                click.secho(f"Could not create dataset: {exc=}", fg=_ERROR_COLOR)
+                num_failed += 1
+
+    click.secho(f"Created {num_created} datasets", fg=_INFO_COLOR)
+    click.secho(f"Skipped {num_already_exist} datasets", fg=_INFO_COLOR)
+    click.secho(f"Failed to create {num_failed} datasets", fg=_INFO_COLOR)
     click.secho("Done!", fg=_SUCCESS_COLOR)
 
 
+def _create_single_dataset(
+    user: typing.Dict, dataset: typing.Dict
+) -> DatasetCreationResult:
+    create_dataset_action = toolkit.get_action("package_create")
+    get_dataset_action = toolkit.get_action("package_show")
+    try:
+        get_dataset_action(
+            context={"user": user["name"]}, data_dict={"id": dataset["name"]}
+        )
+    except toolkit.ObjectNotFound:
+        package_exists = False
+    else:
+        package_exists = True
+    if not package_exists:
+        create_dataset_action(context={"user": user["name"]}, data_dict=dataset)
+        result = DatasetCreationResult.CREATED
+    else:
+        result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
+    return result
+
+
+# TODO: speed this up by doing concurrent processing, similar to create_sample_datasets
 @delete_data.command()
 def delete_sample_datasets():
-    """Delete sample datasets"""
+    """Deletes at most 1000 of existing sample datasets"""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     purge_dataset_action = toolkit.get_action("dataset_purge")
-    get_dataset_action = toolkit.get_action("package_show")
-    for dataset in SAMPLE_DATASETS:
-        click.secho(f"Processing dataset {dataset.name!r}...")
-        try:
-            get_dataset_action(
-                context={"user": user["name"]}, data_dict={"id": dataset.name}
-            )
-        except toolkit.ObjectNotFound:
-            package_exists = False
-            click.secho(
-                f"dataset {dataset.name!r} does not exist. Skipping...", fg=_INFO_COLOR
-            )
-        else:
-            package_exists = True
-        if package_exists:
-            click.secho(f"Purging dataset {dataset.name!r}...")
-            purge_dataset_action(
-                context={"user": user["name"]}, data_dict={"id": dataset.name}
-            )
+    get_datasets_action = toolkit.get_action("package_search")
+    max_rows = 1000
+    existing_sample_datasets = get_datasets_action(
+        context={"user": user["name"]},
+        data_dict={
+            "q": f"tags:{SAMPLE_DATASET_TAG}",
+            "rows": max_rows,
+            "facet": False,
+            "include_drafts": True,
+            "include_private": True,
+        },
+    )
+    for dataset in existing_sample_datasets["results"]:
+        click.secho(f"Purging dataset {dataset['name']!r}...")
+        purge_dataset_action(
+            context={"user": user["name"]}, data_dict={"id": dataset["id"]}
+        )
+    num_existing = existing_sample_datasets["count"]
+    remaining_sample_datasets = num_existing - max_rows
+    if remaining_sample_datasets > 0:
+        click.secho(f"{remaining_sample_datasets} still remain", fg=_INFO_COLOR)
     click.secho("Done!", fg=_SUCCESS_COLOR)
