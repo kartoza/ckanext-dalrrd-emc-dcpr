@@ -114,7 +114,15 @@ guide to install CKAN, then follow the below steps:
    ```
    ckan -c /etc/ckan/default/ckan.ini run
    ```
+## Migrations
 
+Run the extension specific migration using the following commands to upgrade and downgrade 
+the ckan database respectively.
+
+```
+docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db upgrade -p dalrrd_emc_dcpr
+docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db downgrade -p dalrrd_emc_dcpr
+```
 
 ## Operations
 

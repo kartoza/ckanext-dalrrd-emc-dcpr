@@ -52,9 +52,7 @@ def upgrade():
         sa.Column("organization_address", types.UnicodeText),
         sa.Column("proposed_project_name", types.UnicodeText),
         sa.Column("additional_project_context", types.UnicodeText),
-        sa.Column(
-            "capture_start_date", types.DateTime, default=datetime.utcnow
-        ),
+        sa.Column("capture_start_date", types.DateTime, default=datetime.utcnow),
         sa.Column("capture_end_date", types.DateTime, default=datetime.utcnow),
         sa.Column("cost", types.UnicodeText),
         sa.Column("spatial_extent", types.UnicodeText),
@@ -70,17 +68,17 @@ def upgrade():
         sa.Column("nsif_review_additional_documents", types.UnicodeText),
         sa.Column("csi_moderation_notes", types.UnicodeText),
         sa.Column("csi_moderation_additional_documents", types.UnicodeText),
-        sa.Column(
-            "csi_moderation_date", types.DateTime, default=datetime.utcnow
-        ),
+        sa.Column("csi_moderation_date", types.DateTime, default=datetime.utcnow),
     )
 
     op.create_table(
         "dcpr_request_dataset",
         meta.metadata,
         sa.Column(
-            "request_id", types.UnicodeText,
-            ForeignKey("dcpr_request.csi_reference_id"), primary_key=True
+            "request_id",
+            types.UnicodeText,
+            ForeignKey("dcpr_request.csi_reference_id"),
+            primary_key=True,
         ),
         sa.Column("dataset_custodian", types.Boolean, default=False),
         sa.Column("data_type", types.UnicodeText),
@@ -101,9 +99,11 @@ def upgrade():
         sa.Column(
             "target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid
         ),
-        sa.Column("request_id",types.UnicodeText, ForeignKey("dcpr_request.csi_reference_id")),
+        sa.Column(
+            "request_id", types.UnicodeText, ForeignKey("dcpr_request.csi_reference_id")
+        ),
         sa.Column("user_id", types.UnicodeText, ForeignKey("user.id")),
-        sa.Column("group_id",types.UnicodeText, ForeignKey("group.id")),
+        sa.Column("group_id", types.UnicodeText, ForeignKey("group.id")),
     )
 
 
