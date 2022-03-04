@@ -1,0 +1,85 @@
+{% ckan_extends %}
+
+{% block facet_list %}
+    {% set hide_empty = hide_empty or false %}
+
+    {% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
+	{% if items or not hide_empty %}
+	    {% if within_tertiary %}
+		{% set nav_class = 'nav nav-pills nav-stacked' %}
+		{% set nav_item_class = ' ' %}
+		{% set wrapper_class = 'nav-facet nav-facet-tertiary' %}
+	    {% endif %}
+	    {% block facet_list_item %}
+		<section class="{{ wrapper_class or 'module module-narrow module-shallow' }}">
+		    {% block facet_list_heading %}
+                {% set item_id = title.replace(' ', '') %}
+                {% if title not in ["Reference Date"] %}
+                    {% set filters = {
+                        'Groups': 'fa fa-users',
+                        'Organizations': 'fa fa-asterisk',
+                        'Tags': 'fa fa-tags',
+                        'Formats': 'fa fa-file',
+                        'Licenses': 'fa fa-check-circle',
+                        'SASDI Theme': 'fa fa-tasks',
+                        'ISO Topic Category': 'fa fa-filter'
+
+                    } %}
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="head{{ item_id }}">
+                  <h2 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="true" aria-controls="{{ item_id }}">
+                      <i class="{{ filters[title] }}"></i>
+                        {% set title = title or h.get_facet_title(name) %}
+                        {{ title }}
+                    </a>
+                  </h2>
+                </div>
+                {% endif %}
+		    {% endblock %}
+		    {% block facet_list_items %}
+                {% set item_id = title.replace(' ', '') %}
+                <div id="{{ item_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ item_id }}">
+                <div class="panel-body">
+			{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
+             			    {% if items %}
+
+				<nav aria-label="{{ title }}">
+				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
+					{% for item in items %}
+					    {% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
+					    {% set label = label_function(item) if label_function else item.display_name %}
+					    {% set label_truncated = h.truncate(label, 22) if not label_function else label %}
+					    {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
+					    <li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %}">
+						<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+						    <span class="item-label">{{ label_truncated }}</span>
+						    <span class="hidden separator"> - </span>
+						    <span class="item-count badge">{{ count }}</span>
+						</a>
+					    </li>
+					{% endfor %}
+				    </ul>
+				</nav>
+
+				<p class="module-footer">
+				    {% if h.get_param_int('_%s_limit' % name) %}
+					{% if h.has_more_facets(name, search_facets or c.search_facets) %}
+					    <a href="{{ h.remove_url_param('_%s_limit' % name, replace=0, extras=extras, alternative_url=alternative_url) }}" class="read-more">{{ _('Show More {facet_type}').format(facet_type=title) }}</a>
+					{% endif %}
+				    {% else %}
+					<a href="{{ h.remove_url_param('_%s_limit' % name, extras=extras, alternative_url=alternative_url) }}" class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }}</a>
+				    {% endif %}
+				</p>
+			    {% else %}
+				<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
+			    {% endif %}
+			{% endwith %}
+		    {% endblock %}
+        </div>
+        </div>
+		</section>
+	    {% endblock %}
+	{% endif %}
+    {% endwith %}
+{% endblock %}
