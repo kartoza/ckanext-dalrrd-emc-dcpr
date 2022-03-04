@@ -14,9 +14,10 @@
 		<section class="{{ wrapper_class or 'module module-narrow module-shallow' }}">
 		    {% block facet_list_heading %}
                 {% set item_id = title.replace(' ', '') %}
-                {% if title not in ["Reference Date", "Organizations"] %}
+                {% if title not in ["Reference Date"] %}
                     {% set filters = {
                         'Groups': 'fa fa-users',
+                        'Organizations': 'fa fa-asterisk',
                         'Tags': 'fa fa-tags',
                         'Formats': 'fa fa-file',
                         'Licenses': 'fa fa-check-circle',
