@@ -95,7 +95,6 @@ class _CkanBootstrapDCPRRequest:
     additional_project_context: str
     capture_start_date: str
     capture_end_date: str
-    request_dataset: _CkanBootstrapEmcDataset
     cost: str
     spatial_extent: str
     spatial_resolution: str

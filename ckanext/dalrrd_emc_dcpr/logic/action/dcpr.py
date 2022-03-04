@@ -37,7 +37,6 @@ def dcpr_request_create(context, data_dict):
             additional_project_context=data_dict["additional_project_context"],
             capture_start_date=data_dict["capture_start_date"],
             capture_end_date=data_dict["capture_end_date"],
-            request_dataset=data_dict["request_dataset"],
             cost=data_dict["cost"],
             spatial_extent=data_dict["spatial_extent"],
             spatial_resolution=data_dict["spatial_resolution"],

@@ -5,10 +5,6 @@ from . import (
     _CkanBootstrapDCPRRequest,
 )
 
-from ._sample_datasets import SAMPLE_DATASETS
-
-
-request_dataset = SAMPLE_DATASETS[0]
 
 SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
     _CkanBootstrapDCPRRequest(
@@ -21,7 +17,6 @@ SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
         additional_project_context="additional_project_context",
         capture_start_date="2022-01-01",
         capture_end_date="2022-01-01",
-        request_dataset=request_dataset,
         cost="cost",
         spatial_extent="spatial_extent",
         spatial_resolution="EPSG:4326",
