@@ -66,9 +66,9 @@ runs:
       shell: bash
       run: |
         docker exec -t emc-dcpr_ckan-web_1 poetry install
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db upgrade -p dalrrd_emc_dcpr
         docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db init
         docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
-        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan dalrrd-emc-dcpr bootstrap init-dcpr-requests
 
     - name: Run unit tests
       shell: bash
