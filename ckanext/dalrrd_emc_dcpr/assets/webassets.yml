@@ -31,6 +31,12 @@ dataset-spatial-extent-map-css:
     preload:
       - ckanext-dalrrdemcdcpr/vendorized-leaflet-geoman-css
 
+ckan-base-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_ckan_base.css
+  contents:
+    - css/main.css
+  filter: cssrewrite
+
 dalrrd-emc-dcpr-css:
   output: ckanext-dalrrdemcdcpr/%(version)s_dalrrd_emc_dcpr.css
   contents:
