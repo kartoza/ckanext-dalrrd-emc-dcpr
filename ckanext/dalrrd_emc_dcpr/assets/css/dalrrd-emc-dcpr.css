@@ -114,6 +114,18 @@ body {
   background: #FFF url("../../../base/images/bg.png");
  }
 
+.wrapper::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 25%;
+  border-right: 0;
+  z-index: 1;
+}
+
 .btn-primary {
     background-color: #F3881C;
 }
