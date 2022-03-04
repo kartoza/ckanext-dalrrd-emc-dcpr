@@ -76,7 +76,6 @@ def test_create_dcpr_request(request_id, name, user_available, user_logged):
             "additional_project_context": request.additional_project_context,
             "capture_start_date": request.capture_start_date,
             "capture_end_date": request.capture_end_date,
-            "request_dataset": request.request_dataset,
             "cost": request.cost,
             "spatial_extent": request.spatial_extent,
             "spatial_resolution": request.spatial_resolution,
