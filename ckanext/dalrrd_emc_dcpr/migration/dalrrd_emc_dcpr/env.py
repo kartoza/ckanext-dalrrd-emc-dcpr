@@ -5,6 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from ckan.model import meta
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -17,7 +19,8 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+
+target_metadata = meta.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -43,6 +46,7 @@ def run_migrations_offline():
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_table="alembic_dalrrd_emc_dcpr_version",
     )
 
     with context.begin_transaction():
@@ -63,7 +67,11 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            version_table="alembic_dalrrd_emc_dcpr_version",
+        )
 
         with context.begin_transaction():
             context.run_migrations()

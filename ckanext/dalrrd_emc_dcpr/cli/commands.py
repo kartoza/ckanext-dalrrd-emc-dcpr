@@ -1,15 +1,24 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
+import contextlib
 import datetime as dt
 import enum
+import io
+import inspect
 import json
 import logging
 import os
 import typing
 from concurrent import futures
+from pathlib import Path
 
+import alembic.command
+import alembic.config
+import alembic.util.exc
 import click
 
+import ckan
+import ckan.plugins as p
 from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
@@ -86,6 +95,11 @@ def bootstrap():
 @dalrrd_emc_dcpr.group()
 def delete_data():
     """Delete dalrrd-emc-dcpr bootstrapped and sample data"""
+
+
+@dalrrd_emc_dcpr.group()
+def extra_commands():
+    """Extra commands that are less relevant"""
 
 
 @bootstrap.command()
@@ -743,3 +757,95 @@ def delete_sample_datasets():
     if remaining_sample_datasets > 0:
         click.secho(f"{remaining_sample_datasets} still remain", fg=_INFO_COLOR)
     click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+# TODO: This command does not need to be needed anymore,
+#  since the vanilla ckan command seems to work - leaving t here in case we
+#  eventually need it
+@extra_commands.command()
+@click.argument("plugin_name")
+@click.option("-m", "--message")
+@click.option("-a", "--autogenerate", is_flag=True)
+@click.option("-h", "--head")
+def add_db_revision(plugin_name, message, autogenerate, head):
+    try:
+        alembic_wrapper = AlembicWrapper(plugin_name)
+    except RuntimeError:
+        click.secho(
+            f"Plugin {plugin_name!r} does not seem to use migrations", fg=_ERROR_COLOR
+        )
+    else:
+        if head is None:
+            head = f"{plugin_name}@head"
+        alembic_config_ini = Path(_resolve_alembic_config(plugin_name))
+        version_path = str(alembic_config_ini.parent / "versions")
+        click.secho(f"{version_path=}", fg=_INFO_COLOR)
+        out = alembic_wrapper.run_command(
+            alembic.command.revision,
+            message=message,
+            head=head,
+            # branch_label=plugin_name,
+            version_path=version_path,
+            autogenerate=autogenerate,
+        )
+        click.secho(f"{out=}", fg=_INFO_COLOR)
+
+
+def _resolve_alembic_config(plugin):
+    if plugin:
+        plugin_obj = p.get_plugin(plugin)
+        if plugin_obj is None:
+            toolkit.error_shout("Plugin '{}' cannot be loaded.".format(plugin))
+            raise click.Abort()
+        plugin_dir = os.path.dirname(inspect.getsourcefile(type(plugin_obj)))
+
+        # if there is `plugin` folder instead of single_file, find
+        # plugin's parent dir
+        ckanext_idx = plugin_dir.rfind("/ckanext/") + 9
+        idx = plugin_dir.find("/", ckanext_idx)
+        if ~idx:
+            plugin_dir = plugin_dir[:idx]
+        migration_dir = os.path.join(plugin_dir, "migration", plugin)
+    else:
+        import ckan.migration as _cm
+
+        migration_dir = os.path.dirname(_cm.__file__)
+    return os.path.join(migration_dir, "alembic.ini")
+
+
+class AlembicWrapper:
+    alembic_conf: alembic.config.Config
+    _command_output: typing.List[str]
+
+    def __init__(self, plugin_name):
+        self.alembic_conf = self._get_alembic_config(plugin_name)
+        self._command_output = []
+
+    def run_command(self, alembic_command, *args, **kwargs):
+        current_output_index = len(self._command_output)
+        alembic_command(self.alembic_conf, *args, **kwargs)
+        return self._command_output[current_output_index:]
+
+    def _capture_alembic_output(self, message: str, *args):
+        message = message % args
+        self._command_output.append(message)
+
+    def _get_alembic_config(self, plugin_name: str):
+        alembic_config_ini = Path(_resolve_alembic_config(plugin_name))
+        ckan_versions_path = str(Path(ckan.__file__).parent / "migration/versions")
+        if alembic_config_ini.exists():
+            conf = alembic.config.Config(str(alembic_config_ini))
+            conf.set_main_option("script_location", str(alembic_config_ini.parent))
+            conf.set_main_option("sqlalchemy.url", toolkit.config.get("sqlalchemy.url"))
+            conf.set_main_option(
+                "version_locations",
+                " ".join((f"%(here)s/versions", ckan_versions_path)),
+            )
+            conf.print_stdout = self._capture_alembic_output
+            click.secho(
+                f"version_locations in the config: {conf.get_main_option('version_locations')}",
+                fg=_INFO_COLOR,
+            )
+        else:
+            raise RuntimeError("Input plugin name does not have alembic config")
+        return conf
