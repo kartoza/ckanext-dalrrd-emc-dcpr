@@ -16,7 +16,6 @@ from ckan.model import core, domain_object, meta, types as _types
 revision = "d145fc3c67ae"
 down_revision = None
 branch_labels = ("dalrrd_emc_dcpr",)
-# depends_on = "ccd38ad5fced"
 depends_on = None
 
 
