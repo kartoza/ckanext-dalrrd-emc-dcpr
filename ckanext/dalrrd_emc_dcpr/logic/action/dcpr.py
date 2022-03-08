@@ -3,9 +3,10 @@ import typing
 
 import ckan.plugins.toolkit as toolkit
 
-from sqlalchemy import exc
+from sqlalchemy import select, exc
 
-from ckanext.dalrrd_emc_dcpr.model.request import Request
+# from ckanext.dalrrd_emc_dcpr.model.request import Request
+from ...model import request as dcpr_request
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +20,12 @@ def dcpr_request_create(context, data_dict):
         raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
 
     csi_reference_id = str(data_dict["csi_reference_id"])
-    request = Request.get(csi_reference_id=csi_reference_id)
+    request = dcpr_request.Request.get(csi_reference_id=csi_reference_id)
 
     if request:
         raise toolkit.ValidationError({"message": "Request already exists"})
     else:
-        request = Request(
+        request = dcpr_request.Request(
             csi_reference_id=data_dict["csi_reference_id"],
             owner_user=data_dict["owner_user"],
             csi_moderator=data_dict["csi_moderator"],
@@ -70,20 +71,34 @@ def dcpr_request_create(context, data_dict):
 
 @toolkit.side_effect_free
 def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
+    """Present relevant DCPR requests to user
+
+    Anonymous users are able to view all moderated requests
+
+    Unmoderated requests are available only to:
+    - the creator
+    - a sysadmin
+    - if the request has been submitted to users of the current workflow stage
+
+    """
+
     logger.debug("Inside the dcpr_request_list action")
     access_result = toolkit.check_access(
         "dcpr_request_list_auth", context, data_dict=data_dict
     )
     logger.debug(f"access_result: {access_result}")
-    fake_requests = [
-        {"name": "req1", "owner": "tester1"},
-        {"name": "req2", "owner": "tester1"},
-        {"name": "req3", "owner": "tester1"},
-        {"name": "req4", "owner": "tester2"},
-    ]
-    result = []
-    current_user = context["auth_user_obj"]
-    for dcpr_request in fake_requests:
-        if dcpr_request["owner"] == current_user.name:
-            result.append(dcpr_request)
-    return result
+    user = context["auth_user_obj"]
+    model = context["model"]
+    request_table = dcpr_request.request_table
+    query = select([request_table.c.csi_reference_id])
+    if user is None:  # show only  moderated requests
+        pass
+    elif user.sysadmin:  # show all requests
+        pass
+    else:  # show relevant requests depending on the user's organization
+        pass
+    query = query.order_by(request_table.c.csi_reference_id)
+    limit = data_dict.get("limit", 10)
+    offset = data_dict.get("offset", 10)
+    query = query.limit(limit).offset(offset)
+    return [r[0] for r in query.execute()]
