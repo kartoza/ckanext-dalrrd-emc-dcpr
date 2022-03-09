@@ -416,7 +416,7 @@ def create_sample_dcpr_requests():
                     "owner_user": user_id,
                     "csi_moderator": user_id,
                     "nsif_reviewer": user_id,
-                    "notification_targets":[user_id],
+                    "notification_targets": [user_id],
                     "status": request.status,
                     "organization_name": request.organization_name,
                     "organization_level": request.organization_level,

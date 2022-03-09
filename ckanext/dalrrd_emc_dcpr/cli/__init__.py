@@ -109,7 +109,7 @@ class _CkanBootstrapDCPRRequest:
     csi_moderation_notes: str
     csi_moderation_additional_documents: str
     csi_moderation_date: str
-    dataset_custodian: str
+    dataset_custodian: bool
     data_type: str
     purposed_dataset_title: str
     purposed_abstract: str
