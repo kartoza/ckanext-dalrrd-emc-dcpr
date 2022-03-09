@@ -5,8 +5,8 @@ import ckan.plugins.toolkit as toolkit
 
 from sqlalchemy import select, exc
 
-# from ckanext.dalrrd_emc_dcpr.model.request import Request
-from ...model import request as dcpr_request
+# from ckanext.dalrrd_emc_dcpr.model.request import DCPRRequest
+from ...model import dcpr_request as dcpr_request
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +20,12 @@ def dcpr_request_create(context, data_dict):
         raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
 
     csi_reference_id = str(data_dict["csi_reference_id"])
-    request = dcpr_request.Request.get(csi_reference_id=csi_reference_id)
+    request = dcpr_request.DCPRRequest.get(csi_reference_id=csi_reference_id)
 
     if request:
-        raise toolkit.ValidationError({"message": "Request already exists"})
+        raise toolkit.ValidationError({"message": "DCPRRequest already exists"})
     else:
-        request = dcpr_request.Request(
+        request = dcpr_request.DCPRRequest(
             csi_reference_id=data_dict["csi_reference_id"],
             owner_user=data_dict["owner_user"],
             csi_moderator=data_dict["csi_moderator"],

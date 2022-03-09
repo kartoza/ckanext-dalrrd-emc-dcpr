@@ -9,7 +9,7 @@ from sqlalchemy import orm, types, Column, Table, ForeignKey
 
 from ckan.model import core, domain_object, meta, types as _types, Session
 
-request_table = Table(
+dcpr_request_table = Table(
     "dcpr_request",
     meta.metadata,
     Column(
@@ -61,7 +61,7 @@ request_table = Table(
     Column("csi_moderation_date", types.DateTime, default=datetime.datetime.utcnow),
 )
 
-request_dataset_table = Table(
+dcpr_request_dataset_table = Table(
     "dcpr_request_dataset",
     meta.metadata,
     Column("request_id", ForeignKey("dcpr_request.csi_reference_id"), primary_key=True),
@@ -78,7 +78,7 @@ request_dataset_table = Table(
     Column("capture_method_detail", types.UnicodeText),
 )
 
-request_notification_table = Table(
+dcpr_request_notification_table = Table(
     "dcpr_request_notification",
     meta.metadata,
     Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
@@ -88,63 +88,64 @@ request_notification_table = Table(
 )
 
 
-class RequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):
+class DCPRRequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):
     def __init__(self, request=None, request_id=None):
-        super(RequestDataset, self).__init__(request, request_id)
+        super(DCPRRequestDataset, self).__init__(request, request_id)
         self.request = request
         self.request_id = request_id
 
     @classmethod
-    def get(cls, **kw) -> Optional["RequestDataset"]:
+    def get(cls, **kw) -> Optional["DCPRRequestDataset"]:
         """Finds a single request entity in the model."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
 
-class Request(core.StatefulObjectMixin, domain_object.DomainObject):
+class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
     def __init__(self, **kw):
-        super(Request, self).__init__(**kw)
+        super(DCPRRequest, self).__init__(**kw)
         self.csi_reference_id = kw.get("csi_reference_id", None)
 
     @classmethod
-    def get(cls, **kw) -> Optional["Request"]:
+    def get(cls, **kw) -> Optional["DCPRRequest"]:
         """Finds a single request entity in the model."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
-    def get_dataset_elements(self) -> Optional[RequestDataset]:
+    def get_dataset_elements(self) -> Optional[DCPRRequestDataset]:
         dataset = (
-            meta.Session.query(Request)
-            .join(RequestDataset, RequestDataset.request_id == Request.csi_reference_id)
-            .filter(RequestDataset.request_id == str(self.csi_reference))
+            meta.Session.query(DCPRRequest)
+            .join(DCPRRequestDataset,
+                  DCPRRequestDataset.request_id == DCPRRequest.csi_reference_id)
+            .filter(DCPRRequestDataset.request_id == str(self.csi_reference))
             .all()
         )
 
         return dataset
 
 
-class RequestNotificationTarget(domain_object.DomainObject):
+class DCPRRequestNotificationTarget(domain_object.DomainObject):
     pass
 
 
 def init_request_tables():
-    if not request_table.exists():
+    if not dcpr_request_table.exists():
         log.debug("Creating DCPR request table")
-        request_table.create()
+        dcpr_request_table.create()
     else:
         log.debug("DCPR request table already exists")
-    if not request_dataset_table.exists():
+    if not dcpr_request_dataset_table.exists():
         log.debug("Creating DCPR request dataset table")
-        request_dataset_table.create()
+        dcpr_request_dataset_table.create()
     else:
         log.debug("DCPR request dataset table already exists")
-    if not request_notification_table.exists():
+    if not dcpr_request_notification_table.exists():
         log.debug("Creating DCPR request notification target table")
-        request_notification_table.create()
+        dcpr_request_notification_table.create()
     else:
         log.debug("DCPR request notification target table already exists")
 
 
-meta.mapper(Request, request_table)
-meta.mapper(RequestNotificationTarget, request_notification_table)
-meta.mapper(RequestDataset, request_dataset_table)
+meta.mapper(DCPRRequest, dcpr_request_table)
+meta.mapper(DCPRRequestNotificationTarget, dcpr_request_notification_table)
+meta.mapper(DCPRRequestDataset, dcpr_request_dataset_table)

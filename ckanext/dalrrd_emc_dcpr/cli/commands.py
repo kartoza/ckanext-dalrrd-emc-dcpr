@@ -24,7 +24,7 @@ from ckan import model
 from ckan.lib.navl import dictization_functions
 
 # from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
-from ckanext.dalrrd_emc_dcpr.model.request import Request, init_request_tables
+from ckanext.dalrrd_emc_dcpr.model.dcpr_request import DCPRRequest, init_request_tables
 
 from ..constants import (
     ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
@@ -448,7 +448,7 @@ def create_sample_dcpr_requests():
             click.secho(
                 f"Attempting to re-enable possibly deleted request...", fg=_INFO_COLOR
             )
-            sample_request = Request.get(request.id)
+            sample_request = DCPRRequest.get(request.id)
             if sample_request is None:
                 click.secho(
                     f"Could not find sample request with id {request.csi_reference_id!r}",
