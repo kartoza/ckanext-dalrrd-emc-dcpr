@@ -19,7 +19,17 @@
 {% block secondary_content %}
     {% snippet "spatial/snippets/spatial_query.html", default_extent=h.dalrrd_emc_dcpr_default_spatial_search_extent() %}
     {% snippet "snippets/temporal_query.html" %}
-    {{ super() }}
+    <div class="filters">
+    <div>
+      {% for facet in facet_titles %}
+          {% if facet!= 'tags' %}
+        {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, search_facets=search_facets) }}
+          {% endif %}
+      {% endfor %}
+    {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name=facet, search_facets=search_facets) }}
+    </div>
+    <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
+  </div>
 {% endblock %}
 
 
