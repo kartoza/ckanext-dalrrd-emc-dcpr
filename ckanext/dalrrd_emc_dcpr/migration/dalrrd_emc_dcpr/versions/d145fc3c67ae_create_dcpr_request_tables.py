@@ -76,7 +76,7 @@ def upgrade():
         "dcpr_request_dataset",
         meta.metadata,
         sa.Column(
-            "request_id",
+            "dcpr_request_id",
             types.UnicodeText,
             ForeignKey("dcpr_request.csi_reference_id"),
             primary_key=True,
@@ -101,7 +101,9 @@ def upgrade():
             "target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid
         ),
         sa.Column(
-            "request_id", types.UnicodeText, ForeignKey("dcpr_request.csi_reference_id")
+            "dcpr_request_id",
+            types.UnicodeText,
+            ForeignKey("dcpr_request.csi_reference_id"),
         ),
         sa.Column("user_id", types.UnicodeText, ForeignKey("user.id")),
         sa.Column("group_id", types.UnicodeText, ForeignKey("group.id")),

@@ -31,5 +31,16 @@ SAMPLE_REQUESTS: typing.Final[typing.List[_CkanBootstrapDCPRRequest]] = [
         csi_moderation_notes="csi_moderation_notes",
         csi_moderation_additional_documents="csi_moderation_additional_documents",
         csi_moderation_date="2022-01-01",
+        dataset_custodian="dataset_custodian",
+        data_type="data_type",
+        purposed_dataset_title="purposed_dataset_title",
+        purposed_abstract="purposed_abstract",
+        dataset_purpose="dataset_purpose",
+        lineage_statement="lineage_statement",
+        associated_attributes="associated_attributes",
+        feature_description="feature_description",
+        data_usage_restrictions="data_usage_restrictions",
+        capture_method="capture_method",
+        capture_method_detail="capture_method_detail",
     )
 ]

@@ -109,6 +109,17 @@ class _CkanBootstrapDCPRRequest:
     csi_moderation_notes: str
     csi_moderation_additional_documents: str
     csi_moderation_date: str
+    dataset_custodian: str
+    data_type: str
+    purposed_dataset_title: str
+    purposed_abstract: str
+    dataset_purpose: str
+    lineage_statement: str
+    associated_attributes: str
+    feature_description: str
+    data_usage_restrictions: str
+    capture_method: str
+    capture_method_detail: str
 
     def to_data_dict(self) -> typing.Dict:
         result = {}

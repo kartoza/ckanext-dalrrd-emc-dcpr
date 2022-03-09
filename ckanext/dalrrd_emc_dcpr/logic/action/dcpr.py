@@ -23,7 +23,7 @@ def dcpr_request_create(context, data_dict):
     request = dcpr_request.DCPRRequest.get(csi_reference_id=csi_reference_id)
 
     if request:
-        raise toolkit.ValidationError({"message": "DCPRRequest already exists"})
+        raise toolkit.ValidationError({"message": "DCPR request already exists"})
     else:
         request = dcpr_request.DCPRRequest(
             csi_reference_id=data_dict["csi_reference_id"],
@@ -58,8 +58,24 @@ def dcpr_request_create(context, data_dict):
             csi_moderation_date=data_dict["csi_moderation_date"],
         )
 
+        request_dataset = dcpr_request.DCPRRequestDataset(
+            dcpr_request_id=data_dict["csi_reference_id"],
+            dataset_custodian=data_dict["dataset_custodian"],
+            data_type=data_dict["data_type"],
+            purposed_dataset_title=data_dict["purposed_dataset_title"],
+            purposed_abstract=data_dict["purposed_abstract"],
+            dataset_purpose=data_dict["dataset_purpose"],
+            lineage_statement=data_dict["lineage_statement"],
+            associated_attributes=data_dict["associated_attributes"],
+            feature_description=data_dict["feature_description"],
+            data_usage_restrictions=data_dict["data_usage_restrictions"],
+            capture_method=data_dict["capture_method"],
+            capture_method_detail=data_dict["capture_method_detail"],
+        )
+
     try:
         model.Session.add(request)
+        model.Session.add(request_dataset)
         model.repo.commit()
     except exc.InvalidRequestError as exception:
         model.Session.rollback()

@@ -64,7 +64,9 @@ dcpr_request_table = Table(
 dcpr_request_dataset_table = Table(
     "dcpr_request_dataset",
     meta.metadata,
-    Column("request_id", ForeignKey("dcpr_request.csi_reference_id"), primary_key=True),
+    Column(
+        "dcpr_request_id", ForeignKey("dcpr_request.csi_reference_id"), primary_key=True
+    ),
     Column("dataset_custodian", types.Boolean, default=False),
     Column("data_type", types.UnicodeText),
     Column("purposed_dataset_title", types.UnicodeText),
@@ -82,17 +84,32 @@ dcpr_request_notification_table = Table(
     "dcpr_request_notification",
     meta.metadata,
     Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
-    Column("request_id", types.UnicodeText, ForeignKey("dcpr_request.csi_reference_id")),
+    Column(
+        "dcpr_request_id",
+        types.UnicodeText,
+        ForeignKey("dcpr_request.csi_reference_id"),
+    ),
     Column("user_id", types.UnicodeText, ForeignKey("user.id")),
     Column("group_id", types.UnicodeText, ForeignKey("group.id")),
 )
 
 
 class DCPRRequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):
-    def __init__(self, request=None, request_id=None):
-        super(DCPRRequestDataset, self).__init__(request, request_id)
-        self.request = request
-        self.request_id = request_id
+    def __init__(self, **kw):
+        super(DCPRRequestDataset, self).__init__(**kw)
+
+    @classmethod
+    def get(cls, **kw) -> Optional["DCPRRequestDataset"]:
+        """Finds a single request entity in the model."""
+        query = meta.Session.query(cls).autoflush(False)
+        return query.filter_by(**kw).first()
+
+
+class DCPRRequestNotificationTarget(
+    core.StatefulObjectMixin, domain_object.DomainObject
+):
+    def __init__(self, **kw):
+        super(DCPRRequestDataset, self).__init__(**kw)
 
     @classmethod
     def get(cls, **kw) -> Optional["DCPRRequestDataset"]:
@@ -113,19 +130,33 @@ class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
         return query.filter_by(**kw).first()
 
     def get_dataset_elements(self) -> Optional[DCPRRequestDataset]:
-        dataset = (
+        datasets = (
             meta.Session.query(DCPRRequest)
-            .join(DCPRRequestDataset,
-                  DCPRRequestDataset.request_id == DCPRRequest.csi_reference_id)
-            .filter(DCPRRequestDataset.request_id == str(self.csi_reference))
+            .join(
+                DCPRRequestDataset,
+                DCPRRequestDataset.dcpr_request_id == DCPRRequest.csi_reference_id,
+            )
+            .filter(DCPRRequestDataset.dcpr_request_id == str(self.csi_reference))
             .all()
         )
 
-        return dataset
+        return datasets
 
+    def get_notification_targets(self) -> Optional[DCPRRequestNotificationTarget]:
+        targets = (
+            meta.Session.query(DCPRRequest)
+            .join(
+                DCPRRequestNotificationTarget,
+                DCPRRequestNotificationTarget.dcpr_request_id
+                == DCPRRequest.csi_reference_id,
+            )
+            .filter(
+                DCPRRequestNotificationTarget.dcpr_request_id == str(self.csi_reference)
+            )
+            .all()
+        )
 
-class DCPRRequestNotificationTarget(domain_object.DomainObject):
-    pass
+        return targets
 
 
 def init_request_tables():

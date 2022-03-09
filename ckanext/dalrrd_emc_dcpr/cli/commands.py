@@ -438,6 +438,17 @@ def create_sample_dcpr_requests():
                     "csi_moderation_notes": request.csi_moderation_notes,
                     "csi_moderation_additional_documents": request.csi_moderation_additional_documents,
                     "csi_moderation_date": request.csi_moderation_date,
+                    "dataset_custodian": request.dataset_custodian,
+                    "data_type": request.data_type,
+                    "purposed_dataset_title": request.purposed_dataset_title,
+                    "purposed_abstract": request.purposed_abstract,
+                    "dataset_purpose": request.dataset_purpose,
+                    "lineage_statement": request.lineage_statement,
+                    "associated_attributes": request.associated_attributes,
+                    "feature_description": request.feature_description,
+                    "data_usage_restrictions": request.data_usage_restrictions,
+                    "capture_method": request.capture_method,
+                    "capture_method_detail": request.capture_method_detail,
                 },
             )
         except toolkit.ValidationError as exc:
