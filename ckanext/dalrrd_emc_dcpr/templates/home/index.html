@@ -1,5 +1,30 @@
 {% ckan_extends %}
 {% block subtitle %}{{ _("Welcome DALRRD") }}{% endblock %}
 {% block content %}
+<header class="masthead">
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-xl-6">
+                <div class="text-center text-white">
+                    <!-- Page heading-->
+                    <h1 class="mb-5 header-title">Electronic Metadata Catalogue (EMC)</h1>
+                    <div class="col-auto"><a href="/dataset/"><button class="btn btn-primary btn-lg"  type="submit">View All Datasets</button></a></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<main class="container">
+    <div class="index-search">
+    <h2 class="mb-5 section-title">Search for data</h2>
+    {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type="datasets", query=q, sorting_selected=sort_by_selected, placeholder=_('Search  datasets') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
+
+    </div>
+</main>
+<div class="sasdi-theme text-center container">
+    <h2 class="mb-5 section-title">SASDI Theme</h2>
+
+</div>
 
 {% endblock %}

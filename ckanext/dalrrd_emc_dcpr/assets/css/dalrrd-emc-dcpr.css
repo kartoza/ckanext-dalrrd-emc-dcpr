@@ -332,3 +332,33 @@ fieldset[disabled] .btn-default.focus {
 .panel-title > a {
   text-decoration: none;
 }
+
+/* Landing page */
+
+header.masthead {
+  position: relative;
+  background: url("/images/emc.jpg") no-repeat center center;
+  background-size: auto;
+  background-size: cover;
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+
+.header-title {
+  color: #FFFFFF;
+  font-size: 60px;
+}
+
+.index-search  > h2{
+    color: #3A744E;
+}
+
+.sasdi-theme {
+  position: relative;
+  color: #3A744E;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 40px;
+}
