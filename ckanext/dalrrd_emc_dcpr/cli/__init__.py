@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import typing
+import uuid
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -80,6 +81,51 @@ class _CkanBootstrapEmcDataset:
                 result[name] = _to_data_dict(value)
         result["title"] = self.name
         result["lineage"] = f"Dummy lineage for {self.name}"
+        return result
+
+
+@dataclasses.dataclass
+class _CkanBootstrapDCPRRequest:
+    csi_reference_id: uuid.UUID
+    status: str
+    organization_name: str
+    organization_level: str
+    organization_address: str
+    proposed_project_name: str
+    additional_project_context: str
+    capture_start_date: str
+    capture_end_date: str
+    cost: str
+    spatial_extent: str
+    spatial_resolution: str
+    data_capture_urgency: str
+    additional_information: str
+    request_date: str
+    submission_date: str
+    nsif_review_date: str
+    nsif_recommendation: str
+    nsif_review_notes: str
+    nsif_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_moderation_additional_documents: str
+    csi_moderation_date: str
+    dataset_custodian: bool
+    data_type: str
+    purposed_dataset_title: str
+    purposed_abstract: str
+    dataset_purpose: str
+    lineage_statement: str
+    associated_attributes: str
+    feature_description: str
+    data_usage_restrictions: str
+    capture_method: str
+    capture_method_detail: str
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
         return result
 
 

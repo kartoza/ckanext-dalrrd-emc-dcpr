@@ -96,7 +96,7 @@ guide to install CKAN, then follow the below steps:
    . /usr/lib/ckan/default/bin/activate
    ```
 
-3. Clone the source and install it on the virtualenv
+2. Clone the source and install it on the virtualenv
 
    ```
    git clone https://github.com/Kartoza/ckanext-dalrrd-emc-dcpr.git
@@ -105,15 +105,26 @@ guide to install CKAN, then follow the below steps:
    pip install -r requirements.txt
    ```
 
-4. Add `dalrrd-emc-dcpr` to the `ckan.plugins` setting in your CKAN
+3. Add `dalrrd-emc-dcpr` to the `ckan.plugins` setting in your CKAN
    config file (by default the config file is located at
    `/etc/ckan/default/ckan.ini`).
 
-5. Start CKAN:
+4. Start CKAN:
 
    ```
    ckan -c /etc/ckan/default/ckan.ini run
    ```
+
+
+# Migrations
+
+Run the extension's specific migrations using the following commands to upgrade and downgrade
+the ckan database respectively.
+
+```
+docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db upgrade -p dalrrd_emc_dcpr
+docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db downgrade -p dalrrd_emc_dcpr
+``````
 
 
 ## Operations
@@ -258,6 +269,7 @@ mentioned above). Run the following command:
 ```
 docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan db init
 ```
+
 
 Now you should be able to go to `http://localhost:5000` and see the ckan
 landing page. If not, you may need to reload the ckan web app after
@@ -459,6 +471,7 @@ To run the tests you will need to:
    ```
    docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini db init
    docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
+   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr bootstrap init-dcpr-requests
    ```
 
 1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
