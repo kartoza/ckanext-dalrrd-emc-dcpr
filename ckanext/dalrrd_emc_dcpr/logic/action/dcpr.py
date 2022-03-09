@@ -105,7 +105,7 @@ def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
     logger.debug(f"access_result: {access_result}")
     user = context["auth_user_obj"]
     model = context["model"]
-    request_table = dcpr_request.request_table
+    request_table = dcpr_request.dcpr_request_table
     query = select([request_table.c.csi_reference_id])
     if user is None:  # show only  moderated requests
         pass
