@@ -33,7 +33,7 @@ from ..constants import (
 )
 from ..email_notifications import get_and_send_notifications_for_all_users
 
-from ._bootstrap_data import SASDI_ORGANIZATIONS
+from ._bootstrap_data import PORTAL_PAGES, SASDI_ORGANIZATIONS
 from ._sample_datasets import (
     SAMPLE_DATASET_TAG,
     generate_sample_datasets,
@@ -262,6 +262,52 @@ def create_iso_topic_categories():
                     ),
                     fg=_INFO_COLOR,
                 )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@bootstrap.command()
+def create_pages():
+    """Create default pages"""
+    click.secho("Creating default pages...")
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    context = {"user": user["name"]}
+    existing_pages = toolkit.get_action("ckanext_pages_list")(
+        context=context, data_dict={}
+    )
+    existing_page_names = [p["name"] for p in existing_pages]
+    for page in PORTAL_PAGES:
+        if page.name not in existing_page_names:
+            click.secho(f"Creating page {page.name!r}...", fg=_INFO_COLOR)
+            toolkit.get_action("ckanext_pages_update")(
+                context=context, data_dict=page.to_data_dict()
+            )
+        else:
+            click.secho(
+                f"Page {page.name!r} already exists, skipping...", fg=_INFO_COLOR
+            )
+    click.secho("Done!", fg=_SUCCESS_COLOR)
+
+
+@delete_data.command()
+def delete_pages():
+    """Delete default pages"""
+    click.secho("Deleting default pages...")
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    context = {"user": user["name"]}
+    existing_pages = toolkit.get_action("ckanext_pages_list")(
+        context=context, data_dict={}
+    )
+    existing_page_names = [p["name"] for p in existing_pages]
+    for page in PORTAL_PAGES:
+        if page.name in existing_page_names:
+            click.secho(f"Deleting page {page.name!r}...", fg=_INFO_COLOR)
+            toolkit.get_action("ckanext_pages_delete")(
+                context=context, data_dict={"page": page.name}
+            )
+        else:
+            click.secho(
+                f"Page {page.name!r} does not exist, skipping...", fg=_INFO_COLOR
+            )
     click.secho("Done!", fg=_SUCCESS_COLOR)
 
 

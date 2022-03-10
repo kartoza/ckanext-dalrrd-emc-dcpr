@@ -34,19 +34,11 @@ pytestmark = pytest.mark.integration
             id="request-can-not-be-added-integrity-error",
         ),
         pytest.param(
-            uuid.UUID("1d2b018d-3e0b-479c-938c-582376f3cd4a"),
+            uuid.uuid4(),
             "request_3",
             True,
             True,
             id="request-can-be-added-custom-request-id",
-        ),
-        pytest.param(
-            uuid.UUID("1d2b018d-3e0b-479c-938c-582376f3cd4a"),
-            "request_4",
-            True,
-            True,
-            marks=pytest.mark.raises(exception=logic.ValidationError),
-            id="request-can-not-be-added-validation-error",
         ),
     ],
 )

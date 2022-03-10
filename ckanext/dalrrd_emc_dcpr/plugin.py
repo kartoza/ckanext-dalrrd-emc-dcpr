@@ -24,6 +24,7 @@ from .logic import (
 )
 from .logic.auth import dcpr as dcpr_auth
 from .logic.auth import ckan as ckan_auth
+from .logic.auth import pages as ckanext_pages_auth
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +114,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_patch": ckan_auth.package_patch,
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
             "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
+            "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
+            "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
+            "ckanext_pages_show": ckanext_pages_auth.authorize_show_page,
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -143,12 +147,14 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dalrrd_emc_dcpr_default_spatial_search_extent": partial(
                 helpers.get_default_spatial_search_extent, 0.001
             ),
+            "emc_build_nav_main": helpers.build_pages_nav_main,
             "emc_default_bounding_box": helpers.get_default_bounding_box,
             "emc_convert_geojson_to_bounding_box": helpers.convert_geojson_to_bbox,
             "emc_sasdi_themes": helpers.get_sasdi_themes,
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
             "emc_show_version": helpers.helper_show_version,
             "emc_user_is_org_member": helpers.user_is_org_member,
+            "emc_user_is_staff_member": helpers.user_is_staff_member,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
