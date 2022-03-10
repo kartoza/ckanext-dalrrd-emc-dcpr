@@ -116,7 +116,7 @@ guide to install CKAN, then follow the below steps:
    ```
 
 
-# Migrations
+## Migrations
 
 Run the extension's specific migrations using the following commands to upgrade and downgrade
 the ckan database respectively.
@@ -316,7 +316,19 @@ docker volume rm emc-dcpr_datastore-db-data
 ```
 
 
-#### Bootstrap ckanext-spatial extension
+#### Bootstrap additional CKAN extensions
+
+Run the following command in order to have additional extensions correctly get their
+DB tables created:
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan pages initdb
+```
+
+
+##### NOTES
 
 The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
 automatically. However, you may want to bootstrap explicitly. If so, run:
@@ -325,24 +337,12 @@ automatically. However, you may want to bootstrap explicitly. If so, run:
 docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
 ```
 
-
-##### Note
-
-The spatial extension documentation seems to be outdated when it comes to
+Additionally, the spatial extension documentation seems to be outdated when it comes to
 running its custom CKAN CLI commands. Instead
 of the older `paster`-based incantation, they should rather be ran like:
 
 ```sh
 poetry run ckan spatial <command>
-```
-
-#### Bootstrap the harvesting extension
-
-Run the following command in order to have the harvesting tables be created
-on the CKAN DB:
-
-```bash
-docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
 ```
 
 
@@ -469,9 +469,10 @@ To run the tests you will need to:
 1. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
 
    ```
-   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini db init
-   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
-   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr bootstrap init-dcpr-requests
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db init
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr bootstrap init-dcpr-requests
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
    ```
 
 1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
@@ -530,3 +531,10 @@ To run any of the above docker commands once this is deployed into Kubernetes yo
   1. Get the pod name: `kubectl get pods --namespace=emc-dcpr`, it should look like `ckan-<randon string>`
   2. Run `kubectl exec -it <pod name> --namespace=emc-dcpr -- bash`
   3. Or an all in one: `kubectl exec -it "$(kubectl get pods --namespace=emc-dcpr | grep Running | grep ckan- | grep -v postgis | cut -d' ' -f1)" --namespace=emc-dcpr -- bash`
+
+
+## User feedback
+
+The system is using the [crisp] chatbox to allow gathering feedback from users. Configure it at the crisp website
+
+[crisp]: https://crisp.chat/en/

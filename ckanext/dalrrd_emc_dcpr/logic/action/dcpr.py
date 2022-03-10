@@ -75,6 +75,7 @@ def dcpr_request_create(context, data_dict):
 
     try:
         model.Session.add(request)
+        model.repo.commit()
         model.Session.add(request_dataset)
         model.repo.commit()
     except exc.InvalidRequestError as exception:
