@@ -333,6 +333,45 @@ fieldset[disabled] .btn-default.focus {
   text-decoration: none;
 }
 
+.nav-item.active > a,
+.nav-aside li.active a {
+  position: relative;
+  color: #FFF;
+  background-color: #F3881C;
+}
+.nav-item.active > a:hover,
+.nav-aside li.active a:hover {
+  color: #FFF;
+  background-color: #F3881C;
+}
+
+.nav-item.active > a::before, .nav-aside li.active a::before {
+  content: ' ';
+  position: absolute;
+  border-left-color: #F3881C;
+  border-left-width: 6px;
+  top: 0;
+  bottom: 0;
+  right: -6px;
+  width: 6px;
+  height: 34px;
+}
+
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-color: #3A744E;
+  border-radius: 10px;
+}
+
 /* Landing page */
 .btn-warning {
   background-color: #F3881C;
@@ -382,3 +421,16 @@ header.masthead {
 .index-datasets {
   min-height: 400px;
 }
+
+
+/* Footer */
+
+.site-footer {
+  margin-bottom: initial;
+  padding: 10px 0;
+  color: #3A744E;
+  background: #3A744E url("../../../base/images/bg.png");
+  padding: 20px 0;
+}
+
+/* End Footer */
