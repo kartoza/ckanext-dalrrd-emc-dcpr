@@ -116,7 +116,7 @@ guide to install CKAN, then follow the below steps:
    ```
 
 
-# Migrations
+## Migrations
 
 Run the extension's specific migrations using the following commands to upgrade and downgrade
 the ckan database respectively.
@@ -531,3 +531,10 @@ To run any of the above docker commands once this is deployed into Kubernetes yo
   1. Get the pod name: `kubectl get pods --namespace=emc-dcpr`, it should look like `ckan-<randon string>`
   2. Run `kubectl exec -it <pod name> --namespace=emc-dcpr -- bash`
   3. Or an all in one: `kubectl exec -it "$(kubectl get pods --namespace=emc-dcpr | grep Running | grep ckan- | grep -v postgis | cut -d' ' -f1)" --namespace=emc-dcpr -- bash`
+
+
+## User feedback
+
+The system is using the [crisp] chatbox to allow gathering feedback from users. Configure it at the crisp website
+
+[crisp]: https://crisp.chat/en/
