@@ -346,7 +346,9 @@ fieldset[disabled] .btn-default.focus {
 }
 
 /* Landing page */
-
+.btn-warning {
+  background-color: #F3881C;
+}
 header.masthead {
   position: relative;
   background: url("/images/emc.jpg") no-repeat center center;
@@ -361,16 +363,34 @@ header.masthead {
   font-size: 60px;
 }
 
-.index-search  > h2{
-    color: #3A744E;
+.index-search {
+  position: relative;
+  color: #3A744E;
+  background-color: #FFFFFF;
+
 }
 
 .sasdi-theme {
   position: relative;
-  color: #3A744E;
+  color: #FFFFFF;
+  background-color: #3A744E;
+}
+
+.sasdi {
+  color: #FFFFFF;
 }
 
 .section-title {
   text-align: center;
   font-size: 40px;
+}
+
+.sample-datasets {
+  position: relative;
+  background-color: #FFFFFF;
+  color: #3A744E;
+}
+
+.index-datasets {
+  min-height: 400px;
 }
