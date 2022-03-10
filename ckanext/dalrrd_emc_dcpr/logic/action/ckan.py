@@ -21,6 +21,7 @@ def package_update(original_action, context, data_dict):
     """
     Intercepts the core `package_update` action to check if package is being published.
     """
+    logger.debug(f"inside package_update action: {data_dict=}")
     return _package_publish_check(original_action, context, data_dict)
 
 
