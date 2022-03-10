@@ -333,6 +333,18 @@ fieldset[disabled] .btn-default.focus {
   text-decoration: none;
 }
 
+.nav-item.active > a,
+.nav-aside li.active a {
+  position: relative;
+  color: #FFF;
+  background-color: #F3881C;
+}
+.nav-item.active > a:hover,
+.nav-aside li.active a:hover {
+  color: #FFF;
+  background-color: #F3881C;
+}
+
 /* Landing page */
 
 header.masthead {
