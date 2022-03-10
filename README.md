@@ -316,7 +316,19 @@ docker volume rm emc-dcpr_datastore-db-data
 ```
 
 
-#### Bootstrap ckanext-spatial extension
+#### Bootstrap additional CKAN extensions
+
+Run the following command in order to have additional extensions correctly get their
+DB tables created:
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan pages initdb
+```
+
+
+##### NOTES
 
 The ckanext-spatial extension takes care of its own bootstrapping and will create any database tables
 automatically. However, you may want to bootstrap explicitly. If so, run:
@@ -325,24 +337,12 @@ automatically. However, you may want to bootstrap explicitly. If so, run:
 docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan spatial initdb
 ```
 
-
-##### Note
-
-The spatial extension documentation seems to be outdated when it comes to
+Additionally, the spatial extension documentation seems to be outdated when it comes to
 running its custom CKAN CLI commands. Instead
 of the older `paster`-based incantation, they should rather be ran like:
 
 ```sh
 poetry run ckan spatial <command>
-```
-
-#### Bootstrap the harvesting extension
-
-Run the following command in order to have the harvesting tables be created
-on the CKAN DB:
-
-```bash
-docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
 ```
 
 
@@ -469,9 +469,10 @@ To run the tests you will need to:
 1. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
 
    ```
-   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini db init
-   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
-   docker exec -ti {container-name} poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr bootstrap init-dcpr-requests
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db init
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr bootstrap init-dcpr-requests
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
    ```
 
 1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:

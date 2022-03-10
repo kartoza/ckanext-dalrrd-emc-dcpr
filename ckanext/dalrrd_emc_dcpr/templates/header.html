@@ -16,10 +16,12 @@
       {% block header_site_navigation %}
         <ul class="nav navbar-nav container-fluid-nav text-center">
             {% block header_site_navigation_tabs %}
-                <li class="nav-item"><a href="{{ h.url_for('dataset.search') }}">Datasets</a></li>
-                <li class="nav-item"><a href="{{ h.url_for('organization.index') }}">Organizations</a></li>
-                <li class="nav-item"><a href="#">Data Capture</a></li>
-	    {% endblock %}
+                {{ h.emc_build_nav_main(
+                    ('dataset.search', _('Datasets')),
+                    ('organization.index', _('Organizations')),
+                    ('group.index', _('Groups')),
+                    ('home.about', _('About')) ) }}
+            {% endblock %}
         </ul>
       {% endblock %}
       <ul class="nav navbar-nav navbar-right">
@@ -66,13 +68,33 @@
                           </a>
                         </li>
                     {% endif %}
+                    {#
+                    This next section has been borrowed and adapted from ckanext-pages header.html template. One
+                    notable difference is that we only show the pages-related nav items if the current user is allowed
+                    to modify them. This means that we need to provide means for these contents to be visible elsewhere
+                    like for example providing link to them via the main nav.
+                    #}
+                    {% if h.check_access('ckanext_pages_update') %}
+                        <li>
+                            <a href="{{ h.url_for('pages_index') }}" title="{{ _('Pages') }}">
+                                <i class="fa fa-file icon-file" aria-hidden="true"></i>
+                                <span class="text">{{ _('Pages') }}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ h.url_for('pages.blog_index' if h.ckan_version().split('.')[1] | int >= 9 else 'blog_index') }}" title="{{ _('Blog') }}">
+                                <i class="fa fa-pencil icon-pencil"></i>
+                                <span class="text">{{ _('Blog') }}</span>
+                            </a>
+                        </li>
+                    {% endif %}
                     {% block header_account_log_out_link %}
-                    <li>
-                      <a href="{{ h.url_for('user.logout') }}" title="{{ _('Log out') }}">
-                        <i class="fa fa-sign-out" aria-hidden="true"></i>
-                        <span class="text">{{ _('Log out') }}</span>
-                      </a>
-                    </li>
+                        <li>
+                            <a href="{{ h.url_for('user.logout') }}" title="{{ _('Log out') }}">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                <span class="text">{{ _('Log out') }}</span>
+                            </a>
+                        </li>
                     {% endblock %}
                 </ul>
 

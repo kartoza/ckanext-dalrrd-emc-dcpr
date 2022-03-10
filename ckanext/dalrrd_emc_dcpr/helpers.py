@@ -1,9 +1,12 @@
 import json
 import logging
 import typing
+from urllib.parse import quote
+from html import escape as html_escape
 
 from shapely import geometry
 from ckan.plugins import toolkit
+from ckan.lib.helpers import build_nav_main as core_build_nav_main
 
 from . import constants
 from .logic.action.emc import show_version
@@ -90,7 +93,6 @@ def user_is_org_member(
     org_id: str, user=None, role: typing.Optional[str] = None
 ) -> bool:
     """Check if user has editor role in the input organization."""
-    logger.debug(f"{locals()=}")
     result = False
     if user is not None:
         member_list_action = toolkit.get_action("member_list")
@@ -105,6 +107,80 @@ def user_is_org_member(
                     result = True
                 break
     return result
+
+
+def user_is_staff_member(user_id: str) -> bool:
+    """Check if user is a member of the staff org"""
+    memberships_action = toolkit.get_action("organization_list_for_user")
+    memberships = memberships_action(context={"user": user_id}, data_dict={})
+    portal_staff = toolkit.config.get(
+        "ckan.dalrrd_emc_dcpr.portal_staff_organization_name", "sasdi emc staff"
+    )
+    for group in memberships:
+        is_org = group.get("type", "organization") == "organization"
+        is_portal_staff = group.get("title").lower() == portal_staff.lower()
+        if is_org and is_portal_staff:
+            result = True
+            break
+    else:
+        result = False
+    return result
+
+
+def build_pages_nav_main(*args):
+    """Reimplementation of ckanext-pages `build_pages_nav_main()`
+
+    This function reimplements the original ckanext-pages in order to overcome
+    a bug whereby the groups menu is not removable because of a typo in its route name.
+
+    """
+
+    about_menu = toolkit.asbool(toolkit.config.get("ckanext.pages.about_menu", True))
+    group_menu = toolkit.asbool(toolkit.config.get("ckanext.pages.group_menu", True))
+    org_menu = toolkit.asbool(
+        toolkit.config.get("ckanext.pages.organization_menu", True)
+    )
+
+    new_args = []
+    for arg in args:
+        if arg[0] == "home.about" and not about_menu:
+            continue
+        if arg[0] == "organization.index" and not org_menu:
+            continue
+        if arg[0] == "group.index" and not group_menu:
+            continue
+        new_args.append(arg)
+
+    output = core_build_nav_main(*new_args)
+
+    # do not display any private pages in menu even for sysadmins
+    pages_list = toolkit.get_action("ckanext_pages_list")(
+        None, {"order": True, "private": False}
+    )
+
+    page_name = ""
+    is_current_page = toolkit.get_endpoint() in (
+        ("pages", "show"),
+        ("pages", "blog_show"),
+    )
+
+    if is_current_page:
+        page_name = toolkit.request.path.split("/")[-1]
+
+    for page in pages_list:
+        type_ = "blog" if page["page_type"] == "blog" else "pages"
+        name = quote(page["name"])
+        title = html_escape(page["title"])
+        link = toolkit.h.literal('<a href="/{}/{}">{}</a>'.format(type_, name, title))
+        if page["name"] == page_name:
+            li = (
+                toolkit.literal('<li class="active">') + link + toolkit.literal("</li>")
+            )
+        else:
+            li = toolkit.literal("<li>") + link + toolkit.literal("</li>")
+        output = output + li
+
+    return output
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:

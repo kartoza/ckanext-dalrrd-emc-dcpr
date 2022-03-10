@@ -129,6 +129,25 @@ class _CkanBootstrapDCPRRequest:
         return result
 
 
+@dataclasses.dataclass
+class _CkanExtBootstrapPage:
+    name: str
+    content: str
+    private: bool
+    org_id: typing.Optional[str] = None
+    order: typing.Optional[str] = ""
+    page_type: typing.Optional[str] = "page"
+    user_id: typing.Optional[str] = None
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
+        result["title"] = self.name.capitalize()
+        return result
+
+
 def _to_data_dict(value):
     if isinstance(value, str):
         result = value

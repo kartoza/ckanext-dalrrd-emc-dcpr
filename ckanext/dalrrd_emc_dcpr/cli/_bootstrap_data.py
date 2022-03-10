@@ -1,6 +1,12 @@
 import typing
 
-from . import _CkanBootstrapOrganization
+from ckan.plugins import toolkit
+
+from . import _CkanBootstrapOrganization, _CkanExtBootstrapPage
+
+_staff_org_name = toolkit.config.get(
+    "ckan.dalrrd_emc_dcpr.portal_staff_organization_name", "SASDI EMC staff"
+)
 
 
 SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
@@ -29,5 +35,42 @@ SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
             "subcommittees developed a Programme of Work to guide the work to be "
             "done by the CSI in achieving the objectives of SASDI."
         ),
+    ),
+    _CkanBootstrapOrganization(
+        title=_staff_org_name,
+        description=(
+            f"The {_staff_org_name} organization is responsible for the maintenance of "
+            f"the static contents for the EMC portal"
+        ),
+    ),
+]
+
+PORTAL_PAGES: typing.Final[typing.List[_CkanExtBootstrapPage]] = [
+    _CkanExtBootstrapPage(
+        name="help",
+        content=(
+            "This is the EMC help section. It contains resources to help you use the "
+            "SASDI EMC effectively\n\n"
+            "- [Frequently Asked Questions](frequently-asked-questions)"
+        ),
+        private=False,
+        order="3",
+    ),
+    _CkanExtBootstrapPage(
+        name="about",
+        content=("Welcome to the SASDI Electronic Metadata Catalogue"),
+        private=False,
+        order="4",
+    ),
+    _CkanExtBootstrapPage(
+        name="frequently-asked-questions",
+        content=(
+            "This is the default FAQ section\n\n"
+            "1. What is this?\n\n"
+            "    Its a metadata catalogue\n\n"
+            "2. Can I link between pages?\n\n"
+            "    It seems so: here is a link to the [help](help) page"
+        ),
+        private=False,
     ),
 ]

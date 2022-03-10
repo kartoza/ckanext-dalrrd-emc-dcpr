@@ -192,6 +192,25 @@ reference = "v1.3.4"
 resolved_reference = "694a8cc139f42dce4c38eca3cf69b24ff3df347b"
 
 [[package]]
+name = "ckanext-pages"
+version = "0.3.3"
+description = "Basic CMS extension for ckan"
+category = "main"
+optional = false
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+ckantoolkit = "*"
+six = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/ckan/ckanext-pages.git"
+reference = "v0.3.4"
+resolved_reference = "79d9740ffa048ac25ab94de0a5209db0411d0c42"
+
+[[package]]
 name = "ckanext-scheming"
 version = "2.1.0"
 description = ""
@@ -1298,7 +1317,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "26ffc9e1288f8db56a453ccca9afbda6930cebb9396462ae593ed7fea52aaa1e"
+content-hash = "4726d886266879e9f1fa12d7edd53dc352296b8e8beab09feb88cf4f0034dd67"
 
 [metadata.files]
 alembic = [
@@ -1401,6 +1420,7 @@ ckanapi = [
 ]
 ckanext-geoview = []
 ckanext-harvest = []
+ckanext-pages = []
 ckanext-scheming = []
 ckanext-spatial = []
 ckantoolkit = [
