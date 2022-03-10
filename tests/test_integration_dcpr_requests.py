@@ -15,6 +15,8 @@ from ckanext.dalrrd_emc_dcpr.cli._sample_dcpr_requests import SAMPLE_REQUESTS
 pytestmark = pytest.mark.integration
 
 dcpr_request_test_uuid = uuid.uuid4()
+
+
 @pytest.mark.parametrize(
     "request_id, name, user_available, user_logged",
     [
