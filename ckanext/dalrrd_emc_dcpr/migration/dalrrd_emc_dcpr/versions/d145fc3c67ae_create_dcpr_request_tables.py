@@ -105,8 +105,8 @@ def upgrade():
             types.UnicodeText,
             ForeignKey("dcpr_request.csi_reference_id"),
         ),
-        sa.Column("user_id", types.UnicodeText, ForeignKey("user.id")),
-        sa.Column("group_id", types.UnicodeText, ForeignKey("group.id")),
+        sa.Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
+        sa.Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
     )
 
 

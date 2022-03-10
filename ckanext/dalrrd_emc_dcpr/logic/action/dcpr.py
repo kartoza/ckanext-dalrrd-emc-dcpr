@@ -72,12 +72,25 @@ def dcpr_request_create(context, data_dict):
             capture_method=data_dict["capture_method"],
             capture_method_detail=data_dict["capture_method_detail"],
         )
+        notification_targets = []
+
+        for target in data_dict["notification_targets"]:
+            target = dcpr_request.DCPRRequestNotificationTarget(
+                dcpr_request_id=data_dict["csi_reference_id"],
+                user_id=target.get("user_id"),
+                group_id=target.get("group_id"),
+            )
+            notification_targets.append(target)
 
     try:
         model.Session.add(request)
         model.repo.commit()
         model.Session.add(request_dataset)
+
+        model.Session.add_all(notification_targets)
+
         model.repo.commit()
+
     except exc.InvalidRequestError as exception:
         model.Session.rollback()
     finally:
