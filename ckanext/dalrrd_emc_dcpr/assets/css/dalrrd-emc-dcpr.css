@@ -319,6 +319,13 @@ fieldset[disabled] .btn-default.focus {
   margin-right: 1.5em;
 }
 
+.dataset-heading a {
+  color: #3A744E;
+  font-weight: 600;
+}
+
+/* End of datasets*/
+
 /* Filters */
 .panel {
   margin-bottom: 0;
@@ -358,7 +365,7 @@ header.masthead {
 
 }
 
-.sasdi-theme {
+.index-sasdi-theme {
   position: relative;
   color: #FFFFFF;
   background-color: #3A744E;
