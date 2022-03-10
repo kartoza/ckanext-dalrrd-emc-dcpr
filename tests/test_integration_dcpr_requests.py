@@ -14,7 +14,7 @@ from ckanext.dalrrd_emc_dcpr.cli._sample_dcpr_requests import SAMPLE_REQUESTS
 
 pytestmark = pytest.mark.integration
 
-dcpr_request_test_uuid = uuid.uuid4()
+
 @pytest.mark.parametrize(
     "request_id, name, user_available, user_logged",
     [
@@ -34,19 +34,11 @@ dcpr_request_test_uuid = uuid.uuid4()
             id="request-can-not-be-added-integrity-error",
         ),
         pytest.param(
-            dcpr_request_test_uuid,
+            uuid.uuid4(),
             "request_3",
             True,
             True,
             id="request-can-be-added-custom-request-id",
-        ),
-        pytest.param(
-            dcpr_request_test_uuid,
-            "request_4",
-            True,
-            True,
-            marks=pytest.mark.raises(exception=logic.ValidationError),
-            id="request-can-not-be-added-validation-error",
         ),
     ],
 )
