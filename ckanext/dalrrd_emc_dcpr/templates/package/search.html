@@ -14,6 +14,9 @@
     {% block package_search_results_list %}
         {{ h.snippet('snippets/package_list.html', packages=page.items) }}
     {% endblock %}
+    {% block page_pagination %}
+      {{ page.pager(q=q) }}
+    {% endblock %}
 {% endblock %}
 
 {% block secondary_content %}
