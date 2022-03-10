@@ -421,3 +421,16 @@ header.masthead {
 .index-datasets {
   min-height: 400px;
 }
+
+
+/* Footer */
+
+.site-footer {
+  margin-bottom: initial;
+  padding: 10px 0;
+  color: #3A744E;
+  background: #3A744E url("../../../base/images/bg.png");
+  padding: 20px 0;
+}
+
+/* End Footer */
