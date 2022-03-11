@@ -19,8 +19,7 @@
               {% endif %}
             {% endblock %}
             {% block heading_title %}
-{#		{{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}#}
-                {{ title }}
+                {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
             {% endblock %}
             {% block heading_meta %}
               {% if package.get('state', '').startswith('draft') %}
