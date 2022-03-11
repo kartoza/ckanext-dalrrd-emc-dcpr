@@ -126,6 +126,8 @@
         </div>
         <div class="col-lg-6 index-datasets">
             <h2 class="mb-5 section-title">Recent Datasets</h2>
+            {% set recent_datasets = h.emc_get_recently_modified_datasets() %}
+            {{ h.snippet('snippets/package_list.html', packages=recent_datasets) }}
         </div>
     </div>
 </div>
