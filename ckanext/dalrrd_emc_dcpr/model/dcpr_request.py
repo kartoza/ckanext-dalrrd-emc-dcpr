@@ -109,7 +109,7 @@ dcpr_geospatial_request_table = Table(
         nullable=False,
     ),
     Column(
-        "csi_moderator",
+        "csi_reviewer",
         types.UnicodeText,
         ForeignKey("user.id"),
         nullable=False,
@@ -123,7 +123,7 @@ dcpr_geospatial_request_table = Table(
     Column("status", types.UnicodeText),
     Column("organization_name", types.UnicodeText),
     Column("dataset_purpose", types.UnicodeText),
-    Column("region_of_interest", types.UnicodeText),
+    Column("interest_region", types.UnicodeText),
     Column("resolution_scale", types.UnicodeText),
     Column("additional_information", types.UnicodeText),
     Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
