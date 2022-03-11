@@ -148,8 +148,8 @@ dcpr_geospatial_request_notification_table = Table(
         types.UnicodeText,
         ForeignKey("dcpr_geospatial_request.csi_reference_id"),
     ),
-    Column("user_id", types.UnicodeText, ForeignKey("user.id")),
-    Column("group_id", types.UnicodeText, ForeignKey("group.id")),
+    Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
+    Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
 )
 
 
