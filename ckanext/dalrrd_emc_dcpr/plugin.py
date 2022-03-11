@@ -22,9 +22,9 @@ from .logic import (
     converters,
     validators,
 )
-from .logic.auth import dcpr as dcpr_auth
 from .logic.auth import ckan as ckan_auth
 from .logic.auth import pages as ckanext_pages_auth
+from .logic.auth import dcpr as dcpr_auth
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +155,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_show_version": helpers.helper_show_version,
             "emc_user_is_org_member": helpers.user_is_org_member,
             "emc_user_is_staff_member": helpers.user_is_staff_member,
+            "emc_get_featured_datasets": helpers.get_featured_datasets,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
