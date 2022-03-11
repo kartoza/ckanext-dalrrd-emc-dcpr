@@ -537,9 +537,10 @@ def create_sample_geospatial_dcpr_requests():
                 },
                 data_dict={
                     "csi_reference_id": request.csi_reference_id,
-                    "owner_user": request.owner_user,
-                    "csi_reviewer": request.csi_reviewer,
-                    "nsif_reviewer": request.nsif_reviewer,
+                    "owner_user": user_id,
+                    "csi_reviewer": user_id,
+                    "nsif_reviewer": user_id,
+                    "notification_targets": [{"user_id": user_id, "group_id": None}],
                     "status": request.status,
                     "organization_name": request.organization_name,
                     "dataset_purpose": request.dataset_purpose,
