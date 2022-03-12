@@ -146,7 +146,7 @@ def test_create_dcpr_geospatial_request(request_id, name, user_available, user_l
 
     for request in SAMPLE_GEOSPATIAL_REQUESTS:
         data_dict = {
-            "csi_reference_id": request.csi_reference_id,
+            "csi_reference_id": request_id,
             "owner_user": user_id,
             "csi_reviewer": user_id,
             "nsif_reviewer": user_id,

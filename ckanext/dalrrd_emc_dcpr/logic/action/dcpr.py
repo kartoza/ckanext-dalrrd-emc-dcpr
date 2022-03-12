@@ -111,7 +111,9 @@ def dcpr_geospatial_request_create(context, data_dict):
     request = dcpr_request.DCPRGeospatialRequest.get(csi_reference_id=csi_reference_id)
 
     if request:
-        raise toolkit.ValidationError({"message": "DCPR request already exists"})
+        raise toolkit.ValidationError(
+            {"message": "DCPR geospatial request already exists"}
+        )
     else:
         request = dcpr_request.DCPRGeospatialRequest(
             csi_reference_id=data_dict["csi_reference_id"],

@@ -266,4 +266,6 @@ meta.mapper(DCPRRequest, dcpr_request_table)
 meta.mapper(DCPRRequestNotificationTarget, dcpr_request_notification_table)
 meta.mapper(DCPRRequestDataset, dcpr_request_dataset_table)
 meta.mapper(DCPRGeospatialRequest, dcpr_geospatial_request_table)
-meta.mapper(DCPRRequestNotificationTarget, dcpr_geospatial_request_notification_table)
+meta.mapper(
+    DCPRGeospatialRequestNotificationTarget, dcpr_geospatial_request_notification_table
+)
