@@ -114,6 +114,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_update": ckan_auth.package_update,
             "package_patch": ckan_auth.package_patch,
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
+            "dcpr_report_create_auth": dcpr_auth.dcpr_report_create_auth,
             "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
             "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
             "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
