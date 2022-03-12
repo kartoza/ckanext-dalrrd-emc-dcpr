@@ -92,7 +92,7 @@ class _CkanBootstrapDCPRErrorReport:
     error_description: str
     solution_description: str
     request_date: str
-    csi_review_additional_documents: str
+    csi_moderation_additional_documents: str
     csi_moderation_notes: str
     csi_moderation_date: str
 
