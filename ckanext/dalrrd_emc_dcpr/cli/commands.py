@@ -439,7 +439,7 @@ def load_sample_data():
 
 
 @load_sample_data.command()
-def create_sample_dcpr_error_report():
+def create_sample_dcpr_error_reports():
     """Create sample DCPR error reports"""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
 
@@ -469,8 +469,11 @@ def create_sample_dcpr_error_report():
                     "notification_targets": [{"user_id": user_id, "group_id": None}],
                     "status": report.status,
                     "request_date": report.request_date,
+                    "error_application": report.error_application,
+                    "error_description": report.error_description,
+                    "solution_description":report.solution_description,
                     "csi_moderation_notes": report.csi_moderation_notes,
-                    "csi_moderation_additional_documents": report.csi_moderation_additional_documents,
+                    "csi_review_additional_documents": report.csi_review_additional_documents,
                     "csi_moderation_date": report.csi_moderation_date,
                 },
             )
