@@ -526,12 +526,14 @@ def create_sample_geospatial_dcpr_requests():
     )
     user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
 
-    create_request_action = toolkit.get_action("dcpr_request_create")
+    create_geospatial_request_action = toolkit.get_action(
+        "dcpr_geospatial_request_create"
+    )
     click.secho(f"Creating sample dcpr requests ...")
     for request in SAMPLE_GEOSPATIAL_REQUESTS:
         click.secho(f"Creating request with id {request.csi_reference_id!r}...")
         try:
-            create_request_action(
+            create_geospatial_request_action(
                 context={
                     "user": user["name"],
                 },
