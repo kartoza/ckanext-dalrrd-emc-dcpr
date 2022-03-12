@@ -159,24 +159,6 @@ class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
         return targets
 
 
-def init_request_tables():
-    if not dcpr_request_table.exists():
-        log.debug("Creating DCPR request table")
-        dcpr_request_table.create()
-    else:
-        log.debug("DCPR request table already exists")
-    if not dcpr_request_dataset_table.exists():
-        log.debug("Creating DCPR request dataset table")
-        dcpr_request_dataset_table.create()
-    else:
-        log.debug("DCPR request dataset table already exists")
-    if not dcpr_request_notification_table.exists():
-        log.debug("Creating DCPR request notification target table")
-        dcpr_request_notification_table.create()
-    else:
-        log.debug("DCPR request notification target table already exists")
-
-
 meta.mapper(DCPRRequest, dcpr_request_table)
 meta.mapper(DCPRRequestNotificationTarget, dcpr_request_notification_table)
 meta.mapper(DCPRRequestDataset, dcpr_request_dataset_table)
