@@ -16,17 +16,15 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize(
-    "request_id, name, user_available, user_logged",
+    "name, user_available, user_logged",
     [
         pytest.param(
-            uuid.uuid4(),
             "request_1",
             True,
             True,
             id="request-added-successfully",
         ),
         pytest.param(
-            uuid.uuid4(),
             "request_2",
             False,
             True,
@@ -34,7 +32,6 @@ pytestmark = pytest.mark.integration
             id="request-can-not-be-added-integrity-error",
         ),
         pytest.param(
-            uuid.uuid4(),
             "request_3",
             True,
             True,
@@ -42,7 +39,7 @@ pytestmark = pytest.mark.integration
         ),
     ],
 )
-def test_create_dcpr_request(request_id, name, user_available, user_logged):
+def test_create_dcpr_request(name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
 
     convert_user_name_or_id_to_id = toolkit.get_converter(
@@ -56,7 +53,7 @@ def test_create_dcpr_request(request_id, name, user_available, user_logged):
 
     for request in SAMPLE_REQUESTS:
         data_dict = {
-            "csi_reference_id": request_id,
+            "csi_reference_id": uuid.uuid4(),
             "owner_user": user_id,
             "csi_moderator": user_id,
             "nsif_reviewer": user_id,
