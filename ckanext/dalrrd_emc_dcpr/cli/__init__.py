@@ -85,6 +85,26 @@ class _CkanBootstrapEmcDataset:
 
 
 @dataclasses.dataclass
+class _CkanBootstrapDCPRErrorReport:
+    csi_reference_id: uuid.UUID
+    status: str
+    error_application: str
+    error_description: str
+    solution_description: str
+    request_date: str
+    csi_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_moderation_date: str
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
+        return result
+
+
+@dataclasses.dataclass
 class _CkanBootstrapDCPRRequest:
     csi_reference_id: uuid.UUID
     status: str

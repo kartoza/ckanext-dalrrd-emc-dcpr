@@ -132,6 +132,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_create": ckan_actions.package_create,
             "package_update": ckan_actions.package_update,
             "package_patch": ckan_actions.package_patch,
+            "dcpr_error_report_create": dcpr_actions.dcpr_error_report_create,
             "dcpr_request_create": dcpr_actions.dcpr_request_create,
             "dcpr_geospatial_request_create": dcpr_actions.dcpr_geospatial_request_create,
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
