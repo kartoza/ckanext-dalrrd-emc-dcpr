@@ -14,8 +14,8 @@ from ckan.model import core, domain_object, meta, types as _types
 
 
 # revision identifiers, used by Alembic.
-revision = '6831fb82e888'
-down_revision = 'd145fc3c67ae'
+revision = "6831fb82e888"
+down_revision = "d145fc3c67ae"
 branch_labels = None
 depends_on = None
 
@@ -46,7 +46,7 @@ def upgrade():
             "metadata_record",
             types.UnicodeText,
             ForeignKey("package.id"),
-            nullable=False,
+            nullable=True,
         ),
         sa.Column("status", types.UnicodeText),
         sa.Column("error_application", types.UnicodeText),
@@ -61,7 +61,9 @@ def upgrade():
     op.create_table(
         "dcpr_error_report_notification",
         meta.metadata,
-        sa.Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+        sa.Column(
+            "target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid
+        ),
         sa.Column(
             "dcpr_error_report_id",
             types.UnicodeText,

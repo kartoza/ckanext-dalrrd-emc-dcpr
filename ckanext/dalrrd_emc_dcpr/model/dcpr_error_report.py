@@ -34,7 +34,7 @@ dcpr_error_report_table = Table(
         "metadata_record",
         types.UnicodeText,
         ForeignKey("package.id"),
-        nullable=False,
+        nullable=True,
     ),
     Column("status", types.UnicodeText),
     Column("error_application", types.UnicodeText),
