@@ -93,7 +93,8 @@ class DCPRErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
                 == DCPRErrorReport.csi_reference_id,
             )
             .filter(
-                DCPRErrorReportNotificationTarget.dcpr_error_report_id == str(self.csi_reference)
+                DCPRErrorReportNotificationTarget.dcpr_error_report_id
+                == str(self.csi_reference)
             )
             .all()
         )
