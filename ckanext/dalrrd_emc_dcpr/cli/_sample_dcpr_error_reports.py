@@ -15,7 +15,7 @@ SAMPLE_ERROR_REPORTS: typing.Final[typing.List[_CkanBootstrapDCPRErrorReport]] =
         solution_description="Solution description",
         request_date="2022-01-01",
         csi_moderation_notes="CSI moderation notes",
-        csi_moderation_additional_documents="CSI moderation additional documents",
+        csi_review_additional_documents="CSI review additional documents",
         csi_moderation_date="2022-01-01",
     ),
     _CkanBootstrapDCPRErrorReport(
@@ -26,7 +26,7 @@ SAMPLE_ERROR_REPORTS: typing.Final[typing.List[_CkanBootstrapDCPRErrorReport]] =
         solution_description="Another solution description",
         request_date="2022-01-01",
         csi_moderation_notes="CSI moderation notes",
-        csi_moderation_additional_documents="CSI moderation additional documents",
+        csi_review_additional_documents="CSI review additional documents",
         csi_moderation_date="2022-01-01",
     ),
 ]

@@ -19,14 +19,12 @@ pytestmark = pytest.mark.integration
     "name, user_available, user_logged",
     [
         pytest.param(
-            uuid.uuid4(),
             "report_1",
             True,
             True,
             id="request-added-successfully",
         ),
         pytest.param(
-            uuid.uuid4(),
             "report_2",
             False,
             True,
@@ -34,7 +32,6 @@ pytestmark = pytest.mark.integration
             id="report-can-not-be-added-integrity-error",
         ),
         pytest.param(
-            uuid.uuid4(),
             "report_3",
             True,
             True,
@@ -44,8 +41,9 @@ pytestmark = pytest.mark.integration
 )
 def test_create_dcpr_report(name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-    packages = toolkit.get_action("package")({}, {})
-    package_id = packages[0].id
+
+    package = model.Session.query(model.Package).first()
+    package_id = package.id if package else None
 
     convert_user_name_or_id_to_id = toolkit.get_converter(
         "convert_user_name_or_id_to_id"
@@ -60,16 +58,16 @@ def test_create_dcpr_report(name, user_available, user_logged):
         data_dict = {
             "csi_reference_id": uuid.uuid4(),
             "owner_user": user_id,
-            "csi_moderator": user_id,
+            "csi_reviewer": user_id,
             "metadata_record": package_id,
             "notification_targets": [{"user_id": user_id, "group_id": None}],
             "status": report.status,
             "error_application": report.error_application,
             "error_description": report.error_description,
             "solution_description": report.solution_description,
-            "request_date": report.report_date,
+            "request_date": report.request_date,
             "csi_moderation_notes": report.csi_moderation_notes,
-            "csi_moderation_additional_documents": report.csi_moderation_additional_documents,
+            "csi_review_additional_documents": report.csi_review_additional_documents,
             "csi_moderation_date": report.csi_moderation_date,
         }
 

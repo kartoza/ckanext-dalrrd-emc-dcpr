@@ -446,6 +446,10 @@ def create_sample_dcpr_error_report():
     convert_user_name_or_id_to_id = toolkit.get_converter(
         "convert_user_name_or_id_to_id"
     )
+
+    package = model.Session.query(model.Package).first()
+    package_id = package.id if package else None
+
     user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
 
     create_report_action = toolkit.get_action("dcpr_error_report_create")
@@ -461,6 +465,7 @@ def create_sample_dcpr_error_report():
                     "csi_reference_id": report.csi_reference_id,
                     "owner_user": user_id,
                     "csi_reviewer": user_id,
+                    "metadata_record": package_id,
                     "notification_targets": [{"user_id": user_id, "group_id": None}],
                     "status": report.status,
                     "request_date": report.request_date,
