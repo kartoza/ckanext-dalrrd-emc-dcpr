@@ -9,8 +9,8 @@ from sqlalchemy import orm, types, Column, Table, ForeignKey
 
 from ckan.model import core, domain_object, meta, types as _types, Session, Package
 
-error_report_table = Table(
-    "error_report",
+dcpr_error_report_table = Table(
+    "dcpr_error_report",
     meta.metadata,
     Column(
         "csi_reference_id",
@@ -46,54 +46,54 @@ error_report_table = Table(
     Column("csi_moderation_date", types.DateTime, default=datetime.datetime.utcnow),
 )
 
-error_report_notification_table = Table(
-    "error_report_notification",
+dcpr_error_report_notification_table = Table(
+    "dcpr_error_report_notification",
     meta.metadata,
     Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
     Column(
-        "error_report_id",
+        "dcpr_error_report_id",
         types.UnicodeText,
-        ForeignKey("error_report.csi_reference_id"),
+        ForeignKey("dcpr_error_report.csi_reference_id"),
     ),
     Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
     Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
 )
 
 
-class ErrorReportNotificationTarget(
+class DCPRErrorReportNotificationTarget(
     core.StatefulObjectMixin, domain_object.DomainObject
 ):
     def __init__(self, **kw):
-        super(ErrorReportNotificationTarget, self).__init__(**kw)
+        super(DCPRErrorReportNotificationTarget, self).__init__(**kw)
 
     @classmethod
-    def get(cls, **kw) -> Optional["ErrorReportNotificationTarget"]:
+    def get(cls, **kw) -> Optional["DCPRErrorReportNotificationTarget"]:
         """Finds a single request entity in the model."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
 
-class ErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
+class DCPRErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
     def __init__(self, **kw):
-        super(ErrorReport, self).__init__(**kw)
+        super(DCPRErrorReport, self).__init__(**kw)
         self.csi_reference_id = kw.get("csi_reference_id", None)
 
     @classmethod
-    def get(cls, **kw) -> Optional["ErrorReport"]:
+    def get(cls, **kw) -> Optional["DCPRErrorReport"]:
         """Finds a single request entity in the model."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
-    def get_notification_targets(self) -> Optional[ErrorReportNotificationTarget]:
+    def get_notification_targets(self) -> Optional[DCPRErrorReportNotificationTarget]:
         targets = (
-            meta.Session.query(ErrorReport)
+            meta.Session.query(DCPRErrorReport)
             .join(
-                ErrorReportNotificationTarget,
-                ErrorReportNotificationTarget.error_report_id
-                == ErrorReport.csi_reference_id,
+                DCPRErrorReportNotificationTarget,
+                DCPRErrorReportNotificationTarget.dcpr_error_report_id
+                == DCPRErrorReport.csi_reference_id,
             )
             .filter(
-                ErrorReportNotificationTarget.error_report_id == str(self.csi_reference)
+                DCPRErrorReportNotificationTarget.dcpr_error_report_id == str(self.csi_reference)
             )
             .all()
         )
@@ -102,10 +102,10 @@ class ErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
 
     def get_metadata_record(self) -> Optional[Package]:
         record = (
-            meta.Session.query(ErrorReport)
+            meta.Session.query(DCPRErrorReport)
             .join(
                 Package,
-                Package.id == ErrorReport.metadata_record,
+                Package.id == DCPRErrorReport.metadata_record,
             )
             .first()
         )
@@ -113,5 +113,5 @@ class ErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
         return record
 
 
-meta.mapper(ErrorReport, error_report_table)
-meta.mapper(ErrorReportNotificationTarget, error_report_notification_table)
+meta.mapper(DCPRErrorReport, dcpr_error_report_table)
+meta.mapper(DCPRErrorReportNotificationTarget, dcpr_error_report_notification_table)
