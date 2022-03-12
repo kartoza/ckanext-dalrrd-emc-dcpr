@@ -471,7 +471,7 @@ def create_sample_dcpr_error_reports():
                     "request_date": report.request_date,
                     "error_application": report.error_application,
                     "error_description": report.error_description,
-                    "solution_description":report.solution_description,
+                    "solution_description": report.solution_description,
                     "csi_moderation_notes": report.csi_moderation_notes,
                     "csi_review_additional_documents": report.csi_review_additional_documents,
                     "csi_moderation_date": report.csi_moderation_date,
