@@ -111,6 +111,7 @@
 
 body {
   background: #FFF url("../../../base/images/bg.png");
+  height: 100%;
  }
 
 .wrapper::before {
@@ -424,6 +425,10 @@ header.masthead {
 
 
 /* Footer */
+
+[role="main"], .main {
+  min-height: 70vh;
+}
 
 .site-footer {
   margin-bottom: initial;
