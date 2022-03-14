@@ -25,6 +25,7 @@ from .logic import (
 from .logic.auth import ckan as ckan_auth
 from .logic.auth import pages as ckanext_pages_auth
 from .logic.auth import dcpr as dcpr_auth
+from .logic.auth import emc as emc_auth
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +118,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
             "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
             "ckanext_pages_show": ckanext_pages_auth.authorize_show_page,
+            "request_dataset_maintenance": (
+                emc_auth.authorize_request_dataset_maintenance
+            ),
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -127,6 +131,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_request_create": dcpr_actions.dcpr_request_create,
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
             "emc_version": emc_actions.show_version,
+            "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
