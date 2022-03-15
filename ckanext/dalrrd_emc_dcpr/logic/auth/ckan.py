@@ -14,6 +14,7 @@ def package_update(next_auth, context, data_dict=None):
     or site-wide sysadmins.
 
     """
+    logger.debug(f"inside package_update - {locals()=}")
 
     user = context["auth_user_obj"]
     if data_dict is None:
@@ -22,6 +23,7 @@ def package_update(next_auth, context, data_dict=None):
         package = toolkit.get_action("package_show")(
             context=context, data_dict=data_dict
         )
+        logger.debug(f"{package=}")
         if user.sysadmin:
             result = {"success": True}
         elif package.get("private", False):
@@ -29,7 +31,7 @@ def package_update(next_auth, context, data_dict=None):
         elif package.get("state") == "draft":
             result = {"success": True}
         else:
-            org_id = data_dict.get("owner_org")
+            org_id = data_dict.get("owner_org", package.get("owner_org"))
             if org_id is not None:
                 members_action = toolkit.get_action("member_list")
                 members = members_action(
@@ -79,6 +81,7 @@ def authorize_package_publish(
     data_ = data_dict.copy() if data_dict else {}
     user = context["auth_user_obj"]
     result = {"success": False, "msg": "You are not authorized to publish package"}
+    # TODO: check whether we need to make this check, as sysadmin is likely granted access by default
     if user.sysadmin:
         result = {"success": True}
     else:

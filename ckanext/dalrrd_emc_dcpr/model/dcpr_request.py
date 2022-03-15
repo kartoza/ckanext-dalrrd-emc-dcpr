@@ -89,8 +89,8 @@ dcpr_request_notification_table = Table(
         types.UnicodeText,
         ForeignKey("dcpr_request.csi_reference_id"),
     ),
-    Column("user_id", types.UnicodeText, ForeignKey("user.id")),
-    Column("group_id", types.UnicodeText, ForeignKey("group.id")),
+    Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
+    Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
 )
 
 
@@ -109,10 +109,10 @@ class DCPRRequestNotificationTarget(
     core.StatefulObjectMixin, domain_object.DomainObject
 ):
     def __init__(self, **kw):
-        super(DCPRRequestDataset, self).__init__(**kw)
+        super(DCPRRequestNotificationTarget, self).__init__(**kw)
 
     @classmethod
-    def get(cls, **kw) -> Optional["DCPRRequestDataset"]:
+    def get(cls, **kw) -> Optional["DCPRRequestNotificationTarget"]:
         """Finds a single request entity in the model."""
         query = meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()

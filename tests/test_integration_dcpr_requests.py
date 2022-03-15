@@ -60,6 +60,7 @@ def test_create_dcpr_request(request_id, name, user_available, user_logged):
             "owner_user": user_id,
             "csi_moderator": user_id,
             "nsif_reviewer": user_id,
+            "notification_targets": [{"user_id": user_id, "group_id": None}],
             "status": request.status,
             "organization_name": request.organization_name,
             "organization_level": request.organization_level,

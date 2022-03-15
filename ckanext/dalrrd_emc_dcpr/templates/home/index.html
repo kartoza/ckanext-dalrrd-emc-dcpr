@@ -31,7 +31,7 @@
 
     </div>
 </main>
- <section class="sasdi-theme">
+ <section class="index-sasdi-theme">
     <div class="text-center container">
     <h2 class="mb-5 section-title">SASDI Theme</h2>
         <div class="row mb-5">
@@ -121,9 +121,13 @@
     <div class="row mb-5">
         <div class="col-lg-6 index-datasets">
             <h2 class="mb-5 section-title">Featured Datasets</h2>
+            {% set featured_datasets = h.emc_get_featured_datasets() %}
+            {{ h.snippet('snippets/package_list.html', packages=featured_datasets) }}
         </div>
         <div class="col-lg-6 index-datasets">
             <h2 class="mb-5 section-title">Recent Datasets</h2>
+            {% set recent_datasets = h.emc_get_recently_modified_datasets() %}
+            {{ h.snippet('snippets/package_list.html', packages=recent_datasets) }}
         </div>
     </div>
 </div>

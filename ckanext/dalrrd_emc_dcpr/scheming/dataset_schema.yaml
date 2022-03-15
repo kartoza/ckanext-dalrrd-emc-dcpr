@@ -21,6 +21,13 @@ dataset_fields:
     preset: dataset_slug
     form_placeholder: eg. my-dataset
 
+  - field_name: featured
+    label: Feature dataset on EMC landing page?
+    required: false
+    help_text: Should this dataset be featured on the EMC front page?
+    validators: boolean_validator
+    preset: emc_checkbox
+
   - field_name: notes
     label: Description
     required: true
