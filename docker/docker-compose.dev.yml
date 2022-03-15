@@ -42,6 +42,15 @@ services:
       - target: 5000
         published: *ckan-web-published-port
 
+  ckan-background-worker:
+    <<: *partial-ckan-volumes
+    environment:
+      CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
+      CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
+      CKAN_SMTP_USER: ${CKAN_SMTP_USER}
+      CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
+      CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+
   ckan-harvesting-fetcher:
     <<: *partial-ckan-volumes
 

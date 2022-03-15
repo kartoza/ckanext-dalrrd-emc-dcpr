@@ -80,7 +80,9 @@ def send_notification(user, email_dict):
     import ckan.lib.mailer
 
     if not user.get("email"):
-        logger.debug(f"User {user!r} does not have an email address configured")
+        logger.debug(
+            f"User {user.get('name')!r} does not have an email address configured"
+        )
         # FIXME: Raise an exception.
         return
 
@@ -128,7 +130,7 @@ def _notifications_for_activities(activities, user_dict):
         "{n} new activities from {site_title}",
         len(activities),
     ).format(site_title=toolkit.config.get("ckan.site_title"), n=len(activities))
-    jinja_env = _get_jinja_env()
+    jinja_env = get_jinja_env()
     body_template = jinja_env.get_template("email_notifications/email_body.txt")
     rendered_body = body_template.render(
         activities=activities,
@@ -140,7 +142,7 @@ def _notifications_for_activities(activities, user_dict):
     return notifications
 
 
-def _get_jinja_env():
+def get_jinja_env():
     jinja_env = Environment(**jinja_extensions.get_jinja_env_options())
     jinja_env.install_gettext_callables(flask_ugettext, flask_ungettext, newstyle=True)
     # custom filters

@@ -118,7 +118,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
             "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
             "ckanext_pages_show": ckanext_pages_auth.authorize_show_page,
-            "request_dataset_maintenance": (
+            "emc_request_dataset_maintenance": (
                 emc_auth.authorize_request_dataset_maintenance
             ),
         }

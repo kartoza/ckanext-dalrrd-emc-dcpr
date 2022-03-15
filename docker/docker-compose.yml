@@ -7,6 +7,10 @@ services:
   ckan-web:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
 
+  ckan-background-worker:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    command: ["launch-ckan-cli", "jobs", "worker"]
+
   ckan-harvesting-gatherer:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
     command: ["launch-ckan-cli", "harvester", "gather-consumer"]

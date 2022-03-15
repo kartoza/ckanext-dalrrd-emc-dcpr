@@ -7,6 +7,8 @@ import ckan.plugins.toolkit as toolkit
 import sqlalchemy
 from ckan.logic.schema import default_create_activity_schema
 
+from ... import jobs
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,9 +53,12 @@ def list_featured_datasets(
 
 def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
     toolkit.check_access("emc_request_dataset_maintenance", context, data_dict)
-    activity_schema = default_create_activity_schema()
 
     # this is a hacky way to relax the activity type schema validation
+    # we remove the default activity_type_exists validator because it is not possible
+    # to extend it with a custom activity
+
+    activity_schema = default_create_activity_schema()
     to_remove = None
     for index, validator in enumerate(activity_schema["activity_type"]):
         if validator.__name__ == "activity_type_exists":
@@ -71,6 +76,9 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
     activity_schema["object_id"].append(toolkit.get_validator("package_id_exists"))
 
     logger.debug(f"{activity_schema=}")
+    dataset = toolkit.get_action("package_show")(
+        data_dict={"id": data_dict.get("pkg_id")}
+    )
     toolkit.get_action("activity_create")(
         context={
             "ignore_auth": True,
@@ -79,7 +87,15 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
         data_dict={
             "user_id": toolkit.g.userobj.id,
             "object_id": data_dict["pkg_id"],
-            "activity_type": "requested modification",
-            "data": None,
+            "activity_type": "requested dataset maintenance",
+            "data": {
+                "package": dataset,
+            },
         },
+    )
+    toolkit.enqueue_job(
+        jobs.test_job,
+        args=["one", "two"],
+        kwargs={"this": "is it"},
+        title="My test job",
     )

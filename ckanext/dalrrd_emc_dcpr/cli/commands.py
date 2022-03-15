@@ -26,6 +26,7 @@ from ckan.lib.navl import dictization_functions
 # from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import DCPRRequest, init_request_tables
 
+from .. import jobs
 from ..constants import (
     ISO_TOPIC_CATEGOY_VOCABULARY_NAME,
     ISO_TOPIC_CATEGORIES,
@@ -907,3 +908,25 @@ class AlembicWrapper:
         else:
             raise RuntimeError("Input plugin name does not have alembic config")
         return conf
+
+
+@dalrrd_emc_dcpr.command()
+@click.argument("job_name")
+@click.option("--job-arg", multiple=True)
+@click.option(
+    "--job-kwarg",
+    multiple=True,
+    help="Provide each keyword argument as a colon-separated string of key_name:value",
+)
+def test_background_job(job_name, job_arg, job_kwarg):
+    """Run background jobs synchronously"""
+    job_function = getattr(jobs, job_name, None)
+    if job_function is not None:
+        kwargs = {}
+        for raw_kwarg in job_kwarg:
+            key, value = raw_kwarg.partition(":")[::2]
+            kwargs[key] = value
+        job_function(*job_arg, **kwargs)
+        click.secho("Done!", fg=_SUCCESS_COLOR)
+    else:
+        click.secho(f"Job function {job_name!r} does not exist", fg=_ERROR_COLOR)
