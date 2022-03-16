@@ -17,10 +17,13 @@ def request_dataset_maintenance(dataset_id):
     toolkit.get_action("emc_request_dataset_maintenance")(
         data_dict={"pkg_id": dataset_id}
     )
+    toolkit.get_action("follow_dataset")(
+        data_dict={"id": dataset_id},
+    )
     toolkit.h["flash_notice"](
         toolkit._(
-            "Organization publishers will be notified of your request to perform "
-            "maintenance on this dataset!"
+            "Organization publishers have been notified of your request. You are now "
+            "following the dataset and will be notified when it has been modified."
         )
     )
     return toolkit.redirect_to("dataset.read", id=dataset_id)
