@@ -14,7 +14,6 @@ def package_update(next_auth, context, data_dict=None):
     or site-wide sysadmins.
 
     """
-    logger.debug(f"inside package_update - {locals()=}")
 
     user = context["auth_user_obj"]
     if data_dict is None:
