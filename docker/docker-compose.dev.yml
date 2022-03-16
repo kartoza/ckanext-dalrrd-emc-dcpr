@@ -34,6 +34,14 @@ x-partial-ckan-volumes: &partial-ckan-volumes
       target: /home/appuser/who.ini
     - ckan-storage:/home/appuser/data
 
+x-email-environment-values: &partial-email-environment-values
+  CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
+  CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
+  CKAN_SMTP_USER: ${CKAN_SMTP_USER}
+  CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
+  CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+
+
 services:
 
   ckan-web:
@@ -45,11 +53,7 @@ services:
   ckan-background-worker:
     <<: *partial-ckan-volumes
     environment:
-      CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
-      CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
-      CKAN_SMTP_USER: ${CKAN_SMTP_USER}
-      CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
-      CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+      *partial-email-environment-values
 
   ckan-harvesting-fetcher:
     <<: *partial-ckan-volumes
@@ -63,11 +67,7 @@ services:
   ckan-mail-sender:
     <<: *partial-ckan-volumes
     environment:
-      CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
-      CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
-      CKAN_SMTP_USER: ${CKAN_SMTP_USER}
-      CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
-      CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+      *partial-email-environment-values
 
   ckan-db:
     environment:
