@@ -912,14 +912,34 @@ class AlembicWrapper:
 
 @dalrrd_emc_dcpr.command()
 @click.argument("job_name")
-@click.option("--job-arg", multiple=True)
+@click.option(
+    "--job-arg",
+    multiple=True,
+    help="Arguments for the job function. Can be provided multiple times",
+)
 @click.option(
     "--job-kwarg",
     multiple=True,
-    help="Provide each keyword argument as a colon-separated string of key_name:value",
+    help=(
+        "Provide each keyword argument as a colon-separated string of "
+        "key_name:value. This option can be provided multiple times"
+    ),
 )
 def test_background_job(job_name, job_arg, job_kwarg):
-    """Run background jobs synchronously"""
+    """Run background jobs synchronously
+
+    JOB_NAME is the name of the job function to be run. Look in the `jobs` module for
+    existing functions.
+
+    Example:
+
+    \b
+        ckan dalrrd-emc-dcpr test-background-job \\
+            notify_org_admins_of_dataset_maintenance_request \\
+            --job-arg=f1733d0c-5188-43b3-8039-d95efb76b4f5
+
+    """
+
     job_function = getattr(jobs, job_name, None)
     if job_function is not None:
         kwargs = {}
