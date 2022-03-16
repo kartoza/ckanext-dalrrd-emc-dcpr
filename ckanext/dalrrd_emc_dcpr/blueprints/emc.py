@@ -12,13 +12,8 @@ emc_blueprint = Blueprint(
 
 @emc_blueprint.route("/request_dataset_maintenance/<dataset_id>")
 def request_dataset_maintenance(dataset_id):
-    logger.debug(f"{locals()=}")
-    logger.debug("Inside the emc request_package_maintenance view")
     toolkit.get_action("emc_request_dataset_maintenance")(
         data_dict={"pkg_id": dataset_id}
-    )
-    toolkit.get_action("follow_dataset")(
-        data_dict={"id": dataset_id},
     )
     toolkit.h["flash_notice"](
         toolkit._(

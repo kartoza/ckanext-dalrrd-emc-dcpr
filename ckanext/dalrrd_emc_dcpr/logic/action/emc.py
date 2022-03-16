@@ -52,6 +52,17 @@ def list_featured_datasets(
 
 
 def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
+    """Request that a dataset be put on maintenance mode (AKA make it private)
+
+    This action performs the following:
+
+    - Create a new activity, so that it shows up on the user dashboard
+    - Enqueue background job which will email the dataset's owner_org admins
+    - Ensure user is registered to receive email notifications
+    - Ensure user is following the dataset
+
+    """
+
     toolkit.check_access("emc_request_dataset_maintenance", context, data_dict)
 
     # this is a hacky way to relax the activity type schema validation
@@ -93,6 +104,15 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
             },
         },
     )
+    toolkit.get_action("emc_user_patch")(
+        data_dict={"id": context["user"], "activity_streams_email_notifications": True}
+    )
+    try:
+        toolkit.get_action("follow_dataset")(
+            data_dict={"id": data_dict["pkg_id"]},
+        )
+    except toolkit.ValidationError:
+        pass  # user is already following the dataset
     toolkit.enqueue_job(
         jobs.notify_org_admins_of_dataset_maintenance_request,
         args=[activity["id"]],
