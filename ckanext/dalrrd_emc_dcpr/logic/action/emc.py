@@ -79,7 +79,7 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
     dataset = toolkit.get_action("package_show")(
         data_dict={"id": data_dict.get("pkg_id")}
     )
-    toolkit.get_action("activity_create")(
+    activity = toolkit.get_action("activity_create")(
         context={
             "ignore_auth": True,
             "schema": activity_schema,
@@ -94,8 +94,6 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
         },
     )
     toolkit.enqueue_job(
-        jobs.test_job,
-        args=["one", "two"],
-        kwargs={"this": "is it"},
-        title="My test job",
+        jobs.notify_org_admins_of_dataset_maintenance_request,
+        args=[activity["id"]],
     )
