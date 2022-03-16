@@ -1,3 +1,4 @@
+import enum
 import typing
 
 SASDI_THEMES_VOCABULARY_NAME: typing.Final[str] = "sasdi_themes"
@@ -25,3 +26,8 @@ ISO_TOPIC_CATEGORIES: typing.Final[typing.List[typing.Tuple[str, str]]] = [
     ("transportation", "Transportation"),
     ("utilitiesCommuinication", "Utilities, Communication"),
 ]
+
+
+class DatasetManagementActivityType(enum.Enum):
+    REQUEST_MAINTENANCE = "requested dataset maintenance"
+    REQUEST_PUBLICATION = "requested dataset publication"

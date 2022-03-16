@@ -8,6 +8,7 @@ import sqlalchemy
 from ckan.logic.schema import default_create_activity_schema
 
 from ... import jobs
+from ...constants import DatasetManagementActivityType
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +65,48 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
     """
 
     toolkit.check_access("emc_request_dataset_maintenance", context, data_dict)
+    activity = _create_dataset_management_activity(
+        data_dict["pkg_id"], DatasetManagementActivityType.REQUEST_MAINTENANCE
+    )
+    _ensure_user_is_notifiable(context["user"], data_dict["pkg_id"])
+    toolkit.enqueue_job(
+        jobs.notify_org_admins_of_dataset_management_request,
+        args=[activity["id"]],
+    )
 
-    # this is a hacky way to relax the activity type schema validation
-    # we remove the default activity_type_exists validator because it is not possible
-    # to extend it with a custom activity
+
+def request_dataset_publication(context: typing.Dict, data_dict: typing.Dict):
+    toolkit.check_access("emc_request_dataset_publication", context, data_dict)
+    activity = _create_dataset_management_activity(
+        data_dict["pkg_id"], DatasetManagementActivityType.REQUEST_PUBLICATION
+    )
+    _ensure_user_is_notifiable(context["user"], data_dict["pkg_id"])
+    toolkit.enqueue_job(
+        jobs.notify_org_admins_of_dataset_management_request,
+        args=[activity["id"]],
+    )
+
+
+def _ensure_user_is_notifiable(user_id: str, dataset_id):
+    toolkit.get_action("emc_user_patch")(
+        data_dict={"id": user_id, "activity_streams_email_notifications": True}
+    )
+    try:
+        toolkit.get_action("follow_dataset")(
+            data_dict={"id": dataset_id},
+        )
+    except toolkit.ValidationError:
+        pass  # user is already following the dataset
+
+
+def _create_dataset_management_activity(
+    dataset_id: str, activity_type: DatasetManagementActivityType
+) -> typing.Dict:
+    """
+    This is a hacky way to relax the activity type schema validation
+    we remove the default activity_type_exists validator because it is not possible
+    to extend it with a custom activity
+    """
 
     activity_schema = default_create_activity_schema()
     to_remove = None
@@ -85,35 +124,18 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
     if to_remove:
         activity_schema["object_id"].remove(to_remove)
     activity_schema["object_id"].append(toolkit.get_validator("package_id_exists"))
-
-    logger.debug(f"{activity_schema=}")
-    dataset = toolkit.get_action("package_show")(
-        data_dict={"id": data_dict.get("pkg_id")}
-    )
-    activity = toolkit.get_action("activity_create")(
+    dataset = toolkit.get_action("package_show")(data_dict={"id": dataset_id})
+    return toolkit.get_action("activity_create")(
         context={
             "ignore_auth": True,
             "schema": activity_schema,
         },
         data_dict={
             "user_id": toolkit.g.userobj.id,
-            "object_id": data_dict["pkg_id"],
-            "activity_type": "requested dataset maintenance",
+            "object_id": dataset_id,
+            "activity_type": activity_type.value,
             "data": {
                 "package": dataset,
             },
         },
-    )
-    toolkit.get_action("emc_user_patch")(
-        data_dict={"id": context["user"], "activity_streams_email_notifications": True}
-    )
-    try:
-        toolkit.get_action("follow_dataset")(
-            data_dict={"id": data_dict["pkg_id"]},
-        )
-    except toolkit.ValidationError:
-        pass  # user is already following the dataset
-    toolkit.enqueue_job(
-        jobs.notify_org_admins_of_dataset_maintenance_request,
-        args=[activity["id"]],
     )

@@ -6,6 +6,7 @@ from ckan import model
 from ckan.plugins import toolkit
 
 from . import email_notifications
+from .constants import DatasetManagementActivityType
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ def test_job(*args, **kwargs):
     logger.debug(f"inside test_job - {args=} {kwargs=}")
 
 
-def notify_org_admins_of_dataset_maintenance_request(activity_id: str):
+def notify_org_admins_of_dataset_management_request(activity_id: str):
     activity = toolkit.get_action("activity_show")(
         context={
             "ignore_auth": True,
@@ -22,7 +23,15 @@ def notify_org_admins_of_dataset_maintenance_request(activity_id: str):
         },
         data_dict={"id": activity_id, "include_data": True},
     )
+    activity_type = DatasetManagementActivityType(activity["type"])
     dataset = activity.get("data", {}).get("package")
+    templates_map = {
+        DatasetManagementActivityType.REQUEST_PUBLICATION: (),
+        DatasetManagementActivityType.REQUEST_MAINTENANCE: (
+            "email_notifications/dataset_maintenance_request_subject.txt",
+            "email_notifications/dataset_maintenance_request_body.txt",
+        ),
+    }
     if dataset is not None:
         org_id = dataset["owner_org"]
         organization = toolkit.get_action("organization_show")(
@@ -33,14 +42,10 @@ def notify_org_admins_of_dataset_maintenance_request(activity_id: str):
             },
         )
         jinja_env = email_notifications.get_jinja_env()
-        subject_template = jinja_env.get_template(
-            "email_notifications/dataset_maintenance_request_subject.txt"
-        )
-        body_template = jinja_env.get_template(
-            "email_notifications/dataset_maintenance_request_body.txt"
-        )
+        subject_path, body_path = templates_map[activity_type]
+        subject_template = jinja_env.get_template(subject_path)
+        body_template = jinja_env.get_template(body_path)
         for member in organization.get("users", []):
-            logger.debug(f"{member=}")
             is_active = member.get("state") == "active"
             is_org_admin = member.get("capacity") == "admin"
             if is_active and is_org_admin:

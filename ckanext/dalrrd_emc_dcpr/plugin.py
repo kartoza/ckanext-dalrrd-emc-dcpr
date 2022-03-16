@@ -121,6 +121,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_request_dataset_maintenance": (
                 emc_auth.authorize_request_dataset_maintenance
             ),
+            "emc_request_dataset_publication": (
+                emc_auth.authorize_request_dataset_publication
+            ),
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -132,6 +135,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
             "emc_version": emc_actions.show_version,
             "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
+            "emc_request_dataset_publication": emc_actions.request_dataset_publication,
             "emc_user_patch": ckan_actions.user_patch,
         }
 
