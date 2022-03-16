@@ -1,5 +1,72 @@
 {% ckan_extends %}
 
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+
+        const getUrlParameter = function getUrlParameter(sParam) {
+            let sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1];
+                }
+            }
+            return false;
+        };
+
+        function removeParameter(key, url) {
+            let returnURL = url.split("?")[0],
+                parameter,
+                parameters_arr = [],
+                queryString = (url.indexOf("?") !== -1) ? url.split("?")[1] : "";
+            if (queryString !== "") {
+                parameters_arr = queryString.split("&");
+                for (var i = parameters_arr.length - 1; i >= 0; i -= 1) {
+                    parameter = parameters_arr[i].split("=")[0];
+                    if (parameter === key) {
+                        parameters_arr.splice(i, 1);
+                    }
+                }
+                if (parameters_arr.length) returnURL = returnURL + "?" + parameters_arr.join("&");
+            }
+            return returnURL;
+        }
+
+        function activeTemporal(){
+            let url = window.location
+            if(this.value){
+                let new_parameter = this.id + '=' + this.value;
+                let new_url = ''
+                if(getUrlParameter(this.id)){
+                    let old_parametr = this.id + '=' + getUrlParameter(this.id);
+                    new_url = url.toString().replace(old_parametr, new_parameter);
+                }
+                else{
+                    const sep = (url.toString().endsWith('/') ) ? ( '?'): ('&')
+                    new_url = url + sep + new_parameter
+                }
+                window.open(new_url, "_self")
+            }
+            else{
+                if(getUrlParameter(this.id)){
+                    let new_url = removeParameter(this.id, url.toString());
+                    window.open(new_url, "_self")
+                }
+            }
+        }
+        document.getElementById("ext_start_reference_date").addEventListener('change', activeTemporal);
+        document.getElementById("ext_end_reference_date").addEventListener('change', activeTemporal);
+
+    </script>
+
+{% endblock %}
+
 {% block breadcrumb_content %}
     <div class="page-header">
     {% set total =  page.item_count %}
