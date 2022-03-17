@@ -98,6 +98,12 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """IPackageController interface requires reimplementation of this method."""
         return pkg_dict
 
+    # def before_map(self, map):
+    #     dcpr_requests_controller = 'ckanext.controllers.dcpr_requests:DCPRRequestsController'
+    #     map.connect('dcpr_requests.index', '/request', controller=dcpr_requests_controller,
+    #                 action='index')
+    #     return map
+
     def before_search(self, search_params: typing.Dict):
         start_date = search_params.get("extras", {}).get("ext_start_reference_date")
         end_date = search_params.get("extras", {}).get("ext_end_reference_date")
