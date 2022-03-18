@@ -101,11 +101,8 @@ def dcpr_request_create(context, data_dict):
 
 def dcpr_geospatial_request_create(context, data_dict):
     model = context["model"]
-    access = toolkit.check_access("dcpr_request_create_auth", context, data_dict)
+    toolkit.check_access("dcpr_request_create_auth", context, data_dict)
     logger.debug("Inside the dcpr_request_create action")
-
-    if not access:
-        raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
 
     csi_reference_id = str(data_dict["csi_reference_id"])
     request = dcpr_request.DCPRGeospatialRequest.get(csi_reference_id=csi_reference_id)

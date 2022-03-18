@@ -466,7 +466,7 @@ To run the tests you will need to:
    docker exec -ti {container-name} poetry install
    ```
 
-1. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
+2. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
 
    ```
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db init
@@ -475,7 +475,13 @@ To run the tests you will need to:
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
    ```
 
-1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
+3. When there are model changes you will need to upgrade the DB too. Run this:
+
+   ```
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
+   ```
+
+4. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
 
    ```
    # run all tests
