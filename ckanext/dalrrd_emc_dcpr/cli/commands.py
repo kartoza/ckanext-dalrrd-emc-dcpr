@@ -24,7 +24,7 @@ from ckan import model
 from ckan.lib.navl import dictization_functions
 
 # from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
-from ckanext.dalrrd_emc_dcpr.model.dcpr_request import DCPRRequest, init_request_tables
+from ckanext.dalrrd_emc_dcpr.model.dcpr_request import DCPRRequest
 
 from .. import jobs
 from ..constants import (
@@ -426,12 +426,6 @@ def delete_sasdi_organizations():
                 fg=_INFO_COLOR,
             )
     click.secho(f"Done!", fg=_SUCCESS_COLOR)
-
-
-@bootstrap.command()
-def init_dcpr_requests():
-    """Initialize database with the DCPR request tables"""
-    init_request_tables()
 
 
 @dalrrd_emc_dcpr.group()
