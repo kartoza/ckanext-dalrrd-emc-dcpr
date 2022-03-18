@@ -13,12 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 def dcpr_error_report_create(context, data_dict):
-    model = context["model"]
-    access = toolkit.check_access("dcpr_error_report_create_auth", context, data_dict)
+    toolkit.check_access("dcpr_error_report_create_auth", context, data_dict)
     logger.debug("Inside the dcpr_error_report_create action")
-
-    if not access:
-        raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
 
     csi_reference_id = str(data_dict["csi_reference_id"])
     report = dcpr_error_report.DCPRErrorReport.get(csi_reference_id=csi_reference_id)
@@ -55,6 +51,7 @@ def dcpr_error_report_create(context, data_dict):
             )
             notification_targets.append(target)
 
+    model = context["model"]
     try:
         model.Session.add(report)
         model.repo.commit()
