@@ -3,7 +3,7 @@ import typing
 
 import ckan.plugins.toolkit as toolkit
 
-from sqlalchemy import select, exc
+from sqlalchemy import sql, select, exc
 
 # from ckanext.dalrrd_emc_dcpr.model.request import DCPRRequest
 from ...model import dcpr_request as dcpr_request
@@ -239,7 +239,8 @@ def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
     user = context["auth_user_obj"]
     model = context["model"]
     request_table = dcpr_request.dcpr_request_table
-    query = select([request_table.c.csi_reference_id])
+    q = model.Session.query(dcpr_request.DCPRRequest)
+    query = sql.select([request_table.c.csi_reference_id])
     if user is None:  # show only  moderated requests
         pass
     elif user.sysadmin:  # show all requests
@@ -249,5 +250,11 @@ def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
     query = query.order_by(request_table.c.csi_reference_id)
     limit = data_dict.get("limit", 10)
     offset = data_dict.get("offset", 10)
-    query = query.limit(limit).offset(offset)
-    return [r[0] for r in query.execute()]
+    # query = query.limit(limit).offset(offset)
+    logger.debug("Query")
+    logger.debug(q)
+    dcpr_requests = q.all()
+    logger.debug("requests")
+    logger.debug(dcpr_requests)
+
+    return dcpr_requests
