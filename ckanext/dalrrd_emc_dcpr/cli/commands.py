@@ -946,32 +946,77 @@ def delete_sample_datasets():
 #  since the vanilla ckan command seems to work - leaving t here in case we
 #  eventually need it
 @extra_commands.command()
-@click.argument("plugin_name")
 @click.option("-m", "--message")
 @click.option("-a", "--autogenerate", is_flag=True)
-@click.option("-h", "--head")
-def add_db_revision(plugin_name, message, autogenerate, head):
+def add_db_revision(message, autogenerate):
+    plugin_name = "dalrrd_emc_dcpr"
+    alembic_wrapper = AlembicWrapper(plugin_name)
+    out = alembic_wrapper.run_command(
+        alembic.command.revision,
+        message=message,
+        autogenerate=autogenerate,
+        head=f"{plugin_name}@head",
+        version_path=alembic_wrapper.version_path,
+    )
+    click.secho(f"{out=}", fg=_INFO_COLOR)
+
+
+@extra_commands.command()
+@click.argument("alembic_command")
+@click.option(
+    "--collect-args",
+    help="Should the command args be collected into a list?",
+    is_flag=True,
+)
+@click.option(
+    "--command-arg",
+    multiple=True,
+    help="Arguments for the alembic command. Can be provided multiple times",
+)
+@click.option(
+    "--command-kwarg",
+    multiple=True,
+    help=(
+        "Provide each keyword argument as a colon-separated string of "
+        "key_name:value. This option can be provided multiple times"
+    ),
+)
+def defer_to_alembic(alembic_command, collect_args, command_arg, command_kwarg):
+    """Run an alembic command
+
+    Examples:
+
+        \b
+        defer-to-alembic current --command-kwarg=verbose:true
+        defer-to-alembic heads --command-kwarg=verbose:true
+        defer-to-alembic history
+
+    """
+
+    alembic_wrapper = AlembicWrapper("dalrrd_emc_dcpr")
+    bool_keys = (
+        "verbose",
+        "autogenerate",
+    )
     try:
-        alembic_wrapper = AlembicWrapper(plugin_name)
-    except RuntimeError:
-        click.secho(
-            f"Plugin {plugin_name!r} does not seem to use migrations", fg=_ERROR_COLOR
-        )
+        command = getattr(alembic.command, alembic_command)
+    except AttributeError as exc:
+        click.secho(str(exc), fg=_ERROR_COLOR)
     else:
-        if head is None:
-            head = f"{plugin_name}@head"
-        alembic_config_ini = Path(_resolve_alembic_config(plugin_name))
-        version_path = str(alembic_config_ini.parent / "versions")
-        click.secho(f"{version_path=}", fg=_INFO_COLOR)
-        out = alembic_wrapper.run_command(
-            alembic.command.revision,
-            message=message,
-            head=head,
-            # branch_label=plugin_name,
-            version_path=version_path,
-            autogenerate=autogenerate,
-        )
-        click.secho(f"{out=}", fg=_INFO_COLOR)
+        kwargs = {}
+        for raw_kwarg in command_kwarg:
+            key, value = raw_kwarg.partition(":")[::2]
+            if key in bool_keys:
+                kwargs[key] = toolkit.asbool(value)
+            else:
+                kwargs[key] = value
+        if collect_args:
+            out = alembic_wrapper.run_command(command, command_arg, **kwargs)
+        else:
+            out = alembic_wrapper.run_command(command, *command_arg, **kwargs)
+        for line in out:
+            click.secho(line, fg=_INFO_COLOR)
+        click.secho("Done!", fg=_SUCCESS_COLOR)
 
 
 def _resolve_alembic_config(plugin):
@@ -999,13 +1044,22 @@ def _resolve_alembic_config(plugin):
 class AlembicWrapper:
     alembic_conf: alembic.config.Config
     _command_output: typing.List[str]
+    _plugin_name: str
 
     def __init__(self, plugin_name):
+        self._plugin_name = plugin_name
         self.alembic_conf = self._get_alembic_config(plugin_name)
         self._command_output = []
 
+    @property
+    def version_path(self):
+        alembic_config_ini = Path(_resolve_alembic_config(self._plugin_name))
+        return str(alembic_config_ini.parent / "versions")
+
     def run_command(self, alembic_command, *args, **kwargs):
         current_output_index = len(self._command_output)
+        click.secho(f"{args=}", fg=_INFO_COLOR)
+        click.secho(f"{kwargs=}", fg=_INFO_COLOR)
         alembic_command(self.alembic_conf, *args, **kwargs)
         return self._command_output[current_output_index:]
 
@@ -1017,7 +1071,9 @@ class AlembicWrapper:
         alembic_config_ini = Path(_resolve_alembic_config(plugin_name))
         ckan_versions_path = str(Path(ckan.__file__).parent / "migration/versions")
         if alembic_config_ini.exists():
-            conf = alembic.config.Config(str(alembic_config_ini))
+            conf = alembic.config.Config(
+                str(alembic_config_ini), ini_section=plugin_name
+            )
             conf.set_main_option("script_location", str(alembic_config_ini.parent))
             conf.set_main_option("sqlalchemy.url", toolkit.config.get("sqlalchemy.url"))
             conf.set_main_option(
@@ -1034,7 +1090,7 @@ class AlembicWrapper:
         return conf
 
 
-@dalrrd_emc_dcpr.command()
+@extra_commands.command()
 @click.argument("job_name")
 @click.option(
     "--job-arg",
