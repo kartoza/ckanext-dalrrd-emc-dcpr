@@ -42,3 +42,9 @@ dalrrd-emc-dcpr-css:
   contents:
     - css/dalrrd-emc-dcpr.css
   filter: cssrewrite
+
+temporal-query-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_temporalQuery.js
+  contents:
+    - js/temporalQuery.js
+  filter: rjsmin

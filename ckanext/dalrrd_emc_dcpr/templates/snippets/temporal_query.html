@@ -1,6 +1,8 @@
 {#
 Displays a date selector in order to let user choose the temporal range for a search query
 #}
+{% asset "ckanext-dalrrdemcdcpr/temporal-query-js" %}
+
 
 {% set start_identifier = "ext_start_reference_date" %}
 {% set end_identifier = "ext_end_reference_date" %}
@@ -32,6 +34,7 @@ Displays a date selector in order to let user choose the temporal range for a se
                                 class="form-control"
                                 form="dataset-search-form"
                                 value="{{ previous_start }}"
+                                data-module="emc-temporal-query"
                         />
                     </div>
                 </div>
@@ -45,6 +48,7 @@ Displays a date selector in order to let user choose the temporal range for a se
                                 class="form-control"
                                 form="dataset-search-form"
                                 value="{{ previous_end }}"
+                                data-module="emc-temporal-query"
                         />
                     </div>
                 </div>
