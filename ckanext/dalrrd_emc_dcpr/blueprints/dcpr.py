@@ -14,11 +14,6 @@ dcpr_blueprint = Blueprint(
 def dcpr_home():
     logger.debug("Inside the dcpr_home view")
     existing_requests = toolkit.get_action("dcpr_request_list")(data_dict={})
-    result = (
-        "<h1>Hi from the DCPR landing page!</h1><p>The following requests are "
-        "available:</p><ul>"
-    )
-    for dcpr_request in existing_requests:
-        result += f"<li>{dcpr_request['name']}</li>"
-    result += "</ul>"
-    return result
+
+    return toolkit.render('dcpr/index.html', extra_vars={'requests': existing_requests})
+

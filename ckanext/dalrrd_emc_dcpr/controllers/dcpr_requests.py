@@ -12,5 +12,5 @@ class DCPRRequestsController(toolkit.BaseController):
             toolkit.abort(401)
 
         return toolkit.render(
-            "dcpr_requests/index.html", extra_vars={"requests": requests}
+            "dcpr/index.html", extra_vars={"requests": requests}
         )

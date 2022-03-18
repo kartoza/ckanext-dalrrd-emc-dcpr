@@ -1,0 +1,26 @@
+{% extends "page.html" %}
+
+{% block title %}{{ _('DCPR Requests') }} - {{ super() }}{% endblock %}
+
+{% block search %}
+    {{ h.snippet('dcpr/search.html') }}
+{% endblock %}
+
+{% block breadcrumb_content %}
+  {{ h.nav_link(_('DCPR Requests'), named_route='user.index') }}
+{% endblock %}
+
+{% block primary_content_inner %}
+{% block requests_list %}
+  {% if requests %}
+    <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
+    	{% block requests %}
+	      {% for request in requests %}
+	        {% snippet 'dcpr/snippets/request_item.html', request=request %}
+	      {% endfor %}
+	    {% endblock %}
+    </ul>
+  {% endif %}
+{% endblock %}
+
+{% endblock%}

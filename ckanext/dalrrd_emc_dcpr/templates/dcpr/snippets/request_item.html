@@ -1,0 +1,27 @@
+{% set title = request.status or request.status %}
+{% set notes = h.markdown_extract(request.status, extract_length=180) %}
+
+{% block request_item %}
+  <li class="{{ item_class or "dataset-item" }}">
+    {% block content %}
+      <div class="dataset-content">
+        {% block heading %}
+          <h2 class="dataset-heading">
+            {% block heading_title %}
+            <a href="">
+              {{title|truncate(80)}}
+            </a>
+            {% endblock %}
+          </h2>
+        {% endblock %}
+        {% block notes %}
+          {% if notes %}
+            <div>{{ notes|urlize }}</div>
+          {% else %}
+            <p class="empty">_("There is no description for this request") }}</p>
+          {% endif %}
+        {% endblock %}
+      </div>
+    {% endblock %}
+  </li>
+{% endblock %}
