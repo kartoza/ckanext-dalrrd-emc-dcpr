@@ -7,8 +7,63 @@ from sqlalchemy import select, exc
 
 # from ckanext.dalrrd_emc_dcpr.model.request import DCPRRequest
 from ...model import dcpr_request as dcpr_request
+from ...model import dcpr_error_report
 
 logger = logging.getLogger(__name__)
+
+
+def dcpr_error_report_create(context, data_dict):
+    toolkit.check_access("dcpr_error_report_create_auth", context, data_dict)
+    logger.debug("Inside the dcpr_error_report_create action")
+
+    csi_reference_id = str(data_dict["csi_reference_id"])
+    report = dcpr_error_report.DCPRErrorReport.get(csi_reference_id=csi_reference_id)
+
+    if report:
+        raise toolkit.ValidationError(
+            {"message": "The DCPR Error report already exists"}
+        )
+    else:
+        report = dcpr_error_report.DCPRErrorReport(
+            csi_reference_id=data_dict["csi_reference_id"],
+            owner_user=data_dict["owner_user"],
+            csi_reviewer=data_dict["csi_reviewer"],
+            metadata_record=data_dict["metadata_record"],
+            status=data_dict["status"],
+            error_application=data_dict["error_application"],
+            error_description=data_dict["error_description"],
+            solution_description=data_dict["solution_description"],
+            request_date=data_dict["request_date"],
+            csi_review_additional_documents=data_dict[
+                "csi_review_additional_documents"
+            ],
+            csi_moderation_notes=data_dict["csi_moderation_notes"],
+            csi_moderation_date=data_dict["csi_moderation_date"],
+        )
+
+        notification_targets = []
+
+        for target in data_dict["notification_targets"]:
+            target = dcpr_error_report.DCPRErrorReportNotificationTarget(
+                dcpr_error_report_id=data_dict["csi_reference_id"],
+                user_id=target.get("user_id"),
+                group_id=target.get("group_id"),
+            )
+            notification_targets.append(target)
+
+    model = context["model"]
+    try:
+        model.Session.add(report)
+        model.repo.commit()
+        model.Session.add_all(notification_targets)
+        model.repo.commit()
+
+    except exc.InvalidRequestError as exception:
+        model.Session.rollback()
+    finally:
+        model.Session.close()
+
+    return report
 
 
 def dcpr_request_create(context, data_dict):

@@ -28,6 +28,7 @@ from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
     DCPRRequest,
     DCPRGeospatialRequest,
 )
+from ckanext.dalrrd_emc_dcpr.model.dcpr_error_report import DCPRErrorReport
 
 from .. import jobs
 from ..constants import (
@@ -45,6 +46,7 @@ from ._sample_datasets import (
 from ._sample_organizations import SAMPLE_ORGANIZATIONS
 from ._sample_users import SAMPLE_USERS
 from ._sample_dcpr_requests import SAMPLE_REQUESTS, SAMPLE_GEOSPATIAL_REQUESTS
+from ._sample_dcpr_error_reports import SAMPLE_ERROR_REPORTS
 
 logger = logging.getLogger(__name__)
 
@@ -434,6 +436,65 @@ def delete_sasdi_organizations():
 @dalrrd_emc_dcpr.group()
 def load_sample_data():
     """Load sample data into non-production deployments"""
+
+
+@load_sample_data.command()
+def create_sample_dcpr_error_reports():
+    """Create sample DCPR error reports"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+
+    package = model.Session.query(model.Package).first()
+    package_id = package.id if package else None
+
+    user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+
+    create_report_action = toolkit.get_action("dcpr_error_report_create")
+    click.secho(f"Creating sample dcpr error reports ...")
+    for report in SAMPLE_ERROR_REPORTS:
+        click.secho(f"Creating report with id {report.csi_reference_id!r}...")
+        try:
+            create_report_action(
+                context={
+                    "user": user["name"],
+                },
+                data_dict={
+                    "csi_reference_id": report.csi_reference_id,
+                    "owner_user": user_id,
+                    "csi_reviewer": user_id,
+                    "metadata_record": package_id,
+                    "notification_targets": [{"user_id": user_id, "group_id": None}],
+                    "status": report.status,
+                    "request_date": report.request_date,
+                    "error_application": report.error_application,
+                    "error_description": report.error_description,
+                    "solution_description": report.solution_description,
+                    "csi_moderation_notes": report.csi_moderation_notes,
+                    "csi_review_additional_documents": report.csi_review_additional_documents,
+                    "csi_moderation_date": report.csi_moderation_date,
+                },
+            )
+        except toolkit.ValidationError as exc:
+            click.secho(
+                f"Could not create report with id {report.csi_reference_id!r}: {exc}",
+                fg=_INFO_COLOR,
+            )
+            click.secho(
+                f"Attempting to re-enable possibly deleted report...", fg=_INFO_COLOR
+            )
+            sample_report = DCPRErrorReport.get(report.id)
+            if sample_report is None:
+                click.secho(
+                    f"Could not find sample report with id {report.csi_reference_id!r}",
+                    fg=_ERROR_COLOR,
+                )
+                continue
+            else:
+                sample_report.undelete()
+                model.repo.commit()
 
 
 @load_sample_data.command()
