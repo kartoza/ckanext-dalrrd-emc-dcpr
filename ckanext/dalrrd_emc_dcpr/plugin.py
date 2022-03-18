@@ -167,9 +167,13 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return pkg_dict
 
     def before_map(self, map):
-        dcpr_requests_controller = 'ckanext.controllers.dcpr:DCPRRequestsController'
-        map.connect('dcpr.index', '/request', controller=dcpr_requests_controller,
-                    action='index')
+        dcpr_requests_controller = "ckanext.controllers.dcpr:DCPRRequestsController"
+        map.connect(
+            "dcpr.index",
+            "/request",
+            controller=dcpr_requests_controller,
+            action="index",
+        )
         return map
 
     def before_search(self, search_params: typing.Dict):

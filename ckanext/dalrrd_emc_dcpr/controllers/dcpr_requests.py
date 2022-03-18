@@ -11,6 +11,4 @@ class DCPRRequestsController(toolkit.BaseController):
         except toolkit.NotAuthorized:
             toolkit.abort(401)
 
-        return toolkit.render(
-            "dcpr/index.html", extra_vars={"requests": requests}
-        )
+        return toolkit.render("dcpr/index.html", extra_vars={"requests": requests})
