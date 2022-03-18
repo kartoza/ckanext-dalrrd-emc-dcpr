@@ -130,6 +130,35 @@ class _CkanBootstrapDCPRRequest:
 
 
 @dataclasses.dataclass
+class _CkanBootstrapDCPRGeospatialRequest:
+    csi_reference_id: uuid.UUID
+    status: str
+    organization_name: str
+    dataset_purpose: str
+    interest_region: str
+    resolution_scale: str
+    additional_information: str
+    request_date: str
+    submission_date: str
+    nsif_review_date: str
+    nsif_review_notes: str
+    nsif_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_review_additional_documents: str
+    csi_moderation_date: str
+    dataset_sasdi_category: str
+    custodian_organization: str
+    data_type: str
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
+        return result
+
+
+@dataclasses.dataclass
 class _CkanExtBootstrapPage:
     name: str
     content: str

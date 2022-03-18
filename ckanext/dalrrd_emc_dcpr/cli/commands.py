@@ -24,7 +24,10 @@ from ckan import model
 from ckan.lib.navl import dictization_functions
 
 # from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
-from ckanext.dalrrd_emc_dcpr.model.dcpr_request import DCPRRequest
+from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
+    DCPRRequest,
+    DCPRGeospatialRequest,
+)
 
 from .. import jobs
 from ..constants import (
@@ -41,7 +44,7 @@ from ._sample_datasets import (
 )
 from ._sample_organizations import SAMPLE_ORGANIZATIONS
 from ._sample_users import SAMPLE_USERS
-from ._sample_dcpr_requests import SAMPLE_REQUESTS
+from ._sample_dcpr_requests import SAMPLE_REQUESTS, SAMPLE_GEOSPATIAL_REQUESTS
 
 logger = logging.getLogger(__name__)
 
@@ -502,6 +505,72 @@ def create_sample_dcpr_requests():
                 f"Attempting to re-enable possibly deleted request...", fg=_INFO_COLOR
             )
             sample_request = DCPRRequest.get(request.id)
+            if sample_request is None:
+                click.secho(
+                    f"Could not find sample request with id {request.csi_reference_id!r}",
+                    fg=_ERROR_COLOR,
+                )
+                continue
+            else:
+                sample_request.undelete()
+                model.repo.commit()
+
+
+@load_sample_data.command()
+def create_sample_geospatial_dcpr_requests():
+    """Create sample DCPR requests for geospatial data"""
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+
+    create_geospatial_request_action = toolkit.get_action(
+        "dcpr_geospatial_request_create"
+    )
+    click.secho(f"Creating sample dcpr requests ...")
+    for request in SAMPLE_GEOSPATIAL_REQUESTS:
+        click.secho(f"Creating request with id {request.csi_reference_id!r}...")
+        try:
+            create_geospatial_request_action(
+                context={
+                    "user": user["name"],
+                },
+                data_dict={
+                    "csi_reference_id": request.csi_reference_id,
+                    "owner_user": user_id,
+                    "csi_reviewer": user_id,
+                    "nsif_reviewer": user_id,
+                    "notification_targets": [{"user_id": user_id, "group_id": None}],
+                    "status": request.status,
+                    "organization_name": request.organization_name,
+                    "dataset_purpose": request.dataset_purpose,
+                    "interest_region": request.interest_region,
+                    "resolution_scale": request.resolution_scale,
+                    "additional_information": request.additional_information,
+                    "request_date": request.request_date,
+                    "submission_date": request.submission_date,
+                    "nsif_review_date": request.nsif_review_date,
+                    "nsif_review_notes": request.nsif_review_notes,
+                    "nsif_review_additional_documents": request.nsif_review_additional_documents,
+                    "csi_moderation_notes": request.csi_moderation_notes,
+                    "csi_review_additional_documents": request.csi_review_additional_documents,
+                    "csi_moderation_date": request.csi_moderation_date,
+                    "dataset_sasdi_category": request.dataset_sasdi_category,
+                    "custodian_organization": request.custodian_organization,
+                    "data_type": request.data_type,
+                },
+            )
+        except toolkit.ValidationError as exc:
+            click.secho(
+                f"Could not create request with id {request.csi_reference_id!r}: {exc}",
+                fg=_INFO_COLOR,
+            )
+            click.secho(
+                f"Attempting to re-enable possibly deleted request...", fg=_INFO_COLOR
+            )
+            sample_request = DCPRGeospatialRequest.get(request.id)
             if sample_request is None:
                 click.secho(
                     f"Could not find sample request with id {request.csi_reference_id!r}",

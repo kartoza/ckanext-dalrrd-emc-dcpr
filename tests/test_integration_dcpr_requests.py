@@ -10,7 +10,10 @@ from ckan.plugins import toolkit
 from ckan import model, logic
 from sqlalchemy import exc
 
-from ckanext.dalrrd_emc_dcpr.cli._sample_dcpr_requests import SAMPLE_REQUESTS
+from ckanext.dalrrd_emc_dcpr.cli._sample_dcpr_requests import (
+    SAMPLE_REQUESTS,
+    SAMPLE_GEOSPATIAL_REQUESTS,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -97,6 +100,80 @@ def test_create_dcpr_request(name, user_available, user_logged):
 
         helpers.call_action(
             "dcpr_request_create",
+            context=context,
+            **data_dict,
+        )
+
+
+@pytest.mark.parametrize(
+    "request_id, name, user_available, user_logged",
+    [
+        pytest.param(
+            uuid.uuid4(),
+            "request_1",
+            True,
+            True,
+            id="request-added-successfully",
+        ),
+        pytest.param(
+            uuid.uuid4(),
+            "request_2",
+            False,
+            True,
+            marks=pytest.mark.raises(exception=exc.IntegrityError),
+            id="request-can-not-be-added-integrity-error",
+        ),
+        pytest.param(
+            uuid.uuid4(),
+            "request_3",
+            True,
+            True,
+            id="request-can-be-added-custom-request-id",
+        ),
+    ],
+)
+def test_create_dcpr_geospatial_request(request_id, name, user_available, user_logged):
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = (
+        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+        if user_available
+        else None
+    )
+
+    for request in SAMPLE_GEOSPATIAL_REQUESTS:
+        data_dict = {
+            "csi_reference_id": request_id,
+            "owner_user": user_id,
+            "csi_reviewer": user_id,
+            "nsif_reviewer": user_id,
+            "notification_targets": [{"user_id": user_id, "group_id": None}],
+            "status": request.status,
+            "organization_name": request.organization_name,
+            "dataset_purpose": request.dataset_purpose,
+            "interest_region": request.interest_region,
+            "resolution_scale": request.resolution_scale,
+            "additional_information": request.additional_information,
+            "request_date": request.request_date,
+            "submission_date": request.submission_date,
+            "nsif_review_date": request.nsif_review_date,
+            "nsif_review_notes": request.nsif_review_notes,
+            "nsif_review_additional_documents": request.nsif_review_additional_documents,
+            "csi_moderation_notes": request.csi_moderation_notes,
+            "csi_review_additional_documents": request.csi_review_additional_documents,
+            "csi_moderation_date": request.csi_moderation_date,
+            "dataset_sasdi_category": request.dataset_sasdi_category,
+            "custodian_organization": request.custodian_organization,
+            "data_type": request.data_type,
+        }
+
+        context = {"ignore_auth": not user_logged, "user": user["name"]}
+
+        helpers.call_action(
+            "dcpr_geospatial_request_create",
             context=context,
             **data_dict,
         )

@@ -109,8 +109,72 @@ def upgrade():
         sa.Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
     )
 
+    op.create_table(
+        "dcpr_geospatial_request",
+        meta.metadata,
+        sa.Column(
+            "csi_reference_id",
+            types.UnicodeText,
+            primary_key=True,
+            default=_types.make_uuid,
+        ),
+        sa.Column(
+            "owner_user",
+            types.UnicodeText,
+            ForeignKey("user.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "csi_reviewer",
+            types.UnicodeText,
+            ForeignKey("user.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "nsif_reviewer",
+            types.UnicodeText,
+            ForeignKey("user.id"),
+            nullable=False,
+        ),
+        sa.Column("status", types.UnicodeText),
+        sa.Column("organization_name", types.UnicodeText),
+        sa.Column("dataset_purpose", types.UnicodeText),
+        sa.Column("interest_region", types.UnicodeText),
+        sa.Column("resolution_scale", types.UnicodeText),
+        sa.Column("additional_information", types.UnicodeText),
+        sa.Column("request_date", types.DateTime, default=dt.datetime.utcnow),
+        sa.Column("submission_date", types.DateTime, default=dt.datetime.utcnow),
+        sa.Column("nsif_review_date", types.DateTime, default=dt.datetime.utcnow),
+        sa.Column("nsif_review_notes", types.UnicodeText),
+        sa.Column("nsif_review_additional_documents", types.UnicodeText),
+        sa.Column("csi_moderation_notes", types.UnicodeText),
+        sa.Column("csi_review_additional_documents", types.UnicodeText),
+        sa.Column("csi_moderation_date", types.DateTime, default=dt.datetime.utcnow),
+        sa.Column("dataset_sasdi_category", types.UnicodeText),
+        sa.Column("custodian_organization", types.UnicodeText),
+        sa.Column("data_type", types.UnicodeText),
+    )
+
+    op.create_table(
+        "dcpr_geospatial_request_notification",
+        meta.metadata,
+        sa.Column(
+            "target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid
+        ),
+        sa.Column(
+            "dcpr_geospatial_request_id",
+            types.UnicodeText,
+            ForeignKey("dcpr_geospatial_request.csi_reference_id"),
+        ),
+        sa.Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
+        sa.Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
+    )
+
 
 def downgrade():
+    op.drop_table("dcpr_geospatial_request_notification")
+    op.drop_table("dcpr_geospatial_request")
+
     op.drop_table("dcpr_request_dataset")
     op.drop_table("dcpr_request_notification")
     op.drop_table("dcpr_request")
