@@ -6,7 +6,9 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
+from ckan import model
 from flask import Blueprint
+from sqlalchemy import orm
 
 from . import (
     constants,
@@ -26,6 +28,7 @@ from .logic.auth import ckan as ckan_auth
 from .logic.auth import pages as ckanext_pages_auth
 from .logic.auth import dcpr as dcpr_auth
 from .logic.auth import emc as emc_auth
+from .model.user_extra_fields import UserExtraFields
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +44,35 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.IPluginObserver)
+
+    def before_load(self, plugin_class):
+        """IPluginObserver interface requires reimplementation of this method."""
+        pass
+
+    def after_load(self, service):
+        """Control plugin loading mechanism
+
+        This method is implemented by the DalrrdEmcDcprPlugin because we are adding
+        a 1:1 relationship between our `UserExtraFields` model and CKAN's `User` model.
+
+        SQLAlchemy expects relationships to be configured on both sides, which means
+        we have to modify CKAN's User model in order to make the relationship work. We
+        do that in this function.
+
+        """
+
+        model.User.extra_fields = orm.relationship(
+            UserExtraFields, back_populates="user", uselist=False
+        )
+
+    def before_unload(self, plugin_class):
+        """IPluginObserver interface requires reimplementation of this method."""
+        pass
+
+    def after_unload(self, service):
+        """IPluginObserver interface requires reimplementation of this method."""
+        pass
 
     def after_create(self, context, pkg_dict):
         """IPackageController interface requires reimplementation of this method."""

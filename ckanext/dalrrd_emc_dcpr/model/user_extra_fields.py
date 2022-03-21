@@ -4,13 +4,17 @@ import logging
 
 import sqlalchemy
 from ckan import model
-from ckan.model import types as types_
+from ckan.model import (
+    meta,
+    types as types_,
+)
 from sqlalchemy import orm
 
 logger = logging.getLogger(__name__)
 
 user_extra_fields_table = sqlalchemy.Table(
     "user_extra_fields",
+    meta.metadata,
     sqlalchemy.Column(
         "id", sqlalchemy.types.UnicodeText, primary_key=True, default=types_.make_uuid
     ),
@@ -40,8 +44,11 @@ model.meta.mapper(
     properties={
         "user": orm.relationship(
             model.User,
-            uselist=False,
-            backref=orm.backref("_extra_fields", cascade="all, delete, delete-orphan"),
+            backref=orm.backref(
+                "extra_fields",
+                uselist=False,
+                cascade="all, delete, delete-orphan",
+            ),
         ),
     },
 )
