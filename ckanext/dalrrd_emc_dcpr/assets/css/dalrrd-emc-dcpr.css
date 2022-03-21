@@ -82,13 +82,6 @@ a {
   margin: 7.5px 25px;
 }
 
-.nav-item{
-  cursor: pointer;
-  font-size: 14px;
-  padding: 10px 25px;
-  font-weight: bold;
-}
-
 .navbar-right {
   float: right !important;
   margin-right: 0;
@@ -112,7 +105,15 @@ a {
 
 .navbar-default .navbar-nav > li > a {
   color: #3A744E;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
  }
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+  color: #555;
+  background-color: transparent;
+}
 
 body {
   background: #FFF url("../../../base/images/bg.png");
