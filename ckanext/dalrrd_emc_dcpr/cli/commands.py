@@ -1,13 +1,13 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
-import contextlib
 import datetime as dt
 import enum
-import io
 import inspect
 import json
 import logging
 import os
+import sys
+import traceback
 import typing
 from concurrent import futures
 from pathlib import Path
@@ -23,7 +23,6 @@ from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
 
-# from ckan.lib.email_notifications import get_and_send_notifications_for_all_users
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
     DCPRRequest,
     DCPRGeospatialRequest,
@@ -106,6 +105,51 @@ def delete_data():
 @dalrrd_emc_dcpr.group()
 def extra_commands():
     """Extra commands that are less relevant"""
+
+
+@dalrrd_emc_dcpr.command()
+def shell():
+    """
+    Launch a shell with CKAN already imported and ready to explore
+
+    The implementation of this command is mostly inspired and adapted from django's
+    `shell` command
+
+    """
+
+    try:
+        from IPython import start_ipython
+
+        start_ipython(argv=[])
+    except ImportError:
+        import code
+
+        # Set up a dictionary to serve as the environment for the shell.
+        imported_objects = {}
+
+        # By default, this will set up readline to do tab completion and to read and
+        # write history to the .python_history file, but this can be overridden by
+        # $PYTHONSTARTUP or ~/.pythonrc.py.
+        try:
+            sys.__interactivehook__()
+        except Exception:
+            # Match the behavior of the cpython shell where an error in
+            # sys.__interactivehook__ prints a warning and the exception and continues.
+            print("Failed calling sys.__interactivehook__")
+            traceback.print_exc()
+
+        # Set up tab completion for objects imported by $PYTHONSTARTUP or
+        # ~/.pythonrc.py.
+        try:
+            import readline
+            import rlcompleter
+
+            readline.set_completer(rlcompleter.Completer(imported_objects).complete)
+        except ImportError:
+            pass
+
+        # Start the interactive interpreter.
+        code.interact(local=imported_objects)
 
 
 @bootstrap.command()
