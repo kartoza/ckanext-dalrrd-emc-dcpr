@@ -197,6 +197,16 @@ Additionally, in order for notifications to work, there is some configuration:
   it finds interesting enough in order to be notified of changes via email
 
 
+#### Use a shell for interacting with CKAN
+
+There is a CLI command that allows opening a Python shell already configured with the
+CKAN environment. This is analogous to django's `manage.py shell` command. Start it up with:
+
+```
+ckan dalrrd-emc-dcpr shell
+```
+
+
 
 ## Development
 
