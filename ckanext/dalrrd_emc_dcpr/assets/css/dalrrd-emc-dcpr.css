@@ -329,6 +329,7 @@ fieldset[disabled] .btn-default.focus {
 .dataset-heading a {
   color: #3A744E;
   font-weight: 600;
+  text-decoration: none;
 }
 
 /* End of datasets*/
@@ -354,7 +355,7 @@ fieldset[disabled] .btn-default.focus {
   background-color: #F3881C;
 }
 .nav-item.active > a:hover,
-.nav-aside li.active a:hover {
+.nav-facet li.active a:hover {
   color: #FFF;
   background-color: #F3881C;
 }
@@ -386,10 +387,22 @@ fieldset[disabled] .btn-default.focus {
   border-radius: 10px;
 }
 
+.nav-facet .nav-item > a:hover {
+  background-color: transparent;
+}
+
+
 /* Landing page */
 .btn-warning {
   background-color: #F3881C;
 }
+
+.btn-warning:hover {
+  color: #fff;
+  background-color: #F3881C;
+  border-color: #F3881C;
+}
+
 header.masthead {
   position: relative;
   background: url("/images/emc.jpg") no-repeat center center;
