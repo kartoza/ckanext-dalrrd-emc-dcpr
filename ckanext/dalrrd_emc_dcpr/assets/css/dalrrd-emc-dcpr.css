@@ -132,8 +132,17 @@ body {
   z-index: 1;
 }
 
-.btn-primary {
-    background-color: #F3881C;
+.btn-primary:hover {
+  color: #fff;
+  background-color: #3A744E;
+  border-color: #3A744E;
+}
+
+.btn-primary:focus,
+.btn-primary.focus {
+  color: #fff;
+  background-color: #3A744E;
+  border-color: #3A744E;
 }
 
 .btn-secondary {
