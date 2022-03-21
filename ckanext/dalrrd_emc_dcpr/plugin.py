@@ -172,6 +172,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
             "emc_request_dataset_publication": emc_actions.request_dataset_publication,
             "emc_user_patch": ckan_actions.user_patch,
+            "user_update": ckan_actions.user_update,
+            "user_create": ckan_actions.user_create,
+            "user_show": ckan_actions.user_show,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
