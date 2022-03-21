@@ -4,8 +4,83 @@ import logging
 import typing
 
 import ckan.plugins.toolkit as toolkit
+from ckan.model.domain_object import DomainObject
+
+from ...model.user_extra_fields import UserExtraFields
 
 logger = logging.getLogger(__name__)
+
+
+@toolkit.chained_action
+def user_show(original_action, context, data_dict):
+    """
+    Intercepts the core `user_show` action to add any extra_fields that may exist for
+    the user.
+
+    """
+
+    original_result = original_action(context, data_dict)
+    user_id = original_result.get("id")
+    model = context["model"]
+    user_obj = model.Session.query(model.User).filter_by(id=user_id).first()
+    if user_obj.extra_fields is not None:
+        original_result["extra_fields"] = _dictize_user_extra_fields(
+            user_obj.extra_fields
+        )
+    else:
+        original_result["extra_fields"] = None
+    return original_result
+
+
+@toolkit.chained_action
+def user_update(original_action, context, data_dict):
+    """
+    Intercepts the core `user_update` action to update any extra_fields that may exist
+    for the user.
+
+    """
+
+    original_result = original_action(context, data_dict)
+    user_id = original_result["id"]
+    model = context["model"]
+    user_obj = model.Session.query(model.User).filter_by(id=user_id).first()
+    if user_obj.extra_fields is None:
+        extra = UserExtraFields(user_id=user_id)
+    else:
+        extra = user_obj.extra_fields
+    extra.affiliation = data_dict.get("extra_fields_affiliation")
+    extra.professional_occupation = data_dict.get(
+        "extra_fields_professional_occupation"
+    )
+    model.Session.add(extra)
+    model.Session.commit()
+    logger.debug(f"{original_result=}")
+    original_result["extra_fields"] = _dictize_user_extra_fields(extra)
+    return original_result
+
+
+@toolkit.chained_action
+def user_create(original_action, context, data_dict):
+    """Intercepts the core `user_create` action to also create the extra_fields."""
+    original_result = original_action(context, data_dict)
+    user_id = original_result["id"]
+    model = context["model"]
+    extra = UserExtraFields(
+        user_id=user_id,
+        affiliation=data_dict.get("extra_fields") or "",
+        professional_occupation=data_dict.get("extra_fields") or "",
+    )
+    model.Session.add(extra)
+    model.Session.commit()
+    original_result["extra_fields"] = _dictize_user_extra_fields(extra)
+    return original_result
+
+
+def _dictize_user_extra_fields(user_extra_fields: UserExtraFields) -> typing.Dict:
+    dictized_extra = DomainObject.as_dict(user_extra_fields)
+    del dictized_extra["id"]
+    del dictized_extra["user_id"]
+    return dictized_extra
 
 
 @toolkit.chained_action
