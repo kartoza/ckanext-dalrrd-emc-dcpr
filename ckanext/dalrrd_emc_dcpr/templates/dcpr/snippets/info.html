@@ -1,0 +1,15 @@
+{% set requests_count = requests | length %}
+{% block heading %}
+<section class="module module-narrow module-shallow">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+                <h5> {{ _('Total number of DCPR Request(s): %d' % requests_count) }}
+                </h5>
+        </div>
+        <div class="panel-body">
+                {{ _('DCPR Request(s) shown in this page: %d' % requests_count) }}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

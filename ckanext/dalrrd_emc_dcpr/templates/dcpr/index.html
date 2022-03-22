@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block breadcrumb_content %}
-  {{ h.nav_link(_('DCPR Requests'), named_route='user.index') }}
+  {{ _('DCPR Requests') }}
 {% endblock %}
 
 {% block primary_content_inner %}
@@ -20,7 +20,16 @@
 	      {% endfor %}
 	    {% endblock %}
     </ul>
+    </div>
   {% endif %}
 {% endblock %}
 
+ {% block page_pagination %}
+      {{ page.pager(q=q) }}
+    {% endblock %}
+
+{% endblock%}
+
+{% block secondary_content %}
+{% snippet 'dcpr/snippets/info.html', requests=requests %}
 {% endblock%}

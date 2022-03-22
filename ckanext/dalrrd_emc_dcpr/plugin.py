@@ -178,6 +178,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_request_create": dcpr_actions.dcpr_request_create,
             "dcpr_geospatial_request_create": dcpr_actions.dcpr_geospatial_request_create,
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
+            "dcpr_request_search": dcpr_actions.dcpr_request_search,
             "emc_version": emc_actions.show_version,
             "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
             "emc_request_dataset_publication": emc_actions.request_dataset_publication,
