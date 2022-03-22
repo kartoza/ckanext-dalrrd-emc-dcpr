@@ -296,6 +296,12 @@ fieldset[disabled] .btn-default.focus {
   background-color: #fff;
 }
 
+.request-item {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
 .dataset-item:last-of-type {
   border-bottom:  1px solid #ccc;
   margin-bottom: 0;
@@ -322,6 +328,10 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
+}
+
+.request-row{
+  padding: 10px 10px 0px 10px;
 }
 
 .datasets-date {
