@@ -16,6 +16,14 @@ dcpr_blueprint = Blueprint(
 @dcpr_blueprint.route("/")
 def dcpr_home():
     logger.debug("Inside the dcpr_home view")
+    existing_requests = toolkit.get_action("dcpr_request_list")(data_dict={})
+
+    return toolkit.render("dcpr/index.html", extra_vars={"requests": existing_requests})
+
+
+@dcpr_blueprint.route("/search")
+def dcpr_search():
+    logger.debug("Inside the dcpr_search view")
     extra_vars = {}
 
     extra_vars[u"q"] = q = toolkit.request.args.get(u"q", u"")
