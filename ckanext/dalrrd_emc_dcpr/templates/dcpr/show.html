@@ -1,0 +1,32 @@
+{% extends "dcpr/show_base.html" %}
+
+{% block primary_content_inner %}
+  {{ super() }}
+  {% block package_description %}
+    {% if dcpr_request.private %}
+      <span class="request-private badge badge-inverse pull-right">
+        <i class="fa fa-lock"></i>
+        {{ _('Private') }}
+      </span>
+    {% endif %}
+    <h1>
+      {% block page_heading %}
+        {{ _("Request by %s").format(dcpr_request.organization_name) }}
+      {% endblock %}
+    </h1>
+    {% block edit_link %}
+       <div class="col-md-12">
+         <div>
+          <a class="btn pull-right" href="{{ h.url_for('%s.dcpr_request_edit' % dcpr_request.type, request_id=dcpr_request.csi_reference_id) }}">
+           {{ _('Edit Request') }}
+          </a>
+         </div>
+      </div>
+    {% endblock %}
+  {% endblock %}
+
+  {% block package_additional_info %}
+      {% snippet 'dcpr/snippets/request_info.html', dcpr_request=dcpr_request %}
+  {% endblock %}
+
+{% endblock %}
