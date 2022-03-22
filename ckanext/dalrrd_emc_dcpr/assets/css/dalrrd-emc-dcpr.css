@@ -111,7 +111,7 @@ a {
  }
 
 .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
-  color: #555;
+  color: #295237;
   background-color: transparent;
 }
 
@@ -134,8 +134,13 @@ body {
 
 .btn-primary:hover {
   color: #fff;
-  background-color: #3A744E;
-  border-color: #3A744E;
+  background-color: #F3881C;
+  border-color: #F3881C;
+}
+
+.btn-primary {
+  background-color: #ec971f;
+  border-color: #ec971f;
 }
 
 .btn-primary:focus,
@@ -159,20 +164,20 @@ body {
 .btn-default:focus,
 .btn-default.focus {
   color: #fff;
-  background-color: #3A744E;
-  border-color: #3A744E;
+  background-color: #295237;
+  border-color: #295237;
 }
 .btn-default:hover {
   color: #fff;
-  background-color: #3A744E;
-  border-color: #3A744E;
+  background-color: #295237;
+  border-color: #295237;
 }
 .btn-default:active,
 .btn-default.active,
 .open > .dropdown-toggle.btn-default {
   color: #fff;
-  background-color: #3A744E;
-  border-color: #3A744E;
+  background-color: #295237;
+  border-color: #295237;
 }
 .btn-default:active:hover,
 .btn-default.active:hover,
@@ -184,8 +189,8 @@ body {
 .btn-default.active.focus,
 .open > .dropdown-toggle.btn-default.focus {
   color: #fff;
-  background-color: #3A744E;
-  border-color: #3A744E;
+  background-color: #295237;
+  border-color: #295237;
 }
 .btn-default.disabled:hover,
 .btn-default[disabled]:hover,
@@ -341,6 +346,11 @@ fieldset[disabled] .btn-default.focus {
   text-decoration: none;
 }
 
+.dataset-heading > a:hover, .dataset-heading > a:focus {
+  color: #295237;
+  background-color: transparent;
+}
+
 /* End of datasets*/
 
 /* Filters */
@@ -396,16 +406,18 @@ fieldset[disabled] .btn-default.focus {
   border-radius: 10px;
 }
 
-.nav-facet .nav-item > a:hover {
-  background-color: transparent;
-}
-
 
 /* Landing page */
 .btn-warning {
-  background-color: #F3881C;
+  background-color: #ec971f;
 }
 
+.btn-warning:focus,
+.btn-warning.focus {
+  color: #fff;
+  background-color: #F3881C;
+  border-color: #F3881C;
+}
 .btn-warning:hover {
   color: #fff;
   background-color: #F3881C;
@@ -513,3 +525,14 @@ header.masthead {
 }
 
 /* End Pagination */
+
+
+.js .image-upload .btn.hover {
+  color: #fff;
+  text-decoration: none;
+  background-color: #21412c;
+  background-position: 0 -15px;
+  -webkit-transition: background-position 0.1s linear;
+  -o-transition: background-position 0.1s linear;
+  transition: background-position 0.1s linear;
+}
