@@ -47,7 +47,9 @@ def dcpr_search():
         logger.info("Request search query rejected: %r", error.args)
         toolkit.base.abort(
             400,
-            "Invalid search query: {error_message}".format(error_message=str(error)),
+            toolkit._("Invalid search query: {error_message}").format(
+                error_message=str(error)
+            ),
         )
     except SearchError as error:
         # May be bad input from the user, but may also be more serious like
@@ -58,3 +60,33 @@ def dcpr_search():
         extra_vars["page"] = h.Page(collection=[])
 
     return toolkit.render("dcpr/index.html", extra_vars=extra_vars)
+
+
+@dcpr_blueprint.route("/request/<request_id>")
+def dcpr_request_show(request_id):
+    logger.debug("Inside the dcpr_request_show view")
+    data_dict = {"id": request_id}
+    extra_vars = {}
+
+    try:
+        dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
+        extra_vars["dcpr_request"] = dcpr_request
+    except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+        return toolkit.base.abort(404, toolkit._("Request not found"))
+
+    return toolkit.render("dcpr/show.html", extra_vars=extra_vars)
+
+
+@dcpr_blueprint.route("/request/<request_id>/edit")
+def dcpr_request_edit(request_id):
+    logger.debug("Inside the dcpr_request_edit view")
+    data_dict = {"id": request_id}
+    extra_vars = {}
+
+    try:
+        dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
+        extra_vars["dcpr_request"] = dcpr_request
+    except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+        return toolkit.base.abort(404, toolkit._("Request not found"))
+
+    return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)

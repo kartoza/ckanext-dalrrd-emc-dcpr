@@ -3,6 +3,7 @@ import typing
 
 import ckan.plugins.toolkit as toolkit
 from ckan.lib import search
+import ckan.lib.dictization as d
 
 from sqlalchemy import sql, select, exc
 
@@ -239,24 +240,19 @@ def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
     logger.debug(f"access_result: {access_result}")
     user = context["auth_user_obj"]
     model = context["model"]
-    request_table = dcpr_request.dcpr_request_table
+
     q = model.Session.query(dcpr_request.DCPRRequest)
-    query = sql.select([request_table.c.csi_reference_id])
+
     if user is None:  # show only  moderated requests
         pass
     elif user.sysadmin:  # show all requests
         pass
     else:  # show relevant requests depending on the user's organization
         pass
-    query = query.order_by(request_table.c.csi_reference_id)
+
     limit = data_dict.get("limit", 10)
-    offset = data_dict.get("offset", 10)
-    # query = query.limit(limit).offset(offset)
-    logger.debug("Query")
-    logger.debug(q)
-    dcpr_requests = q.all()
-    logger.debug("requests")
-    logger.debug(dcpr_requests)
+    offset = data_dict.get("offset", 0)
+    dcpr_requests = q.limit(limit).offset(offset).all()
 
     return dcpr_requests
 
@@ -297,3 +293,20 @@ def dcpr_request_search(context: typing.Dict, data_dict: typing.Dict) -> typing.
         pass
 
     return search_results
+
+
+@toolkit.side_effect_free
+def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
+
+    request_id = toolkit.get_or_bust(data_dict, "id")
+
+    request_object = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
+
+    if not request_object:
+        raise toolkit.ObjectNotFound
+
+    toolkit.check_access("dcpr_request_show_auth", context, data_dict)
+
+    request_dict = d.table_dictize(request_object, context)
+
+    return request_dict

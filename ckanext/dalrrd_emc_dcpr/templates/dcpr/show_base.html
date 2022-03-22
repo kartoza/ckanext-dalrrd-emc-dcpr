@@ -1,0 +1,40 @@
+{% extends "dcpr/base.html" %}
+
+{% block title %} {{ dcpr_request.organization_name }} - {{ super() }}{% endblock %}
+
+{% block head_extras -%}
+  {{ super() }}
+  {% set description = h.markdown_extract(dcpr_request.notes, extract_length=200)|forceescape %}
+  <meta property="og:title" content="{{ dcpr_request.proposed_project_name  }} - {{ g.site_title }}">
+  <meta property="og:description" content="{{ description|forceescape|trim }}">
+{% endblock -%}
+
+{% block content_action %}
+{% endblock %}
+
+{% block content_primary_nav %}
+
+{% endblock %}
+
+
+{% block secondary_content %}
+
+{% block secondary_help_content %}{% endblock %}
+
+  {% block package_info %}
+    {% if dcpr_request %}
+      <section class="module module-narrow">
+        <div class="module context-info">
+          <div class="module-content">
+            {% block package_info_inner %}
+              {% block heading %}
+                <h1 class="heading">{{ _("Request Menu") }}</h1>
+              {% endblock %}
+            {% endblock %}
+          </div>
+        </div>
+      </section>
+    {% endif %}
+  {% endblock %}
+
+{% endblock %}

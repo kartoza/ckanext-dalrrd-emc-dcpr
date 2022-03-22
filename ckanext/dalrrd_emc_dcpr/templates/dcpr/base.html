@@ -1,0 +1,10 @@
+{% extends "page.html" %}
+
+{% set dcpr_request_type = dcpr_request_type or dcpr_request.type or 'dcpr_request' %}
+
+{% block breadcrumb_content_selected %} class="active"{% endblock %}
+
+{% block subtitle %}{{ dcpr_request_type.title() }}{% endblock %}
+
+{% block breadcrumb_content %}
+{% endblock %}

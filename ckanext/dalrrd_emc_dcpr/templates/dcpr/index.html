@@ -7,22 +7,33 @@
 {% endblock %}
 
 {% block breadcrumb_content %}
-  {{ _('DCPR Requests') }}
-{% endblock %}
+
+    <ol class="breadcrumb">
+    <!-- Snippet snippets/home_breadcrumb_item.html end -->
+        <div class="page-header">
+            <h1>{{ _('DCPR Requests') }}</h1>
+        </div>
+    </ol>
+
+<!-- Snippet snippets/search_form.html start -->
+    {% endblock %}
 
 {% block primary_content_inner %}
 {% block requests_list %}
-  {% if requests %}
     <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
     	{% block requests %}
 	      {% for request in requests %}
 	        {% snippet 'dcpr/snippets/request_item.html', request=request %}
-	      {% endfor %}
+	      {% else %}
+            <div>
+                <h5> {{ _('No found requests') }}</h5>
+            </div>
+          {% endfor %}
 	    {% endblock %}
     </ul>
     </div>
-  {% endif %}
 {% endblock %}
+
 
 {% endblock%}
 
