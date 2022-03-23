@@ -1,9 +1,11 @@
 import logging
 
-from flask import Blueprint
+from flask import Blueprint, redirect, request
 from ckan.plugins import toolkit
 from ckan.lib.search import SearchError, SearchQueryError
 import ckan.lib.helpers as h
+from ckan.logic import clean_dict, parse_params, tuplize_dict
+import ckan.lib.navl.dictization_functions as dict_fns
 
 
 logger = logging.getLogger(__name__)
@@ -77,16 +79,68 @@ def dcpr_request_show(request_id):
     return toolkit.render("dcpr/show.html", extra_vars=extra_vars)
 
 
-@dcpr_blueprint.route("/request/<request_id>/edit")
-def dcpr_request_edit(request_id):
+@dcpr_blueprint.route("/request/edit/<request_id>", methods=["GET", "POST"])
+def dcpr_request_edit(request_id, errors=None, error_summary=None):
     logger.debug("Inside the dcpr_request_edit view")
     data_dict = {"id": request_id}
     extra_vars = {}
 
-    try:
-        dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
-        extra_vars["dcpr_request"] = dcpr_request
-    except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
-        return toolkit.base.abort(404, toolkit._("Request not found"))
+    context = {
+        u"user": toolkit.g.user,
+        u"auth_user_obj": toolkit.g.userobj,
+    }
 
-    return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
+    if request.method == "GET":
+        try:
+            dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
+            extra_vars["dcpr_request"] = dcpr_request
+            extra_vars["errors"] = errors
+            extra_vars["error_summary"] = error_summary
+        except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+            return toolkit.base.abort(404, toolkit._("Request not found"))
+
+        try:
+            toolkit.check_access("dcpr_request_update_auth", context)
+        except toolkit.NotAuthorized:
+            return toolkit.base.abort(
+                403,
+                toolkit._(u"User %r not authorized to edit DCPR requests")
+                % (toolkit.g.user),
+            )
+
+        return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
+
+    else:
+        try:
+            data_dict = clean_dict(
+                dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+            )
+        except dict_fns.DataError:
+            return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
+        try:
+            dcpr_request = toolkit.get_action("dcpr_request_update")(context, data_dict)
+
+            url = toolkit.h.url_for(
+                "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+            )
+            return toolkit.h.redirect_to(url)
+
+        except toolkit.NotAuthorized:
+            return toolkit.base.abort(
+                403,
+                toolkit._(u"Unauthorized to read DCcsi_reference_idPR request %s")
+                % request_id,
+            )
+        except toolkit.NotFound as e:
+            return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
+        except toolkit.ValidationError as e:
+            errors = e.error_dict
+            error_summary = e.error_summary
+            return dcpr_request_edit(
+                dcpr_request.type, dcpr_request.csi_reference_id, errors, error_summary
+            )
+
+        url = toolkit.h.url_for(
+            "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+        )
+        return toolkit.h.redirect_to(url)

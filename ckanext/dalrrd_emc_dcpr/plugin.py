@@ -229,6 +229,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
             "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
             "dcpr_request_show_auth": dcpr_auth.dcpr_request_show_auth,
+            "dcpr_request_update_auth": dcpr_auth.dcpr_request_update_auth,
             "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
             "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
             "ckanext_pages_show": ckanext_pages_auth.authorize_show_page,
