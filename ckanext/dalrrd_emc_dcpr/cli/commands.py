@@ -16,12 +16,12 @@ import alembic.command
 import alembic.config
 import alembic.util.exc
 import click
-
 import ckan
 import ckan.plugins as p
 from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
+from lxml import etree
 
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
     DCPRRequest,
@@ -1174,3 +1174,18 @@ def test_background_job(job_name, job_arg, job_kwarg):
         click.secho("Done!", fg=_SUCCESS_COLOR)
     else:
         click.secho(f"Job function {job_name!r} does not exist", fg=_ERROR_COLOR)
+
+
+@extra_commands.command()
+@click.option("--url", help="Legacy SASDI CSW endpoint")
+@click.option("--page-size", type=int, default=20)
+@click.option(
+    "--output-dir",
+    type=click.types.Path(),
+    default=Path.home() / "legacy_sasdi_downloader/downloaded",
+)
+@click.option("--max-workers", type=int, default=5)
+def download_legacy_sasdi_records(
+    url: str, page_size: int, output_dir: Path, max_workers
+):
+    xml_parser = etree.XMLParser(resolve_entities=False)
