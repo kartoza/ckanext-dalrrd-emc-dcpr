@@ -1,0 +1,24 @@
+{% import 'macros/form.html' as form %}
+{% set action = g.form_action or '' %}
+
+<form id="request-edit" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
+  <input type="hidden" name="_ckan_phase" value="dataset_new_1" />
+  {# pkg_name used in 3 stage edit #}
+  <input type="hidden" name="request_id" value="{{ dcpr_request.id }}" />
+  {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
+
+  {% block fields %}
+    {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors %}
+  {% endblock %}
+
+  {% block form_actions %}
+    <div class="form-actions">
+      {% block delete_button %}
+      {% endblock %}
+      {% block save_button %}
+        <button class="btn btn-primary" type="submit" name="save">{% block save_button_text %}{{ _('Save') }}{% endblock %}</button>
+      {% endblock %}
+      {{ form.required_message() }}
+    </div>
+  {% endblock %}
+</form>

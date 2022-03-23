@@ -42,3 +42,10 @@ def dcpr_request_show_auth(
 ) -> typing.Dict:
     logger.debug("Inside the dcpr_request_show auth")
     return {"success": True}
+
+
+def dcpr_request_update_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    logger.debug("Inside the dcpr_request_show auth")
+    return {"success": True}
