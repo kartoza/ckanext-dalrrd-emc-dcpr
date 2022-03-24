@@ -1,4 +1,4 @@
-{% extends "dcpr/base.html" %}
+{% extends "page.html" %}
 
 {% block title %} {{ dcpr_request.organization_name }} - {{ super() }}{% endblock %}
 
@@ -9,24 +9,15 @@
   <meta property="og:description" content="{{ description|forceescape|trim }}">
 {% endblock -%}
 
-{% block content_action %}
-{% endblock %}
-
-{% block content_primary_nav %}
-
-{% endblock %}
-
-
 {% block secondary_content %}
-
-{% block secondary_help_content %}{% endblock %}
 
   {% block request_info %}
     <section class="module module-narrow module-shallow">
       <div class="panel panel-default">
           <div class="panel-heading">
-              <i class="fa fa-info-circle"></i>
-                  <h4> {{ _('DCPR Request Info') }}
+                  <h4>
+                      <i class="fa fa-info-circle"></i>
+                      {{ _('DCPR Request Info') }}
                   </h4>
           </div>
           <div class="panel-body">
@@ -34,6 +25,13 @@
                   DCPR Requests are requests for data submitted by users that need the
                   requested data in the EMC system.
               </p>
+          </div>
+          <div class="panel-body">
+              <div class="pull-left">
+                  <a class="btn btn-primary" href="{{ h.url_for('%s.dcpr_request_new' % dcpr) }}">
+                   {{ _('Submit Request') }}
+                  </a>
+              </div>
           </div>
       </div>
     </section>
