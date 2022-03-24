@@ -7,8 +7,19 @@
                 </h5>
         </div>
         <div class="panel-body">
-                {{ _('DCPR Request(s) shown in this page: %d' % requests_count) }}
-        </div>
+              <p>
+                  DCPR Requests are requests for data submitted by users that need the
+                  requested data in the EMC system.
+              </p>
+          </div>
+         <div class="panel-body">
+              <div class="pull-left">
+                  <a class="btn btn-primary" href="{{ h.url_for('%s.dcpr_request_new' % dcpr) }}">
+           {{ _('Submit Request') }}
+          </a>
+              </div>
+          </div>
+
     </div>
 </section>
 

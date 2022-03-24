@@ -21,20 +21,22 @@
 
 {% block secondary_help_content %}{% endblock %}
 
-  {% block package_info %}
-    {% if dcpr_request %}
-      <section class="module module-narrow">
-        <div class="module context-info">
-          <div class="module-content">
-            {% block package_info_inner %}
-              {% block heading %}
-                <h1 class="heading">{{ _("Request Menu") }}</h1>
-              {% endblock %}
-            {% endblock %}
+  {% block request_info %}
+    <section class="module module-narrow module-shallow">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <i class="fa fa-info-circle"></i>
+                  <h4> {{ _('DCPR Request Info') }}
+                  </h4>
           </div>
-        </div>
-      </section>
-    {% endif %}
+          <div class="panel-body">
+              <p>
+                  DCPR Requests are requests for data submitted by users that need the
+                  requested data in the EMC system.
+              </p>
+          </div>
+      </div>
+    </section>
   {% endblock %}
 
 {% endblock %}

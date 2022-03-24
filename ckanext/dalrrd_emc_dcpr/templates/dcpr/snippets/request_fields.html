@@ -43,8 +43,3 @@
 {% endblock %}
 
 {% block package_basic_fields_custom %}{% endblock %}
-
-{% block package_basic_fields_description %}
-  {{ form.markdown('additional_project_context', id='field-additional_project_context', label=_('Description'), placeholder=_('eg. Some useful notes about the data'), value=dcpr_request.additional_project_context, error=errors.additional_project_context) }}
-{% endblock %}
-

@@ -23,6 +23,59 @@ def dcpr_home():
     return toolkit.render("dcpr/index.html", extra_vars={"requests": existing_requests})
 
 
+@dcpr_blueprint.route("/request/new", methods=["GET", "POST"])
+def dcpr_request_new():
+    logger.debug("Inside the dcpr_new_request view")
+    context = {
+        u"user": toolkit.g.user,
+        u"auth_user_obj": toolkit.g.userobj,
+    }
+    if request.method == "POST":
+        try:
+            data_dict = clean_dict(
+                dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+            )
+        except dict_fns.DataError:
+            return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
+        try:
+            dcpr_request = toolkit.get_action("dcpr_request_create")(context, data_dict)
+
+            url = toolkit.h.url_for(
+                "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+            )
+            return toolkit.h.redirect_to(url)
+
+        except toolkit.NotAuthorized:
+            return toolkit.base.abort(
+                403, toolkit._(u"Unauthorized to create DCPR request")
+            )
+        except toolkit.NotFound as e:
+            return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
+        except toolkit.ValidationError as e:
+            errors = e.error_dict
+            error_summary = e.error_summary
+            return dcpr_request_edit(
+                dcpr_request.type, dcpr_request.csi_reference_id, errors, error_summary
+            )
+
+        url = toolkit.h.url_for(
+            "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+        )
+        return toolkit.h.redirect_to(url)
+
+    else:
+        try:
+            toolkit.check_access("dcpr_request_create_auth", context)
+        except toolkit.NotAuthorized:
+            return toolkit.base.abort(
+                403,
+                toolkit._(u"User %r not authorized to create DCPR requests")
+                % (toolkit.g.user),
+            )
+
+        return toolkit.render("dcpr/new.html", extra_vars={"dcpr_request": None})
+
+
 @dcpr_blueprint.route("/search")
 def dcpr_search():
     logger.debug("Inside the dcpr_search view")
@@ -128,8 +181,7 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
                 403,
-                toolkit._(u"Unauthorized to read DCcsi_reference_idPR request %s")
-                % request_id,
+                toolkit._(u"Unauthorized to read DCPR request %s") % request_id,
             )
         except toolkit.NotFound as e:
             return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
