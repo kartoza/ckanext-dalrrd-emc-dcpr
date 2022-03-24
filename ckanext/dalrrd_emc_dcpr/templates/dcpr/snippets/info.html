@@ -1,4 +1,4 @@
-{% set requests_count = requests | length %}
+{% set requests_count = dcpr_requests | length %}
 {% block heading %}
 <section class="module module-narrow module-shallow">
     <div class="panel panel-default">
@@ -15,8 +15,8 @@
          <div class="panel-body">
               <div class="pull-left">
                   <a class="btn btn-primary" href="{{ h.url_for('%s.dcpr_request_new' % dcpr) }}">
-           {{ _('Submit Request') }}
-          </a>
+                   {{ _('Submit Request') }}
+                  </a>
               </div>
           </div>
 

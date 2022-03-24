@@ -1,7 +1,7 @@
-{% set request_id = request.csi_reference_id %}
-{% set organization_name = request.organization_name %}
-{% set status = request.status %}
-{% set request_date = request.request_date %}
+{% set request_id = dcpr_request.csi_reference_id %}
+{% set organization_name = dcpr_request.organization_name %}
+{% set status = dcpr_request.status %}
+{% set request_date = dcpr_request.request_date %}
 
 
 {% block request_item %}
@@ -28,7 +28,7 @@
       </div>
     {% endblock %}
       <div>
-        <a class="btn pull-right" href="{{ h.url_for('%s.dcpr_request_show' % request.type, request_id=request_id) }}">
+        <a class="btn pull-right" href="{{ h.url_for('%s.dcpr_request_show' % dcpr_request.type, request_id=request_id) }}">
          {{ _('View Request') }}
         </a>
       </div>

@@ -3,7 +3,7 @@
 
  {% if dcpr_request %}
   <form id="request-new" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
- {% else %}}
+ {% else %}
   <form id="request-edit" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
  {% endif %}
   <input type="hidden" name="_ckan_phase" value="request_new_1" />

@@ -20,7 +20,9 @@ def dcpr_home():
     logger.debug("Inside the dcpr_home view")
     existing_requests = toolkit.get_action("dcpr_request_list")(data_dict={})
 
-    return toolkit.render("dcpr/index.html", extra_vars={"requests": existing_requests})
+    return toolkit.render(
+        "dcpr/index.html", extra_vars={"dcpr_requests": existing_requests}
+    )
 
 
 @dcpr_blueprint.route("/request/new", methods=["GET", "POST"])

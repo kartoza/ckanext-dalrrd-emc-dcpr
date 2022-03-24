@@ -9,21 +9,18 @@
 {% block breadcrumb_content %}
 
     <ol class="breadcrumb">
-    <!-- Snippet snippets/home_breadcrumb_item.html end -->
         <div class="page-header">
             <h1>{{ _('DCPR Requests') }}</h1>
         </div>
     </ol>
-
-<!-- Snippet snippets/search_form.html start -->
     {% endblock %}
 
 {% block primary_content_inner %}
 {% block requests_list %}
     <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
-    	{% block requests %}
-	      {% for request in requests %}
-	        {% snippet 'dcpr/snippets/request_item.html', request=request %}
+    	{% block dcpr_requests %}
+	      {% for request in dcpr_requests %}
+	        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request %}
 	      {% else %}
             <div>
                 <h5> {{ _('No found requests') }}</h5>
@@ -33,9 +30,8 @@
     </ul>
     </div>
 {% endblock %}
-
 {% endblock%}
 
 {% block secondary_content %}
-{% snippet 'dcpr/snippets/info.html', requests=requests %}
+{% snippet 'dcpr/snippets/info.html', dcpr_requests=dcpr_requests %}
 {% endblock%}
