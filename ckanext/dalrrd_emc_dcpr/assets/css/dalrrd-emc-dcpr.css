@@ -64,6 +64,11 @@
   background: none;
 }
 
+.row {
+  margin-right: -15px;
+  margin-left: 0;
+}
+
 a {
   color: #3A744E;
   text-decoration: none;
@@ -535,4 +540,24 @@ header.masthead {
   -webkit-transition: background-position 0.1s linear;
   -o-transition: background-position 0.1s linear;
   transition: background-position 0.1s linear;
+}
+
+.dataset-private {
+  margin-right: 0;
+  margin-left: 10px;
+  text-transform: uppercase;
+}
+
+.page-header.module-content {
+  padding-top: 15px;
+  padding-bottom: 30px;
+}
+
+.page-header .content_action {
+  float: right;
+  margin-top: 3px;
+}
+
+.page-list-item > .span11 {
+  margin: 8px;
 }
