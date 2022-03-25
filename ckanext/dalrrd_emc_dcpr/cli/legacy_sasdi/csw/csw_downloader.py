@@ -2,6 +2,7 @@ import concurrent.futures
 import dataclasses
 import datetime as dt
 import enum
+import json
 import logging
 import typing
 from functools import partial
@@ -10,7 +11,9 @@ from pathlib import Path
 import httpx
 from lxml import etree
 
-from ..utils import get_jinja_env
+from ckanext.dalrrd_emc_dcpr.constants import ISO_TOPIC_CATEGORIES
+from ckanext.dalrrd_emc_dcpr.cli import _CkanEmcDataset, _CkanResource, utils
+from ckanext.dalrrd_emc_dcpr.cli.legacy_sasdi import import_mappings
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +70,69 @@ class CswRecord:
     create_date: typing.Optional[dt.date]
     change_date: typing.Optional[dt.date]
     subjects: typing.List[str]
+
+    def mapped_owner_org(self) -> typing.Optional[str]:
+        result = None
+        for name, aliases in import_mappings.CUSTODIAN_MAP.items():
+            for alias in aliases:
+                if alias.lower() in self.custodian.lower():
+                    result = name
+                    break
+            if result is not None:
+                break
+        return result
+
+    def to_data_dict(self, owner_user: str) -> typing.Dict:
+        return self._to_ckan_dataset(
+            owner_user, owner_org=self.mapped_owner_org() or "ingestion_org"
+        ).to_data_dict()
+
+    def _to_ckan_dataset(self, owner_user: str, owner_org: str) -> _CkanEmcDataset:
+        min_lon, min_lat, max_lon, max_lat = self.bbox.split()
+        bbox = {
+            "type": "Polygon",
+            "coordinates": [
+                [min_lon, min_lat],
+                [max_lon, min_lat],
+                [max_lon, max_lat],
+                [min_lon, max_lat],
+                [min_lon, min_lat],
+            ],
+        }
+        resources = []
+        if self.link is not None:
+            resources.append(
+                _CkanResource(
+                    url=self.link,
+                    format="dummy",
+                    format_version="0",
+                )
+            )
+        return _CkanEmcDataset(
+            name=self.title,
+            private=True,
+            notes=self.abstract,
+            reference_date="2022-01-01",
+            iso_topic_category=ISO_TOPIC_CATEGORIES[0][0],
+            owner_org=owner_org,
+            maintainer=owner_user,
+            resources=resources,
+            spatial=json.dumps(bbox),
+            equivalent_scale="0",  # absurd value, to be corrected manually
+            spatial_representation_type="001",  # dummy value, to be corrected manually
+            spatial_reference_system="EPSG:4326",
+            dataset_language="en",
+            metadata_language="en",
+            dataset_character_set="utf-8",
+            maintainer_email=None,
+            type="dataset",
+            sasdi_theme=None,
+            tags=[
+                {"name": k, "vocabulary_id": None}
+                for k in self.keywords + self.subjects
+            ],
+            source=self.source,
+        )
 
 
 def find_total_records(
@@ -143,17 +209,6 @@ def save_records(
     return result
 
 
-def parse_records(
-    target_dir: Path, namespaces: typing.Dict[str, str], *, xml_parser: etree.XMLParser
-) -> typing.Dict[str, CswRecord]:
-    result = {}
-    for path in target_dir.iterdir():
-        if path.is_file():
-            id_ = path.stem
-            result[id_] = parse_record(path, namespaces, xml_parser=xml_parser)
-    return result
-
-
 def parse_record(
     target_path: Path,
     namespaces: typing.Dict[str, str],
@@ -181,6 +236,14 @@ def parse_record(
         change_date=_retriever("dc:changedate"),
         subjects=_retriever("dc:subject", is_multiple=True),
     )
+
+
+def import_record(record: CswRecord, user_name: str):
+    """Import a parsed record into the CKAN database"""
+    owner_user = None
+    owner_org = None
+    # data_dict = record.to_ckan_dataset(owner_user, owner_org).to_data_dict()
+    # utils.create_single_dataset()
 
 
 def retrieve_record_thumbnails(
@@ -347,7 +410,7 @@ def _perform_get_records(
     client: httpx.Client,
     xml_parser: etree.XMLParser,
 ) -> etree.Element:
-    jinja_env = get_jinja_env()
+    jinja_env = utils.get_jinja_env()
     template = jinja_env.get_template("legacy_sasdi_downloader/get_records.xml")
     request_body = template.render(**render_context)
     logger.debug(f"{request_body}")

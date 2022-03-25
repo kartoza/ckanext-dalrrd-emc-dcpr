@@ -1,7 +1,6 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
 import datetime as dt
-import enum
 import inspect
 import json
 import logging
@@ -38,7 +37,8 @@ from ..constants import (
 )
 from ..email_notifications import get_and_send_notifications_for_all_users
 
-from . import _legacy_sasdi_downloader
+from . import utils
+from .legacy_sasdi.csw import csw_downloader
 from ._bootstrap_data import PORTAL_PAGES, SASDI_ORGANIZATIONS
 from ._sample_datasets import (
     SAMPLE_DATASET_TAG,
@@ -64,11 +64,6 @@ _DEFAULT_LEGACY_SASDI_THUMBNAIL_DIR = (
     Path.home() / "data/storage/legacy_sasdi_downloader/thumbnails"
 )
 _DEFAULT_MAX_WORKERS = 5
-
-
-class DatasetCreationResult(enum.Enum):
-    CREATED = "created"
-    NOT_CREATED_ALREADY_EXISTS = "already_exists"
 
 
 @click.group()
@@ -926,7 +921,7 @@ def create_sample_datasets(
     with futures.ThreadPoolExecutor(workers) as executor:
         to_do = []
         for dataset in ready_to_create_datasets:
-            future = executor.submit(_create_single_dataset, user, dataset)
+            future = executor.submit(utils.create_single_dataset, user, dataset)
             to_do.append(future)
         num_created = 0
         num_already_exist = 0
@@ -934,9 +929,9 @@ def create_sample_datasets(
         for done_future in futures.as_completed(to_do):
             try:
                 result = done_future.result()
-                if result == DatasetCreationResult.CREATED:
+                if result == utils.DatasetCreationResult.CREATED:
                     num_created += 1
-                elif result == DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS:
+                elif result == utils.DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS:
                     num_already_exist += 1
             except dictization_functions.DataError as exc:
                 click.secho(f"Could not create dataset: {exc=}", fg=_ERROR_COLOR)
@@ -949,27 +944,6 @@ def create_sample_datasets(
     click.secho(f"Skipped {num_already_exist} datasets", fg=_INFO_COLOR)
     click.secho(f"Failed to create {num_failed} datasets", fg=_INFO_COLOR)
     click.secho("Done!", fg=_SUCCESS_COLOR)
-
-
-def _create_single_dataset(
-    user: typing.Dict, dataset: typing.Dict
-) -> DatasetCreationResult:
-    create_dataset_action = toolkit.get_action("package_create")
-    get_dataset_action = toolkit.get_action("package_show")
-    try:
-        get_dataset_action(
-            context={"user": user["name"]}, data_dict={"id": dataset["name"]}
-        )
-    except toolkit.ObjectNotFound:
-        package_exists = False
-    else:
-        package_exists = True
-    if not package_exists:
-        create_dataset_action(context={"user": user["name"]}, data_dict=dataset)
-        result = DatasetCreationResult.CREATED
-    else:
-        result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
-    return result
 
 
 # TODO: speed this up by doing concurrent processing, similar to create_sample_datasets
@@ -1190,164 +1164,3 @@ def test_background_job(job_name, job_arg, job_kwarg):
         click.secho("Done!", fg=_SUCCESS_COLOR)
     else:
         click.secho(f"Job function {job_name!r} does not exist", fg=_ERROR_COLOR)
-
-
-@legacy_sasdi.command()
-@click.option(
-    "--url",
-    default="http://app01.saeon.ac.za/PLATFORM_TEST/MAP/csw.asp",
-    show_default=True,
-    help="Legacy SASDI CSW endpoint",
-)
-@click.option("--page-size", type=int, default=20, show_default=True)
-@click.option(
-    "--output-dir",
-    type=click.types.Path(),
-    default=_DEFAULT_LEGACY_SASDI_RECORD_DIR,
-    show_default=True,
-)
-@click.option(
-    "--max-workers", type=int, default=_DEFAULT_MAX_WORKERS, show_default=True
-)
-def download_records(url: str, page_size: int, output_dir: Path, max_workers):
-    """download catalogue records from the legacy SASDI
-
-    Uses the legacy SASDI CSW interface to retrieve existing catalogue records with
-    the csw:Record typename.
-
-    """
-
-    with httpx.Client() as client:
-        try:
-            total_records = _legacy_sasdi_downloader.find_total_records(
-                url, client=client, xml_parser=_xml_parser
-            )
-            logger.debug(f"{total_records=}")
-        except httpx.ConnectError:
-            logger.exception(msg=f"Could not connect to {url!r}")
-        except httpx.ReadTimeout:
-            logger.exception(msg=f"Connection timed out {url!r}")
-        else:
-            total = total_records or 0
-            if total > 0:
-                num_pages, remainder = divmod(total, page_size)
-                if remainder > 0:
-                    num_pages += 1
-                logger.debug(f"{num_pages=}")
-                execution_kwargs = []
-                for page in range(num_pages):
-                    kwargs = {
-                        "limit": page_size,
-                        "offset": (page * page_size),
-                        "client": client,
-                        "xml_parser": _xml_parser,
-                    }
-                    execution_kwargs.append(kwargs)
-                workers = min(max_workers, num_pages)
-                errors = _legacy_sasdi_downloader.download_records_threaded_execution(
-                    url, execution_kwargs, workers, output_dir
-                )
-                if len(errors) > 0:
-                    logger.warning(f"{len(errors)} pages failed, retrying...")
-                    final_errors = _legacy_sasdi_downloader.retry_download_errors(
-                        url, errors, max_workers, output_dir
-                    )
-                    if len(final_errors) > 0:
-                        logger.warning(
-                            f"Got {len(final_errors)} final errors, after retrying. "
-                            f"Could not fetch all pages"
-                        )
-            else:
-                logger.warning(
-                    f"Could not find any records on CSW catalogue at {url!r}"
-                )
-
-
-@legacy_sasdi.command()
-@click.option(
-    "--records-dir",
-    type=click.types.Path(),
-    default=_DEFAULT_LEGACY_SASDI_RECORD_DIR,
-    show_default=True,
-)
-@click.option(
-    "--output-dir",
-    type=click.types.Path(),
-    default=_DEFAULT_LEGACY_SASDI_THUMBNAIL_DIR,
-    show_default=True,
-)
-@click.option(
-    "--max-workers", type=int, default=_DEFAULT_MAX_WORKERS, show_default=True
-)
-def retrieve_thumbnails(records_dir: Path, output_dir: Path, max_workers: int):
-    """Retrieve thumbnails for previously downloaded legacy SASDI records"""
-    num_retrieved = 0
-    page_size = 10
-    errors = []
-    with httpx.Client() as client:
-        current_page = []
-        for idx, path in enumerate(records_dir.iterdir()):
-            logger.debug(f"({idx + 1}) Processing path {path!r}...")
-            if path.is_file():
-                record = _legacy_sasdi_downloader.parse_record(
-                    path,
-                    _legacy_sasdi_downloader.CSW_NAMESPACES,
-                    xml_parser=_xml_parser,
-                )
-                current_page.append(record)
-            if len(current_page) == page_size:
-                with futures.ThreadPoolExecutor(max_workers) as executor:
-                    to_do = {}
-                    for record in current_page:
-                        future = executor.submit(
-                            _legacy_sasdi_downloader.retrieve_thumbnail,
-                            record,
-                            output_dir,
-                            client=client,
-                        )
-                        to_do[future] = record
-                    for i, future in enumerate(futures.as_completed(to_do.keys())):
-                        record = to_do[future]
-                        msg_prefix = f"({i + 1}/{len(to_do)}) - "
-                        try:
-                            thumbnail_path = future.result()
-                        except httpx.ReadTimeout:
-                            logger.exception(
-                                f"{msg_prefix}Request timed out for {future}, "
-                                f"skipping..."
-                            )
-                            errors.append(record)
-                        else:
-                            logger.info(f"Gotten {thumbnail_path!r}")
-
-                current_page = []
-
-                thumbnail_path = _legacy_sasdi_downloader.retrieve_thumbnail(
-                    record,
-                    output_dir,
-                    client=client,
-                )
-                if thumbnail_path is not None:
-                    num_retrieved += 1
-        else:
-            # download last ones
-            pass
-    logger.info(f"Retrieved {num_retrieved} thumbnails")
-
-
-@legacy_sasdi.command()
-@click.option(
-    "--records-dir",
-    type=click.types.Path(),
-    default=_DEFAULT_LEGACY_SASDI_RECORD_DIR,
-    show_default=True,
-)
-@click.option(
-    "--thumbnails-dir",
-    type=click.types.Path(),
-    default=_DEFAULT_LEGACY_SASDI_THUMBNAIL_DIR,
-    show_default=True,
-)
-def import_records(records_dir: Path, thumbnails_dir: Path):
-    """Import previously downloaded legacy SASDI records into the EMC"""
-    click.secho("Not implemented yet", fg=_ERROR_COLOR)
