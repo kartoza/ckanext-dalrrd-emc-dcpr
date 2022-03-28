@@ -71,20 +71,9 @@ class CswRecord:
     change_date: typing.Optional[dt.date]
     subjects: typing.List[str]
 
-    def mapped_owner_org(self) -> typing.Optional[str]:
-        result = None
-        for name, aliases in import_mappings.CUSTODIAN_MAP.items():
-            for alias in aliases:
-                if alias.lower() in self.custodian.lower():
-                    result = name
-                    break
-            if result is not None:
-                break
-        return result
-
     def to_data_dict(self, owner_user: str) -> typing.Dict:
         return self._to_ckan_dataset(
-            owner_user, owner_org=self.mapped_owner_org() or "ingestion_org"
+            owner_user, owner_org=import_mappings.get_owner_org(self.custodian.lower())
         ).to_data_dict()
 
     def _to_ckan_dataset(self, owner_user: str, owner_org: str) -> _CkanEmcDataset:
