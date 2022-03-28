@@ -119,6 +119,7 @@ pytest-raises = "^0.11"
 mypy = "^0.931"
 types-setuptools = "^57.4.9"
 types-python-dateutil = "^2.8.9"
+types-python-slugify = "^5.0.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -43,11 +43,50 @@ def create_single_dataset(
     return result
 
 
-def maybe_create_organization(org_id: str) -> typing.Tuple[typing.Dict, bool]:
+def create_org_user(
+    user_id: str,
+    user_password: str,
+    *,
+    organization_memberships: typing.List[typing.Dict[str, str]],
+    user_email: typing.Optional[str] = None,
+) -> typing.Dict:
+    creator = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    user_details = toolkit.get_action("user_create")(
+        context={
+            "user": creator["name"],
+        },
+        data_dict={
+            "name": user_id,
+            "email": user_email or f"{user_id}@dummy.mail",
+            "password": user_password,
+        },
+    )
+    for membership in organization_memberships:
+        org_details = toolkit.get_action("organization_show")(
+            data_dict={"id": membership["org_id"]}
+        )
+        member_details = toolkit.get_action("organization_member_create")(
+            context={
+                "user": creator["name"],
+            },
+            data_dict={
+                "id": org_details.name,
+                "username": user_id,
+                "role": membership["role"],
+            },
+        )
+    return user_details
+
+
+def maybe_create_organization(
+    name: str,
+    title: typing.Optional[str] = None,
+    description: typing.Optional[str] = None,
+) -> typing.Tuple[typing.Dict, bool]:
     try:
         organization = toolkit.get_action("organization_show")(
-            datadict={
-                "id": org_id,
+            data_dict={
+                "id": name,
                 "include_users": True,
                 "include_datasets": False,
                 "include_dataset_count": False,
@@ -57,18 +96,19 @@ def maybe_create_organization(org_id: str) -> typing.Tuple[typing.Dict, bool]:
             }
         )
         created = False
-    except toolkit.ObjectNotFound:
-        # org does not exist yet, create it
+    except toolkit.ObjectNotFound:  # org does not exist yet, create it
         user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+        data_dict = {
+            "name": name,
+            "title": title,
+            "description": description,
+        }
+        data_dict = {k: v for k, v in data_dict.items() if v is not None}
         organization = toolkit.get_action("organization_create")(
             context={
                 "user": user["name"],
             },
-            data_dict={
-                "name": org_id,
-                "title": org_id,
-                "description": "",
-            },
+            data_dict=data_dict,
         )
         created = True
     return organization, created

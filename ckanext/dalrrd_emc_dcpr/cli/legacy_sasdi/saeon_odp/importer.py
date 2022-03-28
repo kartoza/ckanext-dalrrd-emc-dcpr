@@ -1,15 +1,23 @@
+import datetime as dt
 import json
 import logging
 import typing
 from pathlib import Path
 
 from ckan.plugins import toolkit
+from slugify import slugify
 
 from ....constants import ISO_TOPIC_CATEGORIES
 from ... import _CkanEmcDataset, _CkanResource
 from .. import import_mappings
 
 logger = logging.getLogger(__name__)
+
+
+def import_dataset(dataset: _CkanEmcDataset):
+    # taking into account the dataset's owner_org, get one of the org admins to become
+    # the dataset owner user
+    pass
 
 
 def parse_record(record_path: Path):
@@ -37,23 +45,22 @@ def parse_record(record_path: Path):
     owner_org = import_mappings.get_owner_org(raw_record["publisher"])
     maintainer_obj = _get_maintainer(raw_record)
     return _CkanEmcDataset(
-        name=main_title["title"],
+        name=slugify(main_title["title"]),
+        title=main_title["title"],
         private=True,
         notes=notes,
-        reference_date=[i for i in raw_record["dates"] if i["dateType"] == "Valid"][0][
-            "date"
-        ],
+        reference_date=_get_reference_date(raw_record),
         iso_topic_category=ISO_TOPIC_CATEGORIES[0][0],
-        owner_org=owner_org or "ingestion_org",
+        owner_org=owner_org,
         maintainer=maintainer_obj["name"],
         maintainer_email=None,
         resources=_get_resources(raw_record),
-        spatial=json.dumps(_get_bbox(raw_record)),
+        spatial=",".join(str(i) for i in _get_bbox(raw_record)),
         equivalent_scale="0",
         spatial_representation_type="001",
         spatial_reference_system="EPSG:4326",
-        dataset_language=raw_record.get("language", "en-US"),
-        metadata_language="en-US",
+        dataset_language=raw_record.get("language", "en").partition("-")[0],
+        metadata_language="en",
         dataset_character_set="utf-8",
         type="dataset",
         sasdi_theme=None,
@@ -62,7 +69,17 @@ def parse_record(record_path: Path):
     )
 
 
-def _get_maintainer(raw_record: typing.Dict) -> typing.Dict:
+def _get_reference_date(record: typing.Dict) -> str:
+    for date_ in record["dates"]:
+        result = date_["date"]
+        if date_["dateType"] == "Valid":
+            break
+    else:
+        result = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y-%m-%d")
+    return result
+
+
+def _get_maintainer(record: typing.Dict) -> typing.Dict:
     acceptable_maintainer_roles = [
         "ContactPerson",
         "DataCollector",
@@ -78,7 +95,7 @@ def _get_maintainer(raw_record: typing.Dict) -> typing.Dict:
         "WorkPackageLeader",
     ]
     maintainer = None
-    for contributor in raw_record.get("contributors", []):
+    for contributor in record.get("contributors", []):
         for possible_role in acceptable_maintainer_roles:
             role = contributor.get("contributorType")
             if role == possible_role:
@@ -87,7 +104,7 @@ def _get_maintainer(raw_record: typing.Dict) -> typing.Dict:
         if maintainer is not None:
             break
     else:
-        maintainer = raw_record.get("contributors", [{"name": "dummy"}])[0]
+        maintainer = record.get("contributors", [{"name": "dummy"}])[0]
     return maintainer
 
 
@@ -99,40 +116,67 @@ def _get_bbox(record: typing.Dict) -> typing.Dict:
             min_lat = reported_box["southBoundLatitude"]
             max_lon = reported_box["eastBoundLongitude"]
             max_lat = reported_box["northBoundLatitude"]
-            bbox = {
+            geojson_bbox = {
                 "type": "Polygon",
                 "coordinates": [
-                    [min_lon, min_lat],
-                    [max_lon, min_lat],
-                    [max_lon, max_lat],
-                    [min_lon, max_lat],
-                    [min_lon, min_lat],
+                    [
+                        [min_lon, min_lat],
+                        [max_lon, min_lat],
+                        [max_lon, max_lat],
+                        [min_lon, max_lat],
+                        [min_lon, min_lat],
+                    ],
                 ],
             }
             break
     else:  # did not find any geoLocationBox, lets use a default
-        bbox = toolkit.h["emc_default_bounding_box"]()
-    return bbox
+        geojson_bbox = toolkit.h["emc_default_bounding_box"]()
+    return toolkit.h["emc_convert_geojson_to_bounding_box"](geojson_bbox)
 
 
 def _get_tags(record: typing.Dict) -> typing.List[typing.Dict]:
-    tags = []
+    tags = [
+        {
+            "name": "legacy-sasdi-import",
+            "vocabulary_id": None,
+        }
+    ]
+    custom_separator = "__"
     for subject in record["subjects"]:
-        tags.append({"name": subject["subject"].strip(), "vocabulary_id": None})
-    custom_separator = "**"
-    # add the DOI as a tag
-    doi = record.get("doi")
-    if doi is not None:
-        tags.append({"name": f"doi{custom_separator}{doi}", "vocabulary_id": None})
-    # add any other related identifiers as tags
+        tags.append(
+            {"name": slugify(subject["subject"].strip()), "vocabulary_id": None}
+        )
+    # add any additional file identifiers as extra tags
+    file_identifier = record.get("fileIdentifier")
+    if file_identifier is not None:
+        tags.append(
+            {
+                "name": f"fileIdentifier{custom_separator}{slugify(file_identifier)}",
+                "vocabulary_id": None,
+            }
+        )
+    # add any other identifiers
+    for identifier in record.get("identifiers", []):
+        tags.append(
+            {
+                "name": custom_separator.join(
+                    (
+                        slugify(identifier["identifierType"]),
+                        slugify(identifier["identifier"]),
+                    )
+                ),
+                "vocabulary_id": None,
+            }
+        )
+    # add any other related identifiers
     for related_identifier in record.get("relatedIdentifiers", []):
         tags.append(
             {
                 "name": custom_separator.join(
                     (
-                        related_identifier["relationType"],
-                        related_identifier["relatedIdentifierType"],
-                        related_identifier["relatedIdentifier"],
+                        slugify(related_identifier["relationType"]),
+                        slugify(related_identifier["relatedIdentifierType"]),
+                        slugify(related_identifier["relatedIdentifier"]),
                     )
                 ),
                 "vocabulary_id": None,

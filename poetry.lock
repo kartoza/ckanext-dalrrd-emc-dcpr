@@ -1290,6 +1290,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "types-python-slugify"
+version = "5.0.3"
+description = "Typing stubs for python-slugify"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-setuptools"
 version = "57.4.11"
 description = "Typing stubs for setuptools"
@@ -1414,7 +1422,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "eaef5b475fef5aba7262ff0fb00393f3bc52bff83d7a6acaa99c3cc06765b415"
+content-hash = "57427b21dccf68266746d3f73a0c33cd83a5cb409cd45d6393ff5b625bf884e0"
 
 [metadata.files]
 alembic = [
@@ -2147,6 +2155,10 @@ traitlets = [
 types-python-dateutil = [
     {file = "types-python-dateutil-2.8.10.tar.gz", hash = "sha256:6bcf3aae7242e5793bafd7b2bcfb4e255eb7b2b3144acd0df0e182dce58ccad3"},
     {file = "types_python_dateutil-2.8.10-py3-none-any.whl", hash = "sha256:1f6d2305513d54da353a9dde7ed8a9ef46e8987377291612a0e2b9aac2d2b875"},
+]
+types-python-slugify = [
+    {file = "types-python-slugify-5.0.3.tar.gz", hash = "sha256:76169f4a6d40896fea76fb45a25c50ac7ba2ca03eee759ecac322a05fe4dd21c"},
+    {file = "types_python_slugify-5.0.3-py3-none-any.whl", hash = "sha256:a5761d3c55e949f8ace0694eb5be81210087084bb78df495de14ee5eaad6ac54"},
 ]
 types-setuptools = [
     {file = "types-setuptools-57.4.11.tar.gz", hash = "sha256:262f7406e0c7d705ad6bb4526b5b761fa500bf99eab74de85ac3592187d62935"},

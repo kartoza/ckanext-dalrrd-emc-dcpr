@@ -1,5 +1,7 @@
 import logging
 import typing
+import secrets
+import string
 from concurrent import futures
 from pathlib import Path
 
@@ -9,7 +11,9 @@ from lxml import etree
 
 from .. import utils
 from ..commands import _ERROR_COLOR
+from .import_mappings import CUSTODIAN_MAP
 from .csw import csw_downloader
+from .saeon_odp import importer as saeon_importer
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +34,12 @@ _DEFAULT_MAX_WORKERS = 5
 
 @click.group()
 def legacy_sasdi():
-    """Commands that rely on the CSW interface to the legacy SASDI"""
+    """Commands that deal with import of catalog records from the legacy SASDI"""
+
+
+@legacy_sasdi.group()
+def saeon_odp():
+    """Commands that rely on the SAEON-ODP platform."""
 
 
 @legacy_sasdi.group()
@@ -154,7 +163,7 @@ def retrieve_thumbnails(records_dir: Path, output_dir: Path, max_workers: int):
     logger.info(f"Retrieved {num_retrieved} thumbnails")
 
 
-@csw.command()
+@csw.command("import-records")
 @click.option(
     "--records-dir",
     type=click.types.Path(),
@@ -167,13 +176,8 @@ def retrieve_thumbnails(records_dir: Path, output_dir: Path, max_workers: int):
     default=_DEFAULT_LEGACY_SASDI_THUMBNAIL_DIR,
     show_default=True,
 )
-def import_records(records_dir: Path, thumbnails_dir: Path):
+def import_records_csw(records_dir: Path, thumbnails_dir: Path):
     """Import previously downloaded legacy SASDI records into the EMC"""
-    # need to:
-    # - ensure organizations are created, according to the import mappings
-    # - ensure each org has at least an admin user, which will be used to perform the import
-    # - convert records to data_dicts (taking thumbnail into account)
-    # - create those records which do not exist yet
     seen_orgs: typing.Dict[str, typing.Dict] = {}
     for item in (i for i in records_dir.iterdir() if i.is_file()):
         record = csw_downloader.parse_record(
@@ -189,6 +193,27 @@ def import_records(records_dir: Path, thumbnails_dir: Path):
             organization = seen_orgs[target_org]
         owner_user = None
     click.secho("Not implemented yet", fg=_ERROR_COLOR)
+
+
+@saeon_odp.command("import-records")
+@click.option(
+    "--records-dir",
+    type=click.types.Path(),
+    default=_DEFAULT_LEGACY_SASDI_RECORD_DIR,
+    show_default=True,
+)
+def import_records_saeon_odp(records_dir: Path):
+    for record_path in (i for i in records_dir.iterdir() if i.is_file()):
+        parsed = saeon_importer.parse_record(record_path)
+        owner_org, _ = utils.maybe_create_organization(
+            parsed.owner_org,
+            title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
+            description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
+        )
+        org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
+            0
+        ]
+        utils.create_single_dataset(org_admin, parsed.to_data_dict())
 
 
 def _concurrent_thumbnail_download(

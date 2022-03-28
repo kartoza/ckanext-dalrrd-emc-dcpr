@@ -70,6 +70,7 @@ class _CkanEmcDataset:
     dataset_language: str
     metadata_language: str
     dataset_character_set: str
+    title: typing.Optional[str] = None
     maintainer_email: typing.Optional[str] = None
     type: typing.Optional[str] = "dataset"
     sasdi_theme: typing.Optional[str] = None
@@ -81,7 +82,8 @@ class _CkanEmcDataset:
         for name, value in vars(self).items():
             if value is not None:
                 result[name] = _to_data_dict(value)
-        result["title"] = self.name
+        if result.get("title") is None:
+            result["title"] = self.name
         result["lineage"] = f"Dummy lineage for {self.name}"
         return result
 

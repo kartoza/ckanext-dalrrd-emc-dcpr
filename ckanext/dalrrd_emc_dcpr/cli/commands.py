@@ -17,7 +17,6 @@ import alembic.util.exc
 import click
 import ckan
 import ckan.plugins as p
-import httpx
 from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
@@ -38,7 +37,6 @@ from ..constants import (
 from ..email_notifications import get_and_send_notifications_for_all_users
 
 from . import utils
-from .legacy_sasdi.csw import csw_downloader
 from ._bootstrap_data import PORTAL_PAGES, SASDI_ORGANIZATIONS
 from ._sample_datasets import (
     SAMPLE_DATASET_TAG,
@@ -111,11 +109,6 @@ def delete_data():
 @dalrrd_emc_dcpr.group()
 def extra_commands():
     """Extra commands that are less relevant"""
-
-
-@extra_commands.group()
-def legacy_sasdi():
-    """Commands that deal with import of catalog records from the legacy SASDI"""
 
 
 @dalrrd_emc_dcpr.command()
