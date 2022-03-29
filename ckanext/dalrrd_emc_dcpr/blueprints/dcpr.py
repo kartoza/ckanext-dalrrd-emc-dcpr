@@ -7,7 +7,6 @@ import ckan.lib.helpers as h
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 import ckan.lib.navl.dictization_functions as dict_fns
 
-
 logger = logging.getLogger(__name__)
 
 dcpr_blueprint = Blueprint(
@@ -37,13 +36,22 @@ def dcpr_request_new():
             data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
+            data_dict["owner_user"] = toolkit.g.userobj.id
+            data_dict["csi_moderator"] = None
+            data_dict["nsif_reviewer"] = None
+            data_dict["spatial_extent"] = None
+
+            print("Posted data")
+            print(data_dict)
+
         except dict_fns.DataError:
             return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
         try:
             dcpr_request = toolkit.get_action("dcpr_request_create")(context, data_dict)
 
             url = toolkit.h.url_for(
-                "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+                "{0}.dcpr_request_show".format("dcpr"),
+                request_id=dcpr_request.csi_reference_id,
             )
             return toolkit.h.redirect_to(url)
 
@@ -51,17 +59,18 @@ def dcpr_request_new():
             return toolkit.base.abort(
                 403, toolkit._(u"Unauthorized to create DCPR request")
             )
-        except toolkit.NotFound as e:
+        except toolkit.ObjectNotFound as e:
             return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
             return dcpr_request_edit(
-                dcpr_request.type, dcpr_request.csi_reference_id, errors, error_summary
+                dcpr_request.csi_reference_id, errors, error_summary
             )
 
         url = toolkit.h.url_for(
-            "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+            "{0}.dcpr_request_show".format("dcpr"),
+            request_id=dcpr_request.csi_reference_id,
         )
         return toolkit.h.redirect_to(url)
 
@@ -125,9 +134,30 @@ def dcpr_request_show(request_id):
     data_dict = {"id": request_id}
     extra_vars = {}
 
+    nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+        "nsif", toolkit.g.userobj, role="editor"
+    )
+    csi_reviewer = toolkit.h["emc_user_is_org_member"](
+        "csi", toolkit.g.userobj, role="editor"
+    )
+
+    extra_vars["nsif_reviewer"] = nsif_reviewer
+    extra_vars["csi_reviewer"] = csi_reviewer
+
+    logger.debug("NSIF reviewer")
+    logger.debug(nsif_reviewer)
+
     try:
         dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
+        request_owner = (
+            dcpr_request["owner_user"] == toolkit.g.userobj.id
+            if toolkit.g.userobj
+            else False
+        )
+
         extra_vars["dcpr_request"] = dcpr_request
+        extra_vars["request_owner"] = request_owner
+
     except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
         return toolkit.base.abort(404, toolkit._("Request not found"))
 
@@ -151,11 +181,27 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
             extra_vars["dcpr_request"] = dcpr_request
             extra_vars["errors"] = errors
             extra_vars["error_summary"] = error_summary
+
+            nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+                "nsif", toolkit.g.userobj, role="editor"
+            )
+            csi_reviewer = toolkit.h["emc_user_is_org_member"](
+                "csi", toolkit.g.userobj, role="editor"
+            )
+
+            extra_vars["nsif_reviewer"] = nsif_reviewer
+            extra_vars["csi_reviewer"] = csi_reviewer
+
+            logger.debug("NSIF reviewer")
+            logger.debug(nsif_reviewer)
+
         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
             return toolkit.base.abort(404, toolkit._("Request not found"))
 
         try:
-            toolkit.check_access("dcpr_request_update_auth", context)
+            toolkit.check_access(
+                "dcpr_request_edit_auth", context, {"request_id": request_id}
+            )
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
                 403,
@@ -170,13 +216,16 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
             data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
+            data_dict["csi_moderator"] = None
+            data_dict["nsif_reviewer"] = None
+            data_dict["spatial_extent"] = None
         except dict_fns.DataError:
             return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
         try:
             dcpr_request = toolkit.get_action("dcpr_request_update")(context, data_dict)
 
             url = toolkit.h.url_for(
-                "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+                "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
             )
             return toolkit.h.redirect_to(url)
 
@@ -185,16 +234,16 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
                 403,
                 toolkit._(u"Unauthorized to read DCPR request %s") % request_id,
             )
-        except toolkit.NotFound as e:
+        except toolkit.ObjectNotFound as e:
             return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
             return dcpr_request_edit(
-                dcpr_request.type, dcpr_request.csi_reference_id, errors, error_summary
+                dcpr_request.csi_reference_id, errors, error_summary
             )
 
         url = toolkit.h.url_for(
-            "{0}.show".format(dcpr_request.type), id=dcpr_request.csi_reference_id
+            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
         )
         return toolkit.h.redirect_to(url)

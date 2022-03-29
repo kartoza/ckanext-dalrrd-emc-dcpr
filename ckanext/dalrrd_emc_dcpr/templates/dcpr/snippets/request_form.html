@@ -1,6 +1,21 @@
 {% import 'macros/form.html' as form %}
 {% set action = g.form_action or '' %}
 
+{% if dcpr_request %}
+
+ {% set is_owner = dcpr_request.owner_user == g.userobj.id %}
+ {% set request_submitted = ( dcpr_request.status.value == 'AWAITING_NSIF_REVIEW' ) %}
+ {% set request_under_preparation = ( dcpr_request.status.value == 'UNDER_PREPARATION' ) %}
+ {% set waiting_csi_review = ( dcpr_request.status.value == 'AWAITING_CSI_REVIEW' ) %}
+ {% set immutable = request_submitted and is_owner %}
+ {% set disabled_attr = immutable and 'disabled' or 'enabled' %}
+ {% set status_finalized = dcpr_request.status.value == 'ACCEPTED' or dcpr_request.status.value == 'REJECTED' %}
+ {% set nsif_review_ready = ( not request_under_preparation and nsif_reviewer ) and ( not waiting_csi_review and not status_finalized ) %}
+ {% set csi_review_ready = ( not request_under_preparation and csi_reviewer ) and ( nsif_approved and not status_finalized ) %}
+
+{% endif %}
+
+
  {% if dcpr_request %}
   <form id="request-new" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
  {% else %}
@@ -10,12 +25,13 @@
   {# pkg_name used in 3 stage edit #}
   {% if dcpr_request %}
   <input type="hidden" name="request_id" value="{{ dcpr_request.csi_reference_id }}" />
+  <input type="hidden" name="owner_user" value="{{ dcpr_request.owner_user }}" />
   {% endif %}
   {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
 
   {% block fields %}
     {% if dcpr_request %}
-    {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors %}
+    {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors, immutable=immutable %}
     {% else %}
     {% snippet 'dcpr/snippets/new_request_fields.html' %}
     {% endif %}
@@ -24,11 +40,25 @@
   {% block form_actions %}
     <div class="form-actions">
       {% if dcpr_request %}
-      {% block save_button %}
-        <button class="btn btn-primary" type="submit" name="save">{% block save_button_text %}{{ _('Save') }}{% endblock %}</button>
+
+      {% block save_actions_button %}
+        {% if is_owner and not immutable %}
+         <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
+         <button class="btn btn-primary" type="submit" name="action_type" value=1>{{ _('Submit') }}</button>
+        {% elif nsif_review_ready %}
+        <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
+        <button class="btn btn-primary" type="submit" name="action_type" value=4>{{ _('Escalate to CSI') }}</button>
+        <button class="btn btn-primary" type="submit" name="action_type" value=3>{{ _('Reject') }}</button>
+        {% elif csi_review_ready %}
+        <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
+        <button class="btn btn-primary" type="submit" name="action_type" value=2>{{ _('Accept') }}</button>
+        <button class="btn btn-primary" type="submit" name="action_type" value=3>{{ _('Reject') }}</button>
+        {% endif %}
+
       {% endblock %}
       {% else %}
-       <button class="btn btn-primary" type="submit" name="submit">{% block submit_button_text %}{{ _('Submit') }}{% endblock %}</button>
+       <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
+       <button class="btn btn-primary" type="submit" name="action_type" value=1>{{ _('Submit') }}</button>
       {% endif %}
 
       {{ form.required_message() }}

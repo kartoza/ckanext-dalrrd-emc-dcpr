@@ -1,3 +1,4 @@
+import enum
 import logging
 import typing
 
@@ -12,6 +13,14 @@ from ...model import dcpr_request as dcpr_request
 from ...model import dcpr_error_report
 
 logger = logging.getLogger(__name__)
+
+
+class DCPRRequestActionType(enum.Enum):
+    SAVE = 0
+    SUBMIT = 1
+    ACCEPT = 2
+    REJECT = 3
+    ESCALATE_TO_CSI = 4
 
 
 def dcpr_error_report_create(context, data_dict):
@@ -71,77 +80,76 @@ def dcpr_error_report_create(context, data_dict):
 def dcpr_request_create(context, data_dict):
     model = context["model"]
     access = toolkit.check_access("dcpr_request_create_auth", context, data_dict)
+
     logger.debug("Inside the dcpr_request_create action")
 
     if not access:
         raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
 
-    csi_reference_id = str(data_dict["csi_reference_id"])
-    request = dcpr_request.DCPRRequest.get(csi_reference_id=csi_reference_id)
-
-    if request:
-        raise toolkit.ValidationError({"message": "DCPR request already exists"})
+    if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
+        status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+    elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
+        status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
     else:
-        request = dcpr_request.DCPRRequest(
-            csi_reference_id=data_dict["csi_reference_id"],
-            owner_user=data_dict["owner_user"],
-            csi_moderator=data_dict["csi_moderator"],
-            nsif_reviewer=data_dict["nsif_reviewer"],
-            status=data_dict["status"],
-            organization_name=data_dict["organization_name"],
-            organization_level=data_dict["organization_level"],
-            organization_address=data_dict["organization_address"],
-            proposed_project_name=data_dict["proposed_project_name"],
-            additional_project_context=data_dict["additional_project_context"],
-            capture_start_date=data_dict["capture_start_date"],
-            capture_end_date=data_dict["capture_end_date"],
-            cost=data_dict["cost"],
-            spatial_extent=data_dict["spatial_extent"],
-            spatial_resolution=data_dict["spatial_resolution"],
-            data_capture_urgency=data_dict["data_capture_urgency"],
-            additional_information=data_dict["additional_information"],
-            request_date=data_dict["request_date"],
-            submission_date=data_dict["submission_date"],
-            nsif_review_date=data_dict["nsif_review_date"],
-            nsif_recommendation=data_dict["nsif_recommendation"],
-            nsif_review_notes=data_dict["nsif_review_notes"],
-            nsif_review_additional_documents=data_dict[
-                "nsif_review_additional_documents"
-            ],
-            csi_moderation_notes=data_dict["csi_moderation_notes"],
-            csi_moderation_additional_documents=data_dict[
-                "csi_moderation_additional_documents"
-            ],
-            csi_moderation_date=data_dict["csi_moderation_date"],
-        )
+        raise NotImplementedError
 
-        request_dataset = dcpr_request.DCPRRequestDataset(
-            dcpr_request_id=data_dict["csi_reference_id"],
-            dataset_custodian=data_dict["dataset_custodian"],
-            data_type=data_dict["data_type"],
-            purposed_dataset_title=data_dict["purposed_dataset_title"],
-            purposed_abstract=data_dict["purposed_abstract"],
-            dataset_purpose=data_dict["dataset_purpose"],
-            lineage_statement=data_dict["lineage_statement"],
-            associated_attributes=data_dict["associated_attributes"],
-            feature_description=data_dict["feature_description"],
-            data_usage_restrictions=data_dict["data_usage_restrictions"],
-            capture_method=data_dict["capture_method"],
-            capture_method_detail=data_dict["capture_method_detail"],
-        )
-        notification_targets = []
+    request = dcpr_request.DCPRRequest(
+        owner_user=data_dict["owner_user"],
+        csi_moderator=data_dict["csi_moderator"],
+        nsif_reviewer=data_dict["nsif_reviewer"],
+        status=status,
+        organization_name=data_dict["organization_name"],
+        organization_level=data_dict["organization_level"],
+        organization_address=data_dict["organization_address"],
+        proposed_project_name=data_dict["proposed_project_name"],
+        additional_project_context=data_dict["additional_project_context"],
+        capture_start_date=data_dict["capture_start_date"],
+        capture_end_date=data_dict["capture_end_date"],
+        cost=data_dict["cost"],
+        spatial_extent=data_dict["spatial_extent"],
+        spatial_resolution=data_dict["spatial_resolution"],
+        data_capture_urgency=data_dict["data_capture_urgency"],
+        additional_information=data_dict["additional_information"],
+        request_date=data_dict["request_date"],
+        submission_date=data_dict["submission_date"],
+        nsif_review_date=data_dict["nsif_review_date"],
+        nsif_recommendation=data_dict["nsif_recommendation"],
+        nsif_review_notes=data_dict["nsif_review_notes"],
+        nsif_review_additional_documents=data_dict["nsif_review_additional_documents"],
+        csi_moderation_notes=data_dict["csi_moderation_notes"],
+        csi_moderation_additional_documents=data_dict[
+            "csi_moderation_additional_documents"
+        ],
+        csi_moderation_date=data_dict["csi_moderation_date"],
+    )
 
-        for target in data_dict["notification_targets"]:
-            target = dcpr_request.DCPRRequestNotificationTarget(
-                dcpr_request_id=data_dict["csi_reference_id"],
-                user_id=target.get("user_id"),
-                group_id=target.get("group_id"),
-            )
-            notification_targets.append(target)
+    request_dataset = dcpr_request.DCPRRequestDataset(
+        dataset_custodian=data_dict.get("dataset_custodian", False),
+        data_type=data_dict["data_type"],
+        purposed_dataset_title=data_dict["purposed_dataset_title"],
+        purposed_abstract=data_dict["purposed_abstract"],
+        dataset_purpose=data_dict["dataset_purpose"],
+        lineage_statement=data_dict["lineage_statement"],
+        associated_attributes=data_dict["associated_attributes"],
+        feature_description=data_dict["feature_description"],
+        data_usage_restrictions=data_dict["data_usage_restrictions"],
+        capture_method=data_dict["capture_method"],
+        capture_method_detail=data_dict["capture_method_detail"],
+    )
+    notification_targets = []
+
+    for target in data_dict.get("notification_targets", []):
+        target = dcpr_request.DCPRRequestNotificationTarget(
+            dcpr_request_id=request.csi_reference_id,
+            user_id=target.get("user_id"),
+            group_id=target.get("group_id"),
+        )
+        notification_targets.append(target)
 
     try:
         model.Session.add(request)
         model.repo.commit()
+        request_dataset.dcpr_request_id = request.csi_reference_id
         model.Session.add(request_dataset)
 
         model.Session.add_all(notification_targets)
@@ -156,7 +164,55 @@ def dcpr_request_create(context, data_dict):
     return request
 
 
+def dcpr_request_update(context, data_dict):
+
+    model = context["model"]
+    access = toolkit.check_access("dcpr_request_update_auth", context, data_dict)
+
+    logger.debug("Inside the dcpr_request_update action")
+
+    if not access:
+        raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
+
+    if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
+        status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+    elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
+        status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+    elif int(data_dict["action_type"]) == DCPRRequestActionType.ESCALATE_TO_CSI.value:
+        status = dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+    elif int(data_dict["action_type"]) == DCPRRequestActionType.ACCEPT.value:
+        status = dcpr_request.DCPRRequestStatus.ACCEPTED.value
+    elif int(data_dict["action_type"]) == DCPRRequestActionType.REJECT.value:
+        status = dcpr_request.DCPRRequestStatus.REJECTED.value
+    else:
+        raise NotImplementedError
+
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        data_dict["request_id"]
+    )
+
+    new_request_obj, new_request_dataset_obj, _ = _create_request_objects(
+        context, status, data_dict
+    )
+
+    if not request_obj:
+        raise toolkit.ObjectNotFound
+    else:
+        request_obj.status = new_request_obj.status
+
+    try:
+        model.repo.commit()
+
+    except exc.InvalidRequestError as exception:
+        model.Session.rollback()
+    finally:
+        model.Session.close()
+
+    return request_obj
+
+
 def dcpr_geospatial_request_create(context, data_dict):
+
     model = context["model"]
     toolkit.check_access("dcpr_request_create_auth", context, data_dict)
     logger.debug("Inside the dcpr_request_create action")
@@ -310,3 +366,61 @@ def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
     request_dict = d.table_dictize(request_object, context)
 
     return request_dict
+
+
+def _create_request_objects(context, status, data_dict):
+
+    request = dcpr_request.DCPRRequest(
+        owner_user=data_dict["owner_user"],
+        csi_moderator=data_dict["csi_moderator"],
+        nsif_reviewer=data_dict["nsif_reviewer"],
+        status=status,
+        organization_name=data_dict["organization_name"],
+        organization_level=data_dict["organization_level"],
+        organization_address=data_dict["organization_address"],
+        proposed_project_name=data_dict["proposed_project_name"],
+        additional_project_context=data_dict["additional_project_context"],
+        capture_start_date=data_dict["capture_start_date"],
+        capture_end_date=data_dict["capture_end_date"],
+        cost=data_dict["cost"],
+        spatial_extent=data_dict["spatial_extent"],
+        spatial_resolution=data_dict["spatial_resolution"],
+        data_capture_urgency=data_dict["data_capture_urgency"],
+        additional_information=data_dict["additional_information"],
+        request_date=data_dict["request_date"],
+        submission_date=data_dict["submission_date"],
+        nsif_review_date=data_dict["nsif_review_date"],
+        nsif_recommendation=data_dict["nsif_recommendation"],
+        nsif_review_notes=data_dict["nsif_review_notes"],
+        nsif_review_additional_documents=data_dict["nsif_review_additional_documents"],
+        csi_moderation_notes=data_dict["csi_moderation_notes"],
+        csi_moderation_additional_documents=data_dict[
+            "csi_moderation_additional_documents"
+        ],
+        csi_moderation_date=data_dict["csi_moderation_date"],
+    )
+
+    request_dataset = dcpr_request.DCPRRequestDataset(
+        dataset_custodian=data_dict.get("dataset_custodian", False),
+        data_type=data_dict["data_type"],
+        purposed_dataset_title=data_dict["purposed_dataset_title"],
+        purposed_abstract=data_dict["purposed_abstract"],
+        dataset_purpose=data_dict["dataset_purpose"],
+        lineage_statement=data_dict["lineage_statement"],
+        associated_attributes=data_dict["associated_attributes"],
+        feature_description=data_dict["feature_description"],
+        data_usage_restrictions=data_dict["data_usage_restrictions"],
+        capture_method=data_dict["capture_method"],
+        capture_method_detail=data_dict["capture_method_detail"],
+    )
+    notification_targets = []
+
+    for target in data_dict.get("notification_targets", []):
+        target = dcpr_request.DCPRRequestNotificationTarget(
+            dcpr_request_id=request.csi_reference_id,
+            user_id=target.get("user_id"),
+            group_id=target.get("group_id"),
+        )
+        notification_targets.append(target)
+
+    return request, request_dataset, notification_targets

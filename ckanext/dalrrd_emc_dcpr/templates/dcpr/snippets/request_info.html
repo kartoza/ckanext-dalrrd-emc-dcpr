@@ -192,6 +192,94 @@
             </td>
           </tr>
         {% endif %}
+        {% if dcpr_request.dataset_custodian %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Dataset custodian") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.dataset_custodian }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.data_type %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Data type") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.data_type }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.purposed_dataset_title %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Purposed dataset title") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.purposed_dataset_title }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.purposed_abstract %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Purposed abstract") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.purposed_abstract }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.dataset_purpose %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Dataset purpose") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.dataset_purpose }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.lineage_statement %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Lineage statement") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.lineage_statement }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.associated_attributes %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Associated attributes") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.associated_attributes }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.feature_description %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Features description") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.feature_description }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.data_usage_restrictions %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Data usage restrictions") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.data_usage_restrictions }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.capture_method %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Capture method") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.capture_method }}
+              </td>
+            </tr>
+        {% endif %}
+        {% if dcpr_request.capture_method_detail %}
+            <tr>
+              <th scope="row" class="dataset-label">{{ _("Capture method detail") }}</th>
+              <td class="dataset-details">
+                {{ dcpr_request.capture_method_detail }}
+              </td>
+            </tr>
+        {% endif %}
       {% endblock %}
     </tbody>
   </table>
