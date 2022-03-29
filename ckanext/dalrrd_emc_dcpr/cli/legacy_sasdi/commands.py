@@ -1,3 +1,4 @@
+import concurrent.futures
 import logging
 import typing
 from concurrent import futures
@@ -5,6 +6,7 @@ from pathlib import Path
 
 import click
 import httpx
+from ckan.plugins import toolkit
 from lxml import etree
 
 from .. import utils
@@ -197,6 +199,17 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
     logger.error("Not implemented yet")
 
 
+def _accumulator(iterable: typing.Iterable, *, capacity: int = 10) -> typing.Iterable:
+    current_load = []
+    for idx, item in enumerate(iterable):
+        current_load.append(item)
+        if idx % capacity == 0:
+            yield current_load
+            current_load = []
+    else:  # yield the last elements
+        yield current_load
+
+
 @saeon_odp.command("import-records")
 @click.option(
     "--records-dir",
@@ -211,19 +224,42 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
     show_default=True,
 )
 def import_records_saeon_odp(records_dir: Path):
-    for idx, record_path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
-        logger.debug(f"{idx} - Processing path {record_path!r}...")
-        parsed = saeon_importer.parse_record(record_path)
-        owner_org, _ = utils.maybe_create_organization(
-            parsed.owner_org,
-            title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
-            description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
-        )
-        org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
-            0
-        ]
-        utils.create_single_dataset(org_admin, parsed.to_data_dict())
+    # TODO: create the orgs first, then it will likely be possible to use concurrency
+    for idx, path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
+        logger.debug(f"{idx} - Processing path {path!r}...")
+        parsed = saeon_importer.parse_record(path)
+        try:
+            toolkit.get_action("package_show")(
+                context={"ignore_auth": True}, data_dict={"id": parsed.name}
+            )
+            already_exists = True
+        except toolkit.ObjectNotFound:
+            already_exists = False
+
+        if not already_exists:
+            owner_org, _ = utils.maybe_create_organization(
+                parsed.owner_org,
+                title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
+                description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
+            )
+            org_admin = [
+                u for u in owner_org.get("users", []) if u["capacity"] == "admin"
+            ][0]
+            utils.create_single_dataset(org_admin, parsed.to_data_dict())
+        else:
+            logger.info(f"record {parsed.name!r} already exists, skipping...")
     logger.info("Done!")
+
+
+def _import_single_saeon_record(record_path: Path):
+    parsed = saeon_importer.parse_record(record_path)
+    owner_org, _ = utils.maybe_create_organization(
+        parsed.owner_org,
+        title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
+        description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
+    )
+    org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][0]
+    utils.create_single_dataset(org_admin, parsed.to_data_dict())
 
 
 def _concurrent_thumbnail_download(

@@ -44,7 +44,7 @@ def parse_record(record_path: Path):
         i for i in raw_record["descriptions"] if i["descriptionType"] == "Abstract"
     ][0]["description"]
     owner_org = import_mappings.get_owner_org(raw_record["publisher"])
-    maintainer_obj = _get_maintainer(raw_record)
+    maintainer = _get_maintainer(raw_record, record_path)
     return _CkanEmcDataset(
         name=name,
         title=main_title["title"],
@@ -53,7 +53,7 @@ def parse_record(record_path: Path):
         reference_date=_get_reference_date(raw_record),
         iso_topic_category=ISO_TOPIC_CATEGORIES[0][0],
         owner_org=owner_org,
-        maintainer=maintainer_obj["name"],
+        maintainer=maintainer,
         maintainer_email=None,
         resources=_get_resources(raw_record),
         spatial=",".join(str(i) for i in _get_bbox(raw_record)),
@@ -71,7 +71,8 @@ def parse_record(record_path: Path):
 
 
 def _get_reference_date(record: typing.Dict) -> str:
-    for date_ in record["dates"]:
+    # the jsonschema file has `dates` as mandatory, but some of the legacy data data does not have this element
+    for date_ in record.get("dates", []):
         if date_["dateType"] == "Valid":
             # the provided date may be a range, in which case it is separated by a slash
             # the format is described here:
@@ -94,7 +95,7 @@ def _get_reference_date(record: typing.Dict) -> str:
     return result
 
 
-def _get_maintainer(record: typing.Dict) -> typing.Dict:
+def _get_maintainer(record: typing.Dict, record_path: Path) -> str:
     acceptable_maintainer_roles = [
         "ContactPerson",
         "DataCollector",
@@ -109,28 +110,43 @@ def _get_maintainer(record: typing.Dict) -> typing.Dict:
         "Supervisor",
         "WorkPackageLeader",
     ]
-    maintainer = None
+    placeholder = "placeholder, please change"
     for contributor in record.get("contributors", []):
-        for possible_role in acceptable_maintainer_roles:
-            role = contributor.get("contributorType")
-            if role == possible_role:
-                maintainer = contributor
-                break
-        if maintainer is not None:
+        role = contributor.get("contributorType")
+        if role in acceptable_maintainer_roles:
+            try:
+                maintainer = contributor["name"]
+            except KeyError:
+                try:
+                    maintainer = contributor.get("affiliation", [])[0].get(
+                        "afilliation", placeholder
+                    )
+                except IndexError:
+                    maintainer = placeholder
             break
     else:
-        maintainer = record.get("contributors", [{"name": "dummy"}])[0]
+        maintainer = placeholder
     return maintainer
 
 
 def _get_bbox(record: typing.Dict) -> typing.Dict:
     for item in record.get("geoLocations", []):
         reported_box = item.get("geoLocationBox")
+        reported_point = item.get("geoLocationPoint")
         if reported_box:
             min_lon = reported_box["westBoundLongitude"]
             min_lat = reported_box["southBoundLatitude"]
             max_lon = reported_box["eastBoundLongitude"]
             max_lat = reported_box["northBoundLatitude"]
+        elif reported_point:
+            mid_lon = reported_point["pointLongitude"]
+            mid_lat = reported_point["pointLatitude"]
+            box_width_degrees = 0.001
+            min_lon = mid_lon - box_width_degrees
+            max_lon = mid_lon + box_width_degrees
+            min_lat = mid_lat - box_width_degrees
+            max_lat = mid_lat + box_width_degrees
+        if reported_box or reported_point:
             geojson_bbox = {
                 "type": "Polygon",
                 "coordinates": [
@@ -149,6 +165,11 @@ def _get_bbox(record: typing.Dict) -> typing.Dict:
     return toolkit.h["emc_convert_geojson_to_bounding_box"](geojson_bbox)
 
 
+def _build_tag_name(raw_name: str) -> typing.Optional[str]:
+    name = slugify(raw_name.strip())
+    return name if 2 <= len(name) < 100 else None
+
+
 def _get_tags(record: typing.Dict) -> typing.List[typing.Dict]:
     tags = [
         {
@@ -158,45 +179,39 @@ def _get_tags(record: typing.Dict) -> typing.List[typing.Dict]:
     ]
     custom_separator = "__"
     for subject in record["subjects"]:
-        tags.append(
-            {"name": slugify(subject["subject"].strip()), "vocabulary_id": None}
-        )
+        name = _build_tag_name(subject["subject"])
+        if name:
+            tags.append({"name": name, "vocabulary_id": None})
     # add any additional file identifiers as extra tags
     file_identifier = record.get("fileIdentifier")
     if file_identifier is not None:
-        tags.append(
-            {
-                "name": f"fileIdentifier{custom_separator}{slugify(file_identifier)}",
-                "vocabulary_id": None,
-            }
+        name = _build_tag_name(
+            f"fileIdentifier{custom_separator}{slugify(file_identifier)}"
         )
+        if name:
+            tags.append({"name": name, "vocabulary_id": None})
     # add any other identifiers
     for identifier in record.get("identifiers", []):
-        tags.append(
-            {
-                "name": custom_separator.join(
-                    (
-                        slugify(identifier["identifierType"]),
-                        slugify(identifier["identifier"]),
-                    )
-                ),
-                "vocabulary_id": None,
-            }
+        name = _build_tag_name(
+            custom_separator.join(
+                (identifier["identifierType"], identifier["identifier"])
+            )
         )
+        if name:
+            tags.append({"name": name, "vocabulary_id": None})
     # add any other related identifiers
     for related_identifier in record.get("relatedIdentifiers", []):
-        tags.append(
-            {
-                "name": custom_separator.join(
-                    (
-                        slugify(related_identifier["relationType"]),
-                        slugify(related_identifier["relatedIdentifierType"]),
-                        slugify(related_identifier["relatedIdentifier"]),
-                    )
-                ),
-                "vocabulary_id": None,
-            }
+        name = _build_tag_name(
+            custom_separator.join(
+                (
+                    related_identifier["relationType"],
+                    related_identifier["relatedIdentifierType"],
+                    related_identifier["relatedIdentifier"],
+                )
+            )
         )
+        if name:
+            tags.append({"name": name, "vocabulary_id": None})
     return tags
 
 
