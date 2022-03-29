@@ -1,4 +1,5 @@
 import datetime
+import enum
 from typing import Optional
 
 from logging import getLogger
@@ -28,13 +29,13 @@ dcpr_request_table = Table(
         "csi_moderator",
         types.UnicodeText,
         ForeignKey("user.id"),
-        nullable=False,
+        nullable=True,
     ),
     Column(
         "nsif_reviewer",
         types.UnicodeText,
         ForeignKey("user.id"),
-        nullable=False,
+        nullable=True,
     ),
     Column("status", types.UnicodeText),
     Column("organization_name", types.UnicodeText),
@@ -151,6 +152,16 @@ dcpr_geospatial_request_notification_table = Table(
     Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
     Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
 )
+
+
+class DCPRRequestStatus(enum.Enum):
+    UNDER_PREPARATION = "UNDER_PREPARATION"
+    AWAITING_NSIF_REVIEW = "AWAITING_NSIF_REVIEW"
+    UNDER_NSIF_REVIEW = "UNDER_NSIF_REVIEW"
+    AWAITING_CSI_REVIEW = "AWAITING_CSI_REVIEW"
+    UNDER_CSI_REVIEW = "UNDER_CSI_REVIEW"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
 
 
 class DCPRRequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):

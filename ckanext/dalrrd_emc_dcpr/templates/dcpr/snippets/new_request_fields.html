@@ -2,8 +2,11 @@
 
 {% block fields %}
   {{ form.input('organization_name', id='field-organization_name', label=_('Organization Name'), placeholder=_('eg. SASDI'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
   {{ form.input('organization_level', id='field-organization_level', label=_('Organization Level'), placeholder=_('eg. SASDI Level'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
   {{ form.input('organization_address', id='field-organization_address', label=_('Organization Address'), placeholder=_('eg. SASDI address'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
   {{ form.input('proposed_project_name', id='field-proposed_project_name', label=_('Proposed Project Name'), placeholder=_('eg. Data Request'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.markdown('additional_project_context', id='field-additional_project_context', label=_('Additional project context'), placeholder=_('eg. Some useful notes about the data') ) }}
@@ -31,13 +34,34 @@
 
   {{ form.input('nsif_review_additional_documents', id='field-nsif_review_additional_documents', label=_('NSIF review additional documents'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-
-
   {{ form.input('csi_moderation_date', id='field-csi_moderation_date', label=_('CSI moderation date'), placeholder=_('eg. 2022-01-01'), type='date', classes=[]) }}
 
   {{ form.markdown('csi_moderation_notes', id='field-csi_moderation_notes', label=_('CSI review notes'), placeholder=_('eg. CSI review notes') ) }}
 
   {{ form.input('csi_moderation_additional_documents', id='field-csi_moderation_additional_documents', label=_('NSIF review additional documents'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.checkbox('dataset_custodian', id='field-dataset_custodian', checked=false, value=false, label=_('Dataset Custodian'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('data_type', id='field-data_type', label=_('Data type'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('purposed_dataset_title', id='field-purposed_dataset_title', label=_('Purposed dataset title'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('purposed_abstract', id='field-purposed_abstract', label=_('Proposed abstract'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('dataset_purpose', id='field-dataset_purpose', label=_('Purposed of dataset'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('lineage_statement', id='field-lineage_statement', label=_('Linage statement'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('associated_attributes', id='field-associated_attributes', label=_('Associated attributes'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('feature_description', id='field-feature_description', label=_('Feature Description'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('data_usage_restrictions', id='field-data_usage_restrictions', label=_('Data usage restrictions'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('capture_method', id='field-capture_method', label=_('Method of capture'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
+  {{ form.input('capture_method_detail', id='field-capture_method_detail', label=_('Detail method of capture'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+
 
 
 {% endblock %}
