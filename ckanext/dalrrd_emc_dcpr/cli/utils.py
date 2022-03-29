@@ -1,6 +1,8 @@
 import enum
+import logging
 import typing
 
+import click
 from ckan.lib import jinja_extensions
 from ckan.plugins import toolkit
 from flask_babel import gettext as flask_ugettext, ngettext as flask_ungettext
@@ -112,3 +114,22 @@ def maybe_create_organization(
         )
         created = True
     return organization, created
+
+
+class ClickLoggingHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        fg = None
+        bg = None
+        if record.levelno == logging.DEBUG:
+            fg = "black"
+            bg = "bright_white"
+        elif record.levelno == logging.INFO:
+            fg = "bright_blue"
+        elif record.levelno == logging.WARNING:
+            fg = "bright_magenta"
+        elif record.levelno == logging.CRITICAL:
+            fg = "bright_red"
+        elif record.levelno == logging.ERROR:
+            fg = "bright_white"
+            bg = "red"
+        click.secho(self.format(record), bg=bg, fg=fg)

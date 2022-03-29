@@ -1,7 +1,5 @@
 import logging
 import typing
-import secrets
-import string
 from concurrent import futures
 from pathlib import Path
 
@@ -10,8 +8,7 @@ import httpx
 from lxml import etree
 
 from .. import utils
-from ..commands import _ERROR_COLOR
-from .import_mappings import CUSTODIAN_MAP
+from .import_mappings import get_owner_org
 from .csw import csw_downloader
 from .saeon_odp import importer as saeon_importer
 
@@ -33,8 +30,13 @@ _DEFAULT_MAX_WORKERS = 5
 
 
 @click.group()
-def legacy_sasdi():
+@click.option("--verbose", is_flag=True)
+def legacy_sasdi(verbose: bool):
     """Commands that deal with import of catalog records from the legacy SASDI"""
+    click_handler = utils.ClickLoggingHandler()
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO, handlers=(click_handler,)
+    )
 
 
 @legacy_sasdi.group()
@@ -183,7 +185,7 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
         record = csw_downloader.parse_record(
             item, csw_downloader.CSW_NAMESPACES, xml_parser=_xml_parser
         )
-        target_org = record.mapped_owner_org()
+        target_org = get_owner_org(record.custodian)
         if target_org is None:
             pass  # this will be imported into the unsorted org
         elif target_org not in seen_orgs.keys():
@@ -192,28 +194,36 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
         else:
             organization = seen_orgs[target_org]
         owner_user = None
-    click.secho("Not implemented yet", fg=_ERROR_COLOR)
+    logger.error("Not implemented yet")
 
 
 @saeon_odp.command("import-records")
 @click.option(
     "--records-dir",
-    type=click.types.Path(),
-    default=_DEFAULT_LEGACY_SASDI_RECORD_DIR,
+    type=click.types.Path(
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        readable=True,
+        path_type=Path,
+    ),
+    default=_DEFAULTS_SAEON_ODP_RECORDS_DIR,
     show_default=True,
 )
 def import_records_saeon_odp(records_dir: Path):
-    for record_path in (i for i in records_dir.iterdir() if i.is_file()):
+    for idx, record_path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
+        logger.debug(f"{idx} - Processing path {record_path!r}...")
         parsed = saeon_importer.parse_record(record_path)
-        owner_org, _ = utils.maybe_create_organization(
-            parsed.owner_org,
-            title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
-            description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
-        )
-        org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
-            0
-        ]
-        utils.create_single_dataset(org_admin, parsed.to_data_dict())
+        # owner_org, _ = utils.maybe_create_organization(
+        #     parsed.owner_org,
+        #     title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
+        #     description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
+        # )
+        # org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
+        #     0
+        # ]
+        # utils.create_single_dataset(org_admin, parsed.to_data_dict())
+    logger.info("Done!")
 
 
 def _concurrent_thumbnail_download(
