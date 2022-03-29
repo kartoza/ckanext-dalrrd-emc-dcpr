@@ -140,6 +140,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return [
             commands.dalrrd_emc_dcpr,
             legacy_sasdi_commands.legacy_sasdi,
+            commands.shell,
         ]
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
