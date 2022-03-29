@@ -8,7 +8,7 @@ import httpx
 from lxml import etree
 
 from .. import utils
-from .import_mappings import get_owner_org
+from .import_mappings import CUSTODIAN_MAP, get_owner_org
 from .csw import csw_downloader
 from .saeon_odp import importer as saeon_importer
 
@@ -214,15 +214,15 @@ def import_records_saeon_odp(records_dir: Path):
     for idx, record_path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
         logger.debug(f"{idx} - Processing path {record_path!r}...")
         parsed = saeon_importer.parse_record(record_path)
-        # owner_org, _ = utils.maybe_create_organization(
-        #     parsed.owner_org,
-        #     title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
-        #     description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
-        # )
-        # org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
-        #     0
-        # ]
-        # utils.create_single_dataset(org_admin, parsed.to_data_dict())
+        owner_org, _ = utils.maybe_create_organization(
+            parsed.owner_org,
+            title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
+            description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
+        )
+        org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
+            0
+        ]
+        utils.create_single_dataset(org_admin, parsed.to_data_dict())
     logger.info("Done!")
 
 

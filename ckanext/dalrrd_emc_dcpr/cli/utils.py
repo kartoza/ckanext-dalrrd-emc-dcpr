@@ -27,10 +27,8 @@ def get_jinja_env():
 def create_single_dataset(
     user: typing.Dict, dataset: typing.Dict
 ) -> DatasetCreationResult:
-    create_dataset_action = toolkit.get_action("package_create")
-    get_dataset_action = toolkit.get_action("package_show")
     try:
-        get_dataset_action(
+        toolkit.get_action("package_show")(
             context={"user": user["name"]}, data_dict={"id": dataset["name"]}
         )
     except toolkit.ObjectNotFound:
@@ -38,7 +36,9 @@ def create_single_dataset(
     else:
         package_exists = True
     if not package_exists:
-        create_dataset_action(context={"user": user["name"]}, data_dict=dataset)
+        toolkit.get_action("package_create")(
+            context={"user": user["name"]}, data_dict=dataset
+        )
         result = DatasetCreationResult.CREATED
     else:
         result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
@@ -117,6 +117,8 @@ def maybe_create_organization(
 
 
 class ClickLoggingHandler(logging.Handler):
+    """Custom logging handler to allow using click output functions"""
+
     def emit(self, record: logging.LogRecord) -> None:
         fg = None
         bg = None

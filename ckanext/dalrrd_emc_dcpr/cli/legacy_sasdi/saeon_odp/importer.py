@@ -39,13 +39,14 @@ def parse_record(record_path: Path):
 
     raw_record = json.loads(record_path.read_text())
     main_title = [item for item in raw_record["titles"] if not item.get("titleType")][0]
+    name = slugify(main_title["title"])[:100]
     notes = [
         i for i in raw_record["descriptions"] if i["descriptionType"] == "Abstract"
     ][0]["description"]
     owner_org = import_mappings.get_owner_org(raw_record["publisher"])
     maintainer_obj = _get_maintainer(raw_record)
     return _CkanEmcDataset(
-        name=slugify(main_title["title"]),
+        name=name,
         title=main_title["title"],
         private=True,
         notes=notes,
@@ -71,8 +72,22 @@ def parse_record(record_path: Path):
 
 def _get_reference_date(record: typing.Dict) -> str:
     for date_ in record["dates"]:
-        result = date_["date"]
         if date_["dateType"] == "Valid":
+            # the provided date may be a range, in which case it is separated by a slash
+            # the format is described here:
+            #
+            # http://www.ukoln.ac.uk/metadata/dcmi/collection-RKMS-ISO8601/
+            #
+            start, end = date_["date"].partition("/")[::2]
+            if start and end:
+                # since our schema expects the reference date to be a single temporal
+                # value, we arbitrarily choose the start of the period as the
+                # reference date
+                result = start
+            elif start:
+                result = start
+            else:
+                result = end
             break
     else:
         result = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y-%m-%d")
