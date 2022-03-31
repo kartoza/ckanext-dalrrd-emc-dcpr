@@ -12,7 +12,7 @@ from sqlalchemy import sql, select, exc
 from ...model import dcpr_request as dcpr_request
 from ...model import dcpr_error_report
 
-from ..schema import create_dcpr_request_schema
+from ..schema import create_dcpr_request_schema, update_dcpr_request_schema
 
 logger = logging.getLogger(__name__)
 
@@ -179,6 +179,13 @@ def dcpr_request_update(context, data_dict):
 
     model = context["model"]
     toolkit.check_access("dcpr_request_update_auth", context, data_dict)
+
+    schema = context.get("schema", update_dcpr_request_schema())
+
+    data, errors = toolkit.navl_validate(data_dict, schema, context)
+
+    if errors:
+        raise toolkit.ValidationError(errors)
 
     if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
