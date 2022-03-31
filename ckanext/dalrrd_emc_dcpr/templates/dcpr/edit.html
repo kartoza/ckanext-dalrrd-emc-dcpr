@@ -2,7 +2,7 @@
 
 {% block breadcrumb_content %}
     {{ super() }}
-    {% if dcpr_request %}
+    {% if not errors and dcpr_request %}
 	<li class="active">{% link_for _('Edit'), named_route=dcpr_request.type ~ '.dcpr_request_edit', request_id=dcpr_request.csi_reference_id %}</li>
     {% endif %}
 {% endblock %}

@@ -41,9 +41,6 @@ def dcpr_request_new():
             data_dict["nsif_reviewer"] = None
             data_dict["spatial_extent"] = None
 
-            print("Posted data")
-            print(data_dict)
-
         except dict_fns.DataError:
             return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
         try:
@@ -64,9 +61,9 @@ def dcpr_request_new():
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
-            return dcpr_request_edit(
-                dcpr_request.csi_reference_id, errors, error_summary
-            )
+
+            request.method = "GET"
+            return dcpr_request_edit(None, data_dict, errors, error_summary)
 
         url = toolkit.h.url_for(
             "{0}.dcpr_request_show".format("dcpr"),
@@ -162,7 +159,7 @@ def dcpr_request_show(request_id):
 
 
 @dcpr_blueprint.route("/request/edit/<request_id>", methods=["GET", "POST"])
-def dcpr_request_edit(request_id, errors=None, error_summary=None):
+def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
     logger.debug("Inside the dcpr_request_edit view")
     data_dict = {"id": request_id}
     extra_vars = {}
@@ -174,10 +171,15 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
 
     if request.method == "GET":
         try:
-            dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
-            extra_vars["dcpr_request"] = dcpr_request
-            extra_vars["errors"] = errors
-            extra_vars["error_summary"] = error_summary
+            if request_id is not None:
+                dcpr_request = toolkit.get_action("dcpr_request_show")(
+                    data_dict=data_dict
+                )
+                extra_vars["dcpr_request"] = dcpr_request
+            elif data is not None:
+                extra_vars["dcpr_request"] = data
+                extra_vars["errors"] = errors
+                extra_vars["error_summary"] = error_summary
 
             nsif_reviewer = toolkit.h["emc_user_is_org_member"](
                 "nsif", toolkit.g.userobj, role="editor"
@@ -193,9 +195,13 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
             return toolkit.base.abort(404, toolkit._("Request not found"))
 
         try:
-            toolkit.check_access(
-                "dcpr_request_edit_auth", context, {"request_id": request_id}
-            )
+            if request_id:
+                toolkit.check_access(
+                    "dcpr_request_edit_auth", context, {"request_id": request_id}
+                )
+            else:
+                toolkit.check_access("dcpr_request_create_auth", context, data_dict)
+
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
                 403,
