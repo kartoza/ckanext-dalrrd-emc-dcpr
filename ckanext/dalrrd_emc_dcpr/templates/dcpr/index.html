@@ -17,10 +17,10 @@
 
 {% block primary_content_inner %}
 {% block requests_list %}
-    <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
+    <ul class="{{ list_class or 'list-unstyled' }}">
     	{% block dcpr_requests %}
 	      {% for request in dcpr_requests %}
-	        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request %}
+	        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request, request_status=request_status %}
 	      {% else %}
             <div>
                 <h5> {{ _('No found requests') }}</h5>

@@ -11,6 +11,8 @@ from ckan.lib.helpers import build_nav_main as core_build_nav_main
 from . import constants
 from .logic.action.emc import show_version
 
+from .model.dcpr_request import DCPRRequestStatus
+
 logger = logging.getLogger(__name__)
 
 
@@ -200,3 +202,24 @@ def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)
     oriented_padded = geometry.polygon.orient(padded)
     return geometry.mapping(oriented_padded)
+
+
+def get_status_labels() -> typing.Dict:
+    status_labels = {
+        DCPRRequestStatus.UNDER_PREPARATION.value: (
+            toolkit._("Under preparation"),
+            "info",
+        ),
+        DCPRRequestStatus.AWAITING_NSIF_REVIEW.value: (
+            toolkit._("Waiting for NSIF review"),
+            "info",
+        ),
+        DCPRRequestStatus.AWAITING_CSI_REVIEW.value: (
+            toolkit._("Waiting for CSI review"),
+            "info",
+        ),
+        DCPRRequestStatus.ACCEPTED.value: (toolkit._("Accepted"), "success"),
+        DCPRRequestStatus.REJECTED.value: (toolkit._("Rejected"), "danger"),
+    }
+
+    return status_labels

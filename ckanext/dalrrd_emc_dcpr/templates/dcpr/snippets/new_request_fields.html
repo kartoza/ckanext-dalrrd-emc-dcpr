@@ -1,9 +1,9 @@
 {% import 'macros/form.html' as form %}
 
 {% block fields %}
-  {{ form.input('organization_name', id='field-organization_name', label=_('Organization Name'), placeholder=_('eg. SASDI'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.select('organization_name', id='field-organization_name', label=_('Organization Name'),  options=organizations, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-  {{ form.input('organization_level', id='field-organization_level', label=_('Organization Level'), placeholder=_('eg. SASDI Level'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.select('organization_level', id='field-organization_level', label=_('Organization Level'), options=organizations_levels, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.input('organization_address', id='field-organization_address', label=_('Organization Address'), placeholder=_('eg. SASDI address'), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
@@ -23,22 +23,6 @@
   {{ form.input('data_capture_urgency', id='field-data_capture_urgency', label=_('Data capture urgency'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.markdown('additional_information', id='field-additional_information', label=_('Additional information'), placeholder=_('eg. Some additional notes about the requests') ) }}
-
-  {{ form.input('request_date', id='field-request_date', label=_('Request date'), placeholder=_('eg. 2022-01-01'), type='date', classes=[]) }}
-  {{ form.input('submission_date', id='field-submission_date', label=_('Submission date'), placeholder=_('eg. 2022-01-01'), type='date', classes=[]) }}
-  {{ form.input('nsif_review_date', id='field-nsif_review_date', label=_('NSIF review date'), placeholder=_('eg. 2022-01-01'), type='date', classes=[]) }}
-
-  {{ form.input('nsif_recommendation', id='field-nsif_recommendation', label=_('NSIF recommendation'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
-
-  {{ form.markdown('nsif_review_notes', id='field-nsif_review_notes', label=_('NSIF review notes'), placeholder=_('eg. NSIF review notes') ) }}
-
-  {{ form.input('nsif_review_additional_documents', id='field-nsif_review_additional_documents', label=_('NSIF review additional documents'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
-
-  {{ form.input('csi_moderation_date', id='field-csi_moderation_date', label=_('CSI moderation date'), placeholder=_('eg. 2022-01-01'), type='date', classes=[]) }}
-
-  {{ form.markdown('csi_moderation_notes', id='field-csi_moderation_notes', label=_('CSI review notes'), placeholder=_('eg. CSI review notes') ) }}
-
-  {{ form.input('csi_moderation_additional_documents', id='field-csi_moderation_additional_documents', label=_('NSIF review additional documents'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.checkbox('dataset_custodian', id='field-dataset_custodian', checked=false, value=false, label=_('Dataset Custodian'), placeholder=_(''), classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 

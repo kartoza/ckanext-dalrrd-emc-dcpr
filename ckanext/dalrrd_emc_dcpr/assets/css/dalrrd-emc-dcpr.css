@@ -302,6 +302,13 @@ fieldset[disabled] .btn-default.focus {
     background-color: #fff;
 }
 
+.request-heading {
+  font-size: 15px;
+  margin-top: 0;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
 .dataset-item:last-of-type {
   border-bottom:  1px solid #ccc;
   margin-bottom: 0;

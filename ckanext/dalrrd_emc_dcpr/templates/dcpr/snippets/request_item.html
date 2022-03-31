@@ -1,7 +1,7 @@
 {% set request_id = dcpr_request.csi_reference_id %}
 {% set organization_name = dcpr_request.organization_name %}
-{% set status = dcpr_request.status %}
 {% set request_date = dcpr_request.request_date %}
+{% set status = request_status[dcpr_request.status] %}
 
 
 {% block request_item %}
@@ -10,17 +10,17 @@
 
     <div class="col-md-12">
     {% block content %}
-      <div class="dataset-content">
+      <div>
         {% block heading %}
-          <h2 class="dataset-heading">
+          <h2 class="request-heading">
             {% block heading_title %}
             Request by
-              {{ organization_name }} {{ _('Organization')}}
+             <span class="text-muted">{{ organization_name }}  </span> {{ _('Organization')}}
             {% endblock %}
           </h2>
         {% endblock %}
         {% block notes %}
-          <div>Status: {{ status }}</div>
+        <div >Status: <span class="text-{{status[1]}}">{{ status[0] }}</span></div>
           <div>Request date: {{ request_date }}</div>
         {% endblock %}
       </div>

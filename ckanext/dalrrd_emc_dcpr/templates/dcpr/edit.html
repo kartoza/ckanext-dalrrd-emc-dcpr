@@ -32,6 +32,8 @@
 
 {% block primary_content_inner %}
     {% block form %}
-        {{- h.snippet('dcpr/snippets/request_form.html', dcpr_request=dcpr_request, errors=errors, error_summary=error_summary, nsif_reviewer=nsif_reviewer, csi_reviewer=csi_reviewer) -}}
+        {{- h.snippet('dcpr/snippets/request_form.html', dcpr_request=dcpr_request, errors=errors,
+            error_summary=error_summary, nsif_reviewer=nsif_reviewer, csi_reviewer=csi_reviewer,
+            organizations=organizations) -}}
     {% endblock %}
 {% endblock %}
