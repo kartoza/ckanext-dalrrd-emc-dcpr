@@ -144,9 +144,6 @@ def dcpr_request_show(request_id):
     extra_vars["nsif_reviewer"] = nsif_reviewer
     extra_vars["csi_reviewer"] = csi_reviewer
 
-    logger.debug("NSIF reviewer")
-    logger.debug(nsif_reviewer)
-
     try:
         dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
         request_owner = (
@@ -192,9 +189,6 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
             extra_vars["nsif_reviewer"] = nsif_reviewer
             extra_vars["csi_reviewer"] = csi_reviewer
 
-            logger.debug("NSIF reviewer")
-            logger.debug(nsif_reviewer)
-
         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
             return toolkit.base.abort(404, toolkit._("Request not found"))
 
@@ -229,10 +223,10 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
             )
             return toolkit.h.redirect_to(url)
 
-        except toolkit.NotAuthorized:
+        except toolkit.NotAuthorized as e:
             return toolkit.base.abort(
                 403,
-                toolkit._(u"Unauthorized to read DCPR request %s") % request_id,
+                toolkit._("Unauthorized to perfom the action, %s") % e,
             )
         except toolkit.ObjectNotFound as e:
             return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
@@ -246,4 +240,54 @@ def dcpr_request_edit(request_id, errors=None, error_summary=None):
         url = toolkit.h.url_for(
             "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
         )
+        return toolkit.h.redirect_to(url)
+
+
+@dcpr_blueprint.route("/request/delete/<request_id>", methods=["GET", "POST"])
+def dcpr_request_delete(request_id, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_delete view")
+    data_dict = {"request_id": request_id}
+    extra_vars = {}
+
+    context = {
+        u"user": toolkit.g.user,
+        u"auth_user_obj": toolkit.g.userobj,
+    }
+
+    if request.method == "GET":
+        try:
+            toolkit.check_access(
+                "dcpr_request_delete_auth", context, {"request_id": request_id}
+            )
+        except toolkit.NotAuthorized:
+            return toolkit.base.abort(
+                403,
+                toolkit._(u"User %r not authorized to delete DCPR requests")
+                % (toolkit.g.user),
+            )
+
+        return toolkit.render("dcpr/delete.html", extra_vars=extra_vars)
+
+    else:
+        try:
+            dcpr_request = toolkit.get_action("dcpr_request_delete")(context, data_dict)
+
+            url = toolkit.h.url_for("{0}.dcpr_home".format("dcpr"))
+            return toolkit.h.redirect_to(url)
+
+        except toolkit.NotAuthorized as e:
+            return toolkit.base.abort(
+                403,
+                toolkit._("Unauthorized to perfom the action, %s") % e,
+            )
+        except toolkit.ObjectNotFound as e:
+            return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
+        except toolkit.ValidationError as e:
+            errors = e.error_dict
+            error_summary = e.error_summary
+            return dcpr_request_edit(
+                dcpr_request.csi_reference_id, errors, error_summary
+            )
+
+        url = toolkit.h.url_for("{0}.dcpr_home".format("dcpr"))
         return toolkit.h.redirect_to(url)
