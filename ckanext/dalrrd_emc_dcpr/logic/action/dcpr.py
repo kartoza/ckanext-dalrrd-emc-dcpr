@@ -3,7 +3,7 @@ import logging
 import typing
 
 import ckan.plugins.toolkit as toolkit
-from ckan.lib import search
+from ckan.lib import search, plugins
 import ckan.lib.dictization as d
 
 from sqlalchemy import sql, select, exc
@@ -11,6 +11,8 @@ from sqlalchemy import sql, select, exc
 # from ckanext.dalrrd_emc_dcpr.model.request import DCPRRequest
 from ...model import dcpr_request as dcpr_request
 from ...model import dcpr_error_report
+
+from ..schema import create_dcpr_request_schema
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,6 @@ class DCPRRequestActionType(enum.Enum):
     ACCEPT = 2
     REJECT = 3
     ESCALATE_TO_CSI = 4
-    DELETE = 5
 
 
 def dcpr_error_report_create(context, data_dict):
@@ -93,6 +94,13 @@ def dcpr_request_create(context, data_dict):
         status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
     else:
         raise NotImplementedError
+
+    schema = context.get("schema", create_dcpr_request_schema())
+
+    data, errors = toolkit.navl_validate(data_dict, schema, context)
+
+    if errors:
+        raise toolkit.ValidationError(errors)
 
     request = dcpr_request.DCPRRequest(
         owner_user=data_dict["owner_user"],
