@@ -2,7 +2,7 @@
 
 {% block primary_content_inner %}
     {% block form %}
-        {{- h.snippet('dcpr/snippets/request_form.html') -}}
+        {% snippet 'dcpr/snippets/request_form.html', organizations=organizations, organizations_levels=organizations_levels %}
     {% endblock %}
 {% endblock %}
 

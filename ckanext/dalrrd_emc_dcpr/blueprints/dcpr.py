@@ -7,6 +7,9 @@ import ckan.lib.helpers as h
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 import ckan.lib.navl.dictization_functions as dict_fns
 
+from ..helpers import get_status_labels
+from ..model.dcpr_request import DCPRRequestOrganizationLevel
+
 logger = logging.getLogger(__name__)
 
 dcpr_blueprint = Blueprint(
@@ -19,9 +22,11 @@ def dcpr_home():
     logger.debug("Inside the dcpr_home view")
     existing_requests = toolkit.get_action("dcpr_request_list")(data_dict={})
 
-    return toolkit.render(
-        "dcpr/index.html", extra_vars={"dcpr_requests": existing_requests}
-    )
+    extra_vars = {}
+    extra_vars["dcpr_requests"] = existing_requests
+    extra_vars["request_status"] = get_status_labels()
+
+    return toolkit.render("dcpr/index.html", extra_vars=extra_vars)
 
 
 @dcpr_blueprint.route("/request/new", methods=["GET", "POST"])
@@ -31,15 +36,25 @@ def dcpr_request_new():
         u"user": toolkit.g.user,
         u"auth_user_obj": toolkit.g.userobj,
     }
+    extra_vars = {}
+    organizations = toolkit.get_action("organization_list")(context, {})
+    organizations = [{"value": org, "text": org} for org in organizations]
+
+    organizations_levels = [
+        {"value": level.value, "text": level.value}
+        for level in DCPRRequestOrganizationLevel
+    ]
+
+    extra_vars["dcpr_request"] = None
+    extra_vars["organizations"] = organizations
+    extra_vars["organizations_levels"] = organizations_levels
+
     if request.method == "POST":
         try:
             data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
             data_dict["owner_user"] = toolkit.g.userobj.id
-            data_dict["csi_moderator"] = None
-            data_dict["nsif_reviewer"] = None
-            data_dict["spatial_extent"] = None
 
         except dict_fns.DataError:
             return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
@@ -81,7 +96,7 @@ def dcpr_request_new():
                 % (toolkit.g.user),
             )
 
-        return toolkit.render("dcpr/new.html", extra_vars={"dcpr_request": None})
+        return toolkit.render("dcpr/new.html", extra_vars=extra_vars)
 
 
 @dcpr_blueprint.route("/search")
@@ -130,6 +145,7 @@ def dcpr_request_show(request_id):
     logger.debug("Inside the dcpr_request_show view")
     data_dict = {"id": request_id}
     extra_vars = {}
+    extra_vars["request_status"] = get_status_labels()
 
     nsif_reviewer = toolkit.h["emc_user_is_org_member"](
         "nsif", toolkit.g.userobj, role="editor"
@@ -188,8 +204,11 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
                 "csi", toolkit.g.userobj, role="editor"
             )
 
+            organizations = toolkit.get_action("organization_list")(context, data_dict)
+
             extra_vars["nsif_reviewer"] = nsif_reviewer
             extra_vars["csi_reviewer"] = csi_reviewer
+            extra_vars["organizations"] = organizations
 
         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
             return toolkit.base.abort(404, toolkit._("Request not found"))

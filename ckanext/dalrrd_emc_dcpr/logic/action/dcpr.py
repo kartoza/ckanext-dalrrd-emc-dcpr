@@ -2,6 +2,8 @@ import enum
 import logging
 import typing
 
+from datetime import datetime
+
 import ckan.plugins.toolkit as toolkit
 from ckan.lib import search, plugins
 import ckan.lib.dictization as d
@@ -90,8 +92,10 @@ def dcpr_request_create(context, data_dict):
 
     if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+        data_dict["request_date"] = datetime.now()
     elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
         status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        data_dict["submission_date"] = datetime.now()
     else:
         raise NotImplementedError
 
@@ -104,8 +108,8 @@ def dcpr_request_create(context, data_dict):
 
     request = dcpr_request.DCPRRequest(
         owner_user=data_dict["owner_user"],
-        csi_moderator=data_dict["csi_moderator"],
-        nsif_reviewer=data_dict["nsif_reviewer"],
+        csi_moderator=data_dict.get("csi_moderator", None),
+        nsif_reviewer=data_dict.get("nsif_reviewer", None),
         status=status,
         organization_name=data_dict["organization_name"],
         organization_level=data_dict["organization_level"],
@@ -115,21 +119,12 @@ def dcpr_request_create(context, data_dict):
         capture_start_date=data_dict["capture_start_date"],
         capture_end_date=data_dict["capture_end_date"],
         cost=data_dict["cost"],
-        spatial_extent=data_dict["spatial_extent"],
+        spatial_extent=data_dict.get("spatial_extent", None),
         spatial_resolution=data_dict["spatial_resolution"],
         data_capture_urgency=data_dict["data_capture_urgency"],
         additional_information=data_dict["additional_information"],
-        request_date=data_dict["request_date"],
-        submission_date=data_dict["submission_date"],
-        nsif_review_date=data_dict["nsif_review_date"],
-        nsif_recommendation=data_dict["nsif_recommendation"],
-        nsif_review_notes=data_dict["nsif_review_notes"],
-        nsif_review_additional_documents=data_dict["nsif_review_additional_documents"],
-        csi_moderation_notes=data_dict["csi_moderation_notes"],
-        csi_moderation_additional_documents=data_dict[
-            "csi_moderation_additional_documents"
-        ],
-        csi_moderation_date=data_dict["csi_moderation_date"],
+        request_date=data_dict.get("request_date", None),
+        submission_date=data_dict.get("submission_date", None),
     )
 
     request_dataset = dcpr_request.DCPRRequestDataset(
@@ -191,8 +186,12 @@ def dcpr_request_update(context, data_dict):
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
     elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
         status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        data_dict["nsif_review_date"] = datetime.now()
+        data_dict["nsif_reviewer"] = toolkit.g.userobj.id
     elif int(data_dict["action_type"]) == DCPRRequestActionType.ESCALATE_TO_CSI.value:
         status = dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+        data_dict["csi_review_date"] = datetime.now()
+        data_dict["csi_moderator"] = toolkit.g.userobj.id
     elif int(data_dict["action_type"]) == DCPRRequestActionType.ACCEPT.value:
         status = dcpr_request.DCPRRequestStatus.ACCEPTED.value
     elif int(data_dict["action_type"]) == DCPRRequestActionType.REJECT.value:
@@ -423,8 +422,8 @@ def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
 
 def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
 
-    logger.debug("Data dict")
-    logger.debug(data_dict)
+    data_dict.csi_moderator = data_dict.get("csi_moderator", None)
+    data_dict.nsif_reviewer = data_dict.get("nsif_reviewer", None)
 
     dcpr_request.organization_name = data_dict["organization_name"]
     dcpr_request.organization_level = data_dict["organization_level"]
@@ -434,23 +433,21 @@ def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
     dcpr_request.capture_start_date = data_dict["capture_start_date"]
     dcpr_request.capture_end_date = data_dict["capture_end_date"]
     dcpr_request.cost = data_dict["cost"]
-    dcpr_request.spatial_extent = data_dict["spatial_extent"]
+    dcpr_request.spatial_extent = data_dict.get("spatial_extent", None)
     dcpr_request.spatial_resolution = data_dict["spatial_resolution"]
     dcpr_request.data_capture_urgency = data_dict["data_capture_urgency"]
     dcpr_request.additional_information = data_dict["additional_information"]
-    dcpr_request.request_date = data_dict["request_date"]
-    dcpr_request.submission_date = data_dict["submission_date"]
-    dcpr_request.nsif_review_date = data_dict["nsif_review_date"]
-    dcpr_request.nsif_recommendation = data_dict["nsif_recommendation"]
-    dcpr_request.nsif_review_notes = data_dict["nsif_review_notes"]
-    dcpr_request.nsif_review_additional_documents = data_dict[
-        "nsif_review_additional_documents"
-    ]
-    dcpr_request.csi_moderation_notes = data_dict["csi_moderation_notes"]
-    dcpr_request.csi_moderation_additional_documents = data_dict[
-        "csi_moderation_additional_documents"
-    ]
-    dcpr_request.csi_moderation_date = data_dict["csi_moderation_date"]
+    dcpr_request.nsif_review_date = data_dict.get("nsif_review_date", None)
+    dcpr_request.nsif_recommendation = data_dict.get("nsif_recommendation", None)
+    dcpr_request.nsif_review_notes = data_dict.get("nsif_review_notes", None)
+    dcpr_request.nsif_review_additional_documents = data_dict.get(
+        "nsif_review_additional_documents", None
+    )
+    dcpr_request.csi_moderation_notes = data_dict.get("csi_moderation_notes", None)
+    dcpr_request.csi_moderation_additional_documents = data_dict.get(
+        "csi_moderation_additional_documents", None
+    )
+    dcpr_request.csi_moderation_date = data_dict.get("csi_moderation_date", None)
 
     dcpr_request_dataset.dataset_custodian = data_dict.get("dataset_custodian", False)
     dcpr_request_dataset.data_type = data_dict["data_type"]
@@ -462,4 +459,4 @@ def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
     dcpr_request_dataset.feature_description = data_dict["feature_description"]
     dcpr_request_dataset.data_usage_restrictions = data_dict["data_usage_restrictions"]
     dcpr_request_dataset.capture_method = data_dict["capture_method"]
-    dcpr_request_dataset.capture_method_detail = (data_dict["capture_method_detail"],)
+    dcpr_request_dataset.capture_method_detail = data_dict["capture_method_detail"]

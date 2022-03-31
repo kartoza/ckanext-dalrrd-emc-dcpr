@@ -1,11 +1,13 @@
 {% extends "dcpr/show_base.html" %}
 
+{% set status = request_status[dcpr_request.status] %}
+
 {% block primary_content_inner %}
   {{ super() }}
   {% block package_description %}
     <h1>
       {% block page_heading %}
-        {{ _("Request by %s organization").format(dcpr_request.organization_name) }}
+        <span class="text-muted">{{_('Opened by')}} {{ dcpr_request.organization_name }}  </span> {{ _('Organization')}}
       {% endblock %}
     </h1>
     {% block edit_link %}
@@ -22,7 +24,7 @@
   {% endblock %}
 
   {% block package_additional_info %}
-      {% snippet 'dcpr/snippets/request_info.html', dcpr_request=dcpr_request %}
+      {% snippet 'dcpr/snippets/request_info.html', dcpr_request=dcpr_request, status=status%}
   {% endblock %}
 
 {% endblock %}

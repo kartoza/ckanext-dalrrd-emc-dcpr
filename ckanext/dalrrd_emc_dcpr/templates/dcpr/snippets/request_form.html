@@ -30,9 +30,12 @@
 
   {% block fields %}
     {% if dcpr_request %}
-    {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors, immutable=immutable %}
+    {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors, immutable=immutable,
+      organizations=organizations, organizations_levels=organizations_levels, nsif_reviewer=nsif_reviewer,
+      csi_reviewer=csi_reviewer
+    %}
     {% else %}
-    {% snippet 'dcpr/snippets/new_request_fields.html' %}
+    {% snippet 'dcpr/snippets/new_request_fields.html', organizations=organizations, organizations_levels=organizations_levels %}
     {% endif %}
   {% endblock %}
 

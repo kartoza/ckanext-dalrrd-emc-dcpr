@@ -1,5 +1,5 @@
 <section class="additional-info">
-  <h3>{{ _('Information') }}</h3>
+  <h3>{{ _('Request information') }}</h3>
   <table class="table table-striped table-bordered table-condensed">
     <thead>
       <tr>
@@ -11,8 +11,8 @@
       {% block package_additional_info %}
         {% if dcpr_request.status %}
           <tr>
-            <th scope="row" class="dataset-label">{{ _('Status') }}</th>
-              <td class="dataset-details" property="foaf:homepage">{{ dcpr_request.status }}</td>
+            <th scope="row" class="dataset-label">{{ _('Status') }} </th>
+              <td class="dataset-details" property="foaf:homepage"> <span class="text-{{status[1]}}">{{ status[0] }}</span></td>
           </tr>
         {% endif %}
         {% if dcpr_request.organization_name %}

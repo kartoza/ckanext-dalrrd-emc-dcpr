@@ -164,6 +164,14 @@ class DCPRRequestStatus(enum.Enum):
     REJECTED = "REJECTED"
 
 
+class DCPRRequestOrganizationLevel(enum.Enum):
+    NATIONAL = "National"
+    PROVINCIAL = "Provincial"
+    MUNICIPAL = "Municipal"
+    TRIBAL = "Tribal"
+    AUTHORITY = "Authority"
+
+
 class DCPRRequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):
     def __init__(self, **kw):
         super(DCPRRequestDataset, self).__init__(**kw)
