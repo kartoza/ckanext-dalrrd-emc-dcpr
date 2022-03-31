@@ -41,7 +41,7 @@
 
   {{ form.input('csi_moderation_additional_documents', id='field-csi_moderation_additional_documents', label=_('NSIF review additional documents'), placeholder=_(''), value=dcpr_request.csi_moderation_additional_documents, error=errors.csi_moderation_additional_documents, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-  {{ form.checkbox('dataset_custodian', id='field-dataset_custodian', label=_('Dataset Custodian'), placeholder=_(''), value=dcpr_request.dataset_custodian, error=errors.dataset_custodian, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.checkbox('dataset_custodian', id='field-dataset_custodian', label=_('Dataset Custodian'), placeholder=_(''), checked=dcpr_request.dataset_custodian, value=dcpr_request.dataset_custodian, error=errors.dataset_custodian, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.input('data_type', id='field-data_type', label=_('Data type'), placeholder=_(''), value=dcpr_request.data_type, error=errors.data_type, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 

@@ -21,6 +21,7 @@ class DCPRRequestActionType(enum.Enum):
     ACCEPT = 2
     REJECT = 3
     ESCALATE_TO_CSI = 4
+    DELETE = 5
 
 
 def dcpr_error_report_create(context, data_dict):
@@ -166,13 +167,10 @@ def dcpr_request_create(context, data_dict):
 
 def dcpr_request_update(context, data_dict):
 
-    model = context["model"]
-    access = toolkit.check_access("dcpr_request_update_auth", context, data_dict)
-
     logger.debug("Inside the dcpr_request_update action")
 
-    if not access:
-        raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
+    model = context["model"]
+    toolkit.check_access("dcpr_request_update_auth", context, data_dict)
 
     if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
@@ -191,16 +189,58 @@ def dcpr_request_update(context, data_dict):
         data_dict["request_id"]
     )
 
-    new_request_obj, new_request_dataset_obj, _ = _create_request_objects(
-        context, status, data_dict
+    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
+        dcpr_request.DCPRRequestDataset.dcpr_request_id == data_dict["request_id"]
     )
 
-    if not request_obj:
+    if not request_obj or not request_dataset_obj:
         raise toolkit.ObjectNotFound
     else:
-        request_obj.status = new_request_obj.status
+        request_obj.status = status
+        if data_dict is not None:
+            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
 
     try:
+        model.Session.commit()
+        model.repo.commit()
+
+    except exc.InvalidRequestError as exception:
+        model.Session.rollback()
+    finally:
+        model.Session.close()
+
+    return request_obj
+
+
+def dcpr_request_delete(context, data_dict):
+
+    logger.debug("Inside the dcpr_request_delete action")
+    model = context["model"]
+    toolkit.check_access("dcpr_request_delete_auth", context, data_dict)
+
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        data_dict["request_id"]
+    )
+
+    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
+        dcpr_request.DCPRRequestDataset.dcpr_request_id == data_dict["request_id"]
+    )
+
+    notification_targets = model.Session.query(
+        dcpr_request.DCPRRequestNotificationTarget
+    ).filter(
+        dcpr_request.DCPRRequestNotificationTarget.dcpr_request_id
+        == data_dict["request_id"]
+    )
+
+    for target in notification_targets:
+        target.delete()
+
+    request_dataset_obj.delete()
+    model.Session.delete(request_obj)
+
+    try:
+        model.Session.commit()
         model.repo.commit()
 
     except exc.InvalidRequestError as exception:
@@ -212,7 +252,6 @@ def dcpr_request_update(context, data_dict):
 
 
 def dcpr_geospatial_request_create(context, data_dict):
-
     model = context["model"]
     toolkit.check_access("dcpr_request_create_auth", context, data_dict)
     logger.debug("Inside the dcpr_request_create action")
@@ -353,7 +392,6 @@ def dcpr_request_search(context: typing.Dict, data_dict: typing.Dict) -> typing.
 
 @toolkit.side_effect_free
 def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
-
     request_id = toolkit.get_or_bust(data_dict, "id")
 
     request_object = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
@@ -368,59 +406,45 @@ def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
     return request_dict
 
 
-def _create_request_objects(context, status, data_dict):
+def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
 
-    request = dcpr_request.DCPRRequest(
-        owner_user=data_dict["owner_user"],
-        csi_moderator=data_dict["csi_moderator"],
-        nsif_reviewer=data_dict["nsif_reviewer"],
-        status=status,
-        organization_name=data_dict["organization_name"],
-        organization_level=data_dict["organization_level"],
-        organization_address=data_dict["organization_address"],
-        proposed_project_name=data_dict["proposed_project_name"],
-        additional_project_context=data_dict["additional_project_context"],
-        capture_start_date=data_dict["capture_start_date"],
-        capture_end_date=data_dict["capture_end_date"],
-        cost=data_dict["cost"],
-        spatial_extent=data_dict["spatial_extent"],
-        spatial_resolution=data_dict["spatial_resolution"],
-        data_capture_urgency=data_dict["data_capture_urgency"],
-        additional_information=data_dict["additional_information"],
-        request_date=data_dict["request_date"],
-        submission_date=data_dict["submission_date"],
-        nsif_review_date=data_dict["nsif_review_date"],
-        nsif_recommendation=data_dict["nsif_recommendation"],
-        nsif_review_notes=data_dict["nsif_review_notes"],
-        nsif_review_additional_documents=data_dict["nsif_review_additional_documents"],
-        csi_moderation_notes=data_dict["csi_moderation_notes"],
-        csi_moderation_additional_documents=data_dict[
-            "csi_moderation_additional_documents"
-        ],
-        csi_moderation_date=data_dict["csi_moderation_date"],
-    )
+    logger.debug("Data dict")
+    logger.debug(data_dict)
 
-    request_dataset = dcpr_request.DCPRRequestDataset(
-        dataset_custodian=data_dict.get("dataset_custodian", False),
-        data_type=data_dict["data_type"],
-        purposed_dataset_title=data_dict["purposed_dataset_title"],
-        purposed_abstract=data_dict["purposed_abstract"],
-        dataset_purpose=data_dict["dataset_purpose"],
-        lineage_statement=data_dict["lineage_statement"],
-        associated_attributes=data_dict["associated_attributes"],
-        feature_description=data_dict["feature_description"],
-        data_usage_restrictions=data_dict["data_usage_restrictions"],
-        capture_method=data_dict["capture_method"],
-        capture_method_detail=data_dict["capture_method_detail"],
-    )
-    notification_targets = []
+    dcpr_request.organization_name = data_dict["organization_name"]
+    dcpr_request.organization_level = data_dict["organization_level"]
+    dcpr_request.organization_address = data_dict["organization_address"]
+    dcpr_request.proposed_project_name = data_dict["proposed_project_name"]
+    dcpr_request.additional_project_context = data_dict["additional_project_context"]
+    dcpr_request.capture_start_date = data_dict["capture_start_date"]
+    dcpr_request.capture_end_date = data_dict["capture_end_date"]
+    dcpr_request.cost = data_dict["cost"]
+    dcpr_request.spatial_extent = data_dict["spatial_extent"]
+    dcpr_request.spatial_resolution = data_dict["spatial_resolution"]
+    dcpr_request.data_capture_urgency = data_dict["data_capture_urgency"]
+    dcpr_request.additional_information = data_dict["additional_information"]
+    dcpr_request.request_date = data_dict["request_date"]
+    dcpr_request.submission_date = data_dict["submission_date"]
+    dcpr_request.nsif_review_date = data_dict["nsif_review_date"]
+    dcpr_request.nsif_recommendation = data_dict["nsif_recommendation"]
+    dcpr_request.nsif_review_notes = data_dict["nsif_review_notes"]
+    dcpr_request.nsif_review_additional_documents = data_dict[
+        "nsif_review_additional_documents"
+    ]
+    dcpr_request.csi_moderation_notes = data_dict["csi_moderation_notes"]
+    dcpr_request.csi_moderation_additional_documents = data_dict[
+        "csi_moderation_additional_documents"
+    ]
+    dcpr_request.csi_moderation_date = data_dict["csi_moderation_date"]
 
-    for target in data_dict.get("notification_targets", []):
-        target = dcpr_request.DCPRRequestNotificationTarget(
-            dcpr_request_id=request.csi_reference_id,
-            user_id=target.get("user_id"),
-            group_id=target.get("group_id"),
-        )
-        notification_targets.append(target)
-
-    return request, request_dataset, notification_targets
+    dcpr_request_dataset.dataset_custodian = data_dict.get("dataset_custodian", False)
+    dcpr_request_dataset.data_type = data_dict["data_type"]
+    dcpr_request_dataset.purposed_dataset_title = data_dict["purposed_dataset_title"]
+    dcpr_request_dataset.purposed_abstract = data_dict["purposed_abstract"]
+    dcpr_request_dataset.dataset_purpose = data_dict["dataset_purpose"]
+    dcpr_request_dataset.lineage_statement = data_dict["lineage_statement"]
+    dcpr_request_dataset.associated_attributes = data_dict["associated_attributes"]
+    dcpr_request_dataset.feature_description = data_dict["feature_description"]
+    dcpr_request_dataset.data_usage_restrictions = data_dict["data_usage_restrictions"]
+    dcpr_request_dataset.capture_method = data_dict["capture_method"]
+    dcpr_request_dataset.capture_method_detail = (data_dict["capture_method_detail"],)

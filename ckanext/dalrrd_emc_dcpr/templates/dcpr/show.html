@@ -3,15 +3,9 @@
 {% block primary_content_inner %}
   {{ super() }}
   {% block package_description %}
-    {% if dcpr_request.private %}
-      <span class="request-private badge badge-inverse pull-right">
-        <i class="fa fa-lock"></i>
-        {{ _('Private') }}
-      </span>
-    {% endif %}
     <h1>
       {% block page_heading %}
-        {{ _("Request by %s").format(dcpr_request.organization_name) }}
+        {{ _("Request by %s organization").format(dcpr_request.organization_name) }}
       {% endblock %}
     </h1>
     {% block edit_link %}
