@@ -44,5 +44,4 @@ def create_dcpr_request_schema(ignore_missing, not_missing, not_empty, unicode_s
 
 @validator_args
 def update_dcpr_request_schema():
-
     return create_dcpr_request_schema()

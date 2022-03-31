@@ -163,6 +163,7 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
     logger.debug("Inside the dcpr_request_edit view")
     data_dict = {"id": request_id}
     extra_vars = {}
+    extra_vars["errors"] = errors
 
     context = {
         u"user": toolkit.g.user,
@@ -178,7 +179,6 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
                 extra_vars["dcpr_request"] = dcpr_request
             elif data is not None:
                 extra_vars["dcpr_request"] = data
-                extra_vars["errors"] = errors
                 extra_vars["error_summary"] = error_summary
 
             nsif_reviewer = toolkit.h["emc_user_is_org_member"](
@@ -239,8 +239,9 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
+
             return dcpr_request_edit(
-                dcpr_request.csi_reference_id, errors, error_summary
+                data_dict.get("request_id", None), data_dict, errors, error_summary
             )
 
         url = toolkit.h.url_for(
