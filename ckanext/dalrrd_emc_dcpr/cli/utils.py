@@ -8,6 +8,8 @@ from ckan.plugins import toolkit
 from flask_babel import gettext as flask_ugettext, ngettext as flask_ungettext
 from jinja2 import Environment
 
+logger = logging.getLogger(__name__)
+
 
 class DatasetCreationResult(enum.Enum):
     CREATED = "created"
@@ -41,6 +43,7 @@ def create_single_dataset(
         )
         result = DatasetCreationResult.CREATED
     else:
+        logger.debug(f"dataset {dataset['name']!r} already exists, skipping...")
         result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
     return result
 

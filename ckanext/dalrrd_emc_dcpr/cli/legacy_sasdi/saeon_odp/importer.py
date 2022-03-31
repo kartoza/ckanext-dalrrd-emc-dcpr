@@ -4,6 +4,7 @@ import logging
 import typing
 from pathlib import Path
 
+import dateutil.parser
 from ckan.plugins import toolkit
 from slugify import slugify
 
@@ -37,12 +38,13 @@ def parse_record(record_path: Path):
 
     """
 
+    logger.debug(f"parsing {str(record_path)!r}...")
     raw_record = json.loads(record_path.read_text())
     main_title = [item for item in raw_record["titles"] if not item.get("titleType")][0]
     name = slugify(main_title["title"])[:100]
     notes = [
         i for i in raw_record["descriptions"] if i["descriptionType"] == "Abstract"
-    ][0]["description"]
+    ][0].get("description")
     owner_org = import_mappings.get_owner_org(raw_record["publisher"])
     maintainer = _get_maintainer(raw_record, record_path)
     return _CkanEmcDataset(
@@ -84,15 +86,16 @@ def _get_reference_date(record: typing.Dict) -> str:
                 # since our schema expects the reference date to be a single temporal
                 # value, we arbitrarily choose the start of the period as the
                 # reference date
-                result = start
+                raw_referece_date = start
             elif start:
-                result = start
+                raw_referece_date = start
             else:
-                result = end
+                raw_referece_date = end
             break
     else:
-        result = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y-%m-%d")
-    return result
+        raw_referece_date = dt.datetime.now(tz=dt.timezone.utc).strftime("%Y-%m-%d")
+    parsed = dateutil.parser.parse(raw_referece_date)
+    return parsed.strftime("%Y-%m-%d")
 
 
 def _get_maintainer(record: typing.Dict, record_path: Path) -> str:
@@ -218,14 +221,16 @@ def _get_tags(record: typing.Dict) -> typing.List[typing.Dict]:
 def _get_resources(record: typing.Dict) -> typing.List[_CkanResource]:
     resources = []
     for linked_resource in record.get("linkedResources", []):
-        resources.append(
-            _CkanResource(
-                url=linked_resource["resourceURL"],
-                format=linked_resource.get("resourceFormat"),
-                format_version="1",
-                resource_type=linked_resource["linkedResourceType"],
-                name=linked_resource.get("resourceName"),
-                description=linked_resource.get("resourceDescription"),
+        url = linked_resource.get("resourceURL")
+        if url is not None:
+            resources.append(
+                _CkanResource(
+                    url=linked_resource["resourceURL"],
+                    format=linked_resource.get("resourceFormat"),
+                    format_version="1",
+                    resource_type=linked_resource["linkedResourceType"],
+                    name=linked_resource.get("resourceName"),
+                    description=linked_resource.get("resourceDescription"),
+                )
             )
-        )
     return resources

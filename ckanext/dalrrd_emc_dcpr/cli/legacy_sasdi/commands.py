@@ -6,10 +6,12 @@ from pathlib import Path
 
 import click
 import httpx
-from ckan.plugins import toolkit
+from ckan.config import environment
+from ckan import model
 from lxml import etree
 
-from .. import utils
+from .. import _CkanEmcDataset, utils
+
 from .import_mappings import CUSTODIAN_MAP, get_owner_org
 from .csw import csw_downloader
 from .saeon_odp import importer as saeon_importer
@@ -223,31 +225,86 @@ def _accumulator(iterable: typing.Iterable, *, capacity: int = 10) -> typing.Ite
     default=_DEFAULTS_SAEON_ODP_RECORDS_DIR,
     show_default=True,
 )
-def import_records_saeon_odp(records_dir: Path):
-    # TODO: create the orgs first, then it will likely be possible to use concurrency
-    for idx, path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
-        logger.debug(f"{idx} - Processing path {path!r}...")
-        parsed = saeon_importer.parse_record(path)
-        try:
-            toolkit.get_action("package_show")(
-                context={"ignore_auth": True}, data_dict={"id": parsed.name}
-            )
-            already_exists = True
-        except toolkit.ObjectNotFound:
-            already_exists = False
+@click.option(
+    "--max-workers", type=int, default=_DEFAULT_MAX_WORKERS, show_default=True
+)
+def import_records_saeon_odp(records_dir: Path, max_workers: int):
+    batch_generator = _accumulator(
+        (p for p in records_dir.iterdir() if p.is_file()), capacity=10
+    )
+    relevant_orgs: typing.Dict[str, typing.Dict] = {}
+    for idx, record_paths in enumerate(batch_generator):
+        parsed = [saeon_importer.parse_record(p) for p in record_paths]
+        parsed = []
+        for path_index, path in enumerate(record_paths):
+            parsed_record = saeon_importer.parse_record(path)
+            parsed.append(parsed_record)
+            print(f"({idx + path_index}) {str(path)} - {parsed_record.reference_date}")
+        continue
 
-        if not already_exists:
-            owner_org, _ = utils.maybe_create_organization(
-                parsed.owner_org,
-                title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
-                description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
-            )
-            org_admin = [
-                u for u in owner_org.get("users", []) if u["capacity"] == "admin"
-            ][0]
-            utils.create_single_dataset(org_admin, parsed.to_data_dict())
-        else:
-            logger.info(f"record {parsed.name!r} already exists, skipping...")
+        org_names = {r.owner_org for r in parsed}
+        logger.debug(f"{org_names=}")
+        # first create the organizations
+        with futures.ThreadPoolExecutor(min(max_workers, len(org_names))) as executor:
+            to_do = {}
+            for org_name in org_names:
+                future = executor.submit(
+                    utils.maybe_create_organization,
+                    org_name,
+                    title=CUSTODIAN_MAP[org_name].get("title"),
+                    description=CUSTODIAN_MAP[org_name].get("description"),
+                )
+                to_do[future] = org_name
+            for future in futures.as_completed(to_do.keys()):
+                org, _ = future.result()
+                relevant_orgs[org["name"]] = org
+        logger.info(f"---- relevant_orgs: {list(relevant_orgs.keys())}")
+        model.Session.remove()
+        environment.update_config()
+        # then the records
+        with futures.ThreadPoolExecutor(min(max_workers, len(parsed))) as executor:
+            to_do = {}
+            for record in parsed:
+                owner_org = relevant_orgs[record.owner_org]
+                org_admin = [
+                    u for u in owner_org.get("users", []) if u["capacity"] == "admin"
+                ][0]
+                future = executor.submit(
+                    utils.create_single_dataset, org_admin, record.to_data_dict()
+                )
+                to_do[future] = record
+            for future_index, future in enumerate(futures.as_completed(to_do.keys())):
+                logger.debug(
+                    f"{idx + future_index} - Retrieving result "
+                    f"for {to_do[future].name!r}..."
+                )
+                future.result()
+        model.Session.remove()
+        environment.update_config()
+
+    # for idx, path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
+    #     logger.debug(f"{idx} - Processing path {path!r}...")
+    #     parsed = saeon_importer.parse_record(path)
+    #     try:
+    #         toolkit.get_action("package_show")(
+    #             context={"ignore_auth": True}, data_dict={"id": parsed.name}
+    #         )
+    #         already_exists = True
+    #     except toolkit.ObjectNotFound:
+    #         already_exists = False
+    #
+    #     if not already_exists:
+    #         owner_org, _ = utils.maybe_create_organization(
+    #             parsed.owner_org,
+    #             title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
+    #             description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
+    #         )
+    #         org_admin = [
+    #             u for u in owner_org.get("users", []) if u["capacity"] == "admin"
+    #         ][0]
+    #         utils.create_single_dataset(org_admin, parsed.to_data_dict())
+    #     else:
+    #         logger.info(f"record {parsed.name!r} already exists, skipping...")
     logger.info("Done!")
 
 
