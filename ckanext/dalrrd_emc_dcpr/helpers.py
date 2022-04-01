@@ -87,6 +87,12 @@ def convert_geojson_to_bbox(
     return result
 
 
+def convert_string_extent_to_bbox(extent: str) -> typing.List[float]:
+    if extent is None:
+        return []
+    return [float(value) for value in extent.split(",")]
+
+
 def helper_show_version(*args, **kwargs) -> typing.Dict:
     return show_version()
 

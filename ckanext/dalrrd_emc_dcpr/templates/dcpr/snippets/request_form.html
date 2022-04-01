@@ -32,10 +32,12 @@
     {% if dcpr_request %}
     {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors, immutable=immutable,
       organizations=organizations, organizations_levels=organizations_levels, nsif_reviewer=nsif_reviewer,
-      csi_reviewer=csi_reviewer
+      csi_reviewer=csi_reviewer, data_urgency=data_urgency
     %}
     {% else %}
-    {% snippet 'dcpr/snippets/new_request_fields.html', organizations=organizations, organizations_levels=organizations_levels %}
+    {% snippet 'dcpr/snippets/new_request_fields.html', organizations=organizations, organizations_levels=organizations_levels,
+      data_urgency=data_urgency
+      %}
     {% endif %}
   {% endblock %}
 

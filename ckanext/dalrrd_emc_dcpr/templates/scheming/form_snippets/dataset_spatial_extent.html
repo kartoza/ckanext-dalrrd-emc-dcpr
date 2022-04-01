@@ -14,7 +14,7 @@
     label=h.scheming_language_text(field.label),
     placeholder=h.scheming_language_text(field.form_placeholder),
     type='text',
-    value=(field_bounding_box|join(",") if field_bounding_box is not none else default_bounding_box|join(",")),
+    value=(field_bounding_box if field_bounding_box is not none else default_bounding_box|join(",")),
     error=errors[field.field_name],
     classes=['control-medium'],
     attrs=dict({"class": "form-control"}, **(field.get('form_attrs', {}))),
