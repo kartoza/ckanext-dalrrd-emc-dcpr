@@ -295,3 +295,4 @@ def dcpr_request_delete(request_id, errors=None, error_summary=None):
 
         url = toolkit.h.url_for("{0}.dcpr_home".format("dcpr"))
         return toolkit.h.redirect_to(url)
+
