@@ -94,6 +94,7 @@ def test_create_dcpr_request(name, user_available, user_logged):
             "data_usage_restrictions": request.data_usage_restrictions,
             "capture_method": request.capture_method,
             "capture_method_detail": request.capture_method_detail,
+            "action_type": 0,
         }
 
         context = {"ignore_auth": not user_logged, "user": user["name"]}

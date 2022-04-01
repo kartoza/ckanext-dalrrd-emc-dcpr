@@ -90,9 +90,12 @@ def dcpr_request_create(context, data_dict):
     if not access:
         raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
 
-    if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
+    action_type = data_dict.get("action_type", None)
+    action_type = int(action_type) if action_type is not None else None
+
+    if action_type == DCPRRequestActionType.SAVE.value:
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
-    elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
+    elif action_type == DCPRRequestActionType.SUBMIT.value:
         status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
         data_dict["submission_date"] = datetime.now()
     else:
