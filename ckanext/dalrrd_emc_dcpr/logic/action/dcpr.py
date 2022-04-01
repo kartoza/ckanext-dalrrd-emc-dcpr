@@ -92,7 +92,6 @@ def dcpr_request_create(context, data_dict):
 
     if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
-        data_dict["request_date"] = datetime.now()
     elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
         status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
         data_dict["submission_date"] = datetime.now()
@@ -121,7 +120,7 @@ def dcpr_request_create(context, data_dict):
         cost=data_dict["cost"],
         spatial_extent=data_dict.get("spatial_extent", None),
         spatial_resolution=data_dict["spatial_resolution"],
-        data_capture_urgency=data_dict["data_capture_urgency"],
+        data_capture_urgency=data_dict.get("data_capture_urgency", None),
         additional_information=data_dict["additional_information"],
         request_date=data_dict.get("request_date", None),
         submission_date=data_dict.get("submission_date", None),
@@ -130,8 +129,8 @@ def dcpr_request_create(context, data_dict):
     request_dataset = dcpr_request.DCPRRequestDataset(
         dataset_custodian=data_dict.get("dataset_custodian", False),
         data_type=data_dict["data_type"],
-        purposed_dataset_title=data_dict["purposed_dataset_title"],
-        purposed_abstract=data_dict["purposed_abstract"],
+        proposed_dataset_title=data_dict["proposed_dataset_title"],
+        proposed_abstract=data_dict["proposed_abstract"],
         dataset_purpose=data_dict["dataset_purpose"],
         lineage_statement=data_dict["lineage_statement"],
         associated_attributes=data_dict["associated_attributes"],
@@ -422,8 +421,8 @@ def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
 
 def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
 
-    data_dict.csi_moderator = data_dict.get("csi_moderator", None)
-    data_dict.nsif_reviewer = data_dict.get("nsif_reviewer", None)
+    dcpr_request.csi_moderator = data_dict.get("csi_moderator", None)
+    dcpr_request.nsif_reviewer = data_dict.get("nsif_reviewer", None)
 
     dcpr_request.organization_name = data_dict["organization_name"]
     dcpr_request.organization_level = data_dict["organization_level"]
@@ -451,8 +450,8 @@ def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
 
     dcpr_request_dataset.dataset_custodian = data_dict.get("dataset_custodian", False)
     dcpr_request_dataset.data_type = data_dict["data_type"]
-    dcpr_request_dataset.purposed_dataset_title = data_dict["purposed_dataset_title"]
-    dcpr_request_dataset.purposed_abstract = data_dict["purposed_abstract"]
+    dcpr_request_dataset.proposed_dataset_title = data_dict["proposed_dataset_title"]
+    dcpr_request_dataset.proposed_abstract = data_dict["proposed_abstract"]
     dcpr_request_dataset.dataset_purpose = data_dict["dataset_purpose"]
     dcpr_request_dataset.lineage_statement = data_dict["lineage_statement"]
     dcpr_request_dataset.associated_attributes = data_dict["associated_attributes"]

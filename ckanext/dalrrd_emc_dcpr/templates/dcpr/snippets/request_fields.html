@@ -1,27 +1,39 @@
 {% import 'macros/form.html' as form %}
 
+{% if dcpr_request.capture_start_date %}
+  {% set capture_start_date = h.date_str_to_datetime(dcpr_request.capture_start_date).strftime("%Y-%m-%d") %}
+{% else %}
+    {% set capture_start_date = None %}
+{% endif %}
+
+{% if dcpr_request.capture_end_date %}
+  {% set capture_end_date = h.date_str_to_datetime(dcpr_request.capture_end_date).strftime("%Y-%m-%d") %}
+{% else %}
+    {% set capture_end_date = None %}
+{% endif %}
+
 {% block fields %}
 
-  {{ form.select('organization_name', id='field-organization_name', label=_('Organization Name'), placeholder=_('eg. SASDI'), options=organizations, selected=dcpr_request.organization_name, error=errors.organization_name, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control', disabled_attr: immutable }) }}
+  {{ form.select('organization_name', id='field-organization_name', label=_('Organization Name'), options=organizations, selected=dcpr_request.organization_name, error=errors.organization_name, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control', disabled_attr: immutable }) }}
 
-  {{ form.input('organization_level', id='field-organization_level', label=_('Organization Level'), placeholder=_('eg. SASDI Level'), value=dcpr_request.organization_level, error=errors.organization_level, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control' , disabled_attr: immutable}) }}
+  {{ form.select('organization_level', id='field-organization_level', label=_('Organization Level'), options=organizations_levels, selected=dcpr_request.organization_level, error=errors.organization_level, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control' , disabled_attr: immutable}) }}
 
   {{ form.input('organization_address', id='field-organization_address', label=_('Organization Address'), placeholder=_('eg. SASDI address'), value=dcpr_request.organization_address, error=errors.organization_address, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control' , disabled_attr: immutable}) }}
 
-  {{ form.input('proposed_project_name', id='field-proposed_project_name', label=_('Proposed Project Name'), placeholder=_('eg. Data Request'), value=dcpr_request.proposed_project_name, error=errors.proposed_project_name, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control' , disabled_attr: immutable}) }}
+  {{ form.input('proposed_project_name', id='field-proposed_project_name', label=_('Proposed Project Name'), is_required=True, placeholder=_('eg. Data Request'), value=dcpr_request.proposed_project_name, error=errors.proposed_project_name, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control' , disabled_attr: immutable}) }}
 
   {{ form.markdown('additional_project_context', id='field-additional_project_context', label=_('Additional project context'), placeholder=_('eg. Some useful notes about the data'), value=dcpr_request.additional_project_context, error=errors.additional_project_context) }}
 
-  {{ form.input('capture_start_date', id='field-capture_start_date', label=_('Capture start date'), placeholder=_('eg. 2022-01-01'), value=h.date_str_to_datetime(dcpr_request.capture_start_date).strftime("%Y-%m-%d"), error=errors.capture_start_date, type='date', classes=[]) }}
+  {{ form.input('capture_start_date', id='field-capture_start_date', label=_('Capture start date'), placeholder=_('eg. 2022-01-01'), value=capture_start_date, error=errors.capture_start_date, type='date', classes=[]) }}
 
-  {{ form.input('capture_end_date', id='field-capture_end_date', label=_('Capture end date'), placeholder=_('eg. 2022-01-01'), value=h.date_str_to_datetime(dcpr_request.capture_end_date).strftime("%Y-%m-%d"), error=errors.capture_end_date, type='date', classes=[]) }}
+  {{ form.input('capture_end_date', id='field-capture_end_date', label=_('Capture end date'), placeholder=_('eg. 2022-01-01'), value=capture_end_date, error=errors.capture_end_date, type='date', classes=[]) }}
 
   {{ form.input('cost', id='field-cost', label=_('Proposed project cost'), placeholder=_('eg. 200,000 Rands'), value=dcpr_request.cost, error=errors.cost, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-  {# - snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent"}, data=dcpr_request.spatial_extent -#}
+  {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data=dcpr_request or {}, errors=errors or {} %}
 
   {{ form.input('spatial_resolution', id='field-spatial_resolution', label=_('Spatial resolution'), placeholder=_(''), value=dcpr_request.spatial_resolution, error=errors.spatial_resolution, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
-  {{ form.input('data_capture_urgency', id='field-data_capture_urgency', label=_('Data capture urgency'), placeholder=_(''), value=dcpr_request.data_capture_urgency, error=errors.data_capture_urgency, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.select('data_capture_urgency', id='field-data_capture_urgency', label=_('Data capture urgency'), options=data_urgency, selected=dcpr_request.data_capture_urgency, error=errors.data_capture_urgency, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.markdown('additional_information', id='field-additional_information', label=_('Additional information'), placeholder=_('eg. Some additional notes about the requests'), value=dcpr_request.additional_information, error=errors.additional_information) }}
 
@@ -43,9 +55,9 @@
 
   {{ form.input('data_type', id='field-data_type', label=_('Data type'), placeholder=_(''), value=dcpr_request.data_type, error=errors.data_type, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-  {{ form.input('purposed_dataset_title', id='field-purposed_dataset_title', label=_('Purposed dataset title'), placeholder=_(''), value=dcpr_request.purposed_dataset_title, error=errors.purposed_dataset_title, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.input('proposed_dataset_title', id='field-proposed_dataset_title', label=_('Proposed dataset title'), placeholder=_(''), value=dcpr_request.proposed_dataset_title, error=errors.proposed_dataset_title, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-  {{ form.input('purposed_abstract', id='field-purposed_abstract', label=_('Proposed abstract'), placeholder=_(''), value=dcpr_request.purposed_abstract, error=errors.purposed_abstract, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.input('proposed_abstract', id='field-proposed_abstract', label=_('Proposed abstract'), placeholder=_(''), value=dcpr_request.proposed_abstract, error=errors.proposed_abstract, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.input('dataset_purpose', id='field-dataset_purpose', label=_('Purposed of dataset'), placeholder=_(''), value=dcpr_request.dataset_purpose, error=errors.dataset_purpose, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
@@ -53,7 +65,7 @@
 
   {{ form.input('associated_attributes', id='field-associated_attributes', label=_('Associated attributes'), placeholder=_(''), value=dcpr_request.associated_attributes, error=errors.associated_attributes, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
-  {{ form.input('feature_description', id='field-feature_description', label=_('Feature Description'), placeholder=_(''), value=dcpr_request.feature_description, error=errors.feature_description, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
+  {{ form.markdown('feature_description', id='field-feature_description', label=_('Feature Description'), placeholder=_(''), value=dcpr_request.feature_description, error=errors.feature_description, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 
   {{ form.input('data_usage_restrictions', id='field-data_usage_restrictions', label=_('Data usage restrictions'), placeholder=_(''), value=dcpr_request.data_usage_restrictions, error=errors.data_usage_restrictions, classes=['control-full'], attrs={'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}) }}
 

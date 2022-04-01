@@ -5,7 +5,7 @@
 
 {% set map_config = h.get_common_map_config() %}
 {% set default_bounding_box = h.emc_default_bounding_box() %}
-{% set field_bounding_box = h.emc_convert_geojson_to_bounding_box(data.get(field.field_name)) %}
+{% set field_bounding_box = h.emc_extent_to_bbox(data.get(field.field_name, None)) %}
 {% set input_id = ["field", field.field_name]|join("-") %}
 
 {% call form.input(
@@ -18,13 +18,13 @@
     error=errors[field.field_name],
     classes=['control-medium'],
     attrs=dict({"class": "form-control"}, **(field.get('form_attrs', {}))),
-    is_required=h.scheming_field_required(field)
+    is_required=False
 ) %}
     <div
             class="dataset-spatial-extent-map"
             data-module="emcDatasetSpatialExtentMap"
             data-module-map-config="{{ h.dump_json(map_config) }}"
-            data-module-default-extent="{{ default_bounding_box }}"
+            data-module-default-extent="{{ field_bounding_box or default_bounding_box }}"
             data-module-form-input-id="{{ input_id }}"
     >
         <div id="dataset-spatial-extent-map-container"></div>

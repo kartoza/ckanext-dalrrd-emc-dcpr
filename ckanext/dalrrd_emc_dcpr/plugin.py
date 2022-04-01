@@ -206,6 +206,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_build_nav_main": helpers.build_pages_nav_main,
             "emc_default_bounding_box": helpers.get_default_bounding_box,
             "emc_convert_geojson_to_bounding_box": helpers.convert_geojson_to_bbox,
+            "emc_extent_to_bbox": helpers.convert_string_extent_to_bbox,
             "emc_sasdi_themes": helpers.get_sasdi_themes,
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
             "emc_show_version": helpers.helper_show_version,

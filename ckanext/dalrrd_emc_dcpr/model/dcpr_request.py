@@ -43,8 +43,8 @@ dcpr_request_table = Table(
     Column("organization_address", types.UnicodeText),
     Column("proposed_project_name", types.UnicodeText),
     Column("additional_project_context", types.UnicodeText),
-    Column("capture_start_date", types.DateTime, default=datetime.datetime.utcnow),
-    Column("capture_end_date", types.DateTime, default=datetime.datetime.utcnow),
+    Column("capture_start_date", types.DateTime),
+    Column("capture_end_date", types.DateTime),
     Column("cost", types.UnicodeText),
     Column("spatial_extent", types.UnicodeText),
     Column("spatial_resolution", types.UnicodeText),
@@ -52,14 +52,17 @@ dcpr_request_table = Table(
     Column("additional_information", types.UnicodeText),
     Column("additional_documents", types.UnicodeText),
     Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
-    Column("submission_date", types.DateTime, default=datetime.datetime.utcnow),
-    Column("nsif_review_date", types.DateTime, default=datetime.datetime.utcnow),
+    Column("submission_date", types.DateTime),
+    Column(
+        "nsif_review_date",
+        types.DateTime,
+    ),
     Column("nsif_recommendation", types.UnicodeText),
     Column("nsif_review_notes", types.UnicodeText),
     Column("nsif_review_additional_documents", types.UnicodeText),
     Column("csi_moderation_notes", types.UnicodeText),
     Column("csi_moderation_additional_documents", types.UnicodeText),
-    Column("csi_moderation_date", types.DateTime, default=datetime.datetime.utcnow),
+    Column("csi_moderation_date", types.DateTime),
 )
 
 dcpr_request_dataset_table = Table(
@@ -70,8 +73,8 @@ dcpr_request_dataset_table = Table(
     ),
     Column("dataset_custodian", types.Boolean, default=False),
     Column("data_type", types.UnicodeText),
-    Column("purposed_dataset_title", types.UnicodeText),
-    Column("purposed_abstract", types.UnicodeText),
+    Column("proposed_dataset_title", types.UnicodeText),
+    Column("proposed_abstract", types.UnicodeText),
     Column("dataset_purpose", types.UnicodeText),
     Column("lineage_statement", types.UnicodeText),
     Column("associated_attributes", types.UnicodeText),
@@ -154,6 +157,14 @@ dcpr_geospatial_request_notification_table = Table(
 )
 
 
+class DCPRRequestOrganizationLevel(enum.Enum):
+    NATIONAL = "National"
+    PROVINCIAL = "Provincial"
+    MUNICIPAL = "Municipal"
+    TRIBAL = "Tribal"
+    AUTHORITY = "Authority"
+
+
 class DCPRRequestStatus(enum.Enum):
     UNDER_PREPARATION = "UNDER_PREPARATION"
     AWAITING_NSIF_REVIEW = "AWAITING_NSIF_REVIEW"
@@ -164,12 +175,10 @@ class DCPRRequestStatus(enum.Enum):
     REJECTED = "REJECTED"
 
 
-class DCPRRequestOrganizationLevel(enum.Enum):
-    NATIONAL = "National"
-    PROVINCIAL = "Provincial"
-    MUNICIPAL = "Municipal"
-    TRIBAL = "Tribal"
-    AUTHORITY = "Authority"
+class DCPRRequestUrgency(enum.Enum):
+    LOW = "Low"
+    MEDIUM = "Medium"
+    HIGH = "High"
 
 
 class DCPRRequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):

@@ -8,7 +8,7 @@ from ckan.logic import clean_dict, parse_params, tuplize_dict
 import ckan.lib.navl.dictization_functions as dict_fns
 
 from ..helpers import get_status_labels
-from ..model.dcpr_request import DCPRRequestOrganizationLevel
+from ..model.dcpr_request import DCPRRequestOrganizationLevel, DCPRRequestUrgency
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +44,14 @@ def dcpr_request_new():
         {"value": level.value, "text": level.value}
         for level in DCPRRequestOrganizationLevel
     ]
+    data_urgency = [
+        {"value": level.value, "text": level.value} for level in DCPRRequestUrgency
+    ]
 
     extra_vars["dcpr_request"] = None
     extra_vars["organizations"] = organizations
     extra_vars["organizations_levels"] = organizations_levels
+    extra_vars["data_urgency"] = data_urgency
 
     if request.method == "POST":
         try:
@@ -78,7 +82,9 @@ def dcpr_request_new():
             error_summary = e.error_summary
 
             request.method = "GET"
-            return dcpr_request_edit(None, data_dict, errors, error_summary)
+            return dcpr_request_edit(
+                None, data=data_dict, errors=errors, error_summary=error_summary
+            )
 
         url = toolkit.h.url_for(
             "{0}.dcpr_request_show".format("dcpr"),
@@ -97,47 +103,6 @@ def dcpr_request_new():
             )
 
         return toolkit.render("dcpr/new.html", extra_vars=extra_vars)
-
-
-@dcpr_blueprint.route("/search")
-def dcpr_search():
-    logger.debug("Inside the dcpr_search view")
-    extra_vars = {}
-
-    extra_vars[u"q"] = q = toolkit.request.args.get(u"q", u"")
-    page = toolkit.h.get_page_number(toolkit.request.args)
-
-    limit = toolkit.config.get(u"ckan.dcpr_requests_per_page") or 10
-    data = {u"q": q, u"rows": limit, u"start": (page - 1) * limit}
-    try:
-
-        existing_requests = toolkit.get_action("dcpr_request_search")(data_dict=data)
-        extra_vars["requests"] = existing_requests
-
-        extra_vars[u"page"] = h.Page(
-            collection=existing_requests[u"results"],
-            page=page,
-            item_count=existing_requests[u"count"],
-            items_per_page=limit,
-        )
-
-    except SearchQueryError as error:
-        logger.info("Request search query rejected: %r", error.args)
-        toolkit.base.abort(
-            400,
-            toolkit._("Invalid search query: {error_message}").format(
-                error_message=str(error)
-            ),
-        )
-    except SearchError as error:
-        # May be bad input from the user, but may also be more serious like
-        # bad code causing a SOLR syntax error, or a problem connecting to
-        # SOLR
-        logger.error("Request search error: %r", error.args)
-        extra_vars["query_error"] = True
-        extra_vars["page"] = h.Page(collection=[])
-
-    return toolkit.render("dcpr/index.html", extra_vars=extra_vars)
 
 
 @dcpr_blueprint.route("/request/<request_id>")
@@ -181,6 +146,20 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
     extra_vars = {}
     extra_vars["errors"] = errors
 
+    organizations = toolkit.get_action("organization_list")({}, {})
+    organizations = [{"value": org, "text": org} for org in organizations]
+
+    organizations_levels = [
+        {"value": level.value, "text": level.value}
+        for level in DCPRRequestOrganizationLevel
+    ]
+    data_urgency = [
+        {"value": level.value, "text": level.value} for level in DCPRRequestUrgency
+    ]
+    extra_vars["organizations"] = organizations
+    extra_vars["organizations_levels"] = organizations_levels
+    extra_vars["data_urgency"] = data_urgency
+
     context = {
         u"user": toolkit.g.user,
         u"auth_user_obj": toolkit.g.userobj,
@@ -203,12 +182,8 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
             csi_reviewer = toolkit.h["emc_user_is_org_member"](
                 "csi", toolkit.g.userobj, role="editor"
             )
-
-            organizations = toolkit.get_action("organization_list")(context, data_dict)
-
             extra_vars["nsif_reviewer"] = nsif_reviewer
             extra_vars["csi_reviewer"] = csi_reviewer
-            extra_vars["organizations"] = organizations
 
         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
             return toolkit.base.abort(404, toolkit._("Request not found"))
@@ -237,11 +212,13 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
             )
             data_dict["csi_moderator"] = None
             data_dict["nsif_reviewer"] = None
-            data_dict["spatial_extent"] = None
+
+            logger.debug("Spatial extent")
+            logger.debug(data_dict["spatial_extent"])
         except dict_fns.DataError:
             return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
         try:
-            dcpr_request = toolkit.get_action("dcpr_request_update")(context, data_dict)
+            toolkit.get_action("dcpr_request_update")(context, data_dict)
 
             url = toolkit.h.url_for(
                 "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
@@ -259,6 +236,7 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
             errors = e.error_dict
             error_summary = e.error_summary
 
+            request.method = "GET"
             return dcpr_request_edit(
                 data_dict.get("request_id", None), data_dict, errors, error_summary
             )

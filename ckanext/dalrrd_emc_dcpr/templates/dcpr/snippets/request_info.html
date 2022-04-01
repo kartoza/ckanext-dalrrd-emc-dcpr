@@ -42,7 +42,6 @@
             <td class="dataset-details">{{ dcpr_request.proposed_project_name }}</td>
           </tr>
         {% endif %}
-
         {% if dcpr_request.additional_project_context %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Additional project context") }}</th>
@@ -208,19 +207,19 @@
               </td>
             </tr>
         {% endif %}
-        {% if dcpr_request.purposed_dataset_title %}
+        {% if dcpr_request.proposed_dataset_title %}
             <tr>
-              <th scope="row" class="dataset-label">{{ _("Purposed dataset title") }}</th>
+              <th scope="row" class="dataset-label">{{ _("Proposed dataset title") }}</th>
               <td class="dataset-details">
-                {{ dcpr_request.purposed_dataset_title }}
+                {{ dcpr_request.proposed_dataset_title }}
               </td>
             </tr>
         {% endif %}
-        {% if dcpr_request.purposed_abstract %}
+        {% if dcpr_request.proposed_abstract %}
             <tr>
-              <th scope="row" class="dataset-label">{{ _("Purposed abstract") }}</th>
+              <th scope="row" class="dataset-label">{{ _("Proposed abstract") }}</th>
               <td class="dataset-details">
-                {{ dcpr_request.purposed_abstract }}
+                {{ dcpr_request.proposed_abstract }}
               </td>
             </tr>
         {% endif %}
