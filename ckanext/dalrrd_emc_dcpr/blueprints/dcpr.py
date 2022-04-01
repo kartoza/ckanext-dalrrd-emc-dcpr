@@ -33,8 +33,8 @@ def dcpr_home():
 def dcpr_request_new():
     logger.debug("Inside the dcpr_new_request view")
     context = {
-        u"user": toolkit.g.user,
-        u"auth_user_obj": toolkit.g.userobj,
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
     }
     extra_vars = {}
     organizations = toolkit.get_action("organization_list")(context, {})
@@ -61,7 +61,7 @@ def dcpr_request_new():
             data_dict["owner_user"] = toolkit.g.userobj.id
 
         except dict_fns.DataError:
-            return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
+            return toolkit.base.abort(400, toolkit._("Integrity Error"))
         try:
             dcpr_request = toolkit.get_action("dcpr_request_create")(context, data_dict)
 
@@ -73,10 +73,10 @@ def dcpr_request_new():
 
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
-                403, toolkit._(u"Unauthorized to create DCPR request")
+                403, toolkit._("Unauthorized to create DCPR request")
             )
         except toolkit.ObjectNotFound as e:
-            return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
+            return toolkit.base.abort(404, toolkit._("DCPR request not found"))
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
@@ -98,7 +98,7 @@ def dcpr_request_new():
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
                 403,
-                toolkit._(u"User %r not authorized to create DCPR requests")
+                toolkit._("User %r not authorized to create DCPR requests")
                 % (toolkit.g.user),
             )
 
@@ -161,8 +161,8 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
     extra_vars["data_urgency"] = data_urgency
 
     context = {
-        u"user": toolkit.g.user,
-        u"auth_user_obj": toolkit.g.userobj,
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
     }
 
     if request.method == "GET":
@@ -199,7 +199,7 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
                 403,
-                toolkit._(u"User %r not authorized to edit DCPR requests")
+                toolkit._("User %r not authorized to edit DCPR requests")
                 % (toolkit.g.user),
             )
 
@@ -216,7 +216,7 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
             logger.debug("Spatial extent")
             logger.debug(data_dict["spatial_extent"])
         except dict_fns.DataError:
-            return toolkit.base.abort(400, toolkit._(u"Integrity Error"))
+            return toolkit.base.abort(400, toolkit._("Integrity Error"))
         try:
             toolkit.get_action("dcpr_request_update")(context, data_dict)
 
@@ -231,7 +231,7 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
                 toolkit._("Unauthorized to perfom the action, %s") % e,
             )
         except toolkit.ObjectNotFound as e:
-            return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
+            return toolkit.base.abort(404, toolkit._("DCPR request not found"))
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
@@ -254,8 +254,8 @@ def dcpr_request_delete(request_id, errors=None, error_summary=None):
     extra_vars = {}
 
     context = {
-        u"user": toolkit.g.user,
-        u"auth_user_obj": toolkit.g.userobj,
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
     }
 
     if request.method == "GET":
@@ -266,7 +266,7 @@ def dcpr_request_delete(request_id, errors=None, error_summary=None):
         except toolkit.NotAuthorized:
             return toolkit.base.abort(
                 403,
-                toolkit._(u"User %r not authorized to delete DCPR requests")
+                toolkit._("User %r not authorized to delete DCPR requests")
                 % (toolkit.g.user),
             )
 
@@ -285,7 +285,7 @@ def dcpr_request_delete(request_id, errors=None, error_summary=None):
                 toolkit._("Unauthorized to perfom the action, %s") % e,
             )
         except toolkit.ObjectNotFound as e:
-            return toolkit.base.abort(404, toolkit._(u"DCPR request not found"))
+            return toolkit.base.abort(404, toolkit._("DCPR request not found"))
         except toolkit.ValidationError as e:
             errors = e.error_dict
             error_summary = e.error_summary
@@ -295,4 +295,3 @@ def dcpr_request_delete(request_id, errors=None, error_summary=None):
 
         url = toolkit.h.url_for("{0}.dcpr_home".format("dcpr"))
         return toolkit.h.redirect_to(url)
-
