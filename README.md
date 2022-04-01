@@ -280,6 +280,11 @@ mentioned above). Run the following command:
 docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan db init
 ```
 
+Afterwards, proceed to run any migrations required by the ckanext-dlarrd-emc-dcpr extension
+
+```
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan db upgrade --plugin dalrrd_emc_dcpr
+```
 
 Now you should be able to go to `http://localhost:5000` and see the ckan
 landing page. If not, you may need to reload the ckan web app after
@@ -390,6 +395,18 @@ poetry shell
 
 ckan --help
 ```
+
+
+### Recreating the main CKAN DB
+
+The CKAN database is kept in a docker volume named `emc-dcpr_ckan-db-data`. If you need to recreate the DB you
+can remove this docker volume. Do the following:
+
+- If needed, wind down the docker-compose stack;
+- Remove the DB volume with `docker volume rm emc-dcpr_ckan-db-data`
+- Start the docker-compose stack again
+- Run the DB initialization command
+- Bootstrap the system again
 
 
 ### Frontend work

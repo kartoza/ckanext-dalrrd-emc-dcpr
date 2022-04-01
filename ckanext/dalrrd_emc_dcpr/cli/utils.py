@@ -3,6 +3,8 @@ import logging
 import typing
 
 import click
+from ckan import model
+from ckan.logic import NotFound
 from ckan.lib import jinja_extensions
 from ckan.plugins import toolkit
 from flask_babel import gettext as flask_ugettext, ngettext as flask_ungettext
@@ -27,24 +29,24 @@ def get_jinja_env():
 
 
 def create_single_dataset(
-    user: typing.Dict, dataset: typing.Dict
+    user: typing.Dict, dataset: typing.Dict, close_session: bool = False
 ) -> DatasetCreationResult:
     try:
         toolkit.get_action("package_show")(
-            context={"user": user["name"]}, data_dict={"id": dataset["name"]}
+            {"user": user["name"]}, data_dict={"id": dataset["name"]}
         )
     except toolkit.ObjectNotFound:
         package_exists = False
     else:
         package_exists = True
     if not package_exists:
-        toolkit.get_action("package_create")(
-            context={"user": user["name"]}, data_dict=dataset
-        )
+        toolkit.get_action("package_create")({"user": user["name"]}, data_dict=dataset)
         result = DatasetCreationResult.CREATED
     else:
-        logger.debug(f"dataset {dataset['name']!r} already exists, skipping...")
+        # logger.debug(f"dataset {dataset['name']!r} already exists, skipping...")
         result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
+    if close_session:
+        model.Session.remove()
     return result
 
 
@@ -87,6 +89,7 @@ def maybe_create_organization(
     name: str,
     title: typing.Optional[str] = None,
     description: typing.Optional[str] = None,
+    close_session: bool = False,
 ) -> typing.Tuple[typing.Dict, bool]:
     try:
         organization = toolkit.get_action("organization_show")(
@@ -101,7 +104,7 @@ def maybe_create_organization(
             }
         )
         created = False
-    except toolkit.ObjectNotFound:  # org does not exist yet, create it
+    except NotFound:  # org does not exist yet, create it
         user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
         data_dict = {
             "name": name,
@@ -110,12 +113,12 @@ def maybe_create_organization(
         }
         data_dict = {k: v for k, v in data_dict.items() if v is not None}
         organization = toolkit.get_action("organization_create")(
-            context={
-                "user": user["name"],
-            },
+            context={"user": user["name"]},
             data_dict=data_dict,
         )
         created = True
+    if close_session:
+        model.Session.remove()
     return organization, created
 
 

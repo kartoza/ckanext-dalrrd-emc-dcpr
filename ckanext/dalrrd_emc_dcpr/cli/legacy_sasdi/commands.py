@@ -1,5 +1,5 @@
-import concurrent.futures
 import logging
+import re
 import typing
 from concurrent import futures
 from pathlib import Path
@@ -201,17 +201,6 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
     logger.error("Not implemented yet")
 
 
-def _accumulator(iterable: typing.Iterable, *, capacity: int = 10) -> typing.Iterable:
-    current_load = []
-    for idx, item in enumerate(iterable):
-        current_load.append(item)
-        if idx % capacity == 0:
-            yield current_load
-            current_load = []
-    else:  # yield the last elements
-        yield current_load
-
-
 @saeon_odp.command("import-records")
 @click.option(
     "--records-dir",
@@ -229,94 +218,28 @@ def _accumulator(iterable: typing.Iterable, *, capacity: int = 10) -> typing.Ite
     "--max-workers", type=int, default=_DEFAULT_MAX_WORKERS, show_default=True
 )
 def import_records_saeon_odp(records_dir: Path, max_workers: int):
+    capacity = max_workers
     batch_generator = _accumulator(
-        (p for p in records_dir.iterdir() if p.is_file()), capacity=10
+        (p for p in records_dir.iterdir() if p.is_file()), capacity=capacity
     )
     relevant_orgs: typing.Dict[str, typing.Dict] = {}
     for idx, record_paths in enumerate(batch_generator):
-        parsed = [saeon_importer.parse_record(p) for p in record_paths]
         parsed = []
+        seen_names: typing.Set[str] = set()
         for path_index, path in enumerate(record_paths):
             parsed_record = saeon_importer.parse_record(path)
+            fixed_name = _fix_name(parsed_record.name, seen_names)
+            seen_names.add(fixed_name)
+            parsed_record.name = fixed_name
             parsed.append(parsed_record)
-            print(f"({idx + path_index}) {str(path)} - {parsed_record.reference_date}")
-        continue
-
-        org_names = {r.owner_org for r in parsed}
-        logger.debug(f"{org_names=}")
-        # first create the organizations
-        with futures.ThreadPoolExecutor(min(max_workers, len(org_names))) as executor:
-            to_do = {}
-            for org_name in org_names:
-                future = executor.submit(
-                    utils.maybe_create_organization,
-                    org_name,
-                    title=CUSTODIAN_MAP[org_name].get("title"),
-                    description=CUSTODIAN_MAP[org_name].get("description"),
-                )
-                to_do[future] = org_name
-            for future in futures.as_completed(to_do.keys()):
-                org, _ = future.result()
-                relevant_orgs[org["name"]] = org
-        logger.info(f"---- relevant_orgs: {list(relevant_orgs.keys())}")
-        model.Session.remove()
-        environment.update_config()
-        # then the records
-        with futures.ThreadPoolExecutor(min(max_workers, len(parsed))) as executor:
-            to_do = {}
-            for record in parsed:
-                owner_org = relevant_orgs[record.owner_org]
-                org_admin = [
-                    u for u in owner_org.get("users", []) if u["capacity"] == "admin"
-                ][0]
-                future = executor.submit(
-                    utils.create_single_dataset, org_admin, record.to_data_dict()
-                )
-                to_do[future] = record
-            for future_index, future in enumerate(futures.as_completed(to_do.keys())):
-                logger.debug(
-                    f"{idx + future_index} - Retrieving result "
-                    f"for {to_do[future].name!r}..."
-                )
-                future.result()
-        model.Session.remove()
-        environment.update_config()
-
-    # for idx, path in enumerate(i for i in records_dir.iterdir() if i.is_file()):
-    #     logger.debug(f"{idx} - Processing path {path!r}...")
-    #     parsed = saeon_importer.parse_record(path)
-    #     try:
-    #         toolkit.get_action("package_show")(
-    #             context={"ignore_auth": True}, data_dict={"id": parsed.name}
-    #         )
-    #         already_exists = True
-    #     except toolkit.ObjectNotFound:
-    #         already_exists = False
-    #
-    #     if not already_exists:
-    #         owner_org, _ = utils.maybe_create_organization(
-    #             parsed.owner_org,
-    #             title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
-    #             description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
-    #         )
-    #         org_admin = [
-    #             u for u in owner_org.get("users", []) if u["capacity"] == "admin"
-    #         ][0]
-    #         utils.create_single_dataset(org_admin, parsed.to_data_dict())
-    #     else:
-    #         logger.info(f"record {parsed.name!r} already exists, skipping...")
+            logger.debug(f"{capacity * idx + path_index} - {str(path.name)}")
+        if len(parsed) > 0:
+            org_names = {r.owner_org for r in parsed}
+            logger.debug(f"{org_names=}")
+            relevant_orgs.update(_maybe_create_orgs(org_names, max_workers))
+            result_gen = _create_records(parsed, relevant_orgs, max_workers)
+            list(result_gen)
     logger.info("Done!")
-
-
-def _import_single_saeon_record(record_path: Path):
-    parsed = saeon_importer.parse_record(record_path)
-    owner_org, _ = utils.maybe_create_organization(
-        parsed.owner_org,
-        title=CUSTODIAN_MAP[parsed.owner_org].get("title"),
-        description=CUSTODIAN_MAP[parsed.owner_org].get("description"),
-    )
-    org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][0]
-    utils.create_single_dataset(org_admin, parsed.to_data_dict())
 
 
 def _concurrent_thumbnail_download(
@@ -351,3 +274,112 @@ def _concurrent_thumbnail_download(
                     logger.info(f"Gotten {thumbnail_path!r}")
                     result.append(thumbnail_path)
     return result
+
+
+def _accumulator(iterable: typing.Iterable, *, capacity: int = 10) -> typing.Iterable:
+    current_load = []
+    for idx, item in enumerate(iterable):
+        current_load.append(item)
+        if idx != 0 and idx % capacity == 0:
+            yield current_load
+            current_load = []
+    else:  # yield the last elements
+        yield current_load
+
+
+def _generate_new_name(name: str, max_name_len: int) -> str:
+    """Generates a new name by PREFIXING a numeric string"""
+    pattern = re.compile(r"^(\d+)-")
+    max_len = max_name_len - 2
+    has_number = pattern.search(name)
+    if has_number:
+        current = int(has_number.group(1))
+        next_ = str(current + 1)
+        if len(name) >= max_len:
+            if len(next_) > len(str(current)):
+                # the next number occupies one more char than the previous one, we
+                # need to make space for it. We do it by removing a char at the end of
+                # the name
+                new_name = pattern.sub(f"{next_}-", name[:-1])
+            else:
+                new_name = pattern.sub(f"{next_}-", name)
+        else:
+            new_name = pattern.sub(f"{next_}-", name)
+    else:
+        if len(name) >= max_len:
+            new_name = "1-" + name[:-2]
+        else:
+            new_name = "1-" + name
+    return new_name
+
+
+def _fix_name(
+    name: str,
+    seen_names: typing.Iterable[str],
+    *,
+    max_name_len: int = 100,
+) -> str:
+    """Fix duplicate names by appending a number to them
+
+    This function tries to come up with unique names. If the input `name` is present
+    in the `seen_names` iterable, then a new name will be derived from the input one.
+    The new name will not have a larger length than the input `max_name_len`
+
+    New names are generated by suffixing a slash and an increasing number to the end
+    of the input `name`. When the original name is too big, this function chops off
+    characters from the non-suffix part.
+
+    """
+
+    if name in seen_names:
+        new_name = _generate_new_name(name, max_name_len)
+        result = _fix_name(new_name, seen_names, max_name_len=max_name_len)
+    else:
+        result = name
+    return result
+
+
+def _maybe_create_orgs(
+    organization_names: typing.Collection[str], max_workers: int
+) -> typing.Dict[str, typing.Dict]:
+    orgs = {}
+    num_workers = min(max_workers, len(organization_names))
+    with futures.ThreadPoolExecutor(num_workers) as executor:
+        to_do = {}
+        for name in organization_names:
+            future = executor.submit(
+                utils.maybe_create_organization,
+                name,
+                title=CUSTODIAN_MAP[name].get("title"),
+                description=CUSTODIAN_MAP[name].get("description"),
+                close_session=True,
+            )
+            to_do[future] = name
+        for future in futures.as_completed(to_do.keys()):
+            org, _ = future.result()
+            orgs[org["name"]] = org
+    return orgs
+
+
+def _create_records(
+    records: typing.List[_CkanEmcDataset],
+    owner_organizations: typing.Dict[str, typing.Dict],
+    max_workers: int,
+):
+    with futures.ThreadPoolExecutor(min(max_workers, len(records))) as executor:
+        to_do = {}
+        for record in records:
+            owner_org = owner_organizations[record.owner_org]
+            org_admin = [
+                u for u in owner_org.get("users", []) if u["capacity"] == "admin"
+            ][0]
+            future = executor.submit(
+                utils.create_single_dataset,
+                org_admin,
+                record.to_data_dict(),
+                close_session=True,
+            )
+            to_do[future] = record
+        for future_index, future in enumerate(futures.as_completed(to_do.keys())):
+            yield future_index, future.result()
+    pass

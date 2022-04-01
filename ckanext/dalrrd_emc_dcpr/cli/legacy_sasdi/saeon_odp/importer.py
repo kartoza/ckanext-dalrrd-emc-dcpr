@@ -38,13 +38,13 @@ def parse_record(record_path: Path):
 
     """
 
-    logger.debug(f"parsing {str(record_path)!r}...")
+    # logger.debug(f"parsing {str(record_path)!r}...")
     raw_record = json.loads(record_path.read_text())
     main_title = [item for item in raw_record["titles"] if not item.get("titleType")][0]
     name = slugify(main_title["title"])[:100]
     notes = [
         i for i in raw_record["descriptions"] if i["descriptionType"] == "Abstract"
-    ][0].get("description")
+    ][0].get("description", "There is no additional information about the dataset")
     owner_org = import_mappings.get_owner_org(raw_record["publisher"])
     maintainer = _get_maintainer(raw_record, record_path)
     return _CkanEmcDataset(
@@ -164,7 +164,7 @@ def _get_bbox(record: typing.Dict) -> typing.Dict:
             }
             break
     else:  # did not find any geoLocationBox, lets use a default
-        geojson_bbox = toolkit.h["emc_default_bounding_box"]()
+        geojson_bbox = toolkit.h["dalrrd_emc_dcpr_default_spatial_search_extent"]()
     return toolkit.h["emc_convert_geojson_to_bounding_box"](geojson_bbox)
 
 
