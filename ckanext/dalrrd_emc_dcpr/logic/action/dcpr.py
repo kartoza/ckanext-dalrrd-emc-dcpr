@@ -366,44 +366,6 @@ def dcpr_request_list(context: typing.Dict, data_dict: typing.Dict) -> typing.Li
 
 
 @toolkit.side_effect_free
-def dcpr_request_search(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
-    """Returns search results of the DCPR requests to user
-
-    Anonymous users are able to view all moderated requests
-
-    Unmoderated requests are available only to:
-    - the creator
-    - a sysadmin
-    - if the request has been submitted to users of the current workflow stage
-
-    """
-
-    logger.debug("Inside the dcpr_request_search action")
-    access_result = toolkit.check_access(
-        "dcpr_request_list_auth", context, data_dict=data_dict
-    )
-    logger.debug(f"access_result: {access_result}")
-    user = context["auth_user_obj"]
-
-    query = search.query_for(dcpr_request.DCPRRequest)
-    query.run(data_dict)
-
-    search_results = {
-        "count": query.count,
-        "results": query.results,
-    }
-
-    if user is None:  # show only  moderated requests
-        pass
-    elif user.sysadmin:  # show all requests
-        pass
-    else:  # show relevant requests depending on the user's organization
-        pass
-
-    return search_results
-
-
-@toolkit.side_effect_free
 def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
     request_id = toolkit.get_or_bust(data_dict, "id")
 

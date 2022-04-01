@@ -80,6 +80,9 @@ def dcpr_request_update_auth(
 
     request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=data_dict["request_id"])
 
+    if not request_obj:
+        return {"success": False, "msg": toolkit._("Request not found")}
+
     owner = user.id == request_obj.owner_user
     nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
