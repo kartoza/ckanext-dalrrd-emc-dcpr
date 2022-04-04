@@ -15,12 +15,6 @@ from .. import import_mappings
 logger = logging.getLogger(__name__)
 
 
-def import_dataset(dataset: _CkanEmcDataset):
-    # taking into account the dataset's owner_org, get one of the org admins to become
-    # the dataset owner user
-    pass
-
-
 def parse_record(record_path: Path):
     """Parse the raw JSON record into a Dataset object
 
@@ -67,7 +61,7 @@ def parse_record(record_path: Path):
         dataset_character_set="utf-8",
         type="dataset",
         sasdi_theme=None,
-        tags=_get_tags(raw_record),
+        tags=_get_tags(raw_record, record_path),
         source=None,
     )
 
@@ -173,12 +167,16 @@ def _build_tag_name(raw_name: str) -> typing.Optional[str]:
     return name if 2 <= len(name) < 100 else None
 
 
-def _get_tags(record: typing.Dict) -> typing.List[typing.Dict]:
+def _get_tags(record: typing.Dict, record_path: Path) -> typing.List[typing.Dict]:
     tags = [
         {
-            "name": "legacy-sasdi-import",
+            "name": import_mappings.IMPORT_TAG_NAME,
             "vocabulary_id": None,
-        }
+        },
+        {
+            "name": f"import-filename-{record_path.name}",
+            "vocabulary_id": None,
+        },
     ]
     custom_separator = "__"
     for subject in record["subjects"]:

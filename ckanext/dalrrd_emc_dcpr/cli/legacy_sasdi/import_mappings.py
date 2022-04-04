@@ -3,6 +3,7 @@
 # map to convert from the reported custodian to the respective CKAN org
 import typing
 
+IMPORT_TAG_NAME: typing.Final[str] = "legacy-sasdi-import"
 _STAGING_ORG_NAME: typing.Final[str] = "emc_staging"
 
 CUSTODIAN_MAP: typing.Dict[str, typing.Dict] = {

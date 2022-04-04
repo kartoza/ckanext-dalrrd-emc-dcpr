@@ -1,3 +1,4 @@
+import concurrent.futures
 import logging
 import re
 import typing
@@ -6,13 +7,12 @@ from pathlib import Path
 
 import click
 import httpx
-from ckan.config import environment
-from ckan import model
+from ckan.plugins import toolkit
 from lxml import etree
 
 from .. import _CkanEmcDataset, utils
 
-from .import_mappings import CUSTODIAN_MAP, get_owner_org
+from .import_mappings import CUSTODIAN_MAP, IMPORT_TAG_NAME, get_owner_org
 from .csw import csw_downloader
 from .saeon_odp import importer as saeon_importer
 
@@ -214,32 +214,73 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
     default=_DEFAULTS_SAEON_ODP_RECORDS_DIR,
     show_default=True,
 )
-@click.option(
-    "--max-workers", type=int, default=_DEFAULT_MAX_WORKERS, show_default=True
-)
-def import_records_saeon_odp(records_dir: Path, max_workers: int):
-    capacity = max_workers
-    batch_generator = _accumulator(
-        (p for p in records_dir.iterdir() if p.is_file()), capacity=capacity
-    )
-    relevant_orgs: typing.Dict[str, typing.Dict] = {}
-    for idx, record_paths in enumerate(batch_generator):
-        parsed = []
-        seen_names: typing.Set[str] = set()
-        for path_index, path in enumerate(record_paths):
-            parsed_record = saeon_importer.parse_record(path)
-            fixed_name = _fix_name(parsed_record.name, seen_names)
-            seen_names.add(fixed_name)
-            parsed_record.name = fixed_name
-            parsed.append(parsed_record)
-            logger.debug(f"{capacity * idx + path_index} - {str(path.name)}")
-        if len(parsed) > 0:
-            org_names = {r.owner_org for r in parsed}
-            logger.debug(f"{org_names=}")
-            relevant_orgs.update(_maybe_create_orgs(org_names, max_workers))
-            result_gen = _create_records(parsed, relevant_orgs, max_workers)
-            list(result_gen)
+def import_records_saeon_odp(records_dir: Path):
+    seen_names: typing.Set[str] = set()
+    for idx, path in enumerate(p for p in records_dir.iterdir() if p.is_file()):
+        parsed_record = saeon_importer.parse_record(path)
+        fixed_name = _fix_name(parsed_record.name, seen_names)
+        seen_names.add(fixed_name)
+        parsed_record.name = fixed_name
+        org_name = parsed_record.owner_org
+        owner_org, _ = utils.maybe_create_organization(
+            org_name,
+            title=CUSTODIAN_MAP[org_name].get("title"),
+            description=CUSTODIAN_MAP[org_name].get("description"),
+        )
+        logger.debug(f"({idx}) - Creating {parsed_record.name!r}...")
+        org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
+            0
+        ]
+        utils.create_single_dataset(org_admin, parsed_record.to_data_dict())
     logger.info("Done!")
+
+
+@saeon_odp.command()
+@click.option("--page-size", type=int, default=10)
+def purge_imported_records(page_size: int):
+    """Delete imported records
+
+    Imported records are found by the presence of a specially named tag.
+
+    """
+
+    get_number_result = toolkit.get_action("package_search")(
+        context={"ignore_auth": True},
+        data_dict={
+            "include_private": True,
+            "fq": f"tags:{IMPORT_TAG_NAME}",
+            "rows": 0,
+        },
+    )
+    num_datasets = get_number_result.get("count")
+    if num_datasets is not None and num_datasets > 0:
+        num_pages, remainder = divmod(num_datasets, page_size)
+        num_pages = num_pages + 1 if remainder > 0 else num_pages
+        num_done = 0
+        for page in reversed(range(num_pages)):
+            get_datasets_result = toolkit.get_action("package_search")(
+                context={"ignore_auth": True},
+                data_dict={
+                    "include_private": True,
+                    "fq": f"tags:{IMPORT_TAG_NAME}",
+                    "start": page * page_size,
+                    "rows": page_size,
+                },
+            )
+            datasets = get_datasets_result.get("results", [])
+            for dataset in datasets:
+                logger.info(
+                    f"({num_done + 1}/{num_datasets}) Deleting dataset {dataset}..."
+                )
+                toolkit.get_action("dataset_purge")(
+                    context={"ignore_auth": True}, data_dict={"id": dataset["id"]}
+                )
+        logger.info("Done!")
+    elif num_datasets == 0:
+        logger.info(f"There are no datasets to delete")
+        logger.info("Done!")
+    else:
+        logger.error(f"Could not determine number of imported datasets")
 
 
 def _concurrent_thumbnail_download(
@@ -274,17 +315,6 @@ def _concurrent_thumbnail_download(
                     logger.info(f"Gotten {thumbnail_path!r}")
                     result.append(thumbnail_path)
     return result
-
-
-def _accumulator(iterable: typing.Iterable, *, capacity: int = 10) -> typing.Iterable:
-    current_load = []
-    for idx, item in enumerate(iterable):
-        current_load.append(item)
-        if idx != 0 and idx % capacity == 0:
-            yield current_load
-            current_load = []
-    else:  # yield the last elements
-        yield current_load
 
 
 def _generate_new_name(name: str, max_name_len: int) -> str:
@@ -337,49 +367,3 @@ def _fix_name(
     else:
         result = name
     return result
-
-
-def _maybe_create_orgs(
-    organization_names: typing.Collection[str], max_workers: int
-) -> typing.Dict[str, typing.Dict]:
-    orgs = {}
-    num_workers = min(max_workers, len(organization_names))
-    with futures.ThreadPoolExecutor(num_workers) as executor:
-        to_do = {}
-        for name in organization_names:
-            future = executor.submit(
-                utils.maybe_create_organization,
-                name,
-                title=CUSTODIAN_MAP[name].get("title"),
-                description=CUSTODIAN_MAP[name].get("description"),
-                close_session=True,
-            )
-            to_do[future] = name
-        for future in futures.as_completed(to_do.keys()):
-            org, _ = future.result()
-            orgs[org["name"]] = org
-    return orgs
-
-
-def _create_records(
-    records: typing.List[_CkanEmcDataset],
-    owner_organizations: typing.Dict[str, typing.Dict],
-    max_workers: int,
-):
-    with futures.ThreadPoolExecutor(min(max_workers, len(records))) as executor:
-        to_do = {}
-        for record in records:
-            owner_org = owner_organizations[record.owner_org]
-            org_admin = [
-                u for u in owner_org.get("users", []) if u["capacity"] == "admin"
-            ][0]
-            future = executor.submit(
-                utils.create_single_dataset,
-                org_admin,
-                record.to_data_dict(),
-                close_session=True,
-            )
-            to_do[future] = record
-        for future_index, future in enumerate(futures.as_completed(to_do.keys())):
-            yield future_index, future.result()
-    pass
