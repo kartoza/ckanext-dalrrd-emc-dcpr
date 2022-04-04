@@ -77,7 +77,7 @@ def dcpr_request_update_auth(
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    owner = user.id == request_obj.owner_user
+    owner = user.get("id") == request_obj.owner_user
     nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
 
@@ -143,7 +143,7 @@ def dcpr_request_edit_auth(
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    owner = user.id == request_obj.owner_user
+    owner = user.get("id") == request_obj.owner_user
     nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
 
@@ -169,7 +169,7 @@ def dcpr_request_delete_auth(
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    owner = user.id == request_obj.owner_user
+    owner = user.get("id") == request_obj.owner_user
     request_in_preparation = (
         request_obj.status == dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
     )

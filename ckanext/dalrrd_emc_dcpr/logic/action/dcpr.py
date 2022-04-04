@@ -175,6 +175,8 @@ def dcpr_request_update(context, data_dict):
     logger.debug("Inside the dcpr_request_update action")
 
     model = context["model"]
+    user = context["auth_user_obj"]
+
     toolkit.check_access("dcpr_request_update_auth", context, data_dict)
 
     schema = context.get("schema", update_dcpr_request_schema())
@@ -184,29 +186,41 @@ def dcpr_request_update(context, data_dict):
     if errors:
         raise toolkit.ValidationError(errors)
 
+    nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
+    csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
+
     if int(data_dict["action_type"]) == DCPRRequestActionType.SAVE.value:
         status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
     elif int(data_dict["action_type"]) == DCPRRequestActionType.SUBMIT.value:
         status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-        data_dict["nsif_review_date"] = datetime.now()
-        data_dict["nsif_reviewer"] = toolkit.g.userobj.id
     elif int(data_dict["action_type"]) == DCPRRequestActionType.ESCALATE_TO_CSI.value:
+        data_dict["nsif_review_date"] = datetime.now()
+        data_dict["nsif_reviewer"] = user.id
         status = dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
-        data_dict["csi_review_date"] = datetime.now()
-        data_dict["csi_moderator"] = toolkit.g.userobj.id
     elif int(data_dict["action_type"]) == DCPRRequestActionType.ACCEPT.value:
+        data_dict["csi_review_date"] = datetime.now()
+        data_dict["csi_moderator"] = user.id
         status = dcpr_request.DCPRRequestStatus.ACCEPTED.value
     elif int(data_dict["action_type"]) == DCPRRequestActionType.REJECT.value:
+        if nsif_reviewer:
+            data_dict["nsif_review_date"] = datetime.now()
+            data_dict["nsif_reviewer"] = user.id
+        elif csi_reviewer:
+            data_dict["csi_review_date"] = datetime.now()
+            data_dict["csi_moderator"] = user.id
+        else:
+            raise toolkit.NotAuthorized
         status = dcpr_request.DCPRRequestStatus.REJECTED.value
     else:
-        raise NotImplementedError
+        raise toolkit.NotAuthorized
 
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        data_dict["request_id"]
+        data_dict.get("request_id", None)
     )
 
     request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-        dcpr_request.DCPRRequestDataset.dcpr_request_id == data_dict["request_id"]
+        dcpr_request.DCPRRequestDataset.dcpr_request_id
+        == data_dict.get("request_id", None)
     )
 
     if not request_obj or not request_dataset_obj:

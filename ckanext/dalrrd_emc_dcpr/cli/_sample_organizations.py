@@ -44,4 +44,22 @@ SAMPLE_ORGANIZATIONS: typing.Final[
         ],
         [],
     ),
+    (
+        _CkanBootstrapOrganization("NSIF", _SAMPLE_ORG_DESCRIPTION),
+        [
+            ("tester1", "member"),
+            ("tester2", "editor"),
+            ("tester3", "publisher"),
+        ],
+        [],
+    ),
+    (
+        _CkanBootstrapOrganization("CSI", _SAMPLE_ORG_DESCRIPTION),
+        [
+            ("tester4", "member"),
+            ("tester5", "editor"),
+            ("tester6", "publisher"),
+        ],
+        [],
+    ),
 ]
