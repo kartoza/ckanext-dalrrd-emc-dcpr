@@ -117,7 +117,7 @@ def user_is_org_member(
     return result
 
 
-def org_member_list(org_id: str, role: typing.Optional[str] = None) -> bool:
+def org_member_list(org_id: str, role: typing.Optional[str] = None) -> typing.List:
     """Return list of organization members with the specified role"""
     member_list_action = toolkit.get_action("member_list")
     org_members = member_list_action(data_dict={"id": org_id, "object_type": "user"})
@@ -224,6 +224,7 @@ def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
 
 
 def get_status_labels() -> typing.Dict:
+    """Get status labels for the DCPR requests"""
     status_labels = {
         DCPRRequestStatus.UNDER_PREPARATION.value: (
             toolkit._("Under preparation"),
