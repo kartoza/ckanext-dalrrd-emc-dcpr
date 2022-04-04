@@ -17,6 +17,7 @@ from . import (
 from .blueprints.dcpr import dcpr_blueprint
 from .blueprints.emc import emc_blueprint
 from .cli import commands
+from .cli.legacy_sasdi import commands as legacy_sasdi_commands
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
 from .logic.action import emc as emc_actions
@@ -138,6 +139,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def get_commands(self):
         return [
             commands.dalrrd_emc_dcpr,
+            legacy_sasdi_commands.legacy_sasdi,
+            commands.shell,
         ]
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:

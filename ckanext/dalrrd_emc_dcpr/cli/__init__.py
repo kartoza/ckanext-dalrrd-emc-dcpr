@@ -36,11 +36,12 @@ class _CkanBootstrapHarvester:
 
 
 @dataclasses.dataclass
-class _CkanBootstrapResource:
+class _CkanResource:
     url: str
     format: str
     format_version: str
     package_id: typing.Optional[str] = None
+    name: typing.Optional[str] = None
     description: typing.Optional[str] = None
     resource_type: typing.Optional[str] = None
 
@@ -53,7 +54,7 @@ class _CkanBootstrapResource:
 
 
 @dataclasses.dataclass
-class _CkanBootstrapEmcDataset:
+class _CkanEmcDataset:
     name: str
     private: bool
     notes: str
@@ -69,17 +70,20 @@ class _CkanBootstrapEmcDataset:
     dataset_language: str
     metadata_language: str
     dataset_character_set: str
+    title: typing.Optional[str] = None
     maintainer_email: typing.Optional[str] = None
     type: typing.Optional[str] = "dataset"
     sasdi_theme: typing.Optional[str] = None
     tags: typing.List[typing.Dict] = dataclasses.field(default_factory=list)
+    source: typing.Optional[str] = None
 
     def to_data_dict(self) -> typing.Dict:
         result = {}
         for name, value in vars(self).items():
             if value is not None:
                 result[name] = _to_data_dict(value)
-        result["title"] = self.name
+        if result.get("title") is None:
+            result["title"] = self.name
         result["lineage"] = f"Dummy lineage for {self.name}"
         return result
 
