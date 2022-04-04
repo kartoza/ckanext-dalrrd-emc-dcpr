@@ -280,6 +280,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
             "emc_show_version": helpers.helper_show_version,
             "emc_user_is_org_member": helpers.user_is_org_member,
+            "emc_org_member_list": helpers.org_member_list,
             "emc_user_is_staff_member": helpers.user_is_staff_member,
             "emc_get_featured_datasets": helpers.get_featured_datasets,
             "emc_get_recently_modified_datasets": helpers.get_recently_modified_datasets,

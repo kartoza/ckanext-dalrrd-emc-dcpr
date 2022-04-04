@@ -117,6 +117,19 @@ def user_is_org_member(
     return result
 
 
+def org_member_list(org_id: str, role: typing.Optional[str] = None) -> bool:
+    """Return list of organization members with the specified role"""
+    member_list_action = toolkit.get_action("member_list")
+    org_members = member_list_action(data_dict={"id": org_id, "object_type": "user"})
+
+    results = []
+    for member_id, _, member_role in org_members:
+        if role is None or member_role.lower() == role.lower():
+            results.append(member_id)
+
+    return results
+
+
 def user_is_staff_member(user_id: str) -> bool:
     """Check if user is a member of the staff org"""
     memberships_action = toolkit.get_action("organization_list_for_user")
