@@ -2,8 +2,6 @@ import logging
 
 from flask import Blueprint, redirect, request
 from ckan.plugins import toolkit
-from ckan.lib.search import SearchError, SearchQueryError
-import ckan.lib.helpers as h
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 import ckan.lib.navl.dictization_functions as dict_fns
 
