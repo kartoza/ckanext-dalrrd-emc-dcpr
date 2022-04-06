@@ -13,11 +13,13 @@
               </p>
           </div>
          <div class="panel-body">
+             {% if g.user %}
               <div class="pull-left">
                   <a class="btn btn-primary" href="{{ h.url_for('%s.dcpr_request_new' % dcpr) }}">
-                   {{ _('Submit Request') }}
+                   {{ _('Create Request') }}
                   </a>
               </div>
+             {% endif %}
           </div>
 
     </div>
