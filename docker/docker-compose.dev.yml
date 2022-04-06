@@ -13,6 +13,7 @@ version: "3.8"
 
 # centralized definition of published ports, in order to avoid clashes
 x-ckan-web-published-port: &ckan-web-published-port 5000
+x-pycsw-published-port: &pycsw-published-port 5001
 x-ckan-db-published-port: &ckan-db-published-port 55432
 x-datastore-db-published-port: &datastore-db-published-port 55433
 x-ckan-test-db-published-port: &ckan-test-db-published-port 55434
@@ -68,6 +69,18 @@ services:
     <<: *partial-ckan-volumes
     environment:
       *partial-email-environment-values
+
+  pycsw:
+    environment:
+      - PYCSW_REPOSITORY_DB_USERNAME=ckan-dev
+      - PYCSW_REPOSITORY_DB_PASSWORD=ckan-dev
+      - PYCSW_REPOSITORY_DB_HOST=ckan-db
+      - PYCSW_REPOSITORY_DB=ckan-dev
+      - PYCSW_REPOSITORY_MAPPINGS_PATH=/etc/pycsw/pycsw_repository_mappings.py
+      - PYCSW_REPOSITORY_TABLE=emc_pycsw_view
+    ports:
+      - target: 8000
+        published: *pycsw-published-port
 
   ckan-db:
     environment:
