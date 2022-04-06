@@ -197,6 +197,16 @@ Additionally, in order for notifications to work, there is some configuration:
   it finds interesting enough in order to be notified of changes via email
 
 
+#### Use a shell for interacting with CKAN
+
+There is a CLI command that allows opening a Python shell already configured with the
+CKAN environment. This is analogous to django's `manage.py shell` command. Start it up with:
+
+```
+ckan dalrrd-emc-dcpr shell
+```
+
+
 
 ## Development
 
@@ -270,6 +280,11 @@ mentioned above). Run the following command:
 docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan db init
 ```
 
+Afterwards, proceed to run any migrations required by the ckanext-dlarrd-emc-dcpr extension
+
+```
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan db upgrade --plugin dalrrd_emc_dcpr
+```
 
 Now you should be able to go to `http://localhost:5000` and see the ckan
 landing page. If not, you may need to reload the ckan web app after
@@ -382,6 +397,18 @@ ckan --help
 ```
 
 
+### Recreating the main CKAN DB
+
+The CKAN database is kept in a docker volume named `emc-dcpr_ckan-db-data`. If you need to recreate the DB you
+can remove this docker volume. Do the following:
+
+- If needed, wind down the docker-compose stack;
+- Remove the DB volume with `docker volume rm emc-dcpr_ckan-db-data`
+- Start the docker-compose stack again
+- Run the DB initialization command
+- Bootstrap the system again
+
+
 ### Frontend work
 
 #### CSS
@@ -466,7 +493,7 @@ To run the tests you will need to:
    docker exec -ti {container-name} poetry install
    ```
 
-1. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
+2. Initialize the db - this is only needed the first time (the dev stack uses volumes to persist the DB)
 
    ```
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db init
@@ -475,7 +502,13 @@ To run the tests you will need to:
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
    ```
 
-1. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
+3. When there are model changes you will need to upgrade the DB too. Run this:
+
+   ```
+   docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
+   ```
+
+4. Run the tests with `pytest`. We use markers to differentiate between unit and integration tests. Run them like this:
 
    ```
    # run all tests
@@ -538,3 +571,18 @@ To run any of the above docker commands once this is deployed into Kubernetes yo
 The system is using the [crisp] chatbox to allow gathering feedback from users. Configure it at the crisp website
 
 [crisp]: https://crisp.chat/en/
+
+
+## Import of legacy SASDI EMC datasets
+
+There is some support for importing legacy SASDI EMC datasets. For now, it is available in the form of additional CLI
+commands:
+
+- `ckan legacy-sasdi saeon-odp import-records` - These commands use the legacy SASDI EMC SAEON-ODP platform and rely
+  on the records being in the DataCITE format. For now there is no provision for downloading records from some remote
+  server
+
+- `ckan legacy-sasdi csw <command>` - These commands use the legacy SASDI EMC CSW endpoint and retrieve records via CSW
+  - `ckan legacy-sasdi csw dowload-records`
+  - `ckan legacy-sasdi csw import-records`
+  - `ckan legacy-sasdi csw retrieve-thumbnails`

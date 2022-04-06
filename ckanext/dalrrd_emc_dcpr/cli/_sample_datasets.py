@@ -8,8 +8,8 @@ from ckan.plugins import toolkit
 
 from ..constants import ISO_TOPIC_CATEGORIES
 from . import (
-    _CkanBootstrapEmcDataset,
-    _CkanBootstrapResource,
+    _CkanEmcDataset,
+    _CkanResource,
 )
 
 SAMPLE_DATASET_TAG = "sample-data"
@@ -26,7 +26,7 @@ def generate_sample_datasets(
     latitude_range_end: float = -21,
     longitude_range_start: float = 16.3,
     longitude_range_end: float = 33,
-) -> typing.Iterator[_CkanBootstrapEmcDataset]:
+) -> typing.Iterator[_CkanEmcDataset]:
     possible_dates = _get_days(temporal_range_start, temporal_range_end)
     sasdi_themes = [
         t
@@ -42,7 +42,7 @@ def generate_sample_datasets(
             longitude_range_start,
             longitude_range_end,
         )
-        yield _CkanBootstrapEmcDataset(
+        yield _CkanEmcDataset(
             name=name,
             private=random.choice((True, False)),
             notes=f"Abstract for {name}",
@@ -78,9 +78,7 @@ def generate_sample_datasets(
             metadata_language="en",
             dataset_character_set="utf-8",
             resources=[
-                _CkanBootstrapResource(
-                    "http://fake.com", format="shp", format_version="1"
-                )
+                _CkanResource("http://fake.com", format="shp", format_version="1")
             ],
             tags=[{"name": SAMPLE_DATASET_TAG, "vocabulary_id": None}],
         )

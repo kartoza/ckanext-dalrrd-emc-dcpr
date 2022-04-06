@@ -1,0 +1,16 @@
+{% import 'macros/form.html' as form %}
+
+{% set is_checked = data.featured == "true" %}
+
+{% call form.checkbox(
+    field.field_name,
+    id='field-' + field.field_name,
+    label=h.scheming_language_text(field.label),
+    value="true",
+    checked=is_checked,
+    error=errors[field.field_name],
+    classes=field.classes if 'classes' in field else ['control-medium'],
+    is_required=h.scheming_field_required(field)
+) %}
+    {%- snippet 'scheming/form_snippets/help_text.html', field=field -%}
+{% endcall %}

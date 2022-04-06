@@ -36,11 +36,12 @@ class _CkanBootstrapHarvester:
 
 
 @dataclasses.dataclass
-class _CkanBootstrapResource:
+class _CkanResource:
     url: str
     format: str
     format_version: str
     package_id: typing.Optional[str] = None
+    name: typing.Optional[str] = None
     description: typing.Optional[str] = None
     resource_type: typing.Optional[str] = None
 
@@ -53,7 +54,7 @@ class _CkanBootstrapResource:
 
 
 @dataclasses.dataclass
-class _CkanBootstrapEmcDataset:
+class _CkanEmcDataset:
     name: str
     private: bool
     notes: str
@@ -69,18 +70,41 @@ class _CkanBootstrapEmcDataset:
     dataset_language: str
     metadata_language: str
     dataset_character_set: str
+    title: typing.Optional[str] = None
     maintainer_email: typing.Optional[str] = None
     type: typing.Optional[str] = "dataset"
     sasdi_theme: typing.Optional[str] = None
     tags: typing.List[typing.Dict] = dataclasses.field(default_factory=list)
+    source: typing.Optional[str] = None
 
     def to_data_dict(self) -> typing.Dict:
         result = {}
         for name, value in vars(self).items():
             if value is not None:
                 result[name] = _to_data_dict(value)
-        result["title"] = self.name
+        if result.get("title") is None:
+            result["title"] = self.name
         result["lineage"] = f"Dummy lineage for {self.name}"
+        return result
+
+
+@dataclasses.dataclass
+class _CkanBootstrapDCPRErrorReport:
+    csi_reference_id: uuid.UUID
+    status: str
+    error_application: str
+    error_description: str
+    solution_description: str
+    request_date: str
+    csi_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_moderation_date: str
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
         return result
 
 
@@ -120,6 +144,35 @@ class _CkanBootstrapDCPRRequest:
     data_usage_restrictions: str
     capture_method: str
     capture_method_detail: str
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
+        return result
+
+
+@dataclasses.dataclass
+class _CkanBootstrapDCPRGeospatialRequest:
+    csi_reference_id: uuid.UUID
+    status: str
+    organization_name: str
+    dataset_purpose: str
+    interest_region: str
+    resolution_scale: str
+    additional_information: str
+    request_date: str
+    submission_date: str
+    nsif_review_date: str
+    nsif_review_notes: str
+    nsif_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_review_additional_documents: str
+    csi_moderation_date: str
+    dataset_sasdi_category: str
+    custodian_organization: str
+    data_type: str
 
     def to_data_dict(self) -> typing.Dict:
         result = {}

@@ -183,6 +183,18 @@ def build_pages_nav_main(*args):
     return output
 
 
+def get_featured_datasets():
+    search_action = toolkit.get_action("package_search")
+    result = search_action(data_dict={"q": "featured:true", "rows": 5})
+    return result["results"]
+
+
+def get_recently_modified_datasets():
+    search_action = toolkit.get_action("package_search")
+    result = search_action(data_dict={"sort": "metadata_modified desc", "rows": 5})
+    return result["results"]
+
+
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     geom = geometry.shape(extent)
     padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)

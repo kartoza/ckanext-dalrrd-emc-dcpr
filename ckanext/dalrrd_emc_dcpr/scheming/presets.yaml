@@ -28,3 +28,7 @@ presets:
     values:
       form_snippet: "dataset_spatial_extent.html"
       validators: emc_bbox_converter
+
+  - preset_name: emc_checkbox
+    values:
+      form_snippet: "dataset_featured.html"

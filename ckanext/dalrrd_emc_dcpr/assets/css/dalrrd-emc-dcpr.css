@@ -64,6 +64,11 @@
   background: none;
 }
 
+a {
+  color: #3A744E;
+  text-decoration: none;
+}
+
 .navbar-brand {
   float: left;
   height: auto;
@@ -111,6 +116,7 @@
 
 body {
   background: #FFF url("../../../base/images/bg.png");
+  height: 100%;
  }
 
 .wrapper::before {
@@ -319,6 +325,13 @@ fieldset[disabled] .btn-default.focus {
   margin-right: 1.5em;
 }
 
+.dataset-heading a {
+  color: #3A744E;
+  font-weight: 600;
+}
+
+/* End of datasets*/
+
 /* Filters */
 .panel {
   margin-bottom: 0;
@@ -397,7 +410,7 @@ header.masthead {
 
 }
 
-.sasdi-theme {
+.index-sasdi-theme {
   position: relative;
   color: #FFFFFF;
   background-color: #3A744E;
@@ -425,6 +438,10 @@ header.masthead {
 
 /* Footer */
 
+[role="main"], .main {
+  min-height: 70vh;
+}
+
 .site-footer {
   margin-bottom: initial;
   padding: 10px 0;
@@ -434,3 +451,43 @@ header.masthead {
 }
 
 /* End Footer */
+
+
+/* Pagination */
+.pagination > li > a,
+.pagination > li > span {
+  position: relative;
+  float: left;
+  padding: 6px 12px;
+  margin-left: -1px;
+  line-height: 1.42857143;
+  color: #3A744E;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
+  z-index: 2;
+  color: #21412c;
+  background-color: #eeeeee;
+  border-color: #ddd;
+}
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover,
+.pagination > .active > a:focus,
+.pagination > .active > span:focus {
+  z-index: 3;
+  color: #fff;
+  cursor: default;
+  background-color: #3A744E;
+  border-color: #3A744E;
+}
+
+/* End Pagination */
+

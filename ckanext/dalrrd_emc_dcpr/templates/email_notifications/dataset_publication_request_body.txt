@@ -1,0 +1,11 @@
+You are receiving this email because you are an administrator of the {{ organization.name }} organization in the SASDI Electronic Metadata Catalogue
+
+User {{ user_obj.name }} is requesting that dataset {{ dataset.title }} be published.
+
+If you wish to comply with this request, proceed to:
+
+- Visit the dataset detail page at {{ site_url }}{{ h.url_for("dataset.read", id=dataset.name) }}
+- Click the "Manage" button
+- Set the dataset's "Visibility" property to "Public"
+
+This shall make the dataset available to everyone, including non-authenticated users.

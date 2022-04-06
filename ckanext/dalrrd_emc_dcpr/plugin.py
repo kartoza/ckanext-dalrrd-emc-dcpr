@@ -6,7 +6,9 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
+from ckan import model
 from flask import Blueprint
+from sqlalchemy import orm
 
 from . import (
     constants,
@@ -15,6 +17,7 @@ from . import (
 from .blueprints.dcpr import dcpr_blueprint
 from .blueprints.emc import emc_blueprint
 from .cli import commands
+from .cli.legacy_sasdi import commands as legacy_sasdi_commands
 from .logic.action import ckan as ckan_actions
 from .logic.action import dcpr as dcpr_actions
 from .logic.action import emc as emc_actions
@@ -22,9 +25,11 @@ from .logic import (
     converters,
     validators,
 )
-from .logic.auth import dcpr as dcpr_auth
 from .logic.auth import ckan as ckan_auth
 from .logic.auth import pages as ckanext_pages_auth
+from .logic.auth import dcpr as dcpr_auth
+from .logic.auth import emc as emc_auth
+from .model.user_extra_fields import UserExtraFields
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +45,35 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.IPluginObserver)
+
+    def before_load(self, plugin_class):
+        """IPluginObserver interface requires reimplementation of this method."""
+        pass
+
+    def after_load(self, service):
+        """Control plugin loading mechanism
+
+        This method is implemented by the DalrrdEmcDcprPlugin because we are adding
+        a 1:1 relationship between our `UserExtraFields` model and CKAN's `User` model.
+
+        SQLAlchemy expects relationships to be configured on both sides, which means
+        we have to modify CKAN's User model in order to make the relationship work. We
+        do that in this function.
+
+        """
+
+        model.User.extra_fields = orm.relationship(
+            UserExtraFields, back_populates="user", uselist=False
+        )
+
+    def before_unload(self, plugin_class):
+        """IPluginObserver interface requires reimplementation of this method."""
+        pass
+
+    def after_unload(self, service):
+        """IPluginObserver interface requires reimplementation of this method."""
+        pass
 
     def after_create(self, context, pkg_dict):
         """IPackageController interface requires reimplementation of this method."""
@@ -105,6 +139,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def get_commands(self):
         return [
             commands.dalrrd_emc_dcpr,
+            legacy_sasdi_commands.legacy_sasdi,
+            commands.shell,
         ]
 
     def get_auth_functions(self) -> typing.Dict[str, typing.Callable]:
@@ -112,11 +148,18 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_publish": ckan_auth.authorize_package_publish,
             "package_update": ckan_auth.package_update,
             "package_patch": ckan_auth.package_patch,
+            "dcpr_error_report_create_auth": dcpr_auth.dcpr_report_create_auth,
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
             "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
             "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
             "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
             "ckanext_pages_show": ckanext_pages_auth.authorize_show_page,
+            "emc_request_dataset_maintenance": (
+                emc_auth.authorize_request_dataset_maintenance
+            ),
+            "emc_request_dataset_publication": (
+                emc_auth.authorize_request_dataset_publication
+            ),
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -124,9 +167,17 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_create": ckan_actions.package_create,
             "package_update": ckan_actions.package_update,
             "package_patch": ckan_actions.package_patch,
+            "dcpr_error_report_create": dcpr_actions.dcpr_error_report_create,
             "dcpr_request_create": dcpr_actions.dcpr_request_create,
+            "dcpr_geospatial_request_create": dcpr_actions.dcpr_geospatial_request_create,
             "dcpr_request_list": dcpr_actions.dcpr_request_list,
             "emc_version": emc_actions.show_version,
+            "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
+            "emc_request_dataset_publication": emc_actions.request_dataset_publication,
+            "emc_user_patch": ckan_actions.user_patch,
+            "user_update": ckan_actions.user_update,
+            "user_create": ckan_actions.user_create,
+            "user_show": ckan_actions.user_show,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
@@ -155,6 +206,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_show_version": helpers.helper_show_version,
             "emc_user_is_org_member": helpers.user_is_org_member,
             "emc_user_is_staff_member": helpers.user_is_staff_member,
+            "emc_get_featured_datasets": helpers.get_featured_datasets,
+            "emc_get_recently_modified_datasets": helpers.get_recently_modified_datasets,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
