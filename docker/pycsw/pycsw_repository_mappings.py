@@ -5,7 +5,10 @@ records via pycsw.
 
 """
 
+from sqlalchemy.schema import PrimaryKeyConstraint
+
 MD_CORE_MODEL = {
+    "column_constraints": (PrimaryKeyConstraint("identifier"),),
     "typename": "pycsw:CoreMetadata",
     "outputschema": "http://pycsw.org/metadata",
     "mappings": {

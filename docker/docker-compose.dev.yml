@@ -71,6 +71,7 @@ services:
       *partial-email-environment-values
 
   pycsw:
+    image: ricardogsilva/pycsw:747-allow-using-db-view-as-repo-table
     environment:
       - PYCSW_REPOSITORY_DB_USERNAME=ckan-dev
       - PYCSW_REPOSITORY_DB_PASSWORD=ckan-dev
@@ -81,6 +82,12 @@ services:
     ports:
       - target: 8000
         published: *pycsw-published-port
+    volumes:
+      - type: bind
+        source: $PWD/../../pycsw
+        target: /home/pycsw/pycsw
+        # target: /usr/lib/python3.8/site-packages/pycsw
+    command: ["--reload"]
 
   ckan-db:
     environment:
