@@ -48,3 +48,9 @@ temporal-query-js:
   contents:
     - js/temporalQuery.js
   filter: rjsmin
+
+facets-active-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_facetsActive.js
+  contents:
+    - js/facetsActive.js
+  filter: rjsmin
