@@ -73,6 +73,7 @@ services:
   pycsw:
     image: ricardogsilva/pycsw:747-allow-using-db-view-as-repo-table
     environment:
+      - PYCSW_SERVER_URL=http://localhost:5001
       - PYCSW_REPOSITORY_DB_USERNAME=ckan-dev
       - PYCSW_REPOSITORY_DB_PASSWORD=ckan-dev
       - PYCSW_REPOSITORY_DB_HOST=ckan-db

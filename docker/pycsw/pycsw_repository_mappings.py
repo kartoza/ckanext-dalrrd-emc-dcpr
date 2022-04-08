@@ -13,11 +13,21 @@ MD_CORE_MODEL = {
     "outputschema": "http://pycsw.org/metadata",
     "mappings": {
         "pycsw:Identifier": "identifier",
+        # CSW typename (e.g. csw:Record, md:MD_Metadata)
         "pycsw:Typename": "typename",
+        # schema namespace, i.e. http://www.isotc211.org/2005/gmd
         "pycsw:Schema": "schema",
+        # origin of resource, either 'local', or URL to web service
         "pycsw:MdSource": "mdsource",
-        "pycsw:InsertDate": "insert_date",
+        # date of insertion
+        "pycsw:InsertDate": "insert_date",  # date of insertion
+        # raw XML metadata
         "pycsw:XML": "xml",
+        # raw metadata payload, xml to be migrated to this in the future
+        "pycsw:Metadata": "metadata",
+        # raw metadata payload type, xml as default for now
+        "pycsw:MetadataType": "metadata_type",
+        # bag of metadata element and attributes ONLY, no XML tages
         "pycsw:AnyText": "anytext",
         "pycsw:Language": "language",
         "pycsw:Title": "title",
@@ -29,6 +39,7 @@ MD_CORE_MODEL = {
         "pycsw:Date": "date",
         "pycsw:Modified": "date_modified",
         "pycsw:Type": "type",
+        # geometry, specified in OGC WKT
         "pycsw:BoundingBox": "wkt_geometry",
         "pycsw:CRS": "crs",
         "pycsw:AlternateTitle": "title_alternate",
@@ -67,6 +78,12 @@ MD_CORE_MODEL = {
         "pycsw:Publisher": "publisher",
         "pycsw:Contributor": "contributor",
         "pycsw:Relation": "relation",
+        "pycsw:Platform": "platform",
+        "pycsw:Instrument": "instrument",
+        "pycsw:SensorType": "sensortype",
+        "pycsw:CloudCover": "cloudcover",
+        "pycsw:Bands": "bands",
+        # links: list of dicts with properties: name, description, protocol, url
         "pycsw:Links": "links",
     },
 }
