@@ -21,6 +21,7 @@ from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
 from lxml import etree
+from sqlalchemy import text as sla_text
 
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
     DCPRRequest,
@@ -57,6 +58,7 @@ _DEFAULT_LEGACY_SASDI_THUMBNAIL_DIR = (
     Path.home() / "data/storage/legacy_sasdi_downloader/thumbnails"
 )
 _DEFAULT_MAX_WORKERS = 5
+_PYCSW_MATERIALIZED_VIEW_NAME = "public.emc_pycsw_view"
 
 
 @click.group()
@@ -1100,3 +1102,42 @@ def test_background_job(job_name, job_arg, job_kwarg):
         logger.info("Done!")
     else:
         logger.error(f"Job function {job_name!r} does not exist")
+
+
+@dalrrd_emc_dcpr.group()
+def pycsw():
+    """Commands related to integration between CKAN and pycsw"""
+
+
+@pycsw.command()
+def create_materialized_view():
+    """Create the materialized view used to map between CKAN and pycsw"""
+    jinja_env = utils.get_jinja_env()
+    template = jinja_env.get_template("pycsw/pycsw_view.sql")
+    ddl_command = template.render(view_name=_PYCSW_MATERIALIZED_VIEW_NAME)
+    with model.meta.engine.connect() as conn:
+        conn.execute(sla_text(ddl_command))
+        # conn.commit()
+    logger.info("Done!")
+
+
+@pycsw.command()
+def refresh_materialized_view():
+    """Refresh the materialized view used to map between CKAN and pycsw"""
+    with model.meta.engine.connect() as conn:
+        conn.execute(
+            sla_text(
+                f"REFRESH MATERIALIZED VIEW {_PYCSW_MATERIALIZED_VIEW_NAME} WITH DATA;"
+            )
+        )
+    logger.info("Done!")
+
+
+@pycsw.command()
+def drop_materialized_view():
+    """Delete the materialized view used to map between CKAN and pycsw"""
+    with model.meta.engine.connect() as conn:
+        conn.execute(
+            sla_text(f"DROP MATERIALIZED VIEW {_PYCSW_MATERIALIZED_VIEW_NAME}")
+        )
+    logger.info("Done!")

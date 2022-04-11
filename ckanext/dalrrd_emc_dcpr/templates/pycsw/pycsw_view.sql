@@ -1,4 +1,4 @@
-CREATE MATERIALIZED VIEW public.emc_pycsw_view AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
     WITH cte_extras AS (
         SELECT
                p.id,
@@ -17,6 +17,8 @@ CREATE MATERIALIZED VIEW public.emc_pycsw_view AS
             JOIN "group" AS g ON p.owner_org = g.id
             JOIN package_tag AS pt ON p.id = pt.package_id
             JOIN tag AS t on pt.tag_id = t.id
+        WHERE p.state = 'active'
+         AND p.private = false
         GROUP BY p.id, g.title
     )
     SELECT
@@ -40,6 +42,7 @@ CREATE MATERIALIZED VIEW public.emc_pycsw_view AS
            c.metadata_modified AS date_modified,
            'http://purl.org/dc/dcmitype/Dataset' AS type,
            ST_AsText(ST_GeomFromGeoJSON(c.extras->>'spatial')) AS wkt_geometry,
+           ST_GeomFromGeoJSON(c.extras->>'spatial')::geometry(Polygon, 4326) AS geom,
            c.extras->>'spatial_reference_system' AS crs,
            c.name AS title_alternate,
            NULL as date_revision,
@@ -85,8 +88,4 @@ CREATE MATERIALIZED VIEW public.emc_pycsw_view AS
            -- links: list of dicts with properties: name, description, protocol, url
            NULL AS links
     FROM cte_extras AS c
-WITH DATA
-
-DROP MATERIALIZED VIEW emc_pycsw_view
-
-CREATE UNIQUE INDEX idx_id ON emc_pycsw_view ( identifier)
+WITH DATA;
