@@ -90,7 +90,13 @@ def convert_geojson_to_bbox(
 def convert_string_extent_to_bbox(extent: str) -> typing.List[float]:
     if extent is None:
         return []
-    return [float(value) for value in extent.split(",")]
+    coords_extent = []
+    for value in extent.split(","):
+        try:
+            coords_extent.append(float(value))
+        except ValueError:
+            continue
+    return coords_extent
 
 
 def helper_show_version(*args, **kwargs) -> typing.Dict:
