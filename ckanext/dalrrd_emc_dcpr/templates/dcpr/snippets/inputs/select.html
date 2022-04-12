@@ -5,7 +5,7 @@
     id='field-' + field.field_name,
     label=h.scheming_language_text(field.label),
     options=field.options,
-    selected=field.option_selected,
+    selected=field.selected,
     error=errors[field.field_name],
     classes=['control-medium'],
     attrs=dict({"class": "form-control"}, **(field.get('attrs', {}))),

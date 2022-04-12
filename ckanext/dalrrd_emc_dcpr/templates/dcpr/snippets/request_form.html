@@ -14,7 +14,6 @@
  {% set csi_review_ready = csi_reviewer and waiting_csi_review %}
 
 {% endif %}
-
  {% if dcpr_request %}
   <form id="request-new" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
  {% else %}
@@ -32,7 +31,8 @@
     {% if dcpr_request %}
     {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors, immutable=immutable,
       organizations=organizations, organizations_levels=organizations_levels, nsif_reviewer=nsif_reviewer,
-      csi_reviewer=csi_reviewer, data_urgency=data_urgency
+      csi_reviewer=csi_reviewer, data_urgency=data_urgency, nsif_review_ready=nsif_review_ready,
+      csi_review_ready=csi_review_ready
     %}
     {% else %}
     {% snippet 'dcpr/snippets/new_request_fields.html', organizations=organizations, organizations_levels=organizations_levels,
