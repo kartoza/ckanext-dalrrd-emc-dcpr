@@ -4,6 +4,7 @@
     field.field_name,
     id='field-' + field.field_name,
     label=h.scheming_language_text(field.label),
+    value=field.value,
     error=errors[field.field_name],
     placeholder=field.placeholder,
     is_required=field.is_required or False,
