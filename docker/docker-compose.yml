@@ -26,7 +26,8 @@ services:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
 
   pycsw:
-    image: geopython/pycsw:2.6.1
+    # TODO: replace this with an official pycsw docker release
+    image: ricardogsilva/pycsw:9f1ef474
     volumes:
       - type: bind
         source: $PWD/pycsw/pycsw-config.cfg
