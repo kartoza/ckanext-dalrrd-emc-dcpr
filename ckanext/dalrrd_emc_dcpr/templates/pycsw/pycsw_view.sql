@@ -42,7 +42,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            c.metadata_modified AS date_modified,
            'http://purl.org/dc/dcmitype/Dataset' AS type,
            ST_AsText(ST_GeomFromGeoJSON(c.extras->>'spatial')) AS wkt_geometry,
-           ST_GeomFromGeoJSON(c.extras->>'spatial')::geometry(Polygon, 4326) AS geom,
+           ST_GeomFromGeoJSON(c.extras->>'spatial')::geometry(Polygon, 4326) AS wkb_geometry,
            c.extras->>'spatial_reference_system' AS crs,
            c.name AS title_alternate,
            NULL as date_revision,
