@@ -203,9 +203,17 @@ There is a CLI command that allows opening a Python shell already configured wit
 CKAN environment. This is analogous to django's `manage.py shell` command. Start it up with:
 
 ```
-ckan dalrrd-emc-dcpr shell
+ckan shell
 ```
 
+
+#### Refresh pycsw materialized view
+
+This needs to be run periodically (once per hour is likely enough).
+
+```
+ckan dalrrd-emc-dcpr pycsw refresh-materialized-view
+```
 
 
 ## Development
@@ -358,6 +366,16 @@ of the older `paster`-based incantation, they should rather be ran like:
 
 ```sh
 poetry run ckan spatial <command>
+```
+
+
+#### Generate pycsw DB view
+
+In order to be able to serve the system's datasets through various OGC standards, create a DB materialized view
+in order to integrate with pycsw:
+
+```bash
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan dalrrd-emc-dcpr ckan create-materialized-view
 ```
 
 
