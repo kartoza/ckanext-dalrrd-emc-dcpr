@@ -46,7 +46,16 @@ def dcpr_request_show_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     logger.debug("Inside the dcpr_request_show auth")
-    return {"success": True}
+    request_id = data_dict.get("id", None)
+
+    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
+
+    if not request_obj:
+        return {"success": False, "msg": toolkit._("Request not found")}
+
+    show_request = (request_obj.status != dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value) and \
+                   (request_obj.status != dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value)
+    return {"success": show_request}
 
 
 def dcpr_request_update_auth(
