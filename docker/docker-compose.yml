@@ -25,6 +25,17 @@ services:
   ckan-mail-sender:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
 
+  pycsw:
+    # TODO: replace this with an official pycsw docker release
+    image: ricardogsilva/pycsw:9f1ef474
+    volumes:
+      - type: bind
+        source: $PWD/pycsw/pycsw-config.cfg
+        target: /etc/pycsw/pycsw.cfg
+      - type: bind
+        source: $PWD/pycsw/pycsw_repository_mappings.py
+        target: /etc/pycsw/pycsw_repository_mappings.py
+
   ckan-db:
     image: postgis/postgis:13-3.1
     environment:
