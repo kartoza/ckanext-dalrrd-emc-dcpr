@@ -255,6 +255,7 @@ def dcpr_request_escalate(context, data_dict):
 
     data_dict["nsif_review_date"] = datetime.now()
     data_dict["nsif_reviewer"] = user.id
+
     status = dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
 
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
