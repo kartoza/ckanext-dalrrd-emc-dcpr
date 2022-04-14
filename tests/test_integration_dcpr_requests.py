@@ -23,6 +23,33 @@ logger = logging.getLogger(__name__)
 
 pytestmark = pytest.mark.integration
 
+REQUEST_TEST_DATA = {
+    "status": "status",
+    "organization_name": "organization_name",
+    "organization_level": "organization_level",
+    "organization_address": "organization_address",
+    "proposed_project_name": "proposed_project_name",
+    "additional_project_context": "additional_project_context",
+    "capture_start_date": "2022-01-01",
+    "capture_end_date": "2022-01-01",
+    "cost": "cost",
+    "spatial_extent": "spatial_extent",
+    "spatial_resolution": "EPSG:4326",
+    "data_capture_urgency": "data_capture_urgency",
+    "additional_information": "additional_information",
+    "dataset_custodian": True,
+    "data_type": "data_type",
+    "proposed_dataset_title": "proposed_dataset_title",
+    "proposed_abstract": "proposed_abstract",
+    "dataset_purpose": "dataset_purpose",
+    "lineage_statement": "lineage_statement",
+    "associated_attributes": "associated_attributes",
+    "feature_description": "feature_description",
+    "data_usage_restrictions": "data_usage_restrictions",
+    "capture_method": "capture_method",
+    "capture_method_detail": "capture_method_detail",
+}
+
 
 @pytest.mark.parametrize(
     "name, user_available, user_logged, test_schema_validation",
@@ -71,46 +98,21 @@ def test_create_dcpr_request(name, user_available, user_logged, test_schema_vali
         else None
     )
 
-    for request in SAMPLE_REQUESTS:
-        data_dict = {
-            "owner_user": user_id,
-            "organization_name": request.organization_name,
-            "organization_level": request.organization_level,
-            "organization_address": request.organization_address,
-            "additional_project_context": request.additional_project_context,
-            "capture_start_date": request.capture_start_date,
-            "capture_end_date": request.capture_end_date,
-            "cost": request.cost,
-            "spatial_extent": request.spatial_extent,
-            "spatial_resolution": request.spatial_resolution,
-            "data_capture_urgency": request.data_capture_urgency,
-            "additional_information": request.additional_information,
-            "dataset_custodian": request.dataset_custodian,
-            "data_type": request.data_type,
-            "proposed_dataset_title": request.proposed_dataset_title,
-            "proposed_abstract": request.proposed_abstract,
-            "dataset_purpose": request.dataset_purpose,
-            "lineage_statement": request.lineage_statement,
-            "associated_attributes": request.associated_attributes,
-            "feature_description": request.feature_description,
-            "data_usage_restrictions": request.data_usage_restrictions,
-            "capture_method": request.capture_method,
-            "capture_method_detail": request.capture_method_detail,
-            "action_type": 0,
-        }
+    data_dict = REQUEST_TEST_DATA
+    data_dict["owner_user"] = user_id
 
-        if not test_schema_validation:
-            data_dict["proposed_project_name"] = request.proposed_project_name
+    if test_schema_validation:
+        data_dict["proposed_project_name"] = None
 
-        context = {"ignore_auth": not user_logged, "user": user["name"]}
+    context = {"ignore_auth": not user_logged, "user": user["name"]}
 
-        dcpr_request = helpers.call_action(
-            "dcpr_request_create",
-            context=context,
-            **data_dict,
-        )
+    dcpr_request = helpers.call_action(
+        "dcpr_request_create",
+        context=context,
+        **data_dict,
+    )
 
-        assert dcpr_request.status == DCPRRequestStatus.UNDER_PREPARATION.value
+    assert dcpr_request.status == DCPRRequestStatus.UNDER_PREPARATION.value
 
 
 @pytest.mark.parametrize(
@@ -121,6 +123,13 @@ def test_create_dcpr_request(name, user_available, user_logged, test_schema_vali
             True,
             True,
             id="request-created-and-updated-successfully",
+        ),
+        pytest.param(
+            "request_2",
+            True,
+            False,
+            id="request-update-exceptions",
+            marks=pytest.mark.raises(exception=toolkit.NotAuthorized),
         ),
     ],
 )
@@ -135,35 +144,10 @@ def test_update_dcpr_request(name, user_available, user_logged):
         if user_available
         else None
     )
-    dcpr_request = SAMPLE_REQUESTS[0]
 
-    data_dict = {
-        "owner_user": user_id,
-        "organization_name": dcpr_request.organization_name,
-        "organization_level": dcpr_request.organization_level,
-        "organization_address": dcpr_request.organization_address,
-        "proposed_project_name": dcpr_request.proposed_project_name,
-        "additional_project_context": dcpr_request.additional_project_context,
-        "capture_start_date": dcpr_request.capture_start_date,
-        "capture_end_date": dcpr_request.capture_end_date,
-        "cost": dcpr_request.cost,
-        "spatial_extent": dcpr_request.spatial_extent,
-        "spatial_resolution": dcpr_request.spatial_resolution,
-        "data_capture_urgency": dcpr_request.data_capture_urgency,
-        "additional_information": dcpr_request.additional_information,
-        "dataset_custodian": dcpr_request.dataset_custodian,
-        "data_type": dcpr_request.data_type,
-        "proposed_dataset_title": dcpr_request.proposed_dataset_title,
-        "proposed_abstract": dcpr_request.proposed_abstract,
-        "dataset_purpose": dcpr_request.dataset_purpose,
-        "lineage_statement": dcpr_request.lineage_statement,
-        "associated_attributes": dcpr_request.associated_attributes,
-        "feature_description": dcpr_request.feature_description,
-        "data_usage_restrictions": dcpr_request.data_usage_restrictions,
-        "capture_method": dcpr_request.capture_method,
-        "capture_method_detail": dcpr_request.capture_method_detail,
-        "action_type": 0,
-    }
+    data_dict = REQUEST_TEST_DATA
+    data_dict["owner_user"] = user_id
+    data_dict["proposed_project_name"] = "proposed_project_name"
 
     context = {"ignore_auth": not user_logged, "user": user["name"]}
 
@@ -173,11 +157,76 @@ def test_update_dcpr_request(name, user_available, user_logged):
         **data_dict,
     )
 
-    data_dict["action_type"] = 1
     data_dict["request_id"] = dcpr_request_obj.csi_reference_id
+    data_dict["proposed_project_name"] = "new_project_name"
+
+    if not user_logged:
+        context["auth_user_obj"] = None
+        context["user"] = None
+        context["ignore_auth"] = False
+
+    logger.debug(f"dicts {context}")
 
     dcpr_request_updated_obj = helpers.call_action(
         "dcpr_request_update",
+        context=context,
+        **data_dict,
+    )
+
+    assert dcpr_request_updated_obj.status == dcpr_request_obj.status
+    assert (
+        dcpr_request_updated_obj.proposed_project_name
+        != dcpr_request_obj.proposed_project_name
+    )
+
+
+@pytest.mark.parametrize(
+    "name, user_available, owner_logged",
+    [
+        pytest.param(
+            "request_1",
+            True,
+            True,
+            id="request-submitted-successfully",
+        ),
+        pytest.param(
+            "request_2",
+            True,
+            False,
+            id="request-submit-exceptions",
+            marks=pytest.mark.raises(exception=toolkit.NotAuthorized),
+        ),
+    ],
+)
+def test_submit_dcpr_request(name, user_available, owner_logged):
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = (
+        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+        if user_available
+        else None
+    )
+    data_dict = REQUEST_TEST_DATA
+    data_dict["owner_user"] = user_id
+
+    context = {"ignore_auth": not owner_logged, "user": user["name"]}
+
+    helpers.call_action(
+        "dcpr_request_create",
+        context=context,
+        **data_dict,
+    )
+
+    if not owner_logged:
+        context["auth_user_obj"] = None
+        context["user"] = None
+        context["ignore_auth"] = False
+
+    dcpr_request_updated_obj = helpers.call_action(
+        "dcpr_request_submit",
         context=context,
         **data_dict,
     )
@@ -186,27 +235,193 @@ def test_update_dcpr_request(name, user_available, user_logged):
         dcpr_request_updated_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
     )
 
-    nsif_reviewers = toolkit.h["emc_org_member_list"]("nsif", role="editor")
-    nsif_user = toolkit.get_action("user_show")(
-        {"ignore_auth": True}, {"id": nsif_reviewers[0]}
+
+@pytest.mark.parametrize(
+    "name, user_available, owner_logged",
+    [
+        pytest.param(
+            "request_1",
+            True,
+            True,
+            id="request-submitted-successfully",
+        ),
+        pytest.param(
+            "request_2",
+            True,
+            False,
+            id="request-escalate-exceptions",
+            marks=pytest.mark.raises(exception=toolkit.NotAuthorized),
+        ),
+    ],
+)
+def test_escalate_dcpr_request(name, user_available, owner_logged):
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = (
+        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+        if user_available
+        else None
+    )
+    data_dict = REQUEST_TEST_DATA
+    data_dict["owner_user"] = user_id
+
+    context = {"ignore_auth": not owner_logged, "user": user["name"]}
+
+    helpers.call_action(
+        "dcpr_request_create",
+        context=context,
+        **data_dict,
     )
 
-    user = model.User(id=nsif_user.get("id"), name=nsif_user.get("name"))
+    helpers.call_action(
+        "dcpr_request_submit",
+        context=context,
+        **data_dict,
+    )
 
-    data_dict["action_type"] = 4
-    data_dict["request_id"] = dcpr_request_obj.csi_reference_id
-
-    context["auth_user_obj"] = user
-    context["user"] = nsif_user.get("name")
+    if not owner_logged:
+        context["auth_user_obj"] = None
+        context["user"] = None
+        context["ignore_auth"] = False
 
     dcpr_request_updated_obj = helpers.call_action(
-        "dcpr_request_update",
+        "dcpr_request_escalate",
         context=context,
         **data_dict,
     )
 
     assert (
         dcpr_request_updated_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+    )
+
+
+@pytest.mark.parametrize(
+    "name, user_available, owner_logged",
+    [
+        pytest.param(
+            "request_1",
+            True,
+            True,
+            id="request-submitted-successfully",
+        ),
+        pytest.param(
+            "request_2",
+            True,
+            False,
+            id="request-accept-exceptions",
+            marks=pytest.mark.raises(exception=toolkit.NotAuthorized),
+        ),
+    ],
+)
+def test_accept_dcpr_request(name, user_available, owner_logged):
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = (
+        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+        if user_available
+        else None
+    )
+    data_dict = REQUEST_TEST_DATA
+    data_dict["owner_user"] = user_id
+
+    context = {
+        "ignore_auth": not owner_logged,
+        "user": user["name"],
+        "auth_user_obj": model.User(id=user.get("id")),
+    }
+
+    helpers.call_action(
+        "dcpr_request_create",
+        context=context,
+        **data_dict,
+    )
+
+    helpers.call_action(
+        "dcpr_request_submit",
+        context=context,
+        **data_dict,
+    )
+
+    helpers.call_action(
+        "dcpr_request_escalate",
+        context=context,
+        **data_dict,
+    )
+
+    if not owner_logged:
+        context["auth_user_obj"] = None
+        context["user"] = None
+        context["ignore_auth"] = False
+
+    dcpr_request_updated_obj = helpers.call_action(
+        "dcpr_request_accept",
+        context=context,
+        **data_dict,
+    )
+
+    assert dcpr_request_updated_obj.status == DCPRRequestStatus.ACCEPTED.value
+
+
+@pytest.mark.parametrize(
+    "name, user_available, owner_logged",
+    [
+        pytest.param(
+            "request_1",
+            True,
+            True,
+            id="request-submitted-successfully",
+        ),
+        pytest.param(
+            "request_2",
+            True,
+            False,
+            id="request-reject-exceptions",
+            marks=pytest.mark.raises(exception=toolkit.NotAuthorized),
+        ),
+    ],
+)
+def test_reject_dcpr_request(name, user_available, owner_logged):
+    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+
+    convert_user_name_or_id_to_id = toolkit.get_converter(
+        "convert_user_name_or_id_to_id"
+    )
+    user_id = (
+        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
+        if user_available
+        else None
+    )
+    data_dict = REQUEST_TEST_DATA
+    data_dict["owner_user"] = user_id
+
+    context = {
+        "ignore_auth": not owner_logged,
+        "user": user["name"],
+        "auth_user_obj": model.User(id=user.get("id")),
+    }
+
+    helpers.call_action(
+        "dcpr_request_create",
+        context=context,
+        **data_dict,
+    )
+
+    helpers.call_action(
+        "dcpr_request_submit",
+        context=context,
+        **data_dict,
+    )
+
+    helpers.call_action(
+        "dcpr_request_escalate",
+        context=context,
+        **data_dict,
     )
 
     csi_reviewers = toolkit.h["emc_org_member_list"]("csi", role="editor")
@@ -218,109 +433,18 @@ def test_update_dcpr_request(name, user_available, user_logged):
     context["auth_user_obj"] = user
     context["user"] = csi_user.get("name")
 
-    data_dict["action_type"] = 2
+    if not owner_logged:
+        context["auth_user_obj"] = None
+        context["user"] = None
+        context["ignore_auth"] = False
 
     dcpr_request_updated_obj = helpers.call_action(
-        "dcpr_request_update",
+        "dcpr_request_reject",
         context=context,
         **data_dict,
     )
 
-    assert dcpr_request_updated_obj.status == DCPRRequestStatus.ACCEPTED.value
-
-
-@pytest.mark.parametrize(
-    "name, user_available, user_logged",
-    [
-        pytest.param(
-            "request_1",
-            True,
-            True,
-            id="request-update-exceptions",
-            marks=pytest.mark.raises(exception=toolkit.NotAuthorized),
-        ),
-    ],
-)
-def test_update_dcpr_request_exceptions(name, user_available, user_logged):
-    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-
-    convert_user_name_or_id_to_id = toolkit.get_converter(
-        "convert_user_name_or_id_to_id"
-    )
-    user_id = (
-        convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
-        if user_available
-        else None
-    )
-    dcpr_request = SAMPLE_REQUESTS[0]
-
-    data_dict = {
-        "owner_user": user_id,
-        "organization_name": dcpr_request.organization_name,
-        "organization_level": dcpr_request.organization_level,
-        "organization_address": dcpr_request.organization_address,
-        "proposed_project_name": dcpr_request.proposed_project_name,
-        "additional_project_context": dcpr_request.additional_project_context,
-        "capture_start_date": dcpr_request.capture_start_date,
-        "capture_end_date": dcpr_request.capture_end_date,
-        "cost": dcpr_request.cost,
-        "spatial_extent": dcpr_request.spatial_extent,
-        "spatial_resolution": dcpr_request.spatial_resolution,
-        "data_capture_urgency": dcpr_request.data_capture_urgency,
-        "additional_information": dcpr_request.additional_information,
-        "dataset_custodian": dcpr_request.dataset_custodian,
-        "data_type": dcpr_request.data_type,
-        "proposed_dataset_title": dcpr_request.proposed_dataset_title,
-        "proposed_abstract": dcpr_request.proposed_abstract,
-        "dataset_purpose": dcpr_request.dataset_purpose,
-        "lineage_statement": dcpr_request.lineage_statement,
-        "associated_attributes": dcpr_request.associated_attributes,
-        "feature_description": dcpr_request.feature_description,
-        "data_usage_restrictions": dcpr_request.data_usage_restrictions,
-        "capture_method": dcpr_request.capture_method,
-        "capture_method_detail": dcpr_request.capture_method_detail,
-        "action_type": 0,
-    }
-
-    context = {"ignore_auth": not user_logged, "user": user["name"]}
-
-    dcpr_request_obj = helpers.call_action(
-        "dcpr_request_create",
-        context=context,
-        **data_dict,
-    )
-
-    data_dict["action_type"] = 1
-    data_dict["request_id"] = dcpr_request_obj.csi_reference_id
-
-    dcpr_request_updated_obj = helpers.call_action(
-        "dcpr_request_update",
-        context=context,
-        **data_dict,
-    )
-
-    assert (
-        dcpr_request_updated_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-    )
-
-    nsif_reviewers = toolkit.h["emc_org_member_list"]("nsif", role="editor")
-    nsif_user = toolkit.get_action("user_show")(
-        {"ignore_auth": True}, {"id": nsif_reviewers[0]}
-    )
-
-    user = model.User(id=nsif_user.get("id"), name=nsif_user.get("name"))
-
-    data_dict["action_type"] = 2
-    data_dict["request_id"] = dcpr_request_obj.csi_reference_id
-
-    context["auth_user_obj"] = user
-    context["user"] = nsif_user.get("name")
-
-    helpers.call_action(
-        "dcpr_request_update",
-        context=context,
-        **data_dict,
-    )
+    assert dcpr_request_updated_obj.status == DCPRRequestStatus.REJECTED.value
 
 
 @pytest.mark.parametrize(
