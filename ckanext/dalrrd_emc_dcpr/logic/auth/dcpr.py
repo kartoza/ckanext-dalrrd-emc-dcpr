@@ -46,6 +46,9 @@ def dcpr_request_show_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     logger.debug("Inside the dcpr_request_show auth")
+    if not data_dict:
+        return {"success": False}
+
     request_id = data_dict.get("id", None)
 
     request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
