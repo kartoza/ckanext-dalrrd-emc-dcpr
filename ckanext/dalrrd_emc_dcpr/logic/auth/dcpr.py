@@ -53,8 +53,11 @@ def dcpr_request_show_auth(
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    show_request = (request_obj.status != dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value) and \
-                   (request_obj.status != dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value)
+    show_request = (
+        request_obj.status != dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+    ) and (
+        request_obj.status != dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+    )
     return {"success": show_request}
 
 
