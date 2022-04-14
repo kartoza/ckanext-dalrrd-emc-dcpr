@@ -13,6 +13,8 @@
  {% set nsif_review_ready = ( not request_under_preparation and nsif_reviewer ) and ( not waiting_csi_review and not status_finalized ) %}
  {% set csi_review_ready = csi_reviewer and waiting_csi_review %}
 
+ {% set request_id = dcpr_request.csi_reference_id %}
+
 {% endif %}
  {% if dcpr_request %}
   <form id="request-new" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
@@ -43,12 +45,12 @@
 
   {% block form_actions %}
     <div class="form-actions">
-      {% if dcpr_request %}
+      {% if dcpr_request and not errors %}
 
       {% block save_actions_button %}
         {% if is_owner and not immutable %}
-         <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
-         <button class="btn btn-primary" type="submit" name="action_type" value=1>{{ _('Submit') }}</button>
+         <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
+         <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/submit/{{request_id}}";'>{{ _('Submit') }}</button>
          {% block delete_button %}
             {% if not errors and  h.check_access('dcpr_request_delete_auth', {'request_id': dcpr_request.csi_reference_id}) %}
               <a class="btn btn-danger pull-left"
@@ -59,19 +61,19 @@
             {% endif %}
          {% endblock %}
         {% elif nsif_review_ready %}
-        <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
-        <button class="btn btn-primary" type="submit" name="action_type" value=4>{{ _('Escalate to CSI') }}</button>
-        <button class="btn btn-primary" type="submit" name="action_type" value=3>{{ _('Reject') }}</button>
+        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
+        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/escalate/{{request_id}}";'>{{ _('Escalate to CSI') }}</button>
+        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
         {% elif csi_review_ready %}
-        <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
-        <button class="btn btn-primary" type="submit" name="action_type" value=2>{{ _('Accept') }}</button>
-        <button class="btn btn-primary" type="submit" name="action_type" value=3>{{ _('Reject') }}</button>
+        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
+        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/accept/{{request_id}}";'>{{ _('Accept') }}</button>
+        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
         {% endif %}
 
       {% endblock %}
       {% else %}
-       <button class="btn btn-primary" type="submit" name="action_type" value=0>{{ _('Save') }}</button>
-       <button class="btn btn-primary" type="submit" name="action_type" value=1>{{ _('Submit') }}</button>
+       <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/new";'>{{ _('Save') }}</button>
+       <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/submit";'>{{ _('Submit') }}</button>
       {% endif %}
 
       {{ form.required_message() }}

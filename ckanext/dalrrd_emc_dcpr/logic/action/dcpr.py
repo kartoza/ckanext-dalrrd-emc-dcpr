@@ -89,17 +89,7 @@ def dcpr_request_create(context, data_dict):
 
     if not access:
         raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
-
-    action_type = data_dict.get("action_type", None)
-    action_type = int(action_type) if action_type is not None else None
-
-    if action_type == DCPRRequestActionType.SAVE.value:
-        status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
-    elif action_type == DCPRRequestActionType.SUBMIT.value:
-        status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-        data_dict["submission_date"] = datetime.now()
-    else:
-        raise NotImplementedError
+    status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
 
     schema = context.get("schema", create_dcpr_request_schema())
 
@@ -183,8 +173,6 @@ def dcpr_request_update(context, data_dict):
     if errors:
         raise toolkit.ValidationError(errors)
 
-    status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         data_dict.get("request_id", None)
     )
@@ -195,7 +183,6 @@ def dcpr_request_update(context, data_dict):
     if not request_obj or not request_dataset_obj:
         raise toolkit.ObjectNotFound
     else:
-        request_obj.status = status
         if data_dict is not None:
             _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
 
@@ -378,7 +365,8 @@ def dcpr_request_reject(context, data_dict):
         raise toolkit.ObjectNotFound
     else:
         request_obj.status = status
-
+        if data_dict is not None:
+            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
     try:
         model.Session.commit()
         model.repo.commit()

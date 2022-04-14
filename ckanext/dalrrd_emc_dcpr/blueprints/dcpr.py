@@ -137,7 +137,262 @@ def dcpr_request_show(request_id):
     return toolkit.render("dcpr/show.html", extra_vars=extra_vars)
 
 
-@dcpr_blueprint.route("/request/edit/<request_id>", methods=["GET", "POST"])
+@dcpr_blueprint.route("/request/update/<request_id>", methods=["POST"])
+def dcpr_request_update(request_id, data=None, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_edit view")
+    extra_vars = {}
+    extra_vars["errors"] = errors
+
+    context = {
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
+    }
+
+    try:
+        data_dict = clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+        )
+        data_dict["csi_moderator"] = None
+        data_dict["nsif_reviewer"] = None
+        data_dict["id"] = request_id
+
+    except dict_fns.DataError:
+        return toolkit.base.abort(400, toolkit._("Integrity Error"))
+    try:
+        toolkit.get_action("dcpr_request_update")(context, data_dict)
+
+        url = toolkit.h.url_for(
+            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+        )
+        return toolkit.h.redirect_to(url)
+
+    except toolkit.NotAuthorized as e:
+        return toolkit.base.abort(
+            403,
+            toolkit._("Unauthorized to perfom the action, %s") % e,
+        )
+    except toolkit.ObjectNotFound as e:
+        return toolkit.base.abort(404, toolkit._("DCPR request not found"))
+    except toolkit.ValidationError as e:
+        errors = e.error_dict
+        error_summary = e.error_summary
+
+        request.method = "GET"
+        return dcpr_request_edit(
+            data_dict.get("request_id", None), data_dict, errors, error_summary
+        )
+
+    url = toolkit.h.url_for(
+        "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+    )
+    return toolkit.h.redirect_to(url)
+
+
+@dcpr_blueprint.route("/request/submit/", methods=["POST"])
+@dcpr_blueprint.route("/request/submit/<request_id>", methods=["POST"])
+def dcpr_request_submit(request_id, data=None, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_submit view")
+    extra_vars = {}
+    extra_vars["errors"] = errors
+
+    context = {
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
+    }
+
+    try:
+        data_dict = clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+        )
+        data_dict["csi_moderator"] = None
+        data_dict["nsif_reviewer"] = None
+        data_dict["id"] = request_id
+
+    except dict_fns.DataError:
+        return toolkit.base.abort(400, toolkit._("Integrity Error"))
+    try:
+        if not request_id:
+            dcpr_request = toolkit.get_action("dcpr_request_create")(context, data_dict)
+            request_id = dcpr_request.csi_reference_id
+
+        toolkit.get_action("dcpr_request_submit")(context, data_dict)
+
+        url = toolkit.h.url_for(
+            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+        )
+        return toolkit.h.redirect_to(url)
+
+    except toolkit.NotAuthorized as e:
+        return toolkit.base.abort(
+            403,
+            toolkit._("Unauthorized to perfom the action, %s") % e,
+        )
+    except toolkit.ObjectNotFound as e:
+        return toolkit.base.abort(404, toolkit._("DCPR request not found"))
+    except toolkit.ValidationError as e:
+        errors = e.error_dict
+        error_summary = e.error_summary
+
+        request.method = "GET"
+        return dcpr_request_edit(
+            data_dict.get("request_id", None), data_dict, errors, error_summary
+        )
+
+    url = toolkit.h.url_for(
+        "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+    )
+    return toolkit.h.redirect_to(url)
+
+
+@dcpr_blueprint.route("/request/escalate/<request_id>", methods=["POST"])
+def dcpr_request_escalate(request_id, data=None, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_edit view")
+    data_dict = {"id": request_id}
+    extra_vars = {}
+    extra_vars["errors"] = errors
+
+    context = {
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
+    }
+
+    try:
+        data_dict = clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+        )
+        data_dict["csi_moderator"] = None
+
+    except dict_fns.DataError:
+        return toolkit.base.abort(400, toolkit._("Integrity Error"))
+    try:
+        toolkit.get_action("dcpr_request_escalate")(context, data_dict)
+
+        url = toolkit.h.url_for(
+            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+        )
+        return toolkit.h.redirect_to(url)
+
+    except toolkit.NotAuthorized as e:
+        return toolkit.base.abort(
+            403,
+            toolkit._("Unauthorized to perfom the action, %s") % e,
+        )
+    except toolkit.ObjectNotFound as e:
+        return toolkit.base.abort(404, toolkit._("DCPR request not found"))
+    except toolkit.ValidationError as e:
+        errors = e.error_dict
+        error_summary = e.error_summary
+
+        request.method = "GET"
+        return dcpr_request_edit(
+            data_dict.get("request_id", None), data_dict, errors, error_summary
+        )
+
+    url = toolkit.h.url_for(
+        "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+    )
+    return toolkit.h.redirect_to(url)
+
+
+@dcpr_blueprint.route("/request/accept/<request_id>", methods=["POST"])
+def dcpr_request_accept(request_id, data=None, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_accept view")
+    data_dict = {"id": request_id}
+    extra_vars = {}
+    extra_vars["errors"] = errors
+
+    context = {
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
+    }
+
+    try:
+        data_dict = clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+        )
+
+    except dict_fns.DataError:
+        return toolkit.base.abort(400, toolkit._("Integrity Error"))
+    try:
+        toolkit.get_action("dcpr_request_accept")(context, data_dict)
+
+        url = toolkit.h.url_for(
+            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+        )
+        return toolkit.h.redirect_to(url)
+
+    except toolkit.NotAuthorized as e:
+        return toolkit.base.abort(
+            403,
+            toolkit._("Unauthorized to perfom the action, %s") % e,
+        )
+    except toolkit.ObjectNotFound as e:
+        return toolkit.base.abort(404, toolkit._("DCPR request not found"))
+    except toolkit.ValidationError as e:
+        errors = e.error_dict
+        error_summary = e.error_summary
+
+        request.method = "GET"
+        return dcpr_request_edit(
+            data_dict.get("request_id", None), data_dict, errors, error_summary
+        )
+
+    url = toolkit.h.url_for(
+        "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+    )
+    return toolkit.h.redirect_to(url)
+
+
+@dcpr_blueprint.route("/request/reject/<request_id>", methods=["POST"])
+def dcpr_request_reject(request_id, data=None, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_reject view")
+    data_dict = {"id": request_id}
+    extra_vars = {}
+    extra_vars["errors"] = errors
+
+    context = {
+        "user": toolkit.g.user,
+        "auth_user_obj": toolkit.g.userobj,
+    }
+
+    try:
+        data_dict = clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+        )
+
+    except dict_fns.DataError:
+        return toolkit.base.abort(400, toolkit._("Integrity Error"))
+    try:
+        toolkit.get_action("dcpr_request_reject")(context, data_dict)
+
+        url = toolkit.h.url_for(
+            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+        )
+        return toolkit.h.redirect_to(url)
+
+    except toolkit.NotAuthorized as e:
+        return toolkit.base.abort(
+            403,
+            toolkit._("Unauthorized to perfom the action, %s") % e,
+        )
+    except toolkit.ObjectNotFound as e:
+        return toolkit.base.abort(404, toolkit._("DCPR request not found"))
+    except toolkit.ValidationError as e:
+        errors = e.error_dict
+        error_summary = e.error_summary
+
+        request.method = "GET"
+        return dcpr_request_edit(
+            data_dict.get("request_id", None), data_dict, errors, error_summary
+        )
+
+    url = toolkit.h.url_for(
+        "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+    )
+    return toolkit.h.redirect_to(url)
+
+
+@dcpr_blueprint.route("/request/edit/<request_id>", methods=["GET"])
 def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
     logger.debug("Inside the dcpr_request_edit view")
     data_dict = {"id": request_id}
@@ -163,86 +418,37 @@ def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
         "auth_user_obj": toolkit.g.userobj,
     }
 
-    if request.method == "GET":
-        try:
-            if request_id is not None:
-                dcpr_request = toolkit.get_action("dcpr_request_show")(
-                    data_dict=data_dict
-                )
-                extra_vars["dcpr_request"] = dcpr_request
-            elif data is not None:
-                extra_vars["dcpr_request"] = data
-                extra_vars["error_summary"] = error_summary
+    try:
+        if request_id is not None:
+            dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
+            extra_vars["dcpr_request"] = dcpr_request
+        elif data is not None:
+            extra_vars["dcpr_request"] = data
+            extra_vars["error_summary"] = error_summary
 
-            nsif_reviewer = toolkit.h["emc_user_is_org_member"](
-                "nsif", toolkit.g.userobj, role="editor"
-            )
-            csi_reviewer = toolkit.h["emc_user_is_org_member"](
-                "csi", toolkit.g.userobj, role="editor"
-            )
-            extra_vars["nsif_reviewer"] = nsif_reviewer
-            extra_vars["csi_reviewer"] = csi_reviewer
-
-        except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
-            return toolkit.base.abort(404, toolkit._("Request not found"))
-
-        try:
-            if request_id:
-                toolkit.check_access(
-                    "dcpr_request_edit_auth", context, {"request_id": request_id}
-                )
-            else:
-                toolkit.check_access("dcpr_request_create_auth", context, data_dict)
-
-        except toolkit.NotAuthorized:
-            return toolkit.base.abort(
-                403,
-                toolkit._("User %r not authorized to edit DCPR requests")
-                % (toolkit.g.user),
-            )
-
-        return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
-
-    else:
-        try:
-            data_dict = clean_dict(
-                dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
-            )
-            data_dict["csi_moderator"] = None
-            data_dict["nsif_reviewer"] = None
-
-            logger.debug("Spatial extent")
-            logger.debug(data_dict["spatial_extent"])
-        except dict_fns.DataError:
-            return toolkit.base.abort(400, toolkit._("Integrity Error"))
-        try:
-            toolkit.get_action("dcpr_request_update")(context, data_dict)
-
-            url = toolkit.h.url_for(
-                "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
-            )
-            return toolkit.h.redirect_to(url)
-
-        except toolkit.NotAuthorized as e:
-            return toolkit.base.abort(
-                403,
-                toolkit._("Unauthorized to perfom the action, %s") % e,
-            )
-        except toolkit.ObjectNotFound as e:
-            return toolkit.base.abort(404, toolkit._("DCPR request not found"))
-        except toolkit.ValidationError as e:
-            errors = e.error_dict
-            error_summary = e.error_summary
-
-            request.method = "GET"
-            return dcpr_request_edit(
-                data_dict.get("request_id", None), data_dict, errors, error_summary
-            )
-
-        url = toolkit.h.url_for(
-            "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
+        nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+            "nsif", toolkit.g.userobj, role="editor"
         )
-        return toolkit.h.redirect_to(url)
+        csi_reviewer = toolkit.h["emc_user_is_org_member"](
+            "csi", toolkit.g.userobj, role="editor"
+        )
+        extra_vars["nsif_reviewer"] = nsif_reviewer
+        extra_vars["csi_reviewer"] = csi_reviewer
+
+    except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+        return toolkit.base.abort(404, toolkit._("Request not found"))
+
+    try:
+        toolkit.check_access("dcpr_request_edit_auth", context, data_dict)
+
+    except toolkit.NotAuthorized:
+        return toolkit.base.abort(
+            403,
+            toolkit._("User %r not authorized to edit the requested DCPR request")
+            % (toolkit.g.user),
+        )
+
+    return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
 
 
 @dcpr_blueprint.route("/request/delete/<request_id>", methods=["GET", "POST"])

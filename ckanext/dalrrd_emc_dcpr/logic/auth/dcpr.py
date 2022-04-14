@@ -24,24 +24,12 @@ def dcpr_request_create_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     logger.debug("Inside the dcpr_request_create auth")
-    user = context["auth_user_obj"]
-    # Only allow creation of dcpr requests if there is a user logged in and
-    # the request is intended to be saved or submitted only.
+    # Only allow creation of dcpr requests if there is a user logged in.
 
-    action_type = data_dict.get("action_type", None) if data_dict else None
-    action_type = int(action_type) if action_type else None
+    user = context["auth_user_obj"]
     if user:
-        if action_type:
-            if (
-                action_type == DCPRRequestActionType.SAVE.value
-                or action_type == DCPRRequestActionType.SUBMIT.value
-            ):
-                return {"success": True}
-            else:
-                return {"success": False}
-        else:
-            return {"success": True}
-    else:
+        return {"success": True}
+
         return {"success": False}
 
 
@@ -71,18 +59,34 @@ def dcpr_request_update_auth(
     if not user or not data_dict:
         return {"success": False}
 
-    request_id = data_dict.get("request_id", None)
+    request_id = data_dict.get("id", None)
     request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
 
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    owner = user.get("id") == request_obj.owner_user
+    owner = user.id == request_obj.owner_user
     request_in_preparation = (
         request_obj.status == dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
     )
 
-    return {"success": owner and not request_in_preparation}
+    nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
+    csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
+
+    request_escalated_to_csi = (
+        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+    )
+    request_submitted = (
+        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+    )
+
+    success = (
+        (owner and request_in_preparation)
+        or (csi_reviewer and request_escalated_to_csi)
+        or (nsif_reviewer and request_submitted)
+    )
+
+    return {"success": success}
 
 
 def dcpr_request_submit_auth(
@@ -95,13 +99,13 @@ def dcpr_request_submit_auth(
     if not user or not data_dict:
         return {"success": False}
 
-    request_id = data_dict.get("request_id", None)
+    request_id = data_dict.get("id", None)
     request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
 
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    owner = user.get("id") == request_obj.owner_user
+    owner = user.id == request_obj.owner_user
     request_in_preparation = (
         request_obj.status == dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
     )
@@ -199,14 +203,15 @@ def dcpr_request_edit_auth(
 
     if not user or not data_dict:
         return {"success": False}
-    request_id = data_dict.get("request_id", None)
+
+    request_id = data_dict.get("id", None)
 
     request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
 
     if not request_obj:
         return {"success": False, "msg": toolkit._("Request not found")}
 
-    owner = user.get("id") == request_obj.owner_user
+    owner = user.id == request_obj.owner_user
     nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
 
