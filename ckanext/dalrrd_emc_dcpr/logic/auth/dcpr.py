@@ -30,7 +30,7 @@ def dcpr_request_create_auth(
     if user:
         return {"success": True}
 
-        return {"success": False}
+    return {"success": False}
 
 
 @toolkit.auth_allow_anonymous_access
