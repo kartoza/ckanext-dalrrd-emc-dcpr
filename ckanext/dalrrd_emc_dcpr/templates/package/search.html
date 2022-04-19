@@ -1,42 +1,5 @@
 {% ckan_extends %}
 
-{% block scripts %}
-    {{ super() }}
-    <script type="text/javascript">
-        const getUrlParameter = function getUrlParameter(sParam) {
-            let sPageURL = window.location.search.substring(1),
-                sURLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
-
-            for (i = 0; i < sURLVariables.length; i++) {
-                sParameterName = sURLVariables[i].split('=');
-
-                if (sParameterName[0] === sParam) {
-                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-                }
-            }
-            return false;
-        };
-        const filters = {
-           'organization': 'Organizations',
-           'vocab_sasdi_themes': 'SASDITheme',
-           'vocab_iso_topic_categories': 'ISOTopicCategory',
-           'tags': 'Tags'
-       }
-
-       keys = Object.keys(filters);
-
-       for(let i=0; i<keys.length; i++){
-           if(getUrlParameter(keys[i])){
-               document.getElementById(filters[keys[i]]).classList.add("in")
-           }
-       }
-
-    </script>
-{% endblock %}
-
-
 {% block breadcrumb_content %}
     <div class="page-header">
     {% set total =  page.item_count %}
