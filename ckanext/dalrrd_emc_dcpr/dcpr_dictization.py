@@ -17,6 +17,7 @@ import typing
 
 from ckan.lib.dictization import table_dictize
 
+from .constants import DCPR_REQUEST_DATASET_TYPE
 from .model.dcpr_request import DCPRRequest
 
 
@@ -24,5 +25,5 @@ def dcpr_request_dictize(
     dcpr_request: DCPRRequest, context: typing.Dict
 ) -> typing.Dict:
     result_dict = table_dictize(dcpr_request, context)
-    result_dict["type"] = "dcpr_request"
+    result_dict["type"] = DCPR_REQUEST_DATASET_TYPE
     return result_dict

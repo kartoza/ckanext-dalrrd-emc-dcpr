@@ -27,7 +27,19 @@ ISO_TOPIC_CATEGORIES: typing.Final[typing.List[typing.Tuple[str, str]]] = [
     ("utilitiesCommuinication", "Utilities, Communication"),
 ]
 
+DCPR_REQUEST_DATASET_TYPE = "ckanext-dalrrd_emc_dcpr-dcpr_request"
+
 
 class DatasetManagementActivityType(enum.Enum):
     REQUEST_MAINTENANCE = "requested dataset maintenance"
     REQUEST_PUBLICATION = "requested dataset publication"
+
+
+class DCPRRequestStatus(enum.Enum):
+    UNDER_PREPARATION = "UNDER_PREPARATION"
+    AWAITING_NSIF_REVIEW = "AWAITING_NSIF_REVIEW"
+    UNDER_NSIF_REVIEW = "UNDER_NSIF_REVIEW"
+    AWAITING_CSI_REVIEW = "AWAITING_CSI_REVIEW"
+    UNDER_CSI_REVIEW = "UNDER_CSI_REVIEW"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"

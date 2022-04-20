@@ -165,16 +165,6 @@ class DCPRRequestOrganizationLevel(enum.Enum):
     AUTHORITY = "Authority"
 
 
-class DCPRRequestStatus(enum.Enum):
-    UNDER_PREPARATION = "UNDER_PREPARATION"
-    AWAITING_NSIF_REVIEW = "AWAITING_NSIF_REVIEW"
-    UNDER_NSIF_REVIEW = "UNDER_NSIF_REVIEW"
-    AWAITING_CSI_REVIEW = "AWAITING_CSI_REVIEW"
-    UNDER_CSI_REVIEW = "UNDER_CSI_REVIEW"
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
-
-
 class DCPRRequestUrgency(enum.Enum):
     LOW = "Low"
     MEDIUM = "Medium"
