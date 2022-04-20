@@ -92,12 +92,10 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """IPackageController interface requires reimplementation of this method."""
 
         context = {}
-
         facets = OrderedDict()
-
         default_facet_titles = {
-            u'groups': _(u'Groups'),
-            u'tags': _(u'Tags'),
+            "groups": _("Groups"),
+            "tags": _("Tags"),
         }
 
         for facet in h.facets():
@@ -108,47 +106,50 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
         # Facet titles
         for plugin in plugins.PluginImplementations(plugins.IFacets):
-            facets = plugin.dataset_facets(facets, u'dataset')
+            facets = plugin.dataset_facets(facets, "dataset")
 
-        if context.get('ignore_auth') or (g.user and authz.is_sysadmin(g.user)):
+        if context.get("ignore_auth") or (g.user and authz.is_sysadmin(g.user)):
             labels = None
         else:
-            labels = plugins.get_permission_labels(
-            ).get_user_dataset_labels(g.userobj)
+            labels = plugins.get_permission_labels().get_user_dataset_labels(g.userobj)
 
         query = search.query_for(model.Package)
-        query.run({'fq':'',  u'facet.field': list(facets.keys())}, permission_labels=labels)
+        query.run(
+            {"fq": "", "facet.field": list(facets.keys())}, permission_labels=labels
+        )
 
         facets = query.facets
 
         # organizations in the current search's facets.
         group_names = []
-        for field_name in ('groups', 'organization'):
+        for field_name in ("groups", "organization"):
             group_names.extend(facets.get(field_name, {}).keys())
 
-        groups = (model.Session.query(model.Group.name, model.Group.title)
-                  .filter(model.Group.name.in_(group_names))
-                  .all()
-                  if group_names else [])
+        groups = (
+            model.Session.query(model.Group.name, model.Group.title)
+            .filter(model.Group.name.in_(group_names))
+            .all()
+            if group_names
+            else []
+        )
         group_titles_by_name = dict(groups)
 
         restructured_facets = {}
         for key, value in facets.items():
-            restructured_facets[key] = {
-                'title': key,
-                'items': []
-            }
+            restructured_facets[key] = {"title": key, "items": []}
             for key_, value_ in value.items():
-                new_facet_dict = {'name': key_}
-                if key in ('groups', 'organization'):
+                new_facet_dict = {"name": key_}
+                if key in ("groups", "organization"):
                     display_name = group_titles_by_name.get(key_, key_)
-                    display_name = display_name if display_name and display_name.strip() else key_
-                    new_facet_dict['display_name'] = display_name
+                    display_name = (
+                        display_name if display_name and display_name.strip() else key_
+                    )
+                    new_facet_dict["display_name"] = display_name
                 else:
-                    new_facet_dict['display_name'] = key_
-                new_facet_dict['count'] = value_
-                restructured_facets[key]['items'].append(new_facet_dict)
-        search_results['search_facets'] = restructured_facets
+                    new_facet_dict["display_name"] = key_
+                new_facet_dict["count"] = value_
+                restructured_facets[key]["items"].append(new_facet_dict)
+        search_results["search_facets"] = restructured_facets
 
         return search_results
 
