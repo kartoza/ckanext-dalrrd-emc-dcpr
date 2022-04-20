@@ -91,7 +91,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def after_search(self, search_results, search_params):
         """IPackageController interface requires reimplementation of this method."""
 
-        context = {}
         facets = OrderedDict()
         default_facet_titles = {
             "groups": _("Groups"),
@@ -108,10 +107,15 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         for plugin in plugins.PluginImplementations(plugins.IFacets):
             facets = plugin.dataset_facets(facets, "dataset")
 
-        if context.get("ignore_auth") or (g.user and authz.is_sysadmin(g.user)):
+        if g.user and authz.is_sysadmin(g.user):
             labels = None
         else:
-            labels = plugins.get_permission_labels().get_user_dataset_labels(g.userobj)
+            try:
+                labels = plugins.get_permission_labels().get_user_dataset_labels(
+                    g.userobj
+                )
+            except AttributeError:
+                labels = None
 
         query = search.query_for(model.Package)
         query.run(
