@@ -18,7 +18,11 @@ from .blueprints.dcpr import dcpr_blueprint
 from .blueprints.emc import emc_blueprint
 from .cli import commands
 from .logic.action import ckan as ckan_actions
-from .logic.action import dcpr as dcpr_actions
+from .logic.action.dcpr import create as dcpr_create_actions
+from .logic.action.dcpr import delete as dcpr_delete_actions
+from .logic.action.dcpr import get as dcpr_get_actions
+from .logic.action.dcpr import update as dcpr_update_actions
+
 from .logic.action import emc as emc_actions
 from .logic import (
     converters,
@@ -147,7 +151,14 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_patch": ckan_auth.package_patch,
             "dcpr_error_report_create_auth": dcpr_auth.dcpr_report_create_auth,
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
-            "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
+            "dcpr_request_list_public_auth": dcpr_auth.dcpr_request_list_public_auth,
+            "dcpr_request_list_private_auth": dcpr_auth.dcpr_request_list_private_auth,
+            "dcpr_request_list_pending_csi_auth": (
+                dcpr_auth.dcpr_request_list_pending_csi_auth
+            ),
+            "dcpr_request_list_pending_nsif_auth": (
+                dcpr_auth.dcpr_request_list_pending_nsif_auth
+            ),
             "dcpr_request_show_auth": dcpr_auth.dcpr_request_show_auth,
             "dcpr_request_update_auth": dcpr_auth.dcpr_request_update_auth,
             "dcpr_request_submit_auth": dcpr_auth.dcpr_request_submit_auth,
@@ -172,17 +183,26 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_create": ckan_actions.package_create,
             "package_update": ckan_actions.package_update,
             "package_patch": ckan_actions.package_patch,
-            "dcpr_error_report_create": dcpr_actions.dcpr_error_report_create,
-            "dcpr_request_create": dcpr_actions.dcpr_request_create,
-            "dcpr_geospatial_request_create": dcpr_actions.dcpr_geospatial_request_create,
-            "dcpr_request_list": dcpr_actions.dcpr_request_list,
-            "dcpr_request_show": dcpr_actions.dcpr_request_show,
-            "dcpr_request_update": dcpr_actions.dcpr_request_update,
-            "dcpr_request_submit": dcpr_actions.dcpr_request_submit,
-            "dcpr_request_escalate": dcpr_actions.dcpr_request_escalate,
-            "dcpr_request_accept": dcpr_actions.dcpr_request_accept,
-            "dcpr_request_reject": dcpr_actions.dcpr_request_reject,
-            "dcpr_request_delete": dcpr_actions.dcpr_request_delete,
+            "dcpr_error_report_create": dcpr_create_actions.dcpr_error_report_create,
+            "dcpr_request_create": dcpr_create_actions.dcpr_request_create,
+            "dcpr_geospatial_request_create": (
+                dcpr_create_actions.dcpr_geospatial_request_create
+            ),
+            "dcpr_request_list_public": dcpr_get_actions.dcpr_request_list_public,
+            "dcpr_request_list_private": dcpr_get_actions.dcpr_request_list_private,
+            "dcpr_request_list_awaiting_csi_moderation": (
+                dcpr_get_actions.dcpr_request_list_awaiting_csi_moderation
+            ),
+            "dcpr_request_list_awaiting_nsif_moderation": (
+                dcpr_get_actions.dcpr_request_list_awaiting_nsif_moderation
+            ),
+            "dcpr_request_show": dcpr_get_actions.dcpr_request_show,
+            "dcpr_request_update": dcpr_update_actions.dcpr_request_update,
+            "dcpr_request_submit": dcpr_update_actions.dcpr_request_submit,
+            "dcpr_request_escalate": dcpr_update_actions.dcpr_request_escalate,
+            "dcpr_request_accept": dcpr_update_actions.dcpr_request_accept,
+            "dcpr_request_reject": dcpr_update_actions.dcpr_request_reject,
+            "dcpr_request_delete": dcpr_delete_actions.dcpr_request_delete,
             "emc_version": emc_actions.show_version,
             "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
             "emc_request_dataset_publication": emc_actions.request_dataset_publication,

@@ -2,10 +2,37 @@ import logging
 import typing
 
 from ckan.plugins import toolkit
-from ..action.dcpr import DCPRRequestActionType
 from ...model import dcpr_request as dcpr_request
 
 logger = logging.getLogger(__name__)
+
+
+def dcpr_request_list_private_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+):
+    """Authorize listing private DCPR requests"""
+    # FIXME: Implement this
+    return {"success": False}
+
+
+@toolkit.auth_allow_anonymous_access
+def dcpr_request_list_public_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    """Authorize listing public DCPR requests"""
+    return {"success": True}
+
+
+def dcpr_request_list_pending_csi_auth():
+    """Authorize listing DCPR requests which are under evaluation by CSI"""
+    # FIXME: Implement this
+    return {"success": False}
+
+
+def dcpr_request_list_pending_nsif_auth():
+    """Authorize listing DCPR requests which are under evaluation by NSIF"""
+    # FIXME: Implement this
+    return {"success": False}
 
 
 def dcpr_report_create_auth(
@@ -23,22 +50,24 @@ def dcpr_report_create_auth(
 def dcpr_request_create_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_create auth")
-    # Only allow creation of dcpr requests if there is a user logged in.
+    """Authorize DCPR request creation.
 
+    Creation of dcpr requests is reseverved for logged in users that have been granted
+    membership of an organization
+
+    NOTE: The implementation does not need to check if the user is logged in because
+    CKAN already does that for us, as per:
+
+    https://docs.ckan.org/en/2.9/extensions/plugin-interfaces.html#ckan.plugins.interfaces.IAuthFunctions
+
+    """
+
+    logger.debug("Inside the dcpr_request_create auth")
     user = context["auth_user_obj"]
     if user:
         return {"success": True}
 
     return {"success": False}
-
-
-@toolkit.auth_allow_anonymous_access
-def dcpr_request_list_auth(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
-) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_list auth")
-    return {"success": True}
 
 
 @toolkit.auth_allow_anonymous_access
