@@ -6,12 +6,12 @@ from functools import partial
 import ckan.plugins as plugins
 import ckan.lib.helpers as h
 import ckan.lib.search as search
-import ckan.authz as authz
+
 import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
 from ckan import model
-from ckan.common import _, g
+from ckan.common import _, g, config, asbool
 from flask import Blueprint
 from sqlalchemy import orm
 
@@ -91,6 +91,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def after_search(self, search_results, search_params):
         """IPackageController interface requires reimplementation of this method."""
 
+        context = {}
         facets = OrderedDict()
         default_facet_titles = {
             "groups": _("Groups"),
@@ -107,20 +108,13 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         for plugin in plugins.PluginImplementations(plugins.IFacets):
             facets = plugin.dataset_facets(facets, "dataset")
 
-        if g.user and authz.is_sysadmin(g.user):
-            labels = None
-        else:
-            try:
-                labels = plugins.get_permission_labels().get_user_dataset_labels(
-                    g.userobj
-                )
-            except AttributeError:
-                labels = None
+        data_dict = {
+            "fq": "",
+            "facet.field": list(facets.keys()),
+        }
 
         query = search.query_for(model.Package)
-        query.run(
-            {"fq": "", "facet.field": list(facets.keys())}, permission_labels=labels
-        )
+        query.run(data_dict, permission_labels=None)
 
         facets = query.facets
 
