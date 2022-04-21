@@ -11,7 +11,7 @@ import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
 from ckan import model
-from ckan.common import _, g, config, asbool
+from ckan.common import _, config, g
 from flask import Blueprint
 from sqlalchemy import orm
 
@@ -112,6 +112,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "fq": "",
             "facet.field": list(facets.keys()),
         }
+
+        if not getattr(g, "user", None):
+            data_dict["fq"] = "+capacity:public " + data_dict["fq"]
 
         query = search.query_for(model.Package)
         query.run(data_dict, permission_labels=None)
