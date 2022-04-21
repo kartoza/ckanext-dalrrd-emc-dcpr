@@ -1,12 +1,17 @@
 import logging
 import typing
+from collections import OrderedDict
 from functools import partial
 
 import ckan.plugins as plugins
+import ckan.lib.helpers as h
+import ckan.lib.search as search
+
 import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
 from ckan import model
+from ckan.common import _, config, g
 from flask import Blueprint
 from sqlalchemy import orm
 
@@ -85,6 +90,68 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def after_search(self, search_results, search_params):
         """IPackageController interface requires reimplementation of this method."""
+
+        context = {}
+        facets = OrderedDict()
+        default_facet_titles = {
+            "groups": _("Groups"),
+            "tags": _("Tags"),
+        }
+
+        for facet in h.facets():
+            if facet in default_facet_titles:
+                facets[facet] = default_facet_titles[facet]
+            else:
+                facets[facet] = facet
+
+        # Facet titles
+        for plugin in plugins.PluginImplementations(plugins.IFacets):
+            facets = plugin.dataset_facets(facets, "dataset")
+
+        data_dict = {
+            "fq": "",
+            "facet.field": list(facets.keys()),
+        }
+
+        if not getattr(g, "user", None):
+            data_dict["fq"] = "+capacity:public " + data_dict["fq"]
+
+        query = search.query_for(model.Package)
+        query.run(data_dict, permission_labels=None)
+
+        facets = query.facets
+
+        # organizations in the current search's facets.
+        group_names = []
+        for field_name in ("groups", "organization"):
+            group_names.extend(facets.get(field_name, {}).keys())
+
+        groups = (
+            model.Session.query(model.Group.name, model.Group.title)
+            .filter(model.Group.name.in_(group_names))
+            .all()
+            if group_names
+            else []
+        )
+        group_titles_by_name = dict(groups)
+
+        restructured_facets = {}
+        for key, value in facets.items():
+            restructured_facets[key] = {"title": key, "items": []}
+            for key_, value_ in value.items():
+                new_facet_dict = {"name": key_}
+                if key in ("groups", "organization"):
+                    display_name = group_titles_by_name.get(key_, key_)
+                    display_name = (
+                        display_name if display_name and display_name.strip() else key_
+                    )
+                    new_facet_dict["display_name"] = display_name
+                else:
+                    new_facet_dict["display_name"] = key_
+                new_facet_dict["count"] = value_
+                restructured_facets[key]["items"].append(new_facet_dict)
+        search_results["search_facets"] = restructured_facets
+
         return search_results
 
     def after_show(self, context, pkg_dict):
