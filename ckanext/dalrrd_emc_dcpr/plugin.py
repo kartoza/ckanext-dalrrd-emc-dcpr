@@ -290,10 +290,10 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         }
 
     def is_fallback(self) -> bool:
-        return False
+        return True
 
     def package_types(self) -> typing.List:
-        return [constants.DCPR_REQUEST_DATASET_TYPE]
+        return []
 
     def get_helpers(self):
         return {
