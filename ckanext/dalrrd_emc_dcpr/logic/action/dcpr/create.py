@@ -64,19 +64,9 @@ def dcpr_error_report_create(context, data_dict):
 
 
 def dcpr_request_create(context, data_dict):
-    model = context["model"]
-    access = toolkit.check_access("dcpr_request_create_auth", context, data_dict)
-
-    logger.debug("Inside the dcpr_request_create action")
-
-    if not access:
-        raise toolkit.NotAuthorized({"message": "Unauthorized to perform action"})
-    status = dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
-
+    toolkit.check_access("dcpr_request_create_auth", context, data_dict)
     schema = context.get("schema", create_dcpr_request_schema())
-
     data, errors = toolkit.navl_validate(data_dict, schema, context)
-
     if errors:
         raise toolkit.ValidationError(errors)
 
@@ -84,7 +74,7 @@ def dcpr_request_create(context, data_dict):
         owner_user=data_dict["owner_user"],
         csi_moderator=data_dict.get("csi_moderator", None),
         nsif_reviewer=data_dict.get("nsif_reviewer", None),
-        status=status,
+        status=dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value,
         organization_name=data_dict["organization_name"],
         organization_level=data_dict["organization_level"],
         organization_address=data_dict["organization_address"],
@@ -125,6 +115,7 @@ def dcpr_request_create(context, data_dict):
         notification_targets.append(target)
 
     try:
+        model = context["model"]
         model.Session.add(request)
         model.repo.commit()
         request_dataset.dcpr_request_id = request.csi_reference_id

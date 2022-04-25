@@ -26,7 +26,7 @@
       </div>
     {% endblock %}
       <div>
-        <a class="btn pull-right" href="{{ h.url_for('%s.dcpr_request_show' % dcpr_request.type, request_id=request_id) }}">
+        <a class="btn pull-right" href="{{ h.url_for('dcpr.dcpr_request_show', request_id=request_id) }}">
          {{ _('View Request') }}
         </a>
       </div>

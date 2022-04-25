@@ -16,14 +16,18 @@ def dcpr_request_list_public(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List:
     """Return a list of public DCPR requests."""
-    toolkit.check_access("dcpr_request_list_public_auth", context, data_dict=data_dict)
+    toolkit.check_access(
+        "dcpr_request_list_public_auth", context, data_dict=data_dict or {}
+    )
     query = (
         context["model"]
         .Session.query(dcpr_request.DCPRRequest)
         .limit(data_dict.get("limit", 10))
         .offset(data_dict.get("offset", 0))
     )
-    return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]
+    result = [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]
+    logger.info(f"{result=}")
+    return result
 
 
 @toolkit.side_effect_free

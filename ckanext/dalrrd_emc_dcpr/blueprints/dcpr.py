@@ -1,8 +1,11 @@
+import json
 import logging
+import typing
 
 import ckan.lib.navl.dictization_functions as dict_fns
 from flask import Blueprint, redirect, request
 from flask.views import MethodView
+from ckan.views.home import CACHE_PARAMETERS
 from ckan.plugins import toolkit
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 from ckan.views import dataset as ckan_dataset_views
@@ -24,15 +27,8 @@ def get_public_dcpr_requests():
     existing_public_requests = toolkit.get_action("dcpr_request_list_public")(
         data_dict={}
     )
-    # if user is logged in and is a member of an org then it may have private requests
-    # if user is logged in and is a member of the CSI org then it may have unmoderated requests
-    # if user is logged in and is a member of the NSIF org then it may have unmoderated requests
-
     extra_vars = {
         "public_requests": existing_public_requests,
-        "private_requests": [],
-        "awaiting_csi_moderation_requests": [],
-        "awaiting_nsif_moderation_requests": [],
         "statuses": get_status_labels(),
     }
     return toolkit.render("dcpr/index.html", extra_vars=extra_vars)
@@ -62,87 +58,80 @@ def get_awaiting_nsif_moderation_dcpr_requests():
 #         pass
 
 
-@dcpr_blueprint.route("/request/new", methods=["GET", "POST"])
-def dcpr_request_new():
-    logger.debug("Inside the dcpr_new_request view")
-    context = {
-        "user": toolkit.g.user,
-        "auth_user_obj": toolkit.g.userobj,
-    }
-    extra_vars = {}
-    organizations = toolkit.get_action("organization_list")(context, {})
-    organizations = [{"value": org, "text": org} for org in organizations]
+class DcprRequestCreateView(MethodView):
+    def get(self, data=None, errors=None, error_summary=None):
+        toolkit.check_access("dcpr_request_create_auth", {"user": toolkit.g.user})
 
-    organizations_levels = [
-        {"value": level.value, "text": level.value}
-        for level in DCPRRequestOrganizationLevel
-    ]
-    data_urgency = [
-        {"value": level.value, "text": level.value} for level in DCPRRequestUrgency
-    ]
+        data_to_show = data or clean_dict(
+            dict_fns.unflatten(
+                tuplize_dict(parse_params(request.args, ignore_keys=CACHE_PARAMETERS))
+            )
+        )
+        serialized_errors = json.dumps(errors or {})
+        serialized_error_summary = json.dumps(error_summary or {})
 
-    extra_vars["dcpr_request"] = None
-    extra_vars["organizations"] = organizations
-    extra_vars["organizations_levels"] = organizations_levels
-    extra_vars["data_urgency"] = data_urgency
+        orgs = toolkit.get_action("organization_list")(data_dict={"all_fields": True})
+        extra_vars = {
+            "dcpr_request": None,
+            "organizations": [
+                {"value": org["name"], "text": org["display_name"]} for org in orgs
+            ],
+            "organizations_levels": [
+                {"value": level.value, "text": level.value}
+                for level in DCPRRequestOrganizationLevel
+            ],
+            "data_urgency": [
+                {"value": level.value, "text": level.value}
+                for level in DCPRRequestUrgency
+            ],
+        }
+        return toolkit.render("dcpr/new.html", extra_vars=extra_vars)
 
-    if request.method == "POST":
+    def post(self):
         try:
             data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
             data_dict["owner_user"] = toolkit.g.userobj.id
-
         except dict_fns.DataError:
-            return toolkit.base.abort(400, toolkit._("Integrity Error"))
-        try:
-            dcpr_request = toolkit.get_action("dcpr_request_create")(context, data_dict)
-
-            url = toolkit.h.url_for(
-                "{0}.dcpr_request_show".format("dcpr"),
-                request_id=dcpr_request.csi_reference_id,
-            )
-            return toolkit.h.redirect_to(url)
-
-        except toolkit.NotAuthorized:
-            return toolkit.base.abort(
-                403, toolkit._("Unauthorized to create DCPR request")
-            )
-        except toolkit.ObjectNotFound as e:
-            return toolkit.base.abort(404, toolkit._("DCPR request not found"))
-        except toolkit.ValidationError as e:
-            errors = e.error_dict
-            error_summary = e.error_summary
-
-            request.method = "GET"
-            return dcpr_request_edit(
-                None, data=data_dict, errors=errors, error_summary=error_summary
-            )
-
-        url = toolkit.h.url_for(
-            "{0}.dcpr_request_show".format("dcpr"),
-            request_id=dcpr_request.csi_reference_id,
-        )
-        return toolkit.h.redirect_to(url)
-
-    else:
-        try:
-            toolkit.check_access("dcpr_request_create_auth", context)
-        except toolkit.NotAuthorized:
-            return toolkit.base.abort(
-                403,
-                toolkit._("User %r not authorized to create DCPR requests")
-                % (toolkit.g.user),
-            )
-
-        return toolkit.render("dcpr/new.html", extra_vars=extra_vars)
+            result = toolkit.abort(400, toolkit._("Integrity Error"))
+        else:
+            try:
+                dcpr_request = toolkit.get_action("dcpr_request_create")(
+                    context={"user": toolkit.g.user}, data_dict=data_dict
+                )
+            except toolkit.NotAuthorized:
+                result = toolkit.base.abort(
+                    403, toolkit._("Unauthorized to create DCPR request")
+                )
+            except toolkit.ObjectNotFound:
+                result = toolkit.abort(404, toolkit._("DCPR request not found"))
+            except toolkit.ValidationError as exc:
+                errors = exc.error_dict
+                error_summary = exc.error_summary
+                # request.method = "GET"
+                result = dcpr_request_edit(
+                    None, data=data_dict, errors=errors, error_summary=error_summary
+                )
+            else:
+                url = toolkit.h.url_for(
+                    "dcpr.dcpr_request_show", request_id=dcpr_request.csi_reference_id
+                )
+                result = toolkit.h.redirect_to(url)
+        return result
 
 
-# @dcpr_blueprint.route("/request/<request_id>")
-# def dcpr_request_show(request_id):
-#     logger.debug("Inside the dcpr_request_show view")
-#     data_dict = {"id": request_id}
-#     extra_vars = {}
+new_dcpr_request_view = DcprRequestCreateView.as_view("new_dcpr_request")
+dcpr_blueprint.add_url_rule("/request/new/", view_func=new_dcpr_request_view)
+
+
+@dcpr_blueprint.route("/request/<request_id>")
+def dcpr_request_show(request_id):
+    logger.debug("Inside the dcpr_request_show view")
+    data_dict = {"id": request_id}
+    extra_vars = {}
+
+
 #     extra_vars["request_status"] = get_status_labels()
 #
 #     nsif_reviewer = toolkit.h["emc_user_is_org_member"](
@@ -425,67 +414,66 @@ def dcpr_request_new():
 #         "{0}.dcpr_request_show".format("dcpr"), request_id=request_id
 #     )
 #     return toolkit.h.redirect_to(url)
-#
-#
-# @dcpr_blueprint.route("/request/edit/<request_id>", methods=["GET"])
-# def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
-#     logger.debug("Inside the dcpr_request_edit view")
-#     data_dict = {"id": request_id}
-#     extra_vars = {}
-#     extra_vars["errors"] = errors
-#
-#     organizations = toolkit.get_action("organization_list")({}, {})
-#     organizations = [{"value": org, "text": org} for org in organizations]
-#
-#     organizations_levels = [
-#         {"value": level.value, "text": level.value}
-#         for level in DCPRRequestOrganizationLevel
-#     ]
-#     data_urgency = [
-#         {"value": level.value, "text": level.value} for level in DCPRRequestUrgency
-#     ]
-#     extra_vars["organizations"] = organizations
-#     extra_vars["organizations_levels"] = organizations_levels
-#     extra_vars["data_urgency"] = data_urgency
-#
-#     context = {
-#         "user": toolkit.g.user,
-#         "auth_user_obj": toolkit.g.userobj,
-#     }
-#
-#     try:
-#         if request_id is not None:
-#             dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
-#             extra_vars["dcpr_request"] = dcpr_request
-#         elif data is not None:
-#             extra_vars["dcpr_request"] = data
-#             extra_vars["error_summary"] = error_summary
-#
-#         nsif_reviewer = toolkit.h["emc_user_is_org_member"](
-#             "nsif", toolkit.g.userobj, role="editor"
-#         )
-#         csi_reviewer = toolkit.h["emc_user_is_org_member"](
-#             "csi", toolkit.g.userobj, role="editor"
-#         )
-#         extra_vars["nsif_reviewer"] = nsif_reviewer
-#         extra_vars["csi_reviewer"] = csi_reviewer
-#
-#     except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
-#         return toolkit.base.abort(404, toolkit._("Request not found"))
-#
-#     try:
-#         toolkit.check_access("dcpr_request_edit_auth", context, data_dict)
-#
-#     except toolkit.NotAuthorized:
-#         return toolkit.base.abort(
-#             403,
-#             toolkit._("User %r not authorized to edit the requested DCPR request")
-#             % (toolkit.g.user),
-#         )
-#
-#     return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
-#
-#
+
+
+class DcprRequestEditView(MethodView):
+    pass
+
+
+@dcpr_blueprint.route("/request/edit/<request_id>", methods=["GET"])
+def dcpr_request_edit(request_id, data=None, errors=None, error_summary=None):
+    logger.debug("Inside the dcpr_request_edit view")
+    orgs = toolkit.get_action("organization_list")(data_dict={"all_fields": True})
+    extra_vars = {
+        "errors": errors,
+        "organizations": [
+            {"value": org["name"], "text": org["display_name"]} for org in orgs
+        ],
+        "organizations_levels": [
+            {"value": level.value, "text": level.value}
+            for level in DCPRRequestOrganizationLevel
+        ],
+        "data_urgency": [
+            {"value": level.value, "text": level.value} for level in DCPRRequestUrgency
+        ],
+    }
+
+    context = {"user": toolkit.g.user}
+
+    try:
+        data_dict = {"id": request_id}
+        if request_id is not None:
+            dcpr_request = toolkit.get_action("dcpr_request_show")(data_dict=data_dict)
+            extra_vars["dcpr_request"] = dcpr_request
+        elif data is not None:
+            extra_vars["dcpr_request"] = data
+            extra_vars["error_summary"] = error_summary
+
+        nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+            "nsif", toolkit.g.userobj, role="editor"
+        )
+        csi_reviewer = toolkit.h["emc_user_is_org_member"](
+            "csi", toolkit.g.userobj, role="editor"
+        )
+        extra_vars["nsif_reviewer"] = nsif_reviewer
+        extra_vars["csi_reviewer"] = csi_reviewer
+
+    except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+        return toolkit.base.abort(404, toolkit._("Request not found"))
+
+    try:
+        toolkit.check_access("dcpr_request_edit_auth", context, data_dict)
+
+    except toolkit.NotAuthorized:
+        return toolkit.base.abort(
+            403,
+            toolkit._("User %r not authorized to edit the requested DCPR request")
+            % (toolkit.g.user),
+        )
+
+    return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
+
+
 # @dcpr_blueprint.route("/request/delete/<request_id>", methods=["GET", "POST"])
 # def dcpr_request_delete(request_id, errors=None, error_summary=None):
 #     logger.debug("Inside the dcpr_request_delete view")

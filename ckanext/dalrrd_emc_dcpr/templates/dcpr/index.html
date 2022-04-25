@@ -6,10 +6,24 @@
 
 {# lets only show those nav links that the current user is able to navigate to and do something useful #}
 {% block secondary_content %}
-    {% link_for _('Public DCPR requests'), named_route='dcpr.get_public_dcpr_requests' %}
-    {% link_for _('Unsubmitted DCPR requests'), named_route='dcpr.get_unsubmitted_dcpr_requests' %}
-    {% link_for _('Requests awaiting CSI moderation'), named_route='dcpr.get_awaiting_csi_moderation_dcpr_requests' %}
-    {% link_for _('Requests awaiting NSIF moderation'), named_route='dcpr.get_awaiting_nsif_moderation_dcpr_requests' %}
+    <nav role="navigation">
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" class="active">
+                {% link_for _('Public DCPR requests'), named_route='dcpr.get_public_dcpr_requests' %}
+            </li>
+            {% if able_to_create_request %}
+                <li role="presentation">
+                    {% link_for _('Unsubmitted DCPR requests'), named_route='dcpr.get_unsubmitted_dcpr_requests' %}
+                </li>
+            {% endif %}
+            <li role="presentation">
+                {% link_for _('Requests awaiting CSI moderation'), named_route='dcpr.get_awaiting_csi_moderation_dcpr_requests' %}
+            </li>
+            <li role="presentation">
+                {% link_for _('Requests awaiting NSIF moderation'), named_route='dcpr.get_awaiting_nsif_moderation_dcpr_requests' %}
+            </li>
+        </ul>
+    </nav>
 {% endblock %}
 
 {% block primary_content %}
@@ -20,54 +34,15 @@
             {% block page_primary_action %}
                 {% if able_to_create_request %}
                     <div class="page_primary_action">
-                        {% link_for _('Create request'), named_route='dcpr.dcpr_request_new', class_='btn btn-primary', icon='plus-square' %}
+                        {% link_for _('Create request'), named_route='dcpr.new_dcpr_request', class_='btn btn-primary', icon='plus-square' %}
                     </div>
                 {% endif %}
             {% endblock %}
 
-            {# This should only show for users that are allowed to create private requests #}
-            {% if able_to_create_request and private_requests %}
-                <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
-                    {% for request in private_requests %}
-                        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request, request_status=request_statuses %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div>
-                    <h5> {{ _('There are no private DCPR requests yet') }}</h5>
-                </div>
-            {% endif %}
-
-            {# This should only show for users that are members of the NSIF organization #}
-            {% if awaiting_nsif_moderation_requests %}
-                <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
-                    {% for request in awaiting_nsif_moderation_requests %}
-                        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request, request_status=request_statuses %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div>
-                    <h5> {{ _('There are DCPR requests awaiting moderation from the NSIF') }}</h5>
-                </div>
-            {% endif %}
-
-            {# This should only show for users that are members of the CSI organization #}
-            {% if awaiting_csi_moderation_requests %}
-                <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
-                    {% for request in awaiting_csi_moderation_requests %}
-                        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request, request_status=request_statuses %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div>
-                    <h5> {{ _('There are DCPR requests awaiting moderation from the CSI') }}</h5>
-                </div>
-            {% endif %}
-
             {% if public_requests %}
                 <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
                     {% for request in public_requests %}
-                        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request, request_status=request_statuses %}
+                        {% snippet 'dcpr/snippets/request_item.html', dcpr_request=request, request_status=statuses %}
                     {% endfor %}
                 </ul>
             {% else %}

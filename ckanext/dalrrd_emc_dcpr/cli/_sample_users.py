@@ -10,4 +10,5 @@ SAMPLE_USERS: typing.Final[typing.List[_CkanBootstrapUser]] = [
     _CkanBootstrapUser("tester4", "tester4@fake.mail", _SAMPLE_USER_PASSWORD),
     _CkanBootstrapUser("tester5", "tester5@fake.mail", _SAMPLE_USER_PASSWORD),
     _CkanBootstrapUser("tester6", "tester6@fake.mail", _SAMPLE_USER_PASSWORD),
+    _CkanBootstrapUser("tester7", "tester7@fake.mail", _SAMPLE_USER_PASSWORD),
 ]

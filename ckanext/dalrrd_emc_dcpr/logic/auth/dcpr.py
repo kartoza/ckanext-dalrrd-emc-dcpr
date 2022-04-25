@@ -58,8 +58,8 @@ def dcpr_request_create_auth(
 ) -> typing.Dict:
     """Authorize DCPR request creation.
 
-    Creation of dcpr requests is reseverved for logged in users that have been granted
-    membership of an organization
+    Creation of DCPR requests is reserved for logged in users that have been granted
+    membership of an organization.
 
     NOTE: The implementation does not need to check if the user is logged in because
     CKAN already does that for us, as per:
@@ -68,12 +68,14 @@ def dcpr_request_create_auth(
 
     """
 
-    logger.debug("Inside the dcpr_request_create auth")
-    user = context["auth_user_obj"]
-    if user:
-        return {"success": True}
-
-    return {"success": False}
+    logger.debug("Inside the dcpr_request_create_auth")
+    logger.info(f"{context=}")
+    logger.info(f"{data_dict=}")
+    db_user = context["auth_user_obj"]
+    member_of_orgs = len(db_user.get_groups()) > 0
+    result = {"success": member_of_orgs}
+    logger.info(f"{result=}")
+    return result
 
 
 @toolkit.auth_allow_anonymous_access
