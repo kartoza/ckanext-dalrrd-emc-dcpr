@@ -7,7 +7,7 @@
         <div class="controls">
             <select id="field-sasdi_theme" name="sasdi_theme" data-module="autocomplete">
                 <option value="">{{ _('No SASDI Theme') }}</option>
-                {% for sasdi_theme in h.sasdi_themes()  %}
+                {% for sasdi_theme in h.emc_sasdi_themes()  %}
                     <option value="{{ sasdi_theme.value }}" {% if sasdi_theme in data.get('sasdi_theme', []) %}selected="selected"{% endif %}>{{ sasdi_theme.label }}</option>
                 {% endfor %}
             </select>

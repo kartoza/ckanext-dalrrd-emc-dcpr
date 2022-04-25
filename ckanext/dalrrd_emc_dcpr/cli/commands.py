@@ -1,7 +1,6 @@
 """CKAN CLI commands for the dalrrd-emc-dcpr extension"""
 
 import datetime as dt
-import enum
 import inspect
 import json
 import logging
@@ -16,12 +15,13 @@ import alembic.command
 import alembic.config
 import alembic.util.exc
 import click
-
 import ckan
 import ckan.plugins as p
 from ckan.plugins import toolkit
 from ckan import model
 from ckan.lib.navl import dictization_functions
+from lxml import etree
+from sqlalchemy import text as sla_text
 
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
     DCPRRequest,
@@ -37,6 +37,7 @@ from ..constants import (
 )
 from ..email_notifications import get_and_send_notifications_for_all_users
 
+from . import utils
 from ._bootstrap_data import PORTAL_PAGES, SASDI_ORGANIZATIONS
 from ._sample_datasets import (
     SAMPLE_DATASET_TAG,
@@ -48,21 +49,26 @@ from ._sample_dcpr_requests import SAMPLE_REQUESTS, SAMPLE_GEOSPATIAL_REQUESTS
 from ._sample_dcpr_error_reports import SAMPLE_ERROR_REPORTS
 
 logger = logging.getLogger(__name__)
+_xml_parser = etree.XMLParser(resolve_entities=False)
 
-_DEFAULT_COLOR: typing.Final[typing.Optional[str]] = None
-_SUCCESS_COLOR: typing.Final[str] = "green"
-_ERROR_COLOR: typing.Final[str] = "red"
-_INFO_COLOR: typing.Final[str] = "yellow"
-
-
-class DatasetCreationResult(enum.Enum):
-    CREATED = "created"
-    NOT_CREATED_ALREADY_EXISTS = "already_exists"
+_DEFAULT_LEGACY_SASDI_RECORD_DIR = (
+    Path.home() / "data/storage/legacy_sasdi_downloader/csw_records"
+)
+_DEFAULT_LEGACY_SASDI_THUMBNAIL_DIR = (
+    Path.home() / "data/storage/legacy_sasdi_downloader/thumbnails"
+)
+_DEFAULT_MAX_WORKERS = 5
+_PYCSW_MATERIALIZED_VIEW_NAME = "public.emc_pycsw_view"
 
 
 @click.group()
-def dalrrd_emc_dcpr():
+@click.option("--verbose", is_flag=True)
+def dalrrd_emc_dcpr(verbose: bool):
     """Commands related to the dalrrd-emc-dcpr extension."""
+    click_handler = utils.ClickLoggingHandler()
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO, handlers=(click_handler,)
+    )
 
 
 @dalrrd_emc_dcpr.command()
@@ -78,18 +84,15 @@ def send_email_notifications():
         env_sentinel = "CKAN_SMTP_PASSWORD"
         if os.getenv(env_sentinel) is not None:
             num_sent = get_and_send_notifications_for_all_users()
-            click.secho(f"Sent {num_sent} emails")
-            click.secho("Done!", fg=_SUCCESS_COLOR)
+            logger.info(f"Sent {num_sent} emails")
+            logger.info("Done!")
         else:
-            click.secho(
+            logger.error(
                 f"Could not find the {env_sentinel!r} environment variable. Email "
                 f"notifications are not configured correctly. Aborting...",
-                fg=_ERROR_COLOR,
             )
     else:
-        click.secho(
-            f"{setting_key} is not enabled in config. Aborting...", fg=_ERROR_COLOR
-        )
+        logger.error(f"{setting_key} is not enabled in config. Aborting...")
 
 
 @dalrrd_emc_dcpr.group()
@@ -107,7 +110,8 @@ def extra_commands():
     """Extra commands that are less relevant"""
 
 
-@dalrrd_emc_dcpr.command()
+# @dalrrd_emc_dcpr.command()
+@click.command()
 def shell():
     """
     Launch a shell with CKAN already imported and ready to explore
@@ -164,7 +168,7 @@ def create_sasdi_themes():
 
     """
 
-    click.secho(
+    logger.info(
         f"Creating {SASDI_THEMES_VOCABULARY_NAME!r} CKAN tag vocabulary and adding "
         f"configured SASDI themes to it..."
     )
@@ -175,16 +179,13 @@ def create_sasdi_themes():
     for voc in vocab_list:
         if voc["name"] == SASDI_THEMES_VOCABULARY_NAME:
             vocabulary = voc
-            click.secho(
-                (
-                    f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} already exists, "
-                    f"skipping creation..."
-                ),
-                fg=_INFO_COLOR,
+            logger.info(
+                f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} already exists, "
+                f"skipping creation..."
             )
             break
     else:
-        click.echo(f"Creating vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}...")
+        logger.info(f"Creating vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}...")
         vocabulary = toolkit.get_action("vocabulary_create")(
             context, {"name": SASDI_THEMES_VOCABULARY_NAME}
         )
@@ -195,7 +196,7 @@ def create_sasdi_themes():
         if theme_name != "":
             already_exists = theme_name in [tag["name"] for tag in vocabulary["tags"]]
             if not already_exists:
-                click.echo(
+                logger.info(
                     f"Adding tag {theme_name!r} to "
                     f"vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}..."
                 )
@@ -203,14 +204,11 @@ def create_sasdi_themes():
                     context, {"name": theme_name, "vocabulary_id": vocabulary["id"]}
                 )
             else:
-                click.secho(
-                    (
-                        f"Tag {theme_name!r} is already part of the "
-                        f"{SASDI_THEMES_VOCABULARY_NAME!r} vocabulary, skipping..."
-                    ),
-                    fg=_INFO_COLOR,
+                logger.info(
+                    f"Tag {theme_name!r} is already part of the "
+                    f"{SASDI_THEMES_VOCABULARY_NAME!r} vocabulary, skipping..."
                 )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+    logger.info("Done!")
 
 
 @delete_data.command()
@@ -229,7 +227,7 @@ def delete_sasdi_themes():
     context = {"user": user["name"]}
     vocabulary_list = toolkit.get_action("vocabulary_list")(context)
     if SASDI_THEMES_VOCABULARY_NAME in [voc["name"] for voc in vocabulary_list]:
-        click.secho(
+        logger.info(
             f"Deleting {SASDI_THEMES_VOCABULARY_NAME!r} CKAN tag vocabulary and "
             f"respective tags... "
         )
@@ -237,23 +235,19 @@ def delete_sasdi_themes():
             context, {"vocabulary_id": SASDI_THEMES_VOCABULARY_NAME}
         )
         for tag_name in existing_tags:
-            click.secho(f"Deleting tag {tag_name!r}...")
+            logger.info(f"Deleting tag {tag_name!r}...")
             toolkit.get_action("tag_delete")(
                 context, {"id": tag_name, "vocabulary_id": SASDI_THEMES_VOCABULARY_NAME}
             )
-        click.echo(f"Deleting vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}...")
+        logger.info(f"Deleting vocabulary {SASDI_THEMES_VOCABULARY_NAME!r}...")
         toolkit.get_action("vocabulary_delete")(
             context, {"id": SASDI_THEMES_VOCABULARY_NAME}
         )
     else:
-        click.secho(
-            (
-                f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} does not exist, "
-                f"nothing to do"
-            ),
-            fg=_INFO_COLOR,
+        logger.info(
+            f"Vocabulary {SASDI_THEMES_VOCABULARY_NAME!r} does not exist, nothing to do"
         )
-    click.secho(f"Done!", fg=_SUCCESS_COLOR)
+    logger.info("Done!")
 
 
 @bootstrap.command()
@@ -268,7 +262,7 @@ def create_iso_topic_categories():
 
     """
 
-    click.secho(
+    logger.info(
         f"Creating ISO Topic Categories CKAN tag vocabulary and adding "
         f"the relevant categories..."
     )
@@ -279,16 +273,13 @@ def create_iso_topic_categories():
     for voc in vocab_list:
         if voc["name"] == ISO_TOPIC_CATEGOY_VOCABULARY_NAME:
             vocabulary = voc
-            click.secho(
-                (
-                    f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} already exists, "
-                    f"skipping creation..."
-                ),
-                fg=_INFO_COLOR,
+            logger.info(
+                f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} already exists, "
+                f"skipping creation..."
             )
             break
     else:
-        click.echo(f"Creating vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
+        logger.info(f"Creating vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
         vocabulary = toolkit.get_action("vocabulary_create")(
             context, {"name": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
         )
@@ -297,7 +288,7 @@ def create_iso_topic_categories():
         if theme_name != "":
             already_exists = theme_name in [tag["name"] for tag in vocabulary["tags"]]
             if not already_exists:
-                click.echo(
+                logger.info(
                     f"Adding tag {theme_name!r} to "
                     f"vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}..."
                 )
@@ -305,20 +296,17 @@ def create_iso_topic_categories():
                     context, {"name": theme_name, "vocabulary_id": vocabulary["id"]}
                 )
             else:
-                click.secho(
-                    (
-                        f"Tag {theme_name!r} is already part of the "
-                        f"{ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} vocabulary, skipping..."
-                    ),
-                    fg=_INFO_COLOR,
+                logger.info(
+                    f"Tag {theme_name!r} is already part of the "
+                    f"{ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} vocabulary, skipping..."
                 )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+    logger.info("Done!")
 
 
 @bootstrap.command()
 def create_pages():
     """Create default pages"""
-    click.secho("Creating default pages...")
+    logger.info("Creating default pages...")
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     context = {"user": user["name"]}
     existing_pages = toolkit.get_action("ckanext_pages_list")(
@@ -327,21 +315,19 @@ def create_pages():
     existing_page_names = [p["name"] for p in existing_pages]
     for page in PORTAL_PAGES:
         if page.name not in existing_page_names:
-            click.secho(f"Creating page {page.name!r}...", fg=_INFO_COLOR)
+            logger.info(f"Creating page {page.name!r}...")
             toolkit.get_action("ckanext_pages_update")(
                 context=context, data_dict=page.to_data_dict()
             )
         else:
-            click.secho(
-                f"Page {page.name!r} already exists, skipping...", fg=_INFO_COLOR
-            )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+            logger.info(f"Page {page.name!r} already exists, skipping...")
+    logger.info("Done!")
 
 
 @delete_data.command()
 def delete_pages():
     """Delete default pages"""
-    click.secho("Deleting default pages...")
+    logger.info("Deleting default pages...")
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     context = {"user": user["name"]}
     existing_pages = toolkit.get_action("ckanext_pages_list")(
@@ -350,15 +336,13 @@ def delete_pages():
     existing_page_names = [p["name"] for p in existing_pages]
     for page in PORTAL_PAGES:
         if page.name in existing_page_names:
-            click.secho(f"Deleting page {page.name!r}...", fg=_INFO_COLOR)
+            logger.info(f"Deleting page {page.name!r}...")
             toolkit.get_action("ckanext_pages_delete")(
                 context=context, data_dict={"page": page.name}
             )
         else:
-            click.secho(
-                f"Page {page.name!r} does not exist, skipping...", fg=_INFO_COLOR
-            )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+            logger.info(f"Page {page.name!r} does not exist, skipping...")
+    logger.info("Done!")
 
 
 @delete_data.command()
@@ -374,7 +358,7 @@ def delete_iso_topic_categories():
     context = {"user": user["name"]}
     vocabulary_list = toolkit.get_action("vocabulary_list")(context)
     if ISO_TOPIC_CATEGOY_VOCABULARY_NAME in [voc["name"] for voc in vocabulary_list]:
-        click.secho(
+        logger.info(
             f"Deleting {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} CKAN tag vocabulary and "
             f"respective tags... "
         )
@@ -382,24 +366,21 @@ def delete_iso_topic_categories():
             context, {"vocabulary_id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
         )
         for tag_name in existing_tags:
-            click.secho(f"Deleting tag {tag_name!r}...")
+            logger.info(f"Deleting tag {tag_name!r}...")
             toolkit.get_action("tag_delete")(
                 context,
                 {"id": tag_name, "vocabulary_id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME},
             )
-        click.echo(f"Deleting vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
+        logger.info(f"Deleting vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r}...")
         toolkit.get_action("vocabulary_delete")(
             context, {"id": ISO_TOPIC_CATEGOY_VOCABULARY_NAME}
         )
     else:
-        click.secho(
-            (
-                f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} does not exist, "
-                f"nothing to do"
-            ),
-            fg=_INFO_COLOR,
+        logger.info(
+            f"Vocabulary {ISO_TOPIC_CATEGOY_VOCABULARY_NAME!r} does not exist, "
+            f"nothing to do"
         )
-    click.secho(f"Done!", fg=_SUCCESS_COLOR)
+    logger.info(f"Done!")
 
 
 @bootstrap.command()
@@ -427,7 +408,7 @@ def create_sasdi_organizations():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     for org_details in SASDI_ORGANIZATIONS:
         if org_details.name not in existing_organizations:
-            click.secho(f"Creating organization {org_details.name!r}...")
+            logger.info(f"Creating organization {org_details.name!r}...")
             try:
                 toolkit.get_action("organization_create")(
                     context={
@@ -441,12 +422,9 @@ def create_sasdi_organizations():
                         "image_url": org_details.image_url,
                     },
                 )
-            except toolkit.ValidationError as exc:
-                click.secho(
-                    f"Could not create organization {org_details.name!r}: {exc}",
-                    fg=_ERROR_COLOR,
-                )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+            except toolkit.ValidationError:
+                logger.exception(f"Could not create organization {org_details.name!r}")
+    logger.info("Done!")
 
 
 @delete_data.command()
@@ -464,17 +442,16 @@ def delete_sasdi_organizations():
 
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     for org_details in SASDI_ORGANIZATIONS:
-        click.secho(f"Purging  organization {org_details.name!r}...")
+        logger.info(f"Purging  organization {org_details.name!r}...")
         try:
             toolkit.get_action("organization_purge")(
                 context={"user": user["name"]}, data_dict={"id": org_details.name}
             )
         except toolkit.ObjectNotFound:
-            click.secho(
-                f"Organization {org_details.name!r} does not exist, skipping...",
-                fg=_INFO_COLOR,
+            logger.info(
+                f"Organization {org_details.name!r} does not exist, skipping..."
             )
-    click.secho(f"Done!", fg=_SUCCESS_COLOR)
+    logger.info(f"Done!")
 
 
 @dalrrd_emc_dcpr.group()
@@ -497,9 +474,9 @@ def create_sample_dcpr_error_reports():
     user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
 
     create_report_action = toolkit.get_action("dcpr_error_report_create")
-    click.secho(f"Creating sample dcpr error reports ...")
+    logger.info(f"Creating sample dcpr error reports ...")
     for report in SAMPLE_ERROR_REPORTS:
-        click.secho(f"Creating report with id {report.csi_reference_id!r}...")
+        logger.info(f"Creating report with id {report.csi_reference_id!r}...")
         try:
             create_report_action(
                 context={
@@ -521,19 +498,15 @@ def create_sample_dcpr_error_reports():
                     "csi_moderation_date": report.csi_moderation_date,
                 },
             )
-        except toolkit.ValidationError as exc:
-            click.secho(
-                f"Could not create report with id {report.csi_reference_id!r}: {exc}",
-                fg=_INFO_COLOR,
+        except toolkit.ValidationError:
+            logger.exception(
+                f"Could not create report with id {report.csi_reference_id!r}"
             )
-            click.secho(
-                f"Attempting to re-enable possibly deleted report...", fg=_INFO_COLOR
-            )
+            logger.info(f"Attempting to re-enable possibly deleted report...")
             sample_report = DCPRErrorReport.get(report.id)
             if sample_report is None:
-                click.secho(
-                    f"Could not find sample report with id {report.csi_reference_id!r}",
-                    fg=_ERROR_COLOR,
+                logger.error(
+                    f"Could not find sample report with id {report.csi_reference_id!r}"
                 )
                 continue
             else:
@@ -552,9 +525,9 @@ def create_sample_dcpr_requests():
     user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
 
     create_request_action = toolkit.get_action("dcpr_request_create")
-    click.secho(f"Creating sample dcpr requests ...")
+    logger.info(f"Creating sample dcpr requests ...")
     for request in SAMPLE_REQUESTS:
-        click.secho(f"Creating request with id {request.csi_reference_id!r}...")
+        logger.info(f"Creating request with id {request.csi_reference_id!r}...")
         try:
             create_request_action(
                 context={
@@ -601,19 +574,16 @@ def create_sample_dcpr_requests():
                     "capture_method_detail": request.capture_method_detail,
                 },
             )
-        except toolkit.ValidationError as exc:
-            click.secho(
-                f"Could not create request with id {request.csi_reference_id!r}: {exc}",
-                fg=_INFO_COLOR,
+        except toolkit.ValidationError:
+            logger.exception(
+                f"Could not create request with id {request.csi_reference_id!r}"
             )
-            click.secho(
-                f"Attempting to re-enable possibly deleted request...", fg=_INFO_COLOR
-            )
+            logger.info("Attempting to re-enable possibly deleted request...")
             sample_request = DCPRRequest.get(request.id)
             if sample_request is None:
-                click.secho(
-                    f"Could not find sample request with id {request.csi_reference_id!r}",
-                    fg=_ERROR_COLOR,
+                logger.error(
+                    f"Could not find sample request with "
+                    f"id {request.csi_reference_id!r}"
                 )
                 continue
             else:
@@ -634,9 +604,9 @@ def create_sample_geospatial_dcpr_requests():
     create_geospatial_request_action = toolkit.get_action(
         "dcpr_geospatial_request_create"
     )
-    click.secho(f"Creating sample dcpr requests ...")
+    logger.info(f"Creating sample dcpr requests ...")
     for request in SAMPLE_GEOSPATIAL_REQUESTS:
-        click.secho(f"Creating request with id {request.csi_reference_id!r}...")
+        logger.info(f"Creating request with id {request.csi_reference_id!r}...")
         try:
             create_geospatial_request_action(
                 context={
@@ -667,19 +637,16 @@ def create_sample_geospatial_dcpr_requests():
                     "data_type": request.data_type,
                 },
             )
-        except toolkit.ValidationError as exc:
-            click.secho(
-                f"Could not create request with id {request.csi_reference_id!r}: {exc}",
-                fg=_INFO_COLOR,
+        except toolkit.ValidationError:
+            logger.exception(
+                f"Could not create request with id {request.csi_reference_id!r}"
             )
-            click.secho(
-                f"Attempting to re-enable possibly deleted request...", fg=_INFO_COLOR
-            )
+            logger.info(f"Attempting to re-enable possibly deleted request...")
             sample_request = DCPRGeospatialRequest.get(request.id)
             if sample_request is None:
-                click.secho(
-                    f"Could not find sample request with id {request.csi_reference_id!r}",
-                    fg=_ERROR_COLOR,
+                logger.error(
+                    f"Could not find sample request with "
+                    f"id {request.csi_reference_id!r}"
                 )
                 continue
             else:
@@ -691,9 +658,9 @@ def create_sample_geospatial_dcpr_requests():
 def create_sample_users():
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     create_user_action = toolkit.get_action("user_create")
-    click.secho(f"Creating sample users ...")
+    logger.info(f"Creating sample users ...")
     for user_details in SAMPLE_USERS:
-        click.secho(f"Creating {user_details.name!r}...")
+        logger.debug(f"Creating {user_details.name!r}...")
         try:
             create_user_action(
                 context={
@@ -705,18 +672,12 @@ def create_sample_users():
                     "password": user_details.password,
                 },
             )
-        except toolkit.ValidationError as exc:
-            click.secho(
-                f"Could not create user {user_details.name!r}: {exc}", fg=_INFO_COLOR
-            )
-            click.secho(
-                f"Attempting to re-enable possibly deleted user...", fg=_INFO_COLOR
-            )
+        except toolkit.ValidationError:
+            logger.exception(f"Could not create user {user_details.name!r}")
+            logger.debug("Attempting to re-enable possibly deleted user...")
             sample_user = model.User.get(user_details.name)
             if sample_user is None:
-                click.secho(
-                    f"Could not find sample_user {user_details.name!r}", fg=_ERROR_COLOR
-                )
+                logger.error(f"Could not find sample_user {user_details.name!r}")
                 continue
             else:
                 sample_user.undelete()
@@ -730,9 +691,9 @@ def create_sample_organizations():
     create_org_action = toolkit.get_action("organization_create")
     create_org_member_action = toolkit.get_action("organization_member_create")
     create_harvester_action = toolkit.get_action("harvest_source_create")
-    click.secho(f"Creating sample organizations ...")
+    logger.info(f"Creating sample organizations ...")
     for org_details, memberships, harvesters in SAMPLE_ORGANIZATIONS:
-        click.secho(f"Creating {org_details.name!r}...")
+        logger.debug(f"Creating {org_details.name!r}...")
         try:
             create_org_action(
                 context={
@@ -745,13 +706,10 @@ def create_sample_organizations():
                     "image_url": org_details.image_url,
                 },
             )
-        except toolkit.ValidationError as exc:
-            click.secho(
-                f"Could not create organization {org_details.name!r}: {exc}",
-                fg=_ERROR_COLOR,
-            )
+        except toolkit.ValidationError:
+            logger.exception(f"Could not create organization {org_details.name!r}")
         for user_name, role in memberships:
-            click.secho(f"Creating membership {user_name!r} ({role!r})...")
+            logger.debug(f"Creating membership {user_name!r} ({role!r})...")
             create_org_member_action(
                 context={
                     "user": user["name"],
@@ -763,7 +721,7 @@ def create_sample_organizations():
                 },
             )
         for harvester_details in harvesters:
-            click.secho(f"Creating harvest source {harvester_details.name!r}...")
+            logger.debug(f"Creating harvest source {harvester_details.name!r}...")
             try:
                 create_harvester_action(
                     context={"user": user["name"]},
@@ -776,29 +734,23 @@ def create_sample_organizations():
                         "owner_org": org_details.name,
                     },
                 )
-            except toolkit.ValidationError as exc:
-                click.secho(
-                    (
-                        f"Could not create harvest source "
-                        f"{harvester_details.name!r}: {exc}"
-                    ),
-                    fg=_INFO_COLOR,
+            except toolkit.ValidationError:
+                logger.exception(
+                    f"Could not create harvest source {harvester_details.name!r}"
                 )
-                click.secho(
-                    f"Attempting to re-enable possibly deleted harvester source...",
-                    fg=_INFO_COLOR,
+                logger.debug(
+                    f"Attempting to re-enable possibly deleted harvester source..."
                 )
                 sample_harvester = model.Package.get(harvester_details.name)
                 if sample_harvester is None:
-                    click.secho(
-                        f"Could not find harvester source {harvester_details.name!r}",
-                        fg=_ERROR_COLOR,
+                    logger.error(
+                        f"Could not find harvester source {harvester_details.name!r}"
                     )
                     continue
                 else:
                     sample_harvester.state = model.State.ACTIVE
                     model.repo.commit()
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+    logger.info("Done!")
 
 
 @delete_data.command()
@@ -806,14 +758,14 @@ def delete_sample_users():
     """Delete sample users."""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     delete_user_action = toolkit.get_action("user_delete")
-    click.secho(f"Deleting sample users ...")
+    logger.info(f"Deleting sample users ...")
     for user_details in SAMPLE_USERS:
-        click.secho(f"Deleting {user_details.name!r}...")
+        logger.info(f"Deleting {user_details.name!r}...")
         delete_user_action(
             context={"user": user["name"]},
             data_dict={"id": user_details.name},
         )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+    logger.info("Done!")
 
 
 @delete_data.command()
@@ -827,45 +779,42 @@ def delete_sample_organizations():
     dataset_purge_action = toolkit.get_action("dataset_purge")
     harvest_source_list_action = toolkit.get_action("harvest_source_list")
     harvest_source_delete_action = toolkit.get_action("harvest_source_delete")
-    click.secho(f"Purging sample organizations ...")
+    logger.info(f"Purging sample organizations ...")
     for org_details, _, _ in SAMPLE_ORGANIZATIONS:
         try:
             org = org_show_action(
                 context={"user": user["name"]}, data_dict={"id": org_details.name}
             )
-            click.secho(f"{org = }", fg=_INFO_COLOR)
+            logger.debug(f"{org = }")
         except toolkit.ObjectNotFound:
-            click.secho(
-                f"Organization {org_details.name} does not exist, skipping...",
-                fg=_INFO_COLOR,
-            )
+            logger.info(f"Organization {org_details.name} does not exist, skipping...")
         else:
             packages = package_search_action(
                 context={"user": user["name"]},
                 data_dict={"fq": f"owner_org:{org['id']}"},
             )
-            click.secho(f"{packages = }", fg=_INFO_COLOR)
+            logger.debug(f"{packages = }")
             for package in packages["results"]:
-                click.secho(f"Purging package {package['id']}...")
+                logger.debug(f"Purging package {package['id']}...")
                 dataset_purge_action(
                     context={"user": user["name"]}, data_dict={"id": package["id"]}
                 )
             harvest_sources = harvest_source_list_action(
                 context={"user": user["name"]}, data_dict={"organization_id": org["id"]}
             )
-            click.secho(f"{ harvest_sources = }", fg=_INFO_COLOR)
+            logger.debug(f"{ harvest_sources = }")
             for harvest_source in harvest_sources:
-                click.secho(f"Deleting harvest_source {harvest_source['title']}...")
+                logger.debug(f"Deleting harvest_source {harvest_source['title']}...")
                 harvest_source_delete_action(
                     context={"user": user["name"], "clear_source": True},
                     data_dict={"id": harvest_source["id"]},
                 )
-            click.secho(f"Purging {org_details.name!r}...")
+            logger.debug(f"Purging {org_details.name!r}...")
             purge_org_action(
                 context={"user": user["name"]},
                 data_dict={"id": org["id"]},
             )
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+    logger.info("Done!")
 
 
 @load_sample_data.command()
@@ -910,7 +859,7 @@ def create_sample_datasets(
     with futures.ThreadPoolExecutor(workers) as executor:
         to_do = []
         for dataset in ready_to_create_datasets:
-            future = executor.submit(_create_single_dataset, user, dataset)
+            future = executor.submit(utils.create_single_dataset, user, dataset)
             to_do.append(future)
         num_created = 0
         num_already_exist = 0
@@ -918,42 +867,21 @@ def create_sample_datasets(
         for done_future in futures.as_completed(to_do):
             try:
                 result = done_future.result()
-                if result == DatasetCreationResult.CREATED:
+                if result == utils.DatasetCreationResult.CREATED:
                     num_created += 1
-                elif result == DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS:
+                elif result == utils.DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS:
                     num_already_exist += 1
-            except dictization_functions.DataError as exc:
-                click.secho(f"Could not create dataset: {exc=}", fg=_ERROR_COLOR)
+            except dictization_functions.DataError:
+                logger.exception(f"Could not create dataset")
                 num_failed += 1
-            except ValueError as exc:
-                click.secho(f"Could not create dataset: {exc=}", fg=_ERROR_COLOR)
+            except ValueError:
+                logger.exception(f"Could not create dataset")
                 num_failed += 1
 
-    click.secho(f"Created {num_created} datasets", fg=_INFO_COLOR)
-    click.secho(f"Skipped {num_already_exist} datasets", fg=_INFO_COLOR)
-    click.secho(f"Failed to create {num_failed} datasets", fg=_INFO_COLOR)
-    click.secho("Done!", fg=_SUCCESS_COLOR)
-
-
-def _create_single_dataset(
-    user: typing.Dict, dataset: typing.Dict
-) -> DatasetCreationResult:
-    create_dataset_action = toolkit.get_action("package_create")
-    get_dataset_action = toolkit.get_action("package_show")
-    try:
-        get_dataset_action(
-            context={"user": user["name"]}, data_dict={"id": dataset["name"]}
-        )
-    except toolkit.ObjectNotFound:
-        package_exists = False
-    else:
-        package_exists = True
-    if not package_exists:
-        create_dataset_action(context={"user": user["name"]}, data_dict=dataset)
-        result = DatasetCreationResult.CREATED
-    else:
-        result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
-    return result
+    logger.info(f"Created {num_created} datasets")
+    logger.info(f"Skipped {num_already_exist} datasets")
+    logger.info(f"Failed to create {num_failed} datasets")
+    logger.info("Done!")
 
 
 # TODO: speed this up by doing concurrent processing, similar to create_sample_datasets
@@ -975,15 +903,15 @@ def delete_sample_datasets():
         },
     )
     for dataset in existing_sample_datasets["results"]:
-        click.secho(f"Purging dataset {dataset['name']!r}...")
+        logger.debug(f"Purging dataset {dataset['name']!r}...")
         purge_dataset_action(
             context={"user": user["name"]}, data_dict={"id": dataset["id"]}
         )
     num_existing = existing_sample_datasets["count"]
     remaining_sample_datasets = num_existing - max_rows
     if remaining_sample_datasets > 0:
-        click.secho(f"{remaining_sample_datasets} still remain", fg=_INFO_COLOR)
-    click.secho("Done!", fg=_SUCCESS_COLOR)
+        logger.info(f"{remaining_sample_datasets} still remain")
+    logger.info("Done!")
 
 
 # TODO: This command does not need to be needed anymore,
@@ -1002,7 +930,7 @@ def add_db_revision(message, autogenerate):
         head=f"{plugin_name}@head",
         version_path=alembic_wrapper.version_path,
     )
-    click.secho(f"{out=}", fg=_INFO_COLOR)
+    logger.info(f"{out=}")
 
 
 @extra_commands.command()
@@ -1044,8 +972,8 @@ def defer_to_alembic(alembic_command, collect_args, command_arg, command_kwarg):
     )
     try:
         command = getattr(alembic.command, alembic_command)
-    except AttributeError as exc:
-        click.secho(str(exc), fg=_ERROR_COLOR)
+    except AttributeError:
+        logger.exception("Something wrong with retrieving the command")
     else:
         kwargs = {}
         for raw_kwarg in command_kwarg:
@@ -1059,8 +987,8 @@ def defer_to_alembic(alembic_command, collect_args, command_arg, command_kwarg):
         else:
             out = alembic_wrapper.run_command(command, *command_arg, **kwargs)
         for line in out:
-            click.secho(line, fg=_INFO_COLOR)
-        click.secho("Done!", fg=_SUCCESS_COLOR)
+            logger.info(line)
+        logger.info("Done!")
 
 
 def _resolve_alembic_config(plugin):
@@ -1102,8 +1030,8 @@ class AlembicWrapper:
 
     def run_command(self, alembic_command, *args, **kwargs):
         current_output_index = len(self._command_output)
-        click.secho(f"{args=}", fg=_INFO_COLOR)
-        click.secho(f"{kwargs=}", fg=_INFO_COLOR)
+        logger.debug(f"{args=}")
+        logger.debug(f"{kwargs=}")
         alembic_command(self.alembic_conf, *args, **kwargs)
         return self._command_output[current_output_index:]
 
@@ -1125,9 +1053,9 @@ class AlembicWrapper:
                 " ".join((f"%(here)s/versions", ckan_versions_path)),
             )
             conf.print_stdout = self._capture_alembic_output
-            click.secho(
-                f"version_locations in the config: {conf.get_main_option('version_locations')}",
-                fg=_INFO_COLOR,
+            logger.debug(
+                f"version_locations in the config: "
+                f"{conf.get_main_option('version_locations')}"
             )
         else:
             raise RuntimeError("Input plugin name does not have alembic config")
@@ -1171,6 +1099,45 @@ def test_background_job(job_name, job_arg, job_kwarg):
             key, value = raw_kwarg.partition(":")[::2]
             kwargs[key] = value
         job_function(*job_arg, **kwargs)
-        click.secho("Done!", fg=_SUCCESS_COLOR)
+        logger.info("Done!")
     else:
-        click.secho(f"Job function {job_name!r} does not exist", fg=_ERROR_COLOR)
+        logger.error(f"Job function {job_name!r} does not exist")
+
+
+@dalrrd_emc_dcpr.group()
+def pycsw():
+    """Commands related to integration between CKAN and pycsw"""
+
+
+@pycsw.command()
+def create_materialized_view():
+    """Create the materialized view used to map between CKAN and pycsw"""
+    jinja_env = utils.get_jinja_env()
+    template = jinja_env.get_template("pycsw/pycsw_view.sql")
+    ddl_command = template.render(view_name=_PYCSW_MATERIALIZED_VIEW_NAME)
+    with model.meta.engine.connect() as conn:
+        conn.execute(sla_text(ddl_command))
+        # conn.commit()
+    logger.info("Done!")
+
+
+@pycsw.command()
+def refresh_materialized_view():
+    """Refresh the materialized view used to map between CKAN and pycsw"""
+    with model.meta.engine.connect() as conn:
+        conn.execute(
+            sla_text(
+                f"REFRESH MATERIALIZED VIEW {_PYCSW_MATERIALIZED_VIEW_NAME} WITH DATA;"
+            )
+        )
+    logger.info("Done!")
+
+
+@pycsw.command()
+def drop_materialized_view():
+    """Delete the materialized view used to map between CKAN and pycsw"""
+    with model.meta.engine.connect() as conn:
+        conn.execute(
+            sla_text(f"DROP MATERIALIZED VIEW {_PYCSW_MATERIALIZED_VIEW_NAME}")
+        )
+    logger.info("Done!")

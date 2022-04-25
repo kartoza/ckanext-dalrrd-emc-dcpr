@@ -3,6 +3,7 @@ import typing
 
 from ckan.plugins import toolkit
 from ...model import dcpr_request as dcpr_request
+from ...constants import DCPRRequestStatus
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +11,12 @@ logger = logging.getLogger(__name__)
 def dcpr_request_list_private_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ):
-    """Authorize listing private DCPR requests"""
+    """Authorize listing private DCPR requests.
+
+    Only users that are members of an organization are allowed to have private DCPR
+    requests.
+
+    """
     # FIXME: Implement this
     return {"success": False}
 
@@ -86,10 +92,8 @@ def dcpr_request_show_auth(
         return {"success": False, "msg": toolkit._("Request not found")}
 
     show_request = (
-        request_obj.status != dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
-    ) and (
-        request_obj.status != dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-    )
+        request_obj.status != DCPRRequestStatus.UNDER_PREPARATION.value
+    ) and (request_obj.status != DCPRRequestStatus.AWAITING_NSIF_REVIEW.value)
     return {"success": show_request}
 
 
@@ -111,17 +115,17 @@ def dcpr_request_update_auth(
 
     owner = user.id == request_obj.owner_user
     request_in_preparation = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+        request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
     )
 
     nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
 
     request_escalated_to_csi = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+        request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value
     )
     request_submitted = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
     )
 
     success = (
@@ -151,7 +155,7 @@ def dcpr_request_submit_auth(
 
     owner = user.id == request_obj.owner_user
     request_in_preparation = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+        request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
     )
 
     return {"success": (owner and request_in_preparation)}
@@ -175,7 +179,7 @@ def dcpr_request_escalate_auth(
 
     nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     request_submitted = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
     )
 
     return {"success": nsif_reviewer and request_submitted}
@@ -199,7 +203,7 @@ def dcpr_request_accept_auth(
 
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
     request_escalated_to_csi = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+        request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value
     )
 
     return {
@@ -227,10 +231,10 @@ def dcpr_request_reject_auth(
     csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
 
     request_escalated_to_csi = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+        request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value
     )
     request_submitted = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
     )
 
     return {
@@ -283,7 +287,7 @@ def dcpr_request_delete_auth(
 
     owner = user.get("id") == request_obj.owner_user
     request_in_preparation = (
-        request_obj.status == dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value
+        request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
     )
 
     if not owner or not request_in_preparation:
