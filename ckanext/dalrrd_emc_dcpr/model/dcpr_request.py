@@ -26,6 +26,12 @@ dcpr_request_table = Table(
         nullable=False,
     ),
     Column(
+        "organization_id",
+        types.UnicodeText,
+        ForeignKey("group.id"),
+        nullable=False,
+    ),
+    Column(
         "csi_moderator",
         types.UnicodeText,
         ForeignKey("user.id"),
@@ -38,9 +44,6 @@ dcpr_request_table = Table(
         nullable=True,
     ),
     Column("status", types.UnicodeText),
-    Column("organization_name", types.UnicodeText),
-    Column("organization_level", types.UnicodeText),
-    Column("organization_address", types.UnicodeText),
     Column("proposed_project_name", types.UnicodeText),
     Column("additional_project_context", types.UnicodeText),
     Column("capture_start_date", types.DateTime),
