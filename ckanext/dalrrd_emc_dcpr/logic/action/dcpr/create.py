@@ -5,6 +5,7 @@ from sqlalchemy import exc
 
 from ...schema import create_dcpr_request_schema
 from ....model import dcpr_error_report, dcpr_request
+from ....constants import DCPRRequestStatus
 
 logger = logging.getLogger(__name__)
 
@@ -65,24 +66,31 @@ def dcpr_error_report_create(context, data_dict):
 
 def dcpr_request_create(context, data_dict):
     toolkit.check_access("dcpr_request_create_auth", context, data_dict)
+
+    # enrich the data_dict with any required attributes, ahead of validation
+    data_dict.update(
+        {
+            "owner_user": context["user"],
+        }
+    )
+
+    model = context["model"]
     schema = context.get("schema", create_dcpr_request_schema())
+    logger.info(f"{schema=}")
     data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
+        model.Session.rollback()
         raise toolkit.ValidationError(errors)
 
     request = dcpr_request.DCPRRequest(
         owner_user=data_dict["owner_user"],
-        csi_moderator=data_dict.get("csi_moderator", None),
-        nsif_reviewer=data_dict.get("nsif_reviewer", None),
-        status=dcpr_request.DCPRRequestStatus.UNDER_PREPARATION.value,
-        organization_name=data_dict["organization_name"],
-        organization_level=data_dict["organization_level"],
-        organization_address=data_dict["organization_address"],
+        status=DCPRRequestStatus.UNDER_PREPARATION.value,
+        organization_id=data_dict["organization_id"],
+        cost=data_dict["cost"],
         proposed_project_name=data_dict["proposed_project_name"],
         additional_project_context=data_dict["additional_project_context"],
         capture_start_date=data_dict["capture_start_date"],
         capture_end_date=data_dict["capture_end_date"],
-        cost=data_dict["cost"],
         spatial_extent=data_dict.get("spatial_extent", None),
         spatial_resolution=data_dict["spatial_resolution"],
         data_capture_urgency=data_dict.get("data_capture_urgency", None),

@@ -11,7 +11,7 @@ import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
 from ckan import model
-from ckan.common import _, config, g
+from ckan.common import _, g
 from flask import Blueprint
 from sqlalchemy import orm
 
@@ -28,7 +28,6 @@ from .logic.action.dcpr import create as dcpr_create_actions
 from .logic.action.dcpr import delete as dcpr_delete_actions
 from .logic.action.dcpr import get as dcpr_get_actions
 from .logic.action.dcpr import update as dcpr_update_actions
-
 from .logic.action import emc as emc_actions
 from .logic import (
     converters,
