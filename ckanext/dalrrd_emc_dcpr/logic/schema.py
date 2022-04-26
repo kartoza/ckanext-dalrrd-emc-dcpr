@@ -1,19 +1,27 @@
-from typing import cast
-
 from ckan.logic.schema import validator_args
 
 
 @validator_args
-def create_dcpr_request_schema(ignore_missing, not_missing, not_empty, unicode_safe):
+def create_dcpr_request_schema(
+    ignore_missing,
+    not_missing,
+    not_empty,
+    unicode_safe,
+    is_positive_integer,
+    isodate,
+    group_id_or_name_exists,
+):
     return {
-        "organization_name": [ignore_missing, unicode_safe],
-        "organization_level": [ignore_missing, unicode_safe],
-        "organization_address": [ignore_missing, unicode_safe],
         "proposed_project_name": [not_empty, not_missing, unicode_safe],
+        "organization_id": [
+            not_empty,
+            not_missing,
+            group_id_or_name_exists,
+        ],
         "additional_project_context": [ignore_missing, unicode_safe],
-        "capture_start_date": [not_empty],
-        "capture_end_date": [not_empty],
-        "cost": [ignore_missing, unicode_safe],
+        "capture_start_date": [not_empty, isodate],
+        "capture_end_date": [not_empty, isodate],
+        "cost": [not_empty, not_missing, is_positive_integer],
         "spatial_extent": [ignore_missing, unicode_safe],
         "spatial_resolution": [ignore_missing, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
