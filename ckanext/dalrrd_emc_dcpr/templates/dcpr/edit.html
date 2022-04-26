@@ -1,10 +1,14 @@
 {% extends 'page.html' %}
 
-{% block breadcrumb_content %}
-    {{ super() }}
-    {% if not errors and dcpr_request %}
-	<li class="active">{% link_for _('Edit'), named_route=dcpr_request.type ~ '.dcpr_request_edit', request_id=dcpr_request.csi_reference_id %}</li>
-    {% endif %}
+{% block primary_content_inner %}
+    {% block form %}
+        {% snippet 'dcpr/snippets/request_form.html',
+            data_urgency=data_urgency,
+            errors=errors,
+            error_summary=error_summary,
+            data=data
+        %}
+    {% endblock %}
 {% endblock %}
 
 {% block secondary_content %}
@@ -12,10 +16,10 @@
     <section class="module module-narrow module-shallow">
       <div class="panel panel-default">
           <div class="panel-heading">
-              <h4>
+                  <h4>
                       <i class="fa fa-info-circle"></i>
                       {{ _('DCPR Request Info') }}
-              </h4>
+                  </h4>
           </div>
           <div class="panel-body">
               <p>
@@ -23,17 +27,7 @@
                   requested data in the EMC system.
               </p>
           </div>
-
       </div>
     </section>
   {% endblock %}
-{% endblock %}
-
-
-{% block primary_content_inner %}
-    {% block form %}
-        {{- h.snippet('dcpr/snippets/request_form.html', dcpr_request=dcpr_request, errors=errors,
-            error_summary=error_summary, nsif_reviewer=nsif_reviewer, csi_reviewer=csi_reviewer,
-            organizations=organizations, organizations_levels = organizations_levels, data_urgency=data_urgency) -}}
-    {% endblock %}
 {% endblock %}

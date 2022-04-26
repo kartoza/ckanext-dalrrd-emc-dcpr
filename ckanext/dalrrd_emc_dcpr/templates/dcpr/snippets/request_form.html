@@ -1,82 +1,62 @@
 {% import 'macros/form.html' as form %}
-{% set action = g.form_action or '' %}
 
 {% if dcpr_request %}
-
  {% set is_owner = dcpr_request.owner_user == g.userobj.id %}
  {% set request_submitted = ( dcpr_request.status == 'AWAITING_NSIF_REVIEW' ) %}
  {% set request_under_preparation = ( dcpr_request.status == 'UNDER_PREPARATION' ) %}
  {% set waiting_csi_review = ( dcpr_request.status == 'AWAITING_CSI_REVIEW' ) %}
  {% set immutable = request_submitted and is_owner %}
- {% set disabled_attr = immutable and 'disabled' or 'enabled' %}
  {% set status_finalized = dcpr_request.status == 'ACCEPTED' or dcpr_request.status == 'REJECTED' %}
  {% set nsif_review_ready = ( not request_under_preparation and nsif_reviewer ) and ( not waiting_csi_review and not status_finalized ) %}
  {% set csi_review_ready = csi_reviewer and waiting_csi_review %}
-
  {% set request_id = dcpr_request.csi_reference_id %}
-
 {% endif %}
- {% if dcpr_request %}
-  <form id="request-new" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
- {% else %}
-  <form id="request-edit" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
- {% endif %}
-  <input type="hidden" name="_ckan_phase" value="request_new_1" />
-  {# pkg_name used in 3 stage edit #}
-  {% if dcpr_request %}
-  <input type="hidden" name="request_id" value="{{ dcpr_request.csi_reference_id }}" />
-  <input type="hidden" name="owner_user" value="{{ dcpr_request.owner_user }}" />
-  {% endif %}
-  {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
 
-  {% block fields %}
+<form class="dataset-form" method="post" data-module="basic-form" novalidate>
     {% if dcpr_request %}
-    {% snippet 'dcpr/snippets/request_fields.html', dcpr_request=dcpr_request, errors=errors, immutable=immutable,
-      organizations=organizations, organizations_levels=organizations_levels, nsif_reviewer=nsif_reviewer,
-      csi_reviewer=csi_reviewer, data_urgency=data_urgency, nsif_review_ready=nsif_review_ready,
-      csi_review_ready=csi_review_ready
-    %}
-    {% else %}
-    {% snippet 'dcpr/snippets/new_request_fields.html', organizations=organizations, organizations_levels=organizations_levels,
-      data_urgency=data_urgency
-      %}
+        <input type="hidden" name="request_id" value="{{ dcpr_request.csi_reference_id }}" />
+        <input type="hidden" name="owner_user" value="{{ dcpr_request.owner_user }}" />
     {% endif %}
-  {% endblock %}
-
-  {% block form_actions %}
-    <div class="form-actions">
-      {% if dcpr_request and not errors %}
-
-      {% block save_actions_button %}
-        {% if is_owner and not immutable %}
-         <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
-         <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/submit/{{request_id}}";'>{{ _('Submit') }}</button>
-         {% block delete_button %}
-            {% if not errors and  h.check_access('dcpr_request_delete_auth', {'request_id': dcpr_request.csi_reference_id}) %}
-              <a class="btn btn-danger pull-left"
-                 href="{% url_for 'dcpr' ~ '.dcpr_request_delete', request_id=dcpr_request.csi_reference_id %}" data-module="confirm-action"
-                 data-module-content="{{ _('Are you sure you want to delete this dataset?') }}">
-                  {% block delete_button_text %}{{ _('Delete') }}{% endblock %}
-              </a>
+    {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
+    {% block fields %}
+        {% snippet 'dcpr/snippets/new_request_fields.html', data=data, errors=errors, data_urgency_options=data_urgency %}
+    {% endblock %}
+    {% block form_actions %}
+        <div class="form-actions">
+            {% if dcpr_request and not errors %}
+                {% block save_actions_button %}
+                    {% if is_owner and not immutable %}
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/submit/{{request_id}}";'>{{ _('Submit') }}</button>
+                        {% block delete_button %}
+                            {% if not errors and  h.check_access('dcpr_request_delete_auth', {'request_id': dcpr_request.csi_reference_id}) %}
+                                <a
+                                        class="btn btn-danger pull-left"
+                                        href="{% url_for 'dcpr' ~ '.dcpr_request_delete', request_id=dcpr_request.csi_reference_id %}"
+                                        data-module="confirm-action"
+                                        data-module-content="{{ _('Are you sure you want to delete this dataset?') }}"
+                                >
+                                    {% block delete_button_text %}{{ _('Delete') }}{% endblock %}
+                                </a>
+                            {% endif %}
+                        {% endblock %}
+                    {% elif nsif_review_ready %}
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/escalate/{{request_id}}";'>{{ _('Escalate to CSI') }}</button>
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
+                    {% elif csi_review_ready %}
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/accept/{{request_id}}";'>{{ _('Accept') }}</button>
+                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
+                    {% endif %}
+                {% endblock %}
+            {% elif not dcpr_request %}
+                <input type="submit" class="btn btn-primary" value="{{ _('Save DCPR request') }}">
+            {% else %}
+                <input type="submit" class="btn btn-secondary" value="{{ _('Save DCPR request privately') }}">
+                <input type="submit" class="btn btn-primary" action="{{ h.url_for('dcpr.dcpr_request_submit') }}" value="{{ _('Submit DCPR request for moderation') }}">
             {% endif %}
-         {% endblock %}
-        {% elif nsif_review_ready %}
-        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
-        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/escalate/{{request_id}}";'>{{ _('Escalate to CSI') }}</button>
-        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
-        {% elif csi_review_ready %}
-        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
-        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/accept/{{request_id}}";'>{{ _('Accept') }}</button>
-        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
-        {% endif %}
-
-      {% endblock %}
-      {% else %}
-       <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/new";'>{{ _('Save') }}</button>
-       <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/submit";'>{{ _('Submit') }}</button>
-      {% endif %}
-
-      {{ form.required_message() }}
-    </div>
-  {% endblock %}
+            {{ form.required_message() }}
+        </div>
+    {% endblock %}
 </form>

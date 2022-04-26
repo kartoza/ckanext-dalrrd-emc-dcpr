@@ -1,251 +1,209 @@
 {% import 'macros/form.html' as form %}
 
 {% block fields %}
-  {%- snippet 'dcpr/snippets/inputs/select.html',
-   field = {'field_name': 'organization_name', id: 'field-organization_name',
-           'label': _('Organization Name'),  'options': organizations,
-           'help_text': 'Name of the organization that is requesting data capture.',
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'proposed_project_name',
+        label=_('Proposed Project Name'),
+        id='field-proposed_project_name',
+        placeholder=_('e.g. Data Request'),
+        value=data.proposed_project_name,
+        error=errors.proposed_project_name,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+        {{ form.info(_('Proposed name for the data capture project.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/select.html',
-   field = {'field_name': 'organization_level', id: 'field-organization_level',
-           'label': _('Organization Level'),  'options': organizations,
-           'help_text': 'Administrative level of the organization (National, Provincial,
-            Municipal, Tribal Authority).',
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.checkbox(
+        'dataset_custodian',
+        label=_('Organization is custodian?'),
+        id='field-dataset_custodian',
+        checked=data.dataset_custodian,
+        error=errors.dataset_custodian,
+        is_required=True
+    ) %}
+        {{ form.info(_('Whether the request is being made by a user acting on behalf of the dataset custodian for the specified dataset(s) or not.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'organization_address', id: 'field-organization_address',
-           'label': _('Organization Address'),
-           'help_text': 'Address of the organisation.',
-           'placeholder': _('eg. SASDI address'),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'capture_start_date',
+        label=_('Capture start date'),
+        id='field-capture_start_date',
+        type='date',
+        placeholder=_('eg. 2022-01-01'),
+        value=data.capture_start_date,
+        error=errors.capture_start_date,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+        {{ form.info(_('Proposed start date of the data capture.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'proposed_project_name', id: 'field-proposed_project_name',
-           'label': _('Proposed Project Name'),
-           'help_text': 'Proposed name for the data capture project.',
-           'is_required': True,
-           'placeholder': _('eg. Data Request'),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'capture_end_date',
+        label=_('Capture end date'),
+        id='field-capture_end_date',
+        type='date',
+        placeholder=_('eg. 2022-01-01'),
+        value=data.capture_end_date,
+        error=errors.capture_end_date,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Proposed end date of the data capture.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/markdown.html',
-   field = {'field_name': 'additional_project_context', id: 'field-additional_project_context',
-           'label': _('Additional project context'),
-           'help_text': 'Additional information about the scope of the DCPR request.',
-           'placeholder': _('eg. Some useful notes about the data'),
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'cost',
+        label=_('Estimated cost'),
+        id='field-cost',
+        type='number',
+        value=data.cost,
+        error=errors.cost,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+        {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'capture_start_date', id: 'field-capture_start_date',
-           'label': _('Capture start date'),
-           'help_text': 'Proposed start date of the data capture.',
-           'placeholder': _('eg. 2022-01-01'),
-           'type': 'date',
-           'classes': [],
-   },
-   errors = {}
-  -%}
+    {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'capture_end_date', id: 'field-capture_end_date',
-           'label': _('Capture end date'),
-           'help_text': 'Proposed end date of the data capture.',
-           'placeholder': _('eg. 2022-01-01'),
-           'type': 'date',
-           'classes': [],
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'spatial_resolution',
+        label=_('Spatial resolution'),
+        id='field-spatial_resolution',
+        type='number',
+        value=data.spatial_resolution,
+        error=errors.spatial_resolution,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Spatial resolution that is proposed for the data capture.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'cost', id: 'field-cost',
-           'label': _('Proposed project cost'),
-           'help_text': 'Estimated cost for the data capture project.',
-           'placeholder': _('eg. 200,000 Rands'),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.select(
+        'data_capture_urgency',
+        label=_('Data capture urgency'),
+        id='field-data_capture_urgency',
+        options=data_urgency_options,
+        selected=data.data_capture_urgency,
+        error=errors.data_capture_urgency,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Urgency of the data capture project.')) }}
+    {% endcall %}
 
-  {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
+    {% call form.markdown(
+        'additional_project_context',
+        label=_('Additional project context'),
+        id='field-additional_project_context',
+        value=data.additional_project_context,
+        error=errors.additional_project_context,
+        placeholder=_('e.g. Additional relevant information about the project.')
+    ) %}
+        {{ form.info(_('Additional information about the scope of the DCPR request.')) }}
+    {% endcall %}
 
-  {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'spatial_resolution', id: 'field-spatial_resolution',
-           'label': _('Spatial resolution'),
-           'help_text': 'Spatial resolution that is proposed for the data capture.',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.markdown(
+        'additional_information',
+        label=_('Additional information'),
+        id='field-additional_information',
+        value=data.additional_information,
+        error=errors.additional_information
+    ) %}
+        {{ form.info(_('Any additional details about the project that the user deems relevant for aiding the NSIF and CSI in their review and moderation process')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/select.html',
-   field = {'field_name': 'data_capture_urgency', id: 'field-data_capture_urgency',
-           'label': _('Data capture urgency'),  'options': data_urgency,
-           'help_text': 'Urgency of the data capture project (low, medium, high).',
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'data_type',
+        label=_('Data type'),
+        id='field-data_type',
+        placeholder=_('e.g. Vector line'),
+        value=data.data_type,
+        error=errors.data_type,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
+    {% endcall %}
 
-  {%- snippet 'dcpr/snippets/inputs/markdown.html',
-   field = {'field_name': 'additional_information', id: 'field-additional_information',
-           'label': _('Additional information'),
-           'help_text': 'Any additional details about the project that the user deems relevant
-                         for aiding the NSIF and CSI in their review and moderation process.',
-           'placeholder': _('eg. Some additional notes about the requests'),
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'proposed_dataset_title',
+        label=_('Proposed dataset title'),
+        id='field-proposed_dataset_title',
+        value=data.proposed_dataset_title,
+        error=errors.proposed_dataset_title,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Proposed title for the dataset being collected.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/checkbox.html',
-   field = {'field_name': 'dataset_custodian', id: 'field-dataset_custodian',
-           'label': _('Dataset Custodian'),
-           'help_text': 'Whether the request is being made by a user acting on behalf of the
-                         dataset custodian for the specified datasets or not.',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'proposed_dataset_abstract',
+        label=_('Proposed dataset abstract'),
+        id='field-proposed_dataset_abstract',
+        value=data.proposed_dataset_abstract,
+        error=errors.proposed_dataset_abstract,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'data_type', id: 'field-data_type',
-           'label': _('Data type'),
-           'help_text': 'Data type of the dataset (vector point, vector, Line, raster RADAR,
-                         etc.)',
-           'placeholder': _('eg. Line'),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'dataset_purpose',
+        label=_('Purpose of the dataset'),
+        id='field-dataset_purpose',
+        value=data.dataset_purpose,
+        error=errors.dataset_purpose,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'proposed_dataset_title', id: 'field-proposed_dataset_title',
-           'label': _('Proposed dataset title'),
-           'help_text': 'Proposed title for the dataset.',
-           'placeholder': _('eg. Line'),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.input(
+        'dataset_lineage',
+        label=_('Dataset lineage statement'),
+        id='field-dataset_lineage',
+        value=data.lineage_statement,
+        error=errors.lineage_statement,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Information about the lineage of the dataset being collected (if it is based on previous data, etc.')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'proposed_abstract', id: 'field-proposed_abstract',
-           'label': _('Proposed abstract'),
-           'help_text': 'Proposed abstract for the dataset.',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.markdown(
+        'dataset_associated_attributes',
+        label=_('Dataset associated attributes'),
+        id='field-dataset_associated_attributes',
+        value=data.dataset_associated_attributes,
+        error=errors.dataset_associated_attributes,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(
+            _('Additional alphanumeric attributes that shall be collected, in addition to the geospatial information.
+            If possible, provide a detailed description of each attribute.')
+            ) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'dataset_purpose', id: 'field-dataset_purpose',
-           'label': _('Purposed of dataset'),
-           'help_text': 'Purpose that justifies the existence of the dataset.',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.markdown(
+        'dataset_usage_restrictions',
+        label=_('Dataset usage restrictions'),
+        id='field-dataset_usage_restrictions',
+        value=data.dataset_usage_restrictions,
+        error=errors.dataset_usage_restrictions,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Description of dataset usage restrictions')) }}
+    {% endcall %}
 
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'lineage_statement', id: 'field-lineage_statement',
-           'label': _('Lineage statement'),
-           'help_text': 'Information about the lineage of the dataset (which previous data is
-                         it based upon, etc.)',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
-
-  {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'associated_attributes', id: 'field-associated_attributes',
-           'label': _('Associated attributes'),
-           'help_text': 'Additional alphanumeric attributes that shall be collected, in addition
-                         to the geospatial information.',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
-
-   {%- snippet 'dcpr/snippets/inputs/markdown.html',
-   field = {'field_name': 'feature_description', id: 'field-feature_description',
-           'label': _('Feature Description'),
-           'help_text': 'Detailed description of each of the alphanumeric attributes to
-                         collect.',
-           'placeholder': _(''),
-   },
-   errors = {}
-  -%}
-
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'data_usage_restrictions', id: 'field-data_usage_restrictions',
-           'label': _('Data usage restrictions'),
-           'help_text': 'Description of dataset usage restrictions',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
-
-  {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'capture_method', id: 'field-capture_method',
-           'label': _('Method of capture'),
-           'help_text': 'Method to be employed for collecting the raw data (Aerial
-                         photography, cadastral survey, Digitising, etc)',
-           'placeholder': _('eg. Survey'),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
-
-   {%- snippet 'dcpr/snippets/inputs/input.html',
-   field = {'field_name': 'capture_method_detail', id: 'field-capture_method_detail',
-           'label': _('Detail method of capture'),
-           'help_text': 'Further detail about the method of capture that will be used.',
-           'placeholder': _(''),
-           'classes': ['control-full'], 'attrs':
-           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
-   },
-   errors = {}
-  -%}
+    {% call form.markdown(
+        'dataset_capture_method',
+        label=_('Dataset capture method'),
+        id='field-dataset_capture_method',
+        value=data.dataset_capture_method,
+        error=errors.dataset_capture_method,
+        classes=['control-medium']
+    ) %}
+        {{ form.info(_('Method to be employed for collecting the raw data (Aerial photography, cadastral survey, etc.)')) }}
+    {% endcall %}
 
 {% endblock %}
 
 {% block package_basic_fields_custom %}{% endblock %}
-
