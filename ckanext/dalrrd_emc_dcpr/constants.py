@@ -27,7 +27,8 @@ ISO_TOPIC_CATEGORIES: typing.Final[typing.List[typing.Tuple[str, str]]] = [
     ("utilitiesCommuinication", "Utilities, Communication"),
 ]
 
-DCPR_REQUEST_DATASET_TYPE = "ckanext-dalrrd_emc_dcpr-dcpr_request"
+NSIF_ORG_NAME = "nsif"
+CSI_ORG_NAME = "csi"
 
 
 class DatasetManagementActivityType(enum.Enum):

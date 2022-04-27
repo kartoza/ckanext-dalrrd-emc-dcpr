@@ -11,7 +11,6 @@ from ckan.logic import clean_dict, parse_params, tuplize_dict
 from ckan.views import dataset as ckan_dataset_views
 
 from ..helpers import get_status_labels
-from ..constants import DCPR_REQUEST_DATASET_TYPE
 from ..model.dcpr_request import DCPRRequestOrganizationLevel, DCPRRequestUrgency
 
 logger = logging.getLogger(__name__)

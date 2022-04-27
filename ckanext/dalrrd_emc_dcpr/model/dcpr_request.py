@@ -71,14 +71,13 @@ dcpr_request_table = Table(
 dcpr_request_dataset_table = Table(
     "dcpr_request_dataset",
     meta.metadata,
-    Column(
-        "dcpr_request_id", ForeignKey("dcpr_request.csi_reference_id"), primary_key=True
-    ),
+    Column("dataset_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+    Column("dcpr_request_id", ForeignKey("dcpr_request.csi_reference_id")),
     Column("dataset_custodian", types.Boolean, default=False),
     Column("data_type", types.UnicodeText),
-    Column("proposed_dataset_title", types.UnicodeText),
+    Column("proposed_dataset_title", types.UnicodeText, nullable=False),
     Column("proposed_abstract", types.UnicodeText),
-    Column("dataset_purpose", types.UnicodeText),
+    Column("dataset_purpose", types.UnicodeText, nullable=False),
     Column("lineage_statement", types.UnicodeText),
     Column("associated_attributes", types.UnicodeText),
     Column("feature_description", types.UnicodeText),

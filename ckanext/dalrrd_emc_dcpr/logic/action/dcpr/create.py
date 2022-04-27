@@ -3,6 +3,7 @@ import logging
 from ckan.plugins import toolkit
 from sqlalchemy import exc
 
+from .... import dcpr_dictization
 from ...schema import create_dcpr_request_schema
 from ....model import dcpr_error_report, dcpr_request
 from ....constants import DCPRRequestStatus
@@ -65,80 +66,57 @@ def dcpr_error_report_create(context, data_dict):
 
 
 def dcpr_request_create(context, data_dict):
+    logger.info(f"{data_dict=}")
     toolkit.check_access("dcpr_request_create_auth", context, data_dict)
-
-    # enrich the data_dict with any required attributes, ahead of validation
-    data_dict.update(
-        {
-            "owner_user": context["user"],
-        }
-    )
-
     model = context["model"]
     schema = context.get("schema", create_dcpr_request_schema())
-    logger.info(f"{schema=}")
     data, errors = toolkit.navl_validate(data_dict, schema, context)
+    logger.debug(f"{errors=}")
     if errors:
         model.Session.rollback()
         raise toolkit.ValidationError(errors)
 
-    request = dcpr_request.DCPRRequest(
-        owner_user=data_dict["owner_user"],
-        status=DCPRRequestStatus.UNDER_PREPARATION.value,
-        organization_id=data_dict["organization_id"],
-        cost=data_dict["cost"],
-        proposed_project_name=data_dict["proposed_project_name"],
-        additional_project_context=data_dict["additional_project_context"],
-        capture_start_date=data_dict["capture_start_date"],
-        capture_end_date=data_dict["capture_end_date"],
-        spatial_extent=data_dict.get("spatial_extent", None),
-        spatial_resolution=data_dict["spatial_resolution"],
-        data_capture_urgency=data_dict.get("data_capture_urgency", None),
-        additional_information=data_dict["additional_information"],
-        request_date=data_dict.get("request_date", None),
-        submission_date=data_dict.get("submission_date", None),
+    # after validation of user-supplied data, enrich the data_dict with additional
+    # required attributes, like the request owner, status, etc.
+    data_dict.update(
+        {
+            "owner_user": context["auth_user_obj"].id,
+            "status": DCPRRequestStatus.UNDER_PREPARATION.value,
+        }
     )
-
-    request_dataset = dcpr_request.DCPRRequestDataset(
-        dataset_custodian=data_dict.get("dataset_custodian", False),
-        data_type=data_dict["data_type"],
-        proposed_dataset_title=data_dict["proposed_dataset_title"],
-        proposed_abstract=data_dict["proposed_abstract"],
-        dataset_purpose=data_dict["dataset_purpose"],
-        lineage_statement=data_dict["lineage_statement"],
-        associated_attributes=data_dict["associated_attributes"],
-        feature_description=data_dict["feature_description"],
-        data_usage_restrictions=data_dict["data_usage_restrictions"],
-        capture_method=data_dict["capture_method"],
-        capture_method_detail=data_dict["capture_method_detail"],
+    logger.debug(f"{data_dict=}")
+    dcpr_request = dcpr_dictization.dcpr_request_dict_save(data_dict, context)
+    model.Session.flush()
+    logger.debug(f"{dcpr_request=}")
+    # TODO - would be nice to have an activity being created here
+    # notification_targets = []
+    #
+    # for target in data_dict.get("notification_targets", []):
+    #     target = dcpr_request.DCPRRequestNotificationTarget(
+    #         dcpr_request_id=request.csi_reference_id,
+    #         user_id=target.get("user_id"),
+    #         group_id=target.get("group_id"),
+    #     )
+    #     notification_targets.append(target)
+    #
+    # try:
+    #     model = context["model"]
+    #     model.Session.add(request)
+    #     model.repo.commit()
+    #     request_dataset.dcpr_request_id = request.csi_reference_id
+    #     model.Session.add(request_dataset)
+    #
+    #     model.Session.add_all(notification_targets)
+    #
+    #     model.repo.commit()
+    #
+    # except exc.InvalidRequestError as exception:
+    #     model.Session.rollback()
+    # finally:
+    #     model.Session.close()
+    return toolkit.get_action("dcpr_request_show")(
+        context=context.copy(), data_dict={"id": dcpr_request.csi_reference_id}
     )
-    notification_targets = []
-
-    for target in data_dict.get("notification_targets", []):
-        target = dcpr_request.DCPRRequestNotificationTarget(
-            dcpr_request_id=request.csi_reference_id,
-            user_id=target.get("user_id"),
-            group_id=target.get("group_id"),
-        )
-        notification_targets.append(target)
-
-    try:
-        model = context["model"]
-        model.Session.add(request)
-        model.repo.commit()
-        request_dataset.dcpr_request_id = request.csi_reference_id
-        model.Session.add(request_dataset)
-
-        model.Session.add_all(notification_targets)
-
-        model.repo.commit()
-
-    except exc.InvalidRequestError as exception:
-        model.Session.rollback()
-    finally:
-        model.Session.close()
-
-    return request
 
 
 def dcpr_geospatial_request_create(context, data_dict):

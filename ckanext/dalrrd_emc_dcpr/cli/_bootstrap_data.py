@@ -2,15 +2,18 @@ import typing
 
 from ckan.plugins import toolkit
 
+from .. import constants
 from . import _CkanBootstrapOrganization, _CkanExtBootstrapPage
 
-_staff_org_name = toolkit.config.get(
-    "ckan.dalrrd_emc_dcpr.portal_staff_organization_name", "SASDI EMC staff"
+_staff_org_title = toolkit.config.get(
+    "ckan.dalrrd_emc_dcpr.portal_staff_organization_title", "SASDI EMC staff"
 )
+_staff_org_name = _staff_org_title.replace(" ", "-").lower()[:100]
 
 
 SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
     _CkanBootstrapOrganization(
+        name=constants.NSIF_ORG_NAME,
         title="NSIF",
         description=(
             "The National Spatial Information Framework (NSIF) is a directorate "
@@ -25,6 +28,7 @@ SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
         ),
     ),
     _CkanBootstrapOrganization(
+        name=constants.CSI_ORG_NAME,
         title="CSI",
         description=(
             "The Spatial Data Infrastructure Act (Act No. 54 of 2003) mandates "
@@ -37,9 +41,10 @@ SASDI_ORGANIZATIONS: typing.Final[typing.List[_CkanBootstrapOrganization]] = [
         ),
     ),
     _CkanBootstrapOrganization(
-        title=_staff_org_name,
+        name=_staff_org_name,
+        title=_staff_org_title,
         description=(
-            f"The {_staff_org_name} organization is responsible for the maintenance of "
+            f"The {_staff_org_title} organization is responsible for the maintenance of "
             f"the static contents for the EMC portal"
         ),
     ),

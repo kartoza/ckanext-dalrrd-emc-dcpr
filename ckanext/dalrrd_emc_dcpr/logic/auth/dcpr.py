@@ -3,7 +3,7 @@ import typing
 
 from ckan.plugins import toolkit
 from ...model import dcpr_request as dcpr_request
-from ...constants import DCPRRequestStatus
+from ...constants import DCPRRequestStatus, CSI_ORG_NAME, NSIF_ORG_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -75,24 +75,54 @@ def dcpr_request_create_auth(
 
 
 @toolkit.auth_allow_anonymous_access
-def dcpr_request_show_auth(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
-) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_show auth")
-    if not data_dict:
-        return {"success": False}
-
-    request_id = data_dict.get("id", None)
-
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
-
-    if not request_obj:
-        return {"success": False, "msg": toolkit._("Request not found")}
-
-    show_request = (
-        request_obj.status != DCPRRequestStatus.UNDER_PREPARATION.value
-    ) and (request_obj.status != DCPRRequestStatus.AWAITING_NSIF_REVIEW.value)
-    return {"success": show_request}
+def dcpr_request_show_auth(context: typing.Dict, data_dict: typing.Dict) -> typing.Dict:
+    logger.debug("Inside dcpr_request_show_auth")
+    result = {"success": False}
+    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=data_dict.get("id"))
+    if request_obj:
+        unauthorized_msg = toolkit._("You are not authorized to view this request")
+        published_statuses = (
+            DCPRRequestStatus.ACCEPTED.value,
+            DCPRRequestStatus.REJECTED.value,
+        )
+        csi_statuses = (
+            DCPRRequestStatus.AWAITING_CSI_REVIEW.value,
+            DCPRRequestStatus.UNDER_CSI_REVIEW.value,
+        )
+        nsif_statuses = (
+            DCPRRequestStatus.AWAITING_NSIF_REVIEW.value,
+            DCPRRequestStatus.UNDER_NSIF_REVIEW.value,
+        )
+        if context["auth_user_obj"].id == request_obj.owner_user:
+            # this is the owner, allow
+            result["success"] = True
+        elif request_obj.status in published_statuses:
+            # request has already been moderated, so everyone can see it
+            result["success"] = True
+        elif request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value:
+            # user is not the owner and the request has not been submitted yet, deny
+            result["msg"] = unauthorized_msg
+        elif request_obj.status in csi_statuses:
+            # user is not the owner, but if it is member of CSI, then allow
+            is_csi_member = toolkit.h["emc_user_is_org_member"](
+                CSI_ORG_NAME, context["auth_user_obj"]
+            )
+            if is_csi_member:
+                result["success"] = True
+            else:
+                result["msg"] = unauthorized_msg
+        elif request_obj.status in nsif_statuses:
+            # user is not the owner, but if it is member of NSIF, then allow
+            is_nsif_member = toolkit.h["emc_user_is_org_member"](
+                NSIF_ORG_NAME, context["auth_user_obj"]
+            )
+            if is_nsif_member:
+                result["success"] = True
+            else:
+                result["msg"] = unauthorized_msg
+    else:
+        result["msg"] = toolkit._("DCPR request not found")
+    return result
 
 
 def dcpr_request_update_auth(

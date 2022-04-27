@@ -10,13 +10,10 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class _CkanBootstrapOrganization:
+    name: str
     title: str
     description: str
     image_url: typing.Optional[Path] = None
-
-    @property
-    def name(self):
-        return self.title.replace(" ", "-").lower()[:100]
 
 
 @dataclasses.dataclass

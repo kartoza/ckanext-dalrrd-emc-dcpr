@@ -292,7 +292,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return False
 
     def package_types(self) -> typing.List:
-        return [constants.DCPR_REQUEST_DATASET_TYPE]
+        return []
 
     def get_helpers(self):
         return {

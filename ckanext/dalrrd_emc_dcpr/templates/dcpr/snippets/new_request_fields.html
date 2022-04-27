@@ -14,17 +14,6 @@
         {{ form.info(_('Proposed name for the data capture project.')) }}
     {% endcall %}
 
-    {% call form.checkbox(
-        'dataset_custodian',
-        label=_('Organization is custodian?'),
-        id='field-dataset_custodian',
-        checked=data.dataset_custodian,
-        error=errors.dataset_custodian,
-        is_required=True
-    ) %}
-        {{ form.info(_('Whether the request is being made by a user acting on behalf of the dataset custodian for the specified dataset(s) or not.')) }}
-    {% endcall %}
-
     {% call form.input(
         'capture_start_date',
         label=_('Capture start date'),
@@ -47,7 +36,8 @@
         placeholder=_('eg. 2022-01-01'),
         value=data.capture_end_date,
         error=errors.capture_end_date,
-        classes=['control-medium']
+        classes=['control-medium'],
+        is_required=True
     ) %}
         {{ form.info(_('Proposed end date of the data capture.')) }}
     {% endcall %}
@@ -64,6 +54,17 @@
     ) %}
         {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
     {% endcall %}
+
+    {% call form.checkbox(
+        'dataset_custodian',
+        label=_('Organization is custodian?'),
+        id='field-dataset_custodian',
+        checked=data.dataset_custodian,
+        error=errors.dataset_custodian
+    ) %}
+        {{ form.info(_('Whether the request is being made by a user acting on behalf of the dataset custodian for the specified dataset(s) or not.')) }}
+    {% endcall %}
+
 
     {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
 
