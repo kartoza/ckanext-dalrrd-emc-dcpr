@@ -27,14 +27,14 @@ def dcpr_request_dictize(
     return result_dict
 
 
-def dcpr_request_dict_save(data_dict: typing.Dict, context: typing.Dict):
-    if "request_date" in data_dict:
-        del data_dict["request_date"]
+def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dict):
+    if "request_date" in validated_data_dict:
+        del validated_data_dict["request_date"]
     dcpr_request = ckan_dictization.table_dict_save(
-        data_dict, dcpr_request_model.DCPRRequest, context
+        validated_data_dict, dcpr_request_model.DCPRRequest, context
     )
     dcpr_request_dataset_list_save(
-        data_dict.get("dcpr_datasets", []), dcpr_request, context
+        validated_data_dict.get("datasets", []), dcpr_request, context
     )
     return dcpr_request
 
@@ -48,14 +48,13 @@ def dcpr_request_dataset_list_save(
 
 
 def dcpr_dataset_save(dcpr_dataset_dict: typing.Dict, context: typing.Dict):
-    model = context["model"]
     session = context["session"]
     id_ = dcpr_dataset_dict.get("dataset_id")
     obj = None
     if id_:
-        obj = session.query(model.DCPRRequestDataset).get(id_)
+        obj = session.query(dcpr_request_model.DCPRRequestDataset).get(id_)
     if not obj:
-        obj = model.DCPRRequestDataset()
+        obj = dcpr_request_model.DCPRRequestDataset()
     obj.from_dict(dcpr_dataset_dict)
     session.add(obj)
     return obj

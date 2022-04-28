@@ -17,8 +17,7 @@ def dcpr_request_list_private_auth(
     requests.
 
     """
-    # FIXME: Implement this
-    return {"success": False}
+    return dcpr_request_create_auth(context, data_dict)
 
 
 @toolkit.auth_allow_anonymous_access
@@ -78,7 +77,9 @@ def dcpr_request_create_auth(
 def dcpr_request_show_auth(context: typing.Dict, data_dict: typing.Dict) -> typing.Dict:
     logger.debug("Inside dcpr_request_show_auth")
     result = {"success": False}
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=data_dict.get("id"))
+    request_obj = dcpr_request.DCPRRequest.get(
+        csi_reference_id=data_dict.get("csi_reference_id")
+    )
     if request_obj:
         unauthorized_msg = toolkit._("You are not authorized to view this request")
         published_statuses = (

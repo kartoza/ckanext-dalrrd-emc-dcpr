@@ -3,26 +3,26 @@ from ckan.logic.schema import validator_args
 
 @validator_args
 def create_dcpr_request_schema(
-    boolean_validator,
     ignore_missing,
     not_missing,
     not_empty,
     unicode_safe,
     is_positive_integer,
     isodate,
-    group_id_or_name_exists,
+    convert_group_name_or_id_to_id,
 ):
     return {
         "proposed_project_name": [not_empty, not_missing, unicode_safe],
         "organization_id": [
-            not_empty,
             not_missing,
-            group_id_or_name_exists,
+            not_empty,
+            unicode_safe,
+            convert_group_name_or_id_to_id,
         ],
         "additional_project_context": [ignore_missing, unicode_safe],
         "capture_start_date": [not_empty, isodate],
         "capture_end_date": [not_empty, isodate],
-        "cost": [not_empty, not_missing, is_positive_integer],
+        "cost": [not_missing, not_empty, is_positive_integer],
         "spatial_extent": [ignore_missing, unicode_safe],
         "spatial_resolution": [ignore_missing, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
@@ -35,13 +35,14 @@ def create_dcpr_request_schema(
         "csi_moderation_notes": [ignore_missing, unicode_safe],
         "csi_moderation_additional_documents": [ignore_missing, unicode_safe],
         "csi_moderation_date": [ignore_missing, unicode_safe],
-        "dcpr_datasets": create_dcpr_request_dataset_schema(),
+        "datasets": create_dcpr_request_dataset_schema(),
         "submission_date": [ignore_missing, isodate],
     }
 
 
 @validator_args
 def create_dcpr_request_dataset_schema(
+    boolean_validator,
     ignore_missing,
     unicode_safe,
     not_empty,
@@ -50,7 +51,7 @@ def create_dcpr_request_dataset_schema(
     return {
         "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_purpose": [not_empty, not_missing, unicode_safe],
-        "dataset_custodian": [ignore_missing, unicode_safe],
+        "dataset_custodian": [ignore_missing, boolean_validator],
         "data_type": [ignore_missing, unicode_safe],
         "proposed_abstract": [ignore_missing, unicode_safe],
         "lineage_statement": [ignore_missing, unicode_safe],

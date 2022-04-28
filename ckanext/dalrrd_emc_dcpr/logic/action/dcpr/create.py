@@ -66,28 +66,29 @@ def dcpr_error_report_create(context, data_dict):
 
 
 def dcpr_request_create(context, data_dict):
-    logger.info(f"{data_dict=}")
     toolkit.check_access("dcpr_request_create_auth", context, data_dict)
     model = context["model"]
     schema = context.get("schema", create_dcpr_request_schema())
-    data, errors = toolkit.navl_validate(data_dict, schema, context)
+    logger.debug(f"{schema=}")
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     logger.debug(f"{errors=}")
     if errors:
         model.Session.rollback()
         raise toolkit.ValidationError(errors)
 
-    # after validation of user-supplied data, enrich the data_dict with additional
+    # after validation of user-supplied data, enrich the data dict with additional
     # required attributes, like the request owner, status, etc.
-    data_dict.update(
+    validated_data.update(
         {
             "owner_user": context["auth_user_obj"].id,
             "status": DCPRRequestStatus.UNDER_PREPARATION.value,
         }
     )
-    logger.debug(f"{data_dict=}")
-    dcpr_request = dcpr_dictization.dcpr_request_dict_save(data_dict, context)
-    model.Session.flush()
+    logger.debug(f"{validated_data=}")
+    dcpr_request = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    model.Session.commit()
     logger.debug(f"{dcpr_request=}")
+
     # TODO - would be nice to have an activity being created here
     # notification_targets = []
     #
