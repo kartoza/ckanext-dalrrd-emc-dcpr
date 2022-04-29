@@ -229,7 +229,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 dcpr_auth.dcpr_request_list_pending_nsif_auth
             ),
             "dcpr_request_show_auth": dcpr_auth.dcpr_request_show_auth,
-            "dcpr_request_update_auth": dcpr_auth.dcpr_request_update_auth,
+            "dcpr_request_update_by_owner_auth": dcpr_auth.dcpr_request_update_by_owner_auth,
             "dcpr_request_submit_auth": dcpr_auth.dcpr_request_submit_auth,
             "dcpr_request_escalate_auth": dcpr_auth.dcpr_request_escalate_auth,
             "dcpr_request_accept_auth": dcpr_auth.dcpr_request_accept_auth,
@@ -266,7 +266,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 dcpr_get_actions.dcpr_request_list_awaiting_nsif_moderation
             ),
             "dcpr_request_show": dcpr_get_actions.dcpr_request_show,
-            "dcpr_request_update": dcpr_update_actions.dcpr_request_update,
+            "dcpr_request_update_by_owner": dcpr_update_actions.dcpr_request_update_by_owner,
             "dcpr_request_submit": dcpr_update_actions.dcpr_request_submit,
             "dcpr_request_escalate": dcpr_update_actions.dcpr_request_escalate,
             "dcpr_request_accept": dcpr_update_actions.dcpr_request_accept,
@@ -311,6 +311,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_user_is_staff_member": helpers.user_is_staff_member,
             "emc_get_featured_datasets": helpers.get_featured_datasets,
             "emc_get_recently_modified_datasets": helpers.get_recently_modified_datasets,
+            "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
+            "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

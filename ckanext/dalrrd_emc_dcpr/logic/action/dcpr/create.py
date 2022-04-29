@@ -66,7 +66,6 @@ def dcpr_error_report_create(context, data_dict):
 
 
 def dcpr_request_create(context, data_dict):
-    toolkit.check_access("dcpr_request_create_auth", context, data_dict)
     logger.debug(f"{data_dict=}")
     model = context["model"]
     schema = context.get("schema", create_dcpr_request_schema())
@@ -76,6 +75,7 @@ def dcpr_request_create(context, data_dict):
     if errors:
         model.Session.rollback()
         raise toolkit.ValidationError(errors)
+    toolkit.check_access("dcpr_request_create_auth", context, validated_data)
 
     # after validation of user-supplied data, enrich the data dict with additional
     # required attributes, like the request owner, status, etc.

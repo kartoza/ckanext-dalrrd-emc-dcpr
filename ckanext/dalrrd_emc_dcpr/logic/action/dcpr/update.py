@@ -4,89 +4,67 @@ import logging
 from ckan.plugins import toolkit
 from sqlalchemy import exc
 
-from ...schema import update_dcpr_request_schema
+from ....constants import DCPRRequestStatus
+from ... import schema as dcpr_schema
 from ....model import dcpr_request
+from .... import dcpr_dictization
 
 logger = logging.getLogger(__name__)
 
 
-def dcpr_request_update(context, data_dict):
-    logger.debug("Inside the dcpr_request_update action")
-
-    model = context["model"]
-
-    toolkit.check_access("dcpr_request_update_auth", context, data_dict)
-    schema = context.get("schema", update_dcpr_request_schema())
-
-    data, errors = toolkit.navl_validate(data_dict, schema, context)
-
+def dcpr_request_update_by_owner(context, data_dict):
+    schema = dcpr_schema.update_dcpr_request_by_owner_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
+    toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
+    validated_data["owner_user"] = context["auth_user_obj"].id
+    request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    context["model"].Session.commit()
+    # TODO: would be nice to add an activity here
+    return dcpr_dictization.dcpr_request_dictize(request_obj, context)
 
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        data_dict.get("request_id", None)
-    )
-    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-        dcpr_request.DCPRRequestDataset.dcpr_request_id
-        == data_dict.get("request_id", None)
-    )
-    if not request_obj or not request_dataset_obj:
-        raise toolkit.ObjectNotFound
-    else:
-        if data_dict is not None:
-            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
 
-    try:
-        model.Session.commit()
-        model.repo.commit()
+def dcpr_request_update_by_nsif(context, data_dict):
+    pass
 
-    except exc.InvalidRequestError as exception:
-        model.Session.rollback()
-    finally:
-        model.Session.close()
 
-    return request_obj
+def dcpr_request_update_by_csi(context, data_dict):
+    pass
 
 
 def dcpr_request_submit(context, data_dict):
-    logger.debug("Inside the dcpr_request_submit action")
+    """Submit a DCPR request.
 
-    model = context["model"]
+    By submitting a DCPR request, it is marked as ready for review by the SASDI
+    organizations.
 
-    toolkit.check_access("dcpr_request_submit_auth", context, data_dict)
-    schema = context.get("schema", update_dcpr_request_schema())
+    """
 
-    data, errors = toolkit.navl_validate(data_dict, schema, context)
-
+    schema = dcpr_schema.dcpr_request_submit_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
 
-    status = dcpr_request.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-
+    toolkit.check_access("dcpr_request_submit_auth", context, validated_data)
+    validated_data["submission_date"] = dt.datetime.now(dt.timezone.utc)
+    model = context["model"]
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        data_dict.get("request_id", None)
+        validated_data["csi_reference_id"]
     )
-    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-        dcpr_request.DCPRRequestDataset.dcpr_request_id
-        == data_dict.get("request_id", None)
-    )
-    if not request_obj or not request_dataset_obj:
-        raise toolkit.ObjectNotFound
+    if request_obj is not None:
+        can_be_submitted = (
+            request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
+        )
+        if can_be_submitted:
+            next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+            request_obj.status = next_status
+            model.Session.commit()
+        else:
+            raise RuntimeError("DCPR Request is not currently submittable")
     else:
-        request_obj.status = status
-        if data_dict is not None:
-            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
-
-    try:
-        model.Session.commit()
-        model.repo.commit()
-
-    except exc.InvalidRequestError as exception:
-        model.Session.rollback()
-    finally:
-        model.Session.close()
-
-    return request_obj
+        raise toolkit.ObjectNotFound
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
 def dcpr_request_escalate(context, data_dict):
@@ -96,7 +74,7 @@ def dcpr_request_escalate(context, data_dict):
     user = context["auth_user_obj"]
 
     toolkit.check_access("dcpr_request_escalate_auth", context, data_dict)
-    schema = context.get("schema", update_dcpr_request_schema())
+    schema = context.get("schema", dcpr_schema.update_dcpr_request_schema())
 
     data, errors = toolkit.navl_validate(data_dict, schema, context)
 
@@ -106,7 +84,7 @@ def dcpr_request_escalate(context, data_dict):
     data_dict["nsif_review_date"] = dt.datetime.now()
     data_dict["nsif_reviewer"] = user.id
 
-    status = dcpr_request.DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+    status = DCPRRequestStatus.AWAITING_CSI_REVIEW.value
 
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         data_dict.get("request_id", None)
@@ -141,7 +119,7 @@ def dcpr_request_accept(context, data_dict):
     user = context["auth_user_obj"]
 
     toolkit.check_access("dcpr_request_accept_auth", context, data_dict)
-    schema = context.get("schema", update_dcpr_request_schema())
+    schema = context.get("schema", dcpr_schema.update_dcpr_request_schema())
 
     data, errors = toolkit.navl_validate(data_dict, schema, context)
 
@@ -150,7 +128,7 @@ def dcpr_request_accept(context, data_dict):
 
     data_dict["csi_review_date"] = dt.datetime.now()
     data_dict["csi_moderator"] = user.id
-    status = dcpr_request.DCPRRequestStatus.ACCEPTED.value
+    status = DCPRRequestStatus.ACCEPTED.value
 
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         data_dict.get("request_id", None)
@@ -185,7 +163,7 @@ def dcpr_request_reject(context, data_dict):
     user = context["auth_user_obj"]
 
     toolkit.check_access("dcpr_request_reject_auth", context, data_dict)
-    schema = context.get("schema", update_dcpr_request_schema())
+    schema = context.get("schema", dcpr_schema.update_dcpr_request_schema())
 
     data, errors = toolkit.navl_validate(data_dict, schema, context)
 
@@ -203,7 +181,7 @@ def dcpr_request_reject(context, data_dict):
         data_dict["csi_moderator"] = user.id
     else:
         raise toolkit.NotAuthorized
-    status = dcpr_request.DCPRRequestStatus.REJECTED.value
+    status = DCPRRequestStatus.REJECTED.value
 
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         data_dict.get("request_id", None)

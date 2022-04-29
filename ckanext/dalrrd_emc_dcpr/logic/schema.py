@@ -33,16 +33,79 @@ def create_dcpr_request_schema(
         "data_capture_urgency": [ignore_missing, unicode_safe],
         "additional_information": [ignore_missing, unicode_safe],
         "additional_documents": [unicode_safe, ignore_missing],
-        "nsif_review_date": [ignore_missing, unicode_safe],
+        "datasets": create_dcpr_request_dataset_schema(),
+    }
+
+
+@validator_args
+def update_dcpr_request_by_owner_schema(
+    convert_group_name_or_id_to_id,
+    ignore_missing,
+    isodate,
+    is_positive_integer,
+    not_missing,
+    not_empty,
+    unicode_safe,
+):
+    return {
+        "csi_reference_id": [not_missing, not_empty, unicode_safe],
+        "proposed_project_name": [ignore_missing, not_empty, unicode_safe],
+        "organization_id": [
+            ignore_missing,
+            not_empty,
+            unicode_safe,
+            convert_group_name_or_id_to_id,
+        ],
+        "additional_project_context": [ignore_missing, unicode_safe],
+        "capture_start_date": [ignore_missing, not_empty, isodate],
+        "capture_end_date": [ignore_missing, not_empty, isodate],
+        "cost": [ignore_missing, not_empty, is_positive_integer],
+        "spatial_extent": [ignore_missing, unicode_safe],
+        "spatial_resolution": [ignore_missing, unicode_safe],
+        "data_capture_urgency": [ignore_missing, unicode_safe],
+        "additional_information": [ignore_missing, unicode_safe],
+        "additional_documents": [unicode_safe, ignore_missing],
+        "datasets": create_dcpr_request_dataset_schema(),
+    }
+
+
+@validator_args
+def update_dcpr_request_by_nsif_schema(
+    ignore_missing,
+    not_empty,
+    not_missing,
+    unicode_safe,
+):
+    return {
+        "csi_reference_id": [not_missing, not_empty, unicode_safe],
         "nsif_recommendation": [ignore_missing, unicode_safe],
         "nsif_review_notes": [ignore_missing, unicode_safe],
         "nsif_review_additional_documents": [ignore_missing, unicode_safe],
-        "csi_moderation_notes": [ignore_missing, unicode_safe],
-        "csi_moderation_additional_documents": [ignore_missing, unicode_safe],
-        "csi_moderation_date": [ignore_missing, unicode_safe],
-        "datasets": create_dcpr_request_dataset_schema(),
-        "submission_date": [ignore_missing, isodate],
     }
+
+
+@validator_args
+def update_dcpr_request_by_csi_schema(
+    ignore_missing,
+    not_empty,
+    not_missing,
+    unicode_safe,
+):
+    return {
+        "csi_reference_id": [not_missing, not_empty, unicode_safe],
+        "csi_moderation_notes": [ignore_missing, unicode_safe],
+        "csi_review_additional_documents": [ignore_missing, unicode_safe],
+    }
+
+
+@validator_args
+def dcpr_request_submit_schema():
+    return show_dcpr_request_schema()
+
+
+@validator_args
+def delete_dcpr_request_schema():
+    return show_dcpr_request_schema()
 
 
 @validator_args
@@ -69,13 +132,3 @@ def create_dcpr_request_dataset_schema(
         "capture_method": [ignore_missing, unicode_safe],
         "capture_method_detail": [ignore_missing, unicode_safe],
     }
-
-
-@validator_args
-def update_dcpr_request_schema():
-    return create_dcpr_request_schema()
-
-
-@validator_args
-def delete_dcpr_request_schema():
-    return show_dcpr_request_schema()

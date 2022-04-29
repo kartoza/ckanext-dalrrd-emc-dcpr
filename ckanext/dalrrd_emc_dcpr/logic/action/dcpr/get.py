@@ -71,7 +71,7 @@ def dcpr_request_list_awaiting_csi_moderation(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List:
     """Return a list of DCPR requests that are awaiting moderation by CSI members."""
-    toolkit.check_access("dcpr_request_list_private_auth", context, data_dict)
+    toolkit.check_access("dcpr_request_list_pending_csi_auth", context, data_dict)
     csi_statuses = (
         DCPRRequestStatus.AWAITING_CSI_REVIEW.value,
         DCPRRequestStatus.UNDER_CSI_REVIEW.value,
@@ -91,7 +91,7 @@ def dcpr_request_list_awaiting_nsif_moderation(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List:
     """Return a list of DCPR requests that are awaiting moderation by NSIF members."""
-    toolkit.check_access("dcpr_request_list_private_auth", context, data_dict)
+    toolkit.check_access("dcpr_request_list_pending_nsif_auth", context, data_dict)
     nsif_statuses = (
         DCPRRequestStatus.AWAITING_NSIF_REVIEW.value,
         DCPRRequestStatus.UNDER_NSIF_REVIEW.value,

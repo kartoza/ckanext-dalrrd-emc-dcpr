@@ -10,6 +10,8 @@ from ckan.lib.helpers import build_nav_main as core_build_nav_main
 
 from . import constants
 from .logic.action.emc import show_version
+from .constants import DCPRRequestStatus
+from .model.dcpr_request import DCPRRequest
 
 
 logger = logging.getLogger(__name__)
@@ -248,3 +250,35 @@ def get_status_labels() -> typing.Dict:
     }
 
     return status_labels
+
+
+def get_next_intermediate_dcpr_status(current_status: str) -> typing.Optional[str]:
+    workflow_order = [
+        DCPRRequestStatus.UNDER_PREPARATION,
+        DCPRRequestStatus.AWAITING_NSIF_REVIEW,
+        DCPRRequestStatus.UNDER_NSIF_REVIEW,
+        DCPRRequestStatus.AWAITING_CSI_REVIEW,
+        DCPRRequestStatus.UNDER_CSI_REVIEW,
+    ]
+    result = None
+    try:
+        current_index = workflow_order.index(DCPRRequestStatus(current_status))
+        try:
+            next_status = workflow_order[current_index + 1]
+            result = next_status.value
+        except IndexError:
+            # current_index + 1 is out of bounds for the workflow_list
+            pass
+    except ValueError:
+        # input status is not present in the workflow_order list
+        pass
+    return result
+
+
+def user_is_dcpr_request_owner(user_id, dcpr_request_id) -> bool:
+    request_obj = DCPRRequest.get(dcpr_request_id)
+    if request_obj is not None:
+        result = user_id == request_obj.owner_user
+    else:
+        result = False
+    return result
