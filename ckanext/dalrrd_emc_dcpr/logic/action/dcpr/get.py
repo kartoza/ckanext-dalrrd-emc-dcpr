@@ -7,15 +7,21 @@ from ckan.plugins import toolkit
 from ....model import dcpr_request
 from .... import dcpr_dictization
 from ....constants import DCPRRequestStatus
+from ...schema import show_dcpr_request_schema
 
 logger = logging.getLogger(__name__)
 
 
 @toolkit.side_effect_free
 def dcpr_request_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Dict:
-    toolkit.check_access("dcpr_request_show_auth", context, data_dict)
-    request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
-    request_object = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
+    schema = show_dcpr_request_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    model = context["model"]
+    if errors:
+        model.Session.rollback()
+        raise toolkit.ValidationError(errors)
+    toolkit.check_access("dcpr_request_show_auth", context, validated_data)
+    request_object = dcpr_request.DCPRRequest.get(validated_data["csi_reference_id"])
     if not request_object:
         raise toolkit.ObjectNotFound
     return dcpr_dictization.dcpr_request_dictize(request_object, context)

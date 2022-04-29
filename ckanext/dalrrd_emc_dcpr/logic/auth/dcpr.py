@@ -77,10 +77,8 @@ def dcpr_request_create_auth(
 def dcpr_request_show_auth(context: typing.Dict, data_dict: typing.Dict) -> typing.Dict:
     logger.debug("Inside dcpr_request_show_auth")
     result = {"success": False}
-    request_obj = dcpr_request.DCPRRequest.get(
-        csi_reference_id=data_dict.get("csi_reference_id")
-    )
-    if request_obj:
+    request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
+    if request_obj is not None:
         unauthorized_msg = toolkit._("You are not authorized to view this request")
         published_statuses = (
             DCPRRequestStatus.ACCEPTED.value,
@@ -301,25 +299,22 @@ def dcpr_request_edit_auth(
 def dcpr_request_delete_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_delete auth")
+    """
+    DCPR requests shall be deletable by their creator, but only if they are not
+    submitted yet.
 
-    user = context["auth_user_obj"]
+    """
 
-    if not user or not data_dict:
-        return {"success": False}
-
-    request_id = data_dict.get("request_id", None)
-
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
-    if not request_obj:
-        return {"success": False, "msg": toolkit._("Request not found")}
-
-    owner = user.get("id") == request_obj.owner_user
-    request_in_preparation = (
-        request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
-    )
-
-    if not owner or not request_in_preparation:
-        return {"success": False}
-
-    return {"success": True}
+    request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
+    request_obj = dcpr_request.DCPRRequest.get(request_id)
+    result = {"success": False}
+    if request_obj is not None:
+        is_owner = context["auth_user_obj"].id == request_obj.owner_user
+        request_in_preparation = (
+            request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
+        )
+        if is_owner and request_in_preparation:
+            result["success"] = True
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result

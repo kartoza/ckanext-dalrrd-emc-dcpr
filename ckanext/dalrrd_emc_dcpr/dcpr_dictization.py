@@ -24,7 +24,17 @@ def dcpr_request_dictize(
     dcpr_request: dcpr_request_model.DCPRRequest, context: typing.Dict
 ) -> typing.Dict:
     result_dict = ckan_dictization.table_dictize(dcpr_request, context)
+    result_dict["datasets"] = []
+    for dcpr_dataset in dcpr_request.datasets:
+        dataset_dict = dcpr_request_dataset_dictize(dcpr_dataset, context)
+        result_dict["datasets"].append(dataset_dict)
     return result_dict
+
+
+def dcpr_request_dataset_dictize(
+    dcpr_dataset: dcpr_request_model.DCPRRequestDataset, context: typing.Dict
+) -> typing.Dict:
+    return ckan_dictization.table_dictize(dcpr_dataset, context)
 
 
 def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dict):
@@ -33,6 +43,7 @@ def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dic
     dcpr_request = ckan_dictization.table_dict_save(
         validated_data_dict, dcpr_request_model.DCPRRequest, context
     )
+    context["session"].flush()
     dcpr_request_dataset_list_save(
         validated_data_dict.get("datasets", []), dcpr_request, context
     )
@@ -49,12 +60,7 @@ def dcpr_request_dataset_list_save(
 
 def dcpr_dataset_save(dcpr_dataset_dict: typing.Dict, context: typing.Dict):
     session = context["session"]
-    id_ = dcpr_dataset_dict.get("dataset_id")
-    obj = None
-    if id_:
-        obj = session.query(dcpr_request_model.DCPRRequestDataset).get(id_)
-    if not obj:
-        obj = dcpr_request_model.DCPRRequestDataset()
+    obj = dcpr_request_model.DCPRRequestDataset()
     obj.from_dict(dcpr_dataset_dict)
     session.add(obj)
     return obj

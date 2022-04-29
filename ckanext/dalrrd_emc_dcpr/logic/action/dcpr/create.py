@@ -67,6 +67,7 @@ def dcpr_error_report_create(context, data_dict):
 
 def dcpr_request_create(context, data_dict):
     toolkit.check_access("dcpr_request_create_auth", context, data_dict)
+    logger.debug(f"{data_dict=}")
     model = context["model"]
     schema = context.get("schema", create_dcpr_request_schema())
     logger.debug(f"{schema=}")
@@ -116,7 +117,8 @@ def dcpr_request_create(context, data_dict):
     # finally:
     #     model.Session.close()
     return toolkit.get_action("dcpr_request_show")(
-        context=context.copy(), data_dict={"id": dcpr_request.csi_reference_id}
+        context=context.copy(),
+        data_dict={"csi_reference_id": dcpr_request.csi_reference_id},
     )
 
 

@@ -2,6 +2,11 @@ from ckan.logic.schema import validator_args
 
 
 @validator_args
+def show_dcpr_request_schema(not_missing, not_empty, unicode_safe):
+    return {"csi_reference_id": [not_missing, not_empty, unicode_safe]}
+
+
+@validator_args
 def create_dcpr_request_schema(
     ignore_missing,
     not_missing,
@@ -42,6 +47,7 @@ def create_dcpr_request_schema(
 
 @validator_args
 def create_dcpr_request_dataset_schema(
+    ignore,
     boolean_validator,
     ignore_missing,
     unicode_safe,
@@ -49,6 +55,8 @@ def create_dcpr_request_dataset_schema(
     not_missing,
 ):
     return {
+        "dcpr_request_id": [ignore],
+        "dataset_id": [ignore],
         "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_purpose": [not_empty, not_missing, unicode_safe],
         "dataset_custodian": [ignore_missing, boolean_validator],
@@ -66,3 +74,8 @@ def create_dcpr_request_dataset_schema(
 @validator_args
 def update_dcpr_request_schema():
     return create_dcpr_request_schema()
+
+
+@validator_args
+def delete_dcpr_request_schema():
+    return show_dcpr_request_schema()

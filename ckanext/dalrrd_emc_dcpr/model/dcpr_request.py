@@ -56,10 +56,7 @@ dcpr_request_table = Table(
     Column("additional_documents", types.UnicodeText),
     Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
     Column("submission_date", types.DateTime),
-    Column(
-        "nsif_review_date",
-        types.DateTime,
-    ),
+    Column("nsif_review_date", types.DateTime),
     Column("nsif_recommendation", types.UnicodeText),
     Column("nsif_review_notes", types.UnicodeText),
     Column("nsif_review_additional_documents", types.UnicodeText),
@@ -216,10 +213,10 @@ class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
         self.csi_reference_id = kw.get("csi_reference_id", None)
 
     @classmethod
-    def get(cls, **kw) -> Optional["DCPRRequest"]:
+    def get(cls, csi_reference_id) -> Optional["DCPRRequest"]:
         """Finds a single request entity in the model."""
-        query = meta.Session.query(cls).autoflush(False)
-        return query.filter_by(**kw).first()
+        query = meta.Session.query(cls)
+        return query.get(csi_reference_id)
 
     def get_dataset_elements(self) -> Optional[DCPRRequestDataset]:
         datasets = (
@@ -284,7 +281,16 @@ class DCPRGeospatialRequest(core.StatefulObjectMixin, domain_object.DomainObject
 
 meta.mapper(DCPRRequest, dcpr_request_table)
 meta.mapper(DCPRRequestNotificationTarget, dcpr_request_notification_table)
-meta.mapper(DCPRRequestDataset, dcpr_request_dataset_table)
+meta.mapper(
+    DCPRRequestDataset,
+    dcpr_request_dataset_table,
+    properties={
+        "dcpr_request": orm.relationship(
+            DCPRRequest,
+            backref=orm.backref("datasets", cascade="all, delete, delete-orphan"),
+        )
+    },
+)
 meta.mapper(DCPRGeospatialRequest, dcpr_geospatial_request_table)
 meta.mapper(
     DCPRGeospatialRequestNotificationTarget, dcpr_geospatial_request_notification_table
