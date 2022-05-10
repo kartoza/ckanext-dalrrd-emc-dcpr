@@ -104,6 +104,31 @@ def dcpr_request_submit_schema():
 
 
 @validator_args
+def moderate_nsif_dcpr_request_schema(not_missing, not_empty, boolean_validator):
+    result = show_dcpr_request_schema()
+    result["approved"] = [
+        not_missing,
+        not_empty,
+        boolean_validator,
+    ]
+
+
+@validator_args
+def moderate_csi_dcpr_request_schema(
+    not_missing,
+    not_empty,
+    boolean_validator,
+):
+    result = show_dcpr_request_schema()
+    result["approved"] = [
+        not_missing,
+        not_empty,
+        boolean_validator,
+    ]
+    return result
+
+
+@validator_args
 def delete_dcpr_request_schema():
     return show_dcpr_request_schema()
 
@@ -132,3 +157,13 @@ def create_dcpr_request_dataset_schema(
         "capture_method": [ignore_missing, unicode_safe],
         "capture_method_detail": [ignore_missing, unicode_safe],
     }
+
+
+@validator_args
+def claim_nsif_reviewer_schema():
+    return show_dcpr_request_schema()
+
+
+@validator_args
+def claim_csi_moderator_schema():
+    return show_dcpr_request_schema()

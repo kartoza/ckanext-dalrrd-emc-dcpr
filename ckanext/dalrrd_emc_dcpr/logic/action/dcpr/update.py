@@ -1,5 +1,6 @@
 import datetime as dt
 import logging
+import typing
 
 from ckan.plugins import toolkit
 from sqlalchemy import exc
@@ -26,11 +27,57 @@ def dcpr_request_update_by_owner(context, data_dict):
 
 
 def dcpr_request_update_by_nsif(context, data_dict):
-    pass
+    """Update a DCPR request's NSIF-related fields.
+
+    Some fields of a DCPR request can only be modified by members of the NSIF
+    organization. Additionally, once a specific user starts updating the request, it
+    becomes its nsif_reviewer and all further updates by the NSIF must be done by that
+    user.
+
+    """
+
+    schema = dcpr_schema.update_dcpr_request_by_nsif_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
+    toolkit.check_access("dcpr_request_update_by_nsif_auth", context, validated_data)
+    validated_data.update(
+        {
+            "nsif_reviewer": context["auth_user_obj"].id,
+            "nsif_review_date": dt.datetime.now(dt.timezone.utc),
+        }
+    )
+    request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    context["model"].Session.commit()
+    # TODO: would be nice to add an activity here
+    return dcpr_dictization.dcpr_request_dictize(request_obj, context)
 
 
 def dcpr_request_update_by_csi(context, data_dict):
-    pass
+    """Update a DCPR request's CSI-related fields.
+
+    Some fields of a DCPR request can only be modified by members of the CSI
+    organization. Additionally, once a specific user starts updating the request, it
+    becomes its csi_moderator and all further updates by the CSI must be done by that
+    user.
+
+    """
+
+    schema = dcpr_schema.update_dcpr_request_by_csi_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
+    toolkit.check_access("dcpr_request_update_by_csi_auth", context, validated_data)
+    validated_data.update(
+        {
+            "csi_moderator": context["auth_user_obj"].id,
+            "csi_moderation_date": dt.datetime.now(dt.timezone.utc),
+        }
+    )
+    request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    context["model"].Session.commit()
+    # TODO: would be nice to add an activity here
+    return dcpr_dictization.dcpr_request_dictize(request_obj, context)
 
 
 def dcpr_request_submit(context, data_dict):
@@ -67,184 +114,128 @@ def dcpr_request_submit(context, data_dict):
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
-def dcpr_request_escalate(context, data_dict):
-    logger.debug("Inside the dcpr_request_escalate action")
+def dcpr_request_nsif_moderate(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    """Provide the NSIF's moderation for a DCPR request.
 
-    model = context["model"]
-    user = context["auth_user_obj"]
+    By moderating a DCPR request, it is either rejected or marked as reviewed by the
+    NSIF and ready for further moderation by the CSI.
 
-    toolkit.check_access("dcpr_request_escalate_auth", context, data_dict)
-    schema = context.get("schema", dcpr_schema.update_dcpr_request_schema())
+    """
 
-    data, errors = toolkit.navl_validate(data_dict, schema, context)
-
+    schema = dcpr_schema.moderate_nsif_dcpr_request_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
 
-    data_dict["nsif_review_date"] = dt.datetime.now()
-    data_dict["nsif_reviewer"] = user.id
-
-    status = DCPRRequestStatus.AWAITING_CSI_REVIEW.value
-
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        data_dict.get("request_id", None)
-    )
-    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-        dcpr_request.DCPRRequestDataset.dcpr_request_id
-        == data_dict.get("request_id", None)
-    )
-    if not request_obj or not request_dataset_obj:
-        raise toolkit.ObjectNotFound
-    else:
-        request_obj.status = status
-        if data_dict is not None:
-            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
-
-    try:
-        model.Session.commit()
-        model.repo.commit()
-
-    except exc.InvalidRequestError as exception:
-        model.Session.rollback()
-    finally:
-        model.Session.close()
-
-    return request_obj
-
-
-def dcpr_request_accept(context, data_dict):
-    logger.debug("Inside the dcpr_request_accept action")
-
+    toolkit.check_access("dcpr_request_nsif_moderate_auth", context, validated_data)
+    validated_data["nsif_review_date"] = dt.datetime.now(dt.timezone.utc)
     model = context["model"]
-    user = context["auth_user_obj"]
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        validated_data["csi_reference_id"]
+    )
+    if request_obj is not None:
+        can_be_moderated = (
+            request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value
+        )
+        if can_be_moderated:
+            next_status = (
+                DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+                if validated_data["accepted"]
+                else DCPRRequestStatus.REJECTED.value
+            )
+            request_obj.status = next_status
+            model.Session.commit()
+        else:
+            raise RuntimeError("DCPR Request can not currently be moderated by NSIF")
+    else:
+        raise toolkit.ObjectNotFound
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
-    toolkit.check_access("dcpr_request_accept_auth", context, data_dict)
-    schema = context.get("schema", dcpr_schema.update_dcpr_request_schema())
 
-    data, errors = toolkit.navl_validate(data_dict, schema, context)
+def dcpr_request_csi_moderate(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    """Provide the CSI's moderation for a DCPR request.
 
+    By moderating a DCPR request, it is marked as reviewed by the CSI and made public.
+
+    """
+
+    schema = dcpr_schema.moderate_csi_dcpr_request_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
 
-    data_dict["csi_review_date"] = dt.datetime.now()
-    data_dict["csi_moderator"] = user.id
-    status = DCPRRequestStatus.ACCEPTED.value
-
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        data_dict.get("request_id", None)
-    )
-    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-        dcpr_request.DCPRRequestDataset.dcpr_request_id
-        == data_dict.get("request_id", None)
-    )
-    if not request_obj or not request_dataset_obj:
-        raise toolkit.ObjectNotFound
-    else:
-        request_obj.status = status
-        if data_dict is not None:
-            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
-
-    try:
-        model.Session.commit()
-        model.repo.commit()
-
-    except exc.InvalidRequestError as exception:
-        model.Session.rollback()
-    finally:
-        model.Session.close()
-
-    return request_obj
-
-
-def dcpr_request_reject(context, data_dict):
-    logger.debug("Inside the dcpr_request_reject action")
-
+    toolkit.check_access("dcpr_request_csi_moderate_auth", context, validated_data)
+    validated_data["csi_moderation_date"] = dt.datetime.now(dt.timezone.utc)
     model = context["model"]
-    user = context["auth_user_obj"]
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        validated_data["csi_reference_id"]
+    )
+    if request_obj is not None:
+        can_be_moderated = (
+            request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value
+        )
+        if can_be_moderated:
+            final_status = (
+                DCPRRequestStatus.ACCEPTED.value
+                if validated_data["approved"]
+                else DCPRRequestStatus.REJECTED.value
+            )
+            request_obj.status = final_status
+            model.Session.commit()
+        else:
+            raise RuntimeError("DCPR Request can not currently be moderated by CSI")
+    else:
+        raise toolkit.ObjectNotFound
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
-    toolkit.check_access("dcpr_request_reject_auth", context, data_dict)
-    schema = context.get("schema", dcpr_schema.update_dcpr_request_schema())
 
-    data, errors = toolkit.navl_validate(data_dict, schema, context)
-
+def claim_dcpr_request_nsif_reviewer(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    schema = dcpr_schema.claim_nsif_reviewer_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
 
-    nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
-    csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
-
-    if nsif_reviewer:
-        data_dict["nsif_review_date"] = dt.datetime.now()
-        data_dict["nsif_reviewer"] = user.id
-    elif csi_reviewer:
-        data_dict["csi_review_date"] = dt.datetime.now()
-        data_dict["csi_moderator"] = user.id
-    else:
-        raise toolkit.NotAuthorized
-    status = DCPRRequestStatus.REJECTED.value
-
+    toolkit.check_access(
+        "dcpr_request_claim_nsif_reviewer_auth", context, validated_data
+    )
+    model = context["model"]
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        data_dict.get("request_id", None)
+        validated_data["csi_reference_id"]
     )
-    request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-        dcpr_request.DCPRRequestDataset.dcpr_request_id
-        == data_dict.get("request_id", None)
-    )
-    if not request_obj or not request_dataset_obj:
-        raise toolkit.ObjectNotFound
-    else:
-        request_obj.status = status
-        if data_dict is not None:
-            _copy_dcpr_requests_fields(request_obj, request_dataset_obj, data_dict)
-    try:
+    if request_obj is not None:
+        next_status = DCPRRequestStatus.UNDER_NSIF_REVIEW.value
+        request_obj.status = next_status
         model.Session.commit()
-        model.repo.commit()
-
-    except exc.InvalidRequestError as exception:
-        model.Session.rollback()
-    finally:
-        model.Session.close()
-
-    return request_obj
+    else:
+        raise toolkit.ObjectNotFound
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
-def _copy_dcpr_requests_fields(dcpr_request, dcpr_request_dataset, data_dict):
+def claim_dcpr_request_csi_moderator(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    schema = dcpr_schema.claim_csi_moderator_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
 
-    dcpr_request.csi_moderator = data_dict.get("csi_moderator", None)
-    dcpr_request.nsif_reviewer = data_dict.get("nsif_reviewer", None)
-
-    dcpr_request.organization_name = data_dict["organization_name"]
-    dcpr_request.organization_level = data_dict["organization_level"]
-    dcpr_request.organization_address = data_dict["organization_address"]
-    dcpr_request.proposed_project_name = data_dict["proposed_project_name"]
-    dcpr_request.additional_project_context = data_dict["additional_project_context"]
-    dcpr_request.capture_start_date = data_dict["capture_start_date"]
-    dcpr_request.capture_end_date = data_dict["capture_end_date"]
-    dcpr_request.cost = data_dict["cost"]
-    dcpr_request.spatial_extent = data_dict.get("spatial_extent", None)
-    dcpr_request.spatial_resolution = data_dict["spatial_resolution"]
-    dcpr_request.data_capture_urgency = data_dict["data_capture_urgency"]
-    dcpr_request.additional_information = data_dict["additional_information"]
-    dcpr_request.nsif_review_date = data_dict.get("nsif_review_date", None)
-    dcpr_request.nsif_recommendation = data_dict.get("nsif_recommendation", None)
-    dcpr_request.nsif_review_notes = data_dict.get("nsif_review_notes", None)
-    dcpr_request.nsif_review_additional_documents = data_dict.get(
-        "nsif_review_additional_documents", None
+    toolkit.check_access(
+        "dcpr_request_claim_csi_moderator_auth", context, validated_data
     )
-    dcpr_request.csi_moderation_notes = data_dict.get("csi_moderation_notes", None)
-    dcpr_request.csi_moderation_additional_documents = data_dict.get(
-        "csi_moderation_additional_documents", None
+    model = context["model"]
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        validated_data["csi_reference_id"]
     )
-    dcpr_request.csi_moderation_date = data_dict.get("csi_moderation_date", None)
-
-    dcpr_request_dataset.dataset_custodian = data_dict.get("dataset_custodian", False)
-    dcpr_request_dataset.data_type = data_dict["data_type"]
-    dcpr_request_dataset.proposed_dataset_title = data_dict["proposed_dataset_title"]
-    dcpr_request_dataset.proposed_abstract = data_dict["proposed_abstract"]
-    dcpr_request_dataset.dataset_purpose = data_dict["dataset_purpose"]
-    dcpr_request_dataset.lineage_statement = data_dict["lineage_statement"]
-    dcpr_request_dataset.associated_attributes = data_dict["associated_attributes"]
-    dcpr_request_dataset.feature_description = data_dict["feature_description"]
-    dcpr_request_dataset.data_usage_restrictions = data_dict["data_usage_restrictions"]
-    dcpr_request_dataset.capture_method = data_dict["capture_method"]
-    dcpr_request_dataset.capture_method_detail = data_dict["capture_method_detail"]
+    if request_obj is not None:
+        next_status = DCPRRequestStatus.UNDER_CSI_REVIEW.value
+        request_obj.status = next_status
+        model.Session.commit()
+    else:
+        raise toolkit.ObjectNotFound
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)

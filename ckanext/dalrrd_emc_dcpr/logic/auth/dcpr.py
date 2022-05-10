@@ -103,10 +103,10 @@ def dcpr_request_show_auth(context: typing.Dict, data_dict: typing.Dict) -> typi
             DCPRRequestStatus.UNDER_NSIF_REVIEW.value,
         )
         if context["auth_user_obj"].id == request_obj.owner_user:
-            # this is the owner, allow
+            # this is the owner, allow regardless of current status
             result["success"] = True
         elif request_obj.status in published_statuses:
-            # request has already been moderated, so everyone can see it
+            # allow, request has already been moderated so everyone can see it
             result["success"] = True
         elif request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value:
             # user is not the owner and the request has not been submitted yet, deny
@@ -140,6 +140,92 @@ def dcpr_request_update_by_owner_auth(
     return dcpr_request_submit_auth(context, data_dict)
 
 
+def dcpr_request_update_by_nsif_auth(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    """Authorize updates of a DCPR request's NSIF-related fields.
+
+    In order for a DCPR request to have its NSIF-related fields be updated, the
+    following conditions must be met:
+
+    - Current user must be member of the NSIF organization
+    - Current status of the DCPR request must be awaiting NSIF moderation
+    - Current status of the DCPR request must be under NSIF moderation and the current
+      user is the reviewer
+
+    """
+
+    result = {"success": False}
+    unauthorized_msg = toolkit._("You are not authorized to update this request")
+    is_nsif_member = toolkit.h["emc_user_is_org_member"](
+        NSIF_ORG_NAME, context["auth_user_obj"]
+    )
+    if is_nsif_member:
+        request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
+        if request_obj is not None:
+            if request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value:
+                # this user will become the reviewer
+                result["success"] = True
+            elif request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value:
+                is_reviewer = request_obj.nsif_reviewer == context["auth_user_obj"].id
+                if is_reviewer:
+                    result["success"] = True
+                else:
+                    result["msg"] = unauthorized_msg
+            else:
+                result["msg"] = toolkit._(
+                    "DCPR request cannot be currently updated by NSIF members"
+                )
+        else:
+            result["msg"] = toolkit._("DCPR request not found")
+    else:
+        result["msg"] = unauthorized_msg
+    return result
+
+
+def dcpr_request_update_by_csi_auth(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    """Authorize updates of a DCPR request's CSI-related fields.
+
+    In order for a DCPR request to have its CSI-related fields be updated, the following
+    conditions must be met:
+
+    - Current user must be member of the CSI organization;
+    - Current status of the DCPR request must be awaiting CSI moderation
+    - Current status of the DCPR request must be under CSI moderation and the current
+      user is the moderator
+
+    """
+
+    result = {"success": False}
+    unauthorized_msg = toolkit._("You are not authorized to update this request")
+    is_csi_member = toolkit.h["emc_user_is_org_member"](
+        CSI_ORG_NAME, context["auth_user_obj"]
+    )
+    if is_csi_member:
+        request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
+        if request_obj is not None:
+            if request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value:
+                # this user will become the reviewer
+                result["success"] = True
+            elif request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
+                is_moderator = request_obj.csi_moderator == context["auth_user_obj"].id
+                if is_moderator:
+                    result["success"] = True
+                else:
+                    result["msg"] = unauthorized_msg
+            else:
+                result["msg"] = toolkit._(
+                    "DCPR request cannot be currently updated by CSI members"
+                )
+        else:
+            result["msg"] = toolkit._("DCPR request not found")
+    else:
+        result["msg"] = unauthorized_msg
+    return result
+
+
 def dcpr_request_submit_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
@@ -147,119 +233,66 @@ def dcpr_request_submit_auth(
     request_obj = dcpr_request.DCPRRequest.get(data_dict["csi_reference_id"])
     result = {"success": False}
     if request_obj is not None:
-        is_owner = context["auth_user_obj"].id == request_obj.owner_user
-        result["success"] = is_owner
+        if request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value:
+            if context["auth_user_obj"].id == request_obj.owner_user:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "Current user is not authorized to submit this DCPR request"
+                )
+        else:
+            result["msg"] = toolkit._("DCPR request cannot currently be submitted")
     else:
         result["msg"] = toolkit._("Request not found")
     return result
 
 
-def dcpr_request_escalate_auth(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+def dcpr_request_nsif_moderate_auth(
+    context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_escalate auth")
+    """DCPR request nsif_reviewer is the only one allowed to moderate it."""
+    request_obj = dcpr_request.DCPRRequest.get(data_dict["csi_reference_id"])
+    result = {"success": False}
+    if request_obj is not None:
+        if request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value:
+            if context["auth_user_obj"].id == request_obj.nsif_reviewer:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "Current user is not authorized to moderate this DCPR request on "
+                    "behalf of the NSIF"
+                )
+        else:
+            result["msg"] = toolkit._(
+                "DCPR request cannot currently be moderated on behalf of the NSIF"
+            )
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
 
-    user = context["auth_user_obj"]
 
-    if not user or not data_dict:
-        return {"success": False}
-
-    request_id = data_dict.get("request_id", None)
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
-
-    if not request_obj:
-        return {"success": False, "msg": toolkit._("Request not found")}
-
-    nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
-    request_submitted = (
-        request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-    )
-
-    return {"success": nsif_reviewer and request_submitted}
-
-
-def dcpr_request_accept_auth(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+def dcpr_request_csi_moderate_auth(
+    context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_accept auth")
-
-    user = context["auth_user_obj"]
-
-    if not user or not data_dict:
-        return {"success": False}
-
-    request_id = data_dict.get("request_id", None)
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
-
-    if not request_obj:
-        return {"success": False, "msg": toolkit._("Request not found")}
-
-    csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
-    request_escalated_to_csi = (
-        request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value
-    )
-
-    return {
-        "success": csi_reviewer and request_escalated_to_csi,
-    }
-
-
-def dcpr_request_reject_auth(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
-) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_reject auth")
-
-    user = context["auth_user_obj"]
-
-    if not user or not data_dict:
-        return {"success": False}
-
-    request_id = data_dict.get("request_id", None)
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
-
-    if not request_obj:
-        return {"success": False, "msg": toolkit._("Request not found")}
-
-    nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
-    csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
-
-    request_escalated_to_csi = (
-        request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value
-    )
-    request_submitted = (
-        request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-    )
-
-    return {
-        "success": (csi_reviewer and request_escalated_to_csi)
-        or (nsif_reviewer and request_submitted)
-    }
-
-
-def dcpr_request_edit_auth(
-    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
-) -> typing.Dict:
-    logger.debug("Inside the dcpr_request_edit auth")
-    user = context["auth_user_obj"]
-
-    if not user or not data_dict:
-        return {"success": False}
-
-    request_id = data_dict.get("id", None)
-
-    request_obj = dcpr_request.DCPRRequest.get(csi_reference_id=request_id)
-
-    if not request_obj:
-        return {"success": False, "msg": toolkit._("Request not found")}
-
-    owner = user.id == request_obj.owner_user
-    nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
-    csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", user, role="editor")
-
-    if not owner and not nsif_reviewer and not csi_reviewer:
-        return {"success": False}
-
-    return {"success": True}
+    """DCPR request csi_moderator is the only one allowed to moderate it."""
+    request_obj = dcpr_request.DCPRRequest.get(data_dict["csi_reference_id"])
+    result = {"success": False}
+    if request_obj is not None:
+        if request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
+            if context["auth_user_obj"].id == request_obj.csi_moderator:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "Current user is not authorized to moderate this DCPR request on "
+                    "behalf of the CSI"
+                )
+        else:
+            result["msg"] = toolkit._(
+                "DCPR request cannot currently be moderated on behalf of the CSI"
+            )
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
 
 
 def dcpr_request_delete_auth(
@@ -281,6 +314,62 @@ def dcpr_request_delete_auth(
         )
         if is_owner and request_in_preparation:
             result["success"] = True
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
+
+
+def dcpr_request_claim_nsif_reviewer_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    """Check whether current user can claim the role of NSIF reviewer for a DCPR request"""
+    request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
+    request_obj = dcpr_request.DCPRRequest.get(request_id)
+    result = {"suceess": False}
+    if request_obj is not None:
+        is_nsif_member = toolkit.h["emc_user_is_org_member"](
+            NSIF_ORG_NAME, context["auth_user_obj"]
+        )
+        if is_nsif_member:
+            if request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "DCPR request cannot currently be claimed for NSIF review"
+                )
+        else:
+            result["msg"] = toolkit._(
+                "Current user is not authorized to claim the role of NSIF reviewer "
+                "for this DCPR request"
+            )
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
+
+
+def dcpr_request_claim_csi_moderator_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    """Check whether current user can claim the role of CSI moderator for a DCPR request"""
+    request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
+    request_obj = dcpr_request.DCPRRequest.get(request_id)
+    result = {"suceess": False}
+    if request_obj is not None:
+        is_csi_member = toolkit.h["emc_user_is_org_member"](
+            CSI_ORG_NAME, context["auth_user_obj"]
+        )
+        if is_csi_member:
+            if request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "DCPR request cannot currently be claimed for CSI review"
+                )
+        else:
+            result["msg"] = toolkit._(
+                "Current user is not authorized to claim the role of CSI moderator "
+                "for this DCPR request"
+            )
     else:
         result["msg"] = toolkit._("Request not found")
     return result
