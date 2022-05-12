@@ -12,6 +12,7 @@ from ckan.views import dataset as ckan_dataset_views
 
 from ..helpers import get_status_labels
 from ..model.dcpr_request import DCPRRequestOrganizationLevel, DCPRRequestUrgency
+from ..constants import DCPRRequestStatus
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +28,22 @@ def get_public_dcpr_requests():
         data_dict={}
     )
     extra_vars = {
-        "public_requests": existing_public_requests,
+        "dcpr_requests": existing_public_requests,
         "statuses": get_status_labels(),
     }
-    return toolkit.render("dcpr/index.html", extra_vars=extra_vars)
+    return toolkit.render("dcpr/list.html", extra_vars=extra_vars)
 
 
-@dcpr_blueprint.route("/unsubmitted-dcpr-requests")
-def get_unsubmitted_dcpr_requests():
-    raise NotImplementedError
+@dcpr_blueprint.route("/my-dcpr-requests")
+def get_my_dcpr_requests():
+    dcpr_requests = toolkit.get_action("my_dcpr_request_list")(
+        context={"user": toolkit.g.user}
+    )
+    extra_vars = {
+        "dcpr_requests": dcpr_requests,
+        "statuses": get_status_labels(),
+    }
+    return toolkit.render("dcpr/list.html", extra_vars=extra_vars)
 
 
 @dcpr_blueprint.route("/awaiting-csi-moderation-dcpr-requests")
@@ -52,9 +60,6 @@ class DcprRequestCreateView(MethodView):
     def get(self, data=None, errors=None, error_summary=None):
         toolkit.check_access("dcpr_request_create_auth", {"user": toolkit.g.user})
         org_name = request.args.get("organization")
-        logger.info(f"{org_name=}")
-        logger.info(f"{data=}")
-
         data_to_show = data or clean_dict(
             dict_fns.unflatten(
                 tuplize_dict(parse_params(request.args, ignore_keys=CACHE_PARAMETERS))
@@ -65,7 +70,6 @@ class DcprRequestCreateView(MethodView):
         logger.info(f"{data_to_show=}")
         logger.info(f"{serialized_errors=}")
         logger.info(f"{serialized_error_summary=}")
-
         extra_vars = {
             "dcpr_request": None,
             "data": data_to_show,
@@ -87,10 +91,14 @@ class DcprRequestCreateView(MethodView):
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
         else:
-            data_dict["owner_user"] = toolkit.g.userobj.id
+            data_dict["organization_id"] = request.args.get("organization_id")
             try:
                 dcpr_request = toolkit.get_action("dcpr_request_create")(
-                    context={"user": toolkit.g.user}, data_dict=data_dict
+                    context={
+                        "user": toolkit.g.user,
+                        "auth_user_obj": toolkit.g.userobj,
+                    },
+                    data_dict=data_dict,
                 )
             except toolkit.ObjectNotFound:
                 result = toolkit.abort(404, toolkit._("DCPR request not found"))
@@ -105,7 +113,8 @@ class DcprRequestCreateView(MethodView):
                 # )
             else:
                 url = toolkit.h.url_for(
-                    "dcpr.dcpr_request_show", request_id=dcpr_request.csi_reference_id
+                    "dcpr.dcpr_request_show",
+                    request_id=dcpr_request["csi_reference_id"],
                 )
                 result = toolkit.h.redirect_to(url)
         return result
@@ -115,11 +124,32 @@ new_dcpr_request_view = DcprRequestCreateView.as_view("new_dcpr_request")
 dcpr_blueprint.add_url_rule("/request/new/", view_func=new_dcpr_request_view)
 
 
-@dcpr_blueprint.route("/request/<request_id>")
-def dcpr_request_show(request_id):
+@dcpr_blueprint.route("/request/<csi_reference_id>")
+def dcpr_request_show(csi_reference_id):
     logger.debug("Inside the dcpr_request_show view")
-    data_dict = {"id": request_id}
-    extra_vars = {}
+    try:
+        dcpr_request = toolkit.get_action("dcpr_request_show")(
+            context={}, data_dict={"csi_reference_id": csi_reference_id}
+        )
+    except toolkit.ObjectNotFound:
+        result = toolkit.abort(404, toolkit._("DCPR request not found"))
+    except toolkit.NotAuthorized:
+        result = toolkit.base.abort(401, toolkit._("Not authorized"))
+    else:
+
+        is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+            "nsif", toolkit.g.userobj
+        )
+        is_csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", toolkit.g.userobj)
+
+        extra_vars = {
+            "dcpr_request": dcpr_request,
+            "is_owner": dcpr_request["owner_user"] == toolkit.g.userobj.id,
+            "is_nsif_reviewer": is_nsif_reviewer,
+            "is_csi_reviewer": is_csi_reviewer,
+        }
+        result = toolkit.render("dcpr/show.html", extra_vars=extra_vars)
+    return result
 
 
 #     extra_vars["request_status"] = get_status_labels()

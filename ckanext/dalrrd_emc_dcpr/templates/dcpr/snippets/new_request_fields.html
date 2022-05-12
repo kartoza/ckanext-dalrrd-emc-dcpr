@@ -136,7 +136,7 @@
         {{ form.info(_('Proposed title for the dataset being collected.')) }}
     {% endcall %}
 
-    {% call form.input(
+    {% call form.markdown(
         'proposed_dataset_abstract',
         label=_('Proposed dataset abstract'),
         id='field-proposed_dataset_abstract',
@@ -147,7 +147,7 @@
         {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
     {% endcall %}
 
-    {% call form.input(
+    {% call form.markdown(
         'dataset_purpose',
         label=_('Purpose of the dataset'),
         id='field-dataset_purpose',
@@ -158,7 +158,7 @@
         {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
     {% endcall %}
 
-    {% call form.input(
+    {% call form.markdown(
         'dataset_lineage',
         label=_('Dataset lineage statement'),
         id='field-dataset_lineage',

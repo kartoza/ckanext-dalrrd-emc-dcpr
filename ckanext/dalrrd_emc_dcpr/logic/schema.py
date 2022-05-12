@@ -15,6 +15,7 @@ def create_dcpr_request_schema(
     is_positive_integer,
     isodate,
     convert_group_name_or_id_to_id,
+    dcpr_end_date_after_start_date_validator,
 ):
     return {
         "proposed_project_name": [not_empty, not_missing, unicode_safe],
@@ -25,7 +26,11 @@ def create_dcpr_request_schema(
             convert_group_name_or_id_to_id,
         ],
         "additional_project_context": [ignore_missing, unicode_safe],
-        "capture_start_date": [not_empty, isodate],
+        "capture_start_date": [
+            not_empty,
+            isodate,
+            dcpr_end_date_after_start_date_validator,
+        ],
         "capture_end_date": [not_empty, isodate],
         "cost": [not_missing, not_empty, is_positive_integer],
         "spatial_extent": [ignore_missing, unicode_safe],

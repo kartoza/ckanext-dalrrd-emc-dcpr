@@ -9,6 +9,11 @@ from ckan.lib.navl.dictization_functions import (
 logger = logging.getLogger(__name__)
 
 
+def dcpr_end_date_after_start_date_validator(key, flattened_data, errors, context):
+    """Validator that checks that start and end dates are consistent"""
+    logger.debug(f"{flattened_data=}")
+
+
 def emc_value_or_true_validator(value: typing.Union[str, Missing]):
     """Validator that provides a default value of `True` when the input is None.
 

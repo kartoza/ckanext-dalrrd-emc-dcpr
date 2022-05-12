@@ -51,7 +51,7 @@
                     {% endif %}
                 {% endblock %}
             {% elif not dcpr_request %}
-                <input type="submit" class="btn btn-primary" value="{{ _('Save DCPR request') }}">
+                <input type="submit" class="btn btn-primary" value="{{ _('Save') }}">
             {% else %}
                 <input type="submit" class="btn btn-secondary" value="{{ _('Save DCPR request privately') }}">
                 <input type="submit" class="btn btn-primary" action="{{ h.url_for('dcpr.dcpr_request_submit') }}" value="{{ _('Submit DCPR request for moderation') }}">

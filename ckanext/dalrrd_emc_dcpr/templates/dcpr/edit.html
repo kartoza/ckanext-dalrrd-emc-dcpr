@@ -1,5 +1,21 @@
 {% extends 'page.html' %}
 
+{% block subtitle %}
+    {% if dcpr_request %}
+        {{ _('Edit DCPR request') }}
+    {% else %}
+        {{ _('Create DCPR request') }}
+    {% endif %}
+{% endblock %}
+
+{% block page_header %}
+    {% if dcpr_request %}
+        <h1>{{ _('Edit DCPR request') }}</h1>
+    {% else %}
+        <h1>{{ _('Create new DCPR request') }}</h1>
+    {% endif %}
+{% endblock %}
+
 {% block primary_content_inner %}
     {% block form %}
         {% snippet 'dcpr/snippets/request_form.html',
@@ -22,9 +38,9 @@
                   </h4>
           </div>
           <div class="panel-body">
-              <p>
-                  DCPR Requests are requests for data submitted by users that need the
-                  requested data in the EMC system.
+              <p>The Data Capture Project Registry (DCPR) provides a mechanism by which SASDI stakeholders can request
+                  that new geospatial data collecting missions be managed more efficiently by the central
+                  SASDI-governing institutions.
               </p>
           </div>
       </div>

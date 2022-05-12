@@ -1,30 +1,314 @@
-{% extends "dcpr/show_base.html" %}
+{% extends "page.html" %}
 
-{% set status = request_status[dcpr_request.status] %}
+{% block title %} {{ dcpr_request.proposed_project_name }} - {{ super() }}{% endblock %}
+
+{% block head_extras -%}
+  {{ super() }}
+  {% set description = h.markdown_extract(dcpr_request.notes, extract_length=200)|forceescape %}
+  <meta property="og:title" content="{{ dcpr_request.proposed_project_name  }} - {{ g.site_title }}">
+  <meta property="og:description" content="{{ description|forceescape|trim }}">
+{% endblock -%}
+
+{% block secondary_content %}
+    {% snippet 'dcpr/snippets/info.html', dcpr_requests=dcpr_requests %}
+{% endblock %}
 
 {% block primary_content_inner %}
-  {{ super() }}
-  {% block package_description %}
-    <h1>
-      {% block page_heading %}
-        <span class="text-muted">{{_('Opened by')}} {{ dcpr_request.organization_name }}  </span> {{ _('Organization')}}
-      {% endblock %}
-    </h1>
-    {% block edit_link %}
+    <h1>{{ dcpr_request.proposed_project_name }}</h1>
     {% if request_owner or nsif_reviewer or csi_reviewer %}
-       <div class="col-md-12">
-         <div>
-          <a class="btn pull-right" href="{{ h.url_for('%s.dcpr_request_edit' % dcpr_request.type, request_id=dcpr_request.csi_reference_id) }}">
-           {{ _('Edit Request') }}
-          </a>
-         </div>
-      </div>
+        <div class="col-md-12">
+            <div>
+                <a class="btn pull-right" href="{{ h.url_for('%s.dcpr_request_edit' % dcpr_request.type, request_id=dcpr_request.csi_reference_id) }}">
+                    {{ _('Edit Request') }}
+                </a>
+            </div>
+        </div>
     {% endif %}
-    {% endblock %}
-  {% endblock %}
+    <section class="additional-info">
+        <h3>{{ _('Request information') }}</h3>
+        <table class="table table-striped table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th scope="col">{{ _('Field') }}</th>
+                <th scope="col">{{ _('Value') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% block package_additional_info %}
+                {% if dcpr_request.status %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _('Status') }} </th>
+                        <td class="dataset-details" property="foaf:homepage"> <span class="text-{{dcpr_request.status}}">{{ dcpr_request.status }}</span></td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.organization_name %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _('Organization Name') }}</th>
+                        <td class="dataset-details" property="foaf:homepage">{{ dcpr_request.organization_name }}</td>
+                    </tr>
+                {% endif %}
 
-  {% block package_additional_info %}
-      {% snippet 'dcpr/snippets/request_info.html', dcpr_request=dcpr_request, status=status%}
-  {% endblock %}
+                {% if dcpr_request.organization_level %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Organization Level") }}</th>
+                        <td class="dataset-details" property="dc:creator">{{ dcpr_request.organization_level }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if dcpr_request.organization_address %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _('Organization Address') }}</th>
+                        <td class="dataset-details" property="dc:contributor">{{ dcpr_request.organization_address }}</td>
+                    </tr>
+                {% endif %}
+
+                {% if dcpr_request.proposed_project_name %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Proposed project name") }}</th>
+                        <td class="dataset-details">{{ dcpr_request.proposed_project_name }}</td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.additional_project_context %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Additional project context") }}</th>
+                        <td class="dataset-details">
+                            {{ additional_project_context }}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if dcpr_request.capture_start_date %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Capture start date") }}</th>
+
+                        <td class="dataset-details">
+                            {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.capture_start_date %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.capture_end_date %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Capture end date") }}</th>
+                        <td class="dataset-details">
+                            {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.capture_end_date %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if dcpr_request.cost %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Cost") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.cost }}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if dcpr_request.spatial_extent %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Spatial extent") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.spatial_extent }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.spatial_resolution %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Spatial resolution") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.spatial_resolution }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.data_capture_urgency %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Data capture urgency") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.data_capture_urgency }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.additional_information %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Additional information") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.additional_information }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.additional_documents %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Additional documents") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.additional_documents }}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if dcpr_request.request_date %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Request date") }}</th>
+                        <td class="dataset-details">
+                            {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.request_date %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.submission_date %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Submission date") }}</th>
+                        <td class="dataset-details">
+                            {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.submission_date %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.nsif_review_date %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("NSIF review date") }}</th>
+                        <td class="dataset-details">
+                            {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.nsif_review_date %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.nsif_recommendation %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("NSIF recommendation") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.nsif_recommendation }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.nsif_review_notes %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("NSIF review notes") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.nsif_review_notes }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.nsif_review_additional_documents %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("NSIF review additional documents") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.nsif_review_additional_documents }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.csi_moderation_notes %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("CSI moderation notes") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.csi_moderation_notes }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.csi_moderation_additional_documents %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("CSI moderation additional documents") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.csi_moderation_additional_documents }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.csi_moderation_date %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("CSI moderation date") }}</th>
+                        <td class="dataset-details">
+                            {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.csi_moderation_date %}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.dataset_custodian %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Dataset custodian") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.dataset_custodian }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.data_type %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Data type") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.data_type }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.proposed_dataset_title %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Proposed dataset title") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.proposed_dataset_title }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.proposed_abstract %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Proposed abstract") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.proposed_abstract }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.dataset_purpose %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Dataset purpose") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.dataset_purpose }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.lineage_statement %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Lineage statement") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.lineage_statement }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.associated_attributes %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Associated attributes") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.associated_attributes }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.feature_description %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Features description") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.feature_description }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.data_usage_restrictions %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Data usage restrictions") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.data_usage_restrictions }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.capture_method %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Capture method") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.capture_method }}
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if dcpr_request.capture_method_detail %}
+                    <tr>
+                        <th scope="row" class="dataset-label">{{ _("Capture method detail") }}</th>
+                        <td class="dataset-details">
+                            {{ dcpr_request.capture_method_detail }}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endblock %}
+            </tbody>
+        </table>
+    </section>
+
 
 {% endblock %}
