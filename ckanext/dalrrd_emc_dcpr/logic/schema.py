@@ -167,3 +167,13 @@ def claim_nsif_reviewer_schema():
 @validator_args
 def claim_csi_moderator_schema():
     return show_dcpr_request_schema()
+
+
+@validator_args
+def resign_nsif_reviewer_schema():
+    return show_dcpr_request_schema()
+
+
+@validator_args
+def resign_csi_moderator_schema():
+    return show_dcpr_request_schema()

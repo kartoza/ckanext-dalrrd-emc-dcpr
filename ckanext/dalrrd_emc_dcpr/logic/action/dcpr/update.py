@@ -214,6 +214,7 @@ def claim_dcpr_request_nsif_reviewer(
         model.Session.commit()
     else:
         raise toolkit.ObjectNotFound
+    # TODO: would be nice to add an activity here
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
@@ -238,4 +239,55 @@ def claim_dcpr_request_csi_moderator(
         model.Session.commit()
     else:
         raise toolkit.ObjectNotFound
+    # TODO: would be nice to add an activity here
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)
+
+
+def resign_dcpr_request_nsif_reviewer(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    schema = dcpr_schema.resign_nsif_reviewer_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
+
+    toolkit.check_access(
+        "dcpr_request_resign_nsif_moderator_auth", context, validated_data
+    )
+    model = context["model"]
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        validated_data["csi_reference_id"]
+    )
+    if request_obj is not None:
+        next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        request_obj.status = next_status
+        model.Session.commit()
+    else:
+        raise toolkit.ObjectNotFound
+    # TODO: would be nice to add an activity here
+    return toolkit.get_action("dcpr_request_show")(context, validated_data)
+
+
+def resign_dcpr_request_csi_reviewer(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    schema = dcpr_schema.resign_csi_moderator_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
+
+    toolkit.check_access(
+        "dcpr_request_resign_csi_moderator_auth", context, validated_data
+    )
+    model = context["model"]
+    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
+        validated_data["csi_reference_id"]
+    )
+    if request_obj is not None:
+        next_status = DCPRRequestStatus.AWAITING_CSI_REVIEW.value
+        request_obj.status = next_status
+        model.Session.commit()
+    else:
+        raise toolkit.ObjectNotFound
+    # TODO: would be nice to add an activity here
     return toolkit.get_action("dcpr_request_show")(context, validated_data)

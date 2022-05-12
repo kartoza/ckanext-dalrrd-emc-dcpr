@@ -8,6 +8,12 @@ from ...constants import DCPRRequestStatus, CSI_ORG_NAME, NSIF_ORG_NAME
 logger = logging.getLogger(__name__)
 
 
+def my_dcpr_request_list_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+):
+    return {"success": True}
+
+
 def dcpr_request_list_private_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ):
@@ -370,6 +376,68 @@ def dcpr_request_claim_csi_moderator_auth(
                 "Current user is not authorized to claim the role of CSI moderator "
                 "for this DCPR request"
             )
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
+
+
+def dcpr_request_resign_nsif_moderator_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    """
+    Check whether current user can resign from role of NSIF moderator of a DCPR request
+    """
+
+    request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
+    request_obj = dcpr_request.DCPRRequest.get(request_id)
+    result = {"success": False}
+    if request_obj is not None:
+        if request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value:
+            # TODO: Should probably also check for sysadmins, as they ought to be
+            #  allowed to perform this action
+            is_current_nsif_reviewer = (
+                request_obj.nsif_reviewer == context["auth_user_obj"].id
+            )
+            if is_current_nsif_reviewer:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "Current user is not authorized to resign from the role of NSIF "
+                    "moderator for this DCPR request"
+                )
+        else:
+            result["msg"] = toolkit._("DCPR request is not currently under NSIF review")
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
+
+
+def dcpr_request_resign_csi_moderator_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    """
+    Check whether current user can resign from role of CSI moderator of a DCPR request
+    """
+
+    request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
+    request_obj = dcpr_request.DCPRRequest.get(request_id)
+    result = {"success": False}
+    if request_obj is not None:
+        if request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
+            # TODO: Should probably also check for sysadmins, as they ought to be
+            #  allowed to perform this action
+            is_current_csi_moderator = (
+                request_obj.csi_moderator == context["auth_user_obj"].id
+            )
+            if is_current_csi_moderator:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "Current user is not authorized to resign from the role of CSI "
+                    "moderator for this DCPR request"
+                )
+        else:
+            result["msg"] = toolkit._("DCPR request is not currently under CSI review")
     else:
         result["msg"] = toolkit._("Request not found")
     return result

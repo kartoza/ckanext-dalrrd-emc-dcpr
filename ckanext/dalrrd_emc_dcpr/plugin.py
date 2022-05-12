@@ -220,6 +220,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_patch": ckan_auth.package_patch,
             "dcpr_error_report_create_auth": dcpr_auth.dcpr_report_create_auth,
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
+            "my_dcpr_request_list_auth": dcpr_auth.my_dcpr_request_list_auth,
             "dcpr_request_list_public_auth": dcpr_auth.dcpr_request_list_public_auth,
             "dcpr_request_list_private_auth": dcpr_auth.dcpr_request_list_private_auth,
             "dcpr_request_list_pending_csi_auth": (
@@ -260,6 +261,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 dcpr_create_actions.dcpr_geospatial_request_create
             ),
             "dcpr_request_list_public": dcpr_get_actions.dcpr_request_list_public,
+            "my_dcpr_request_list": dcpr_get_actions.my_dcpr_request_list,
+            # TODO: This action does not seem to be needed
             "dcpr_request_list_private": dcpr_get_actions.dcpr_request_list_private,
             "dcpr_request_list_awaiting_csi_moderation": (
                 dcpr_get_actions.dcpr_request_list_awaiting_csi_moderation
@@ -274,6 +277,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_request_update_by_csi": dcpr_update_actions.dcpr_request_update_by_csi,
             "claim_dcpr_request_nsif_reviewer": dcpr_update_actions.claim_dcpr_request_nsif_reviewer,
             "claim_dcpr_request_csi_moderator": dcpr_update_actions.claim_dcpr_request_csi_moderator,
+            "resign_dcpr_request_nsif_reviewer": dcpr_update_actions.resign_dcpr_request_nsif_reviewer,
+            "resign_dcpr_request_csi_reviewer": dcpr_update_actions.resign_dcpr_request_csi_reviewer,
             "dcpr_request_nsif_moderate": dcpr_update_actions.dcpr_request_nsif_moderate,
             "dcpr_request_csi_moderate": dcpr_update_actions.dcpr_request_csi_moderate,
             "dcpr_request_delete": dcpr_delete_actions.dcpr_request_delete,

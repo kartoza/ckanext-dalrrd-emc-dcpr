@@ -43,7 +43,7 @@ def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dic
 
     # vanilla ckan's table_dict_save expects the input data_dict to have an `id` key,
     # otherwise it will not be able to find pre-existing table rows
-    validated_data_dict["id"] = validated_data_dict["csi_reference_id"]
+    validated_data_dict["id"] = validated_data_dict.get("csi_reference_id")
 
     dcpr_request = ckan_dictization.table_dict_save(
         validated_data_dict, dcpr_request_model.DCPRRequest, context

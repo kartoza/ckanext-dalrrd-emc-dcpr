@@ -49,6 +49,21 @@ def dcpr_request_list_public(
 
 
 @toolkit.side_effect_free
+def my_dcpr_request_list(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.List[typing.Dict]:
+    toolkit.check_access("my_dcpr_request_list_auth", context, data_dict)
+    query = (
+        context["model"]
+        .Session.query(dcpr_request.DCPRRequest)
+        .filter(dcpr_request.DCPRRequest.owner_user == context["auth_user_obj"].id)
+        .limit(data_dict.get("limit", 10))
+        .offset(data_dict.get("offset", 0))
+    )
+    return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]
+
+
+@toolkit.side_effect_free
 def dcpr_request_list_private(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List[typing.Dict]:
