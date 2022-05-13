@@ -13,50 +13,25 @@
 {% endif %}
 
 <form class="dataset-form" method="post" data-module="basic-form" novalidate>
-    {% if dcpr_request %}
-        <input type="hidden" name="request_id" value="{{ dcpr_request.csi_reference_id }}" />
-        <input type="hidden" name="owner_user" value="{{ dcpr_request.owner_user }}" />
-    {% endif %}
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
     {% block fields %}
         {% snippet 'dcpr/snippets/new_request_fields.html', data=data, errors=errors, data_urgency_options=data_urgency %}
     {% endblock %}
     {% block form_actions %}
         <div class="form-actions">
-            {% if dcpr_request and not errors %}
-                {% block save_actions_button %}
-                    {% if is_owner and not immutable %}
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/submit/{{request_id}}";'>{{ _('Submit') }}</button>
-                        {% block delete_button %}
-                            {% if not errors and  h.check_access('dcpr_request_delete_auth', {'request_id': dcpr_request.csi_reference_id}) %}
-                                <a
-                                        class="btn btn-danger pull-left"
-                                        href="{% url_for 'dcpr' ~ '.dcpr_request_delete', request_id=dcpr_request.csi_reference_id %}"
-                                        data-module="confirm-action"
-                                        data-module-content="{{ _('Are you sure you want to delete this dataset?') }}"
-                                >
-                                    {% block delete_button_text %}{{ _('Delete') }}{% endblock %}
-                                </a>
-                            {% endif %}
-                        {% endblock %}
-                    {% elif nsif_review_ready %}
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/escalate/{{request_id}}";'>{{ _('Escalate to CSI') }}</button>
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
-                    {% elif csi_review_ready %}
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/update/{{request_id}}";'>{{ _('Save') }}</button>
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/accept/{{request_id}}";'>{{ _('Accept') }}</button>
-                        <button class="btn btn-primary" type="submit" onclick='this.form.action="/dcpr/request/reject/{{request_id}}";'>{{ _('Reject') }}</button>
-                    {% endif %}
-                {% endblock %}
-            {% elif not dcpr_request %}
-                <input type="submit" class="btn btn-primary" value="{{ _('Save') }}">
-            {% else %}
-                <input type="submit" class="btn btn-secondary" value="{{ _('Save DCPR request privately') }}">
-                <input type="submit" class="btn btn-primary" action="{{ h.url_for('dcpr.dcpr_request_submit') }}" value="{{ _('Submit DCPR request for moderation') }}">
+            {% if csi_reference_id and h.check_access("dcpr_request_delete_auth", {"csi_reference_id": csi_reference_id}) %}
+                {% link_for _('Delete DCPR request'),
+                    named_route="dcpr.dcpr_request_delete",
+                    csi_reference_id=csi_reference_id,
+                    class_='btn btn-danger pull-left',
+                    icon='trash'
+                %}
             {% endif %}
+            <input type="submit" class="btn btn-primary" value="{{ _('Save') }}">
             {{ form.required_message() }}
         </div>
     {% endblock %}
 </form>
+
+{#data-module="confirm-action",#}
+{#data-module-content="{{ _('Are you sure you want to delete this DCPR request?') }}"#}

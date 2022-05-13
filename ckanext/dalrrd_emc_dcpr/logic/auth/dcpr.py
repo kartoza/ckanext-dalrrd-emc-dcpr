@@ -154,38 +154,28 @@ def dcpr_request_update_by_nsif_auth(
     In order for a DCPR request to have its NSIF-related fields be updated, the
     following conditions must be met:
 
-    - Current user must be member of the NSIF organization
-    - Current status of the DCPR request must be awaiting NSIF moderation
     - Current status of the DCPR request must be under NSIF moderation and the current
       user is the reviewer
 
     """
 
     result = {"success": False}
-    unauthorized_msg = toolkit._("You are not authorized to update this request")
-    is_nsif_member = toolkit.h["emc_user_is_org_member"](
-        NSIF_ORG_NAME, context["auth_user_obj"]
-    )
-    if is_nsif_member:
-        request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
-        if request_obj is not None:
-            if request_obj.status == DCPRRequestStatus.AWAITING_NSIF_REVIEW.value:
-                # this user will become the reviewer
+    request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
+    if request_obj is not None:
+        if request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value:
+            is_reviewer = request_obj.nsif_reviewer == context["auth_user_obj"].id
+            if is_reviewer:
                 result["success"] = True
-            elif request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value:
-                is_reviewer = request_obj.nsif_reviewer == context["auth_user_obj"].id
-                if is_reviewer:
-                    result["success"] = True
-                else:
-                    result["msg"] = unauthorized_msg
             else:
                 result["msg"] = toolkit._(
-                    "DCPR request cannot be currently updated by NSIF members"
+                    "You are not authorized to update this request"
                 )
         else:
-            result["msg"] = toolkit._("DCPR request not found")
+            result["msg"] = toolkit._(
+                "DCPR request cannot be currently updated by NSIF members"
+            )
     else:
-        result["msg"] = unauthorized_msg
+        result["msg"] = toolkit._("DCPR request not found")
     return result
 
 
@@ -205,30 +195,22 @@ def dcpr_request_update_by_csi_auth(
     """
 
     result = {"success": False}
-    unauthorized_msg = toolkit._("You are not authorized to update this request")
-    is_csi_member = toolkit.h["emc_user_is_org_member"](
-        CSI_ORG_NAME, context["auth_user_obj"]
-    )
-    if is_csi_member:
-        request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
-        if request_obj is not None:
-            if request_obj.status == DCPRRequestStatus.AWAITING_CSI_REVIEW.value:
-                # this user will become the reviewer
+    request_obj = dcpr_request.DCPRRequest.get(data_dict.get("csi_reference_id"))
+    if request_obj is not None:
+        if request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
+            is_moderator = request_obj.csi_moderator == context["auth_user_obj"].id
+            if is_moderator:
                 result["success"] = True
-            elif request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
-                is_moderator = request_obj.csi_moderator == context["auth_user_obj"].id
-                if is_moderator:
-                    result["success"] = True
-                else:
-                    result["msg"] = unauthorized_msg
             else:
                 result["msg"] = toolkit._(
-                    "DCPR request cannot be currently updated by CSI members"
+                    "You are not authorized to update this request"
                 )
         else:
-            result["msg"] = toolkit._("DCPR request not found")
+            result["msg"] = toolkit._(
+                "DCPR request cannot be currently updated by CSI members"
+            )
     else:
-        result["msg"] = unauthorized_msg
+        result["msg"] = toolkit._("DCPR request not found")
     return result
 
 
@@ -331,7 +313,7 @@ def dcpr_request_claim_nsif_reviewer_auth(
     """Check whether current user can claim the role of NSIF reviewer for a DCPR request"""
     request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
     request_obj = dcpr_request.DCPRRequest.get(request_id)
-    result = {"suceess": False}
+    result = {"success": False}
     if request_obj is not None:
         is_nsif_member = toolkit.h["emc_user_is_org_member"](
             NSIF_ORG_NAME, context["auth_user_obj"]
@@ -359,7 +341,7 @@ def dcpr_request_claim_csi_moderator_auth(
     """Check whether current user can claim the role of CSI moderator for a DCPR request"""
     request_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
     request_obj = dcpr_request.DCPRRequest.get(request_id)
-    result = {"suceess": False}
+    result = {"success": False}
     if request_obj is not None:
         is_csi_member = toolkit.h["emc_user_is_org_member"](
             CSI_ORG_NAME, context["auth_user_obj"]

@@ -31,6 +31,7 @@ def dcpr_request_list_public(
 ) -> typing.List:
     """Return a list of public DCPR requests."""
     toolkit.check_access("dcpr_request_list_public_auth", context, data_dict)
+    data_ = data_dict if data_dict is not None else {}
     public_statuses = (
         DCPRRequestStatus.ACCEPTED.value,
         DCPRRequestStatus.REJECTED.value,
@@ -39,8 +40,8 @@ def dcpr_request_list_public(
         context["model"]
         .Session.query(dcpr_request.DCPRRequest)
         .filter(dcpr_request.DCPRRequest.status.in_(public_statuses))
-        .limit(data_dict.get("limit", 10))
-        .offset(data_dict.get("offset", 0))
+        .limit(data_.get("limit", 10))
+        .offset(data_.get("offset", 0))
     )
     return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]
 
@@ -67,14 +68,15 @@ def dcpr_request_list_private(
 ) -> typing.List[typing.Dict]:
     """Return a list of private DCPR requests"""
     toolkit.check_access("dcpr_request_list_private_auth", context, data_dict)
+    data_ = data_dict if data_dict is not None else {}
     query = (
         context["model"]
         .Session.query(dcpr_request.DCPRRequest)
         .filter(
             dcpr_request.DCPRRequest.status == DCPRRequestStatus.UNDER_PREPARATION.value
         )
-        .limit(data_dict.get("limit", 10))
-        .offset(data_dict.get("offset", 0))
+        .limit(data_.get("limit", 10))
+        .offset(data_.get("offset", 0))
     )
     return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]
 
@@ -85,6 +87,7 @@ def dcpr_request_list_awaiting_csi_moderation(
 ) -> typing.List:
     """Return a list of DCPR requests that are awaiting moderation by CSI members."""
     toolkit.check_access("dcpr_request_list_pending_csi_auth", context, data_dict)
+    data_ = data_dict if data_dict is not None else {}
     csi_statuses = (
         DCPRRequestStatus.AWAITING_CSI_REVIEW.value,
         DCPRRequestStatus.UNDER_CSI_REVIEW.value,
@@ -93,8 +96,8 @@ def dcpr_request_list_awaiting_csi_moderation(
         context["model"]
         .Session.query(dcpr_request.DCPRRequest)
         .filter(dcpr_request.DCPRRequest.status.in_(csi_statuses))
-        .limit(data_dict.get("limit", 10))
-        .offset(data_dict.get("offset", 0))
+        .limit(data_.get("limit", 10))
+        .offset(data_.get("offset", 0))
     )
     return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]
 
@@ -105,6 +108,7 @@ def dcpr_request_list_awaiting_nsif_moderation(
 ) -> typing.List:
     """Return a list of DCPR requests that are awaiting moderation by NSIF members."""
     toolkit.check_access("dcpr_request_list_pending_nsif_auth", context, data_dict)
+    data_ = data_dict if data_dict is not None else {}
     nsif_statuses = (
         DCPRRequestStatus.AWAITING_NSIF_REVIEW.value,
         DCPRRequestStatus.UNDER_NSIF_REVIEW.value,
@@ -113,7 +117,7 @@ def dcpr_request_list_awaiting_nsif_moderation(
         context["model"]
         .Session.query(dcpr_request.DCPRRequest)
         .filter(dcpr_request.DCPRRequest.status.in_(nsif_statuses))
-        .limit(data_dict.get("limit", 10))
-        .offset(data_dict.get("offset", 0))
+        .limit(data_.get("limit", 10))
+        .offset(data_.get("offset", 0))
     )
     return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]

@@ -1,29 +1,36 @@
 {% extends 'page.html' %}
 
 {% block subtitle %}
-    {% if dcpr_request %}
+    {% if csi_reference_id %}
         {{ _('Edit DCPR request') }}
     {% else %}
         {{ _('Create DCPR request') }}
     {% endif %}
 {% endblock %}
 
-{% block page_header %}
-    {% if dcpr_request %}
-        <h1>{{ _('Edit DCPR request') }}</h1>
-    {% else %}
-        <h1>{{ _('Create new DCPR request') }}</h1>
+{% block content_action %}
+    {% if csi_reference_id %}
+        {% link_for _('View DCPR request'), named_route="dcpr.dcpr_request_show", csi_reference_id=csi_reference_id, class_='btn btn-default', icon='eye' %}
     {% endif %}
 {% endblock %}
 
 {% block primary_content_inner %}
+    {% if csi_reference_id %}
+        <h1>{{ _('Edit DCPR request') }}</h1>
+    {% else %}
+        <h1>{{ _('Create new DCPR request') }}</h1>
+    {% endif %}
     {% block form %}
-        {% snippet 'dcpr/snippets/request_form.html',
-            data_urgency=data_urgency,
+
+        {{- h.snippet(
+            form_snippet,
+            csi_reference_id=csi_reference_id,
+            data=data,
             errors=errors,
             error_summary=error_summary,
-            data=data
-        %}
+            data_urgency=data_urgency)
+        -}}
+
     {% endblock %}
 {% endblock %}
 

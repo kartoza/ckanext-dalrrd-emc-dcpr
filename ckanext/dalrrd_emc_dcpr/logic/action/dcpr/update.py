@@ -99,6 +99,7 @@ def dcpr_request_submit(context, data_dict):
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         validated_data["csi_reference_id"]
     )
+    logger.debug(f"{request_obj=}")
     if request_obj is not None:
         can_be_submitted = (
             request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value

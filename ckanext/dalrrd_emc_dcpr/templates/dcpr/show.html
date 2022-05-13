@@ -13,6 +13,23 @@
     {% snippet 'dcpr/snippets/info.html', dcpr_requests=dcpr_requests %}
 {% endblock %}
 
+{% block content_action %}
+    {% if h.check_access("dcpr_request_submit_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+        {% link_for _('Submit request for moderation'), named_route="dcpr.dcpr_request_submit", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-warning', icon='graduation-cap' %}
+    {% endif %}
+    {% if h.check_access("dcpr_request_update_by_owner_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+        {% link_for _('Manage'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
+    {% elif h.check_access("dcpr_request_claim_nsif_reviewer_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+        {% link_for _('Become NSIF Reviewer'), named_route="dcpr.dcpr_request_claim_reviewer", csi_reference_id=dcpr_request.csi_reference_id, organization="nsif", class_='btn btn-default', icon='wrench' %}
+    {% elif h.check_access("dcpr_request_update_by_nsif_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+        {% link_for _('Manage (NSIF)'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
+    {% elif h.check_access("dcpr_request_claim_csi_moderator_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+        {% link_for _('Become CSI reviewer'), named_route="dcpr.dcpr_request_claim_reviewer", csi_reference_id=dcpr_request.csi_reference_id, organization="csi", class_='btn btn-default', icon='wrench' %}
+    {% elif h.check_access("dcpr_request_update_by_csi_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+        {% link_for _('Manage (CSI)'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
+    {% endif %}
+{% endblock %}
+
 {% block primary_content_inner %}
     <h1>{{ dcpr_request.proposed_project_name }}</h1>
     {% if request_owner or nsif_reviewer or csi_reviewer %}

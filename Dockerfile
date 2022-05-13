@@ -52,8 +52,7 @@ RUN mkdir /home/appuser/app  && \
 ENV PATH="$PATH:/home/appuser/.local/bin" \
     # This allows us to get traces whenever some C code segfaults
     PYTHONFAULTHANDLER=1 \
-    CKAN_INI=/home/appuser/ckan.ini \
-    CKAN_INSTALL_TAG="ckan-2.9.4"
+    CKAN_INI=/home/appuser/ckan.ini
 
 # Only copy the dependencies for now and install them
 WORKDIR /home/appuser/app

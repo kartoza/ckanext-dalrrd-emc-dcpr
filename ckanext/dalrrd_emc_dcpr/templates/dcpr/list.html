@@ -1,0 +1,60 @@
+{% extends "page.html" %}
+
+{% set able_to_create_request = h.check_access('dcpr_request_create_auth') %}
+{% set is_nsif_member = h.emc_user_is_org_member('nsif', g.userobj) %}
+{% set is_csi_member = h.emc_user_is_org_member('csi', g.userobj) %}
+{% set has_multiple_request_types = able_to_create_request or is_nsif_member or is_csi_member %}
+
+{% block subtitle %}{{ _('DCPR Requests') }} - {{ super() }}{% endblock %}
+
+{% block secondary_content %}
+    {% snippet 'dcpr/snippets/info.html', dcpr_requests=dcpr_requests %}
+{% endblock%}
+
+{% if has_multiple_request_types %}
+    {% block content_primary_nav %}
+        {{ h.build_nav("dcpr.get_public_dcpr_requests", _("Public DCPR Requests")) }}
+        {% if able_to_create_request %}
+            {{ h.build_nav("dcpr.get_my_dcpr_requests", _("My DCPR Requests")) }}
+        {% endif %}
+        {%  if is_nsif_member %}
+            {{ h.build_nav("dcpr.get_awaiting_nsif_moderation_dcpr_requests", _("DCPR Requests awaiting nsif moderation")) }}
+        {% endif %}
+        {%  if is_csi_member %}
+            {{ h.build_nav("dcpr.get_awaiting_csi_moderation_dcpr_requests", _("DCPR Requests awaiting CSI moderation")) }}
+        {% endif %}
+    {% endblock %}
+{% endif %}
+
+{% block primary_content_inner %}
+    <section class="module">
+        <div class="module-content">
+            {% if dcpr_requests %}
+                <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
+                    {% for dcpr_request in dcpr_requests %}
+                        <li class="request-item">
+                            <div class="row request-row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <h2 class="dataset-heading">
+                                            {{ h.link_to(h.truncate(dcpr_request.proposed_project_name, 80), h.url_for('dcpr.dcpr_request_show', csi_reference_id=dcpr_request.csi_reference_id)) }}
+                                        </h2>
+                                        <div >CSI Reference ID: {{ dcpr_request.csi_reference_id }}</div>
+                                        <div >Status: {{ dcpr_request.status }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div>
+                    <h5> {{ _('There are no DCPR requests yet.') }}</h5>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+{% endblock %}
