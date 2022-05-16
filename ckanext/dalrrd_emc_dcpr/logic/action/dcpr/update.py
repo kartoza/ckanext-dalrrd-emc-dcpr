@@ -101,15 +101,9 @@ def dcpr_request_submit(context, data_dict):
     )
     logger.debug(f"{request_obj=}")
     if request_obj is not None:
-        can_be_submitted = (
-            request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value
-        )
-        if can_be_submitted:
-            next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-            request_obj.status = next_status
-            model.Session.commit()
-        else:
-            raise RuntimeError("DCPR Request is not currently submittable")
+        next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        request_obj.status = next_status
+        model.Session.commit()
     else:
         raise toolkit.ObjectNotFound
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
@@ -125,70 +119,56 @@ def dcpr_request_nsif_moderate(
 
     """
 
-    schema = dcpr_schema.moderate_nsif_dcpr_request_schema()
-    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
-    if errors:
-        raise toolkit.ValidationError(errors)
-
-    toolkit.check_access("dcpr_request_nsif_moderate_auth", context, validated_data)
-    validated_data["nsif_review_date"] = dt.datetime.now(dt.timezone.utc)
-    model = context["model"]
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        validated_data["csi_reference_id"]
+    return _moderate(
+        context,
+        data_dict,
+        auth_function="dcpr_request_nsif_moderate_auth",
+        approval_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
+        nsif_moderation_date=dt.datetime.now(dt.timezone.utc),
     )
-    if request_obj is not None:
-        can_be_moderated = (
-            request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value
-        )
-        if can_be_moderated:
-            next_status = (
-                DCPRRequestStatus.AWAITING_CSI_REVIEW.value
-                if validated_data["accepted"]
-                else DCPRRequestStatus.REJECTED.value
-            )
-            request_obj.status = next_status
-            model.Session.commit()
-        else:
-            raise RuntimeError("DCPR Request can not currently be moderated by NSIF")
-    else:
-        raise toolkit.ObjectNotFound
-    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
 def dcpr_request_csi_moderate(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    """Provide the CSI's moderation for a DCPR request.
+    return _moderate(
+        context,
+        data_dict,
+        auth_function="dcpr_request_csi_moderate_auth",
+        csi_moderation_date=dt.datetime.now(dt.timezone.utc),
+    )
 
-    By moderating a DCPR request, it is marked as reviewed by the CSI and made public.
 
-    """
-
-    schema = dcpr_schema.moderate_csi_dcpr_request_schema()
+def _moderate(
+    context: typing.Dict,
+    data_dict: typing.Dict,
+    auth_function: str,
+    approval_status: DCPRRequestStatus = DCPRRequestStatus.ACCEPTED,
+    rejection_status: DCPRRequestStatus = DCPRRequestStatus.REJECTED,
+    **additional_data,
+) -> typing.Dict:
+    logger.debug(f"inside _moderate - {data_dict=}")
+    schema = dcpr_schema.moderate_dcpr_request_schema()
+    logger.debug(f"{schema=}")
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    logger.debug(f"validated_data - {validated_data=}")
+    logger.debug(f"errors - {errors=}")
     if errors:
         raise toolkit.ValidationError(errors)
 
-    toolkit.check_access("dcpr_request_csi_moderate_auth", context, validated_data)
-    validated_data["csi_moderation_date"] = dt.datetime.now(dt.timezone.utc)
-    model = context["model"]
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        validated_data["csi_reference_id"]
+    toolkit.check_access(auth_function, context, validated_data)
+    validated_data.update(additional_data)
+    request_obj = (
+        context["model"]
+        .Session.query(dcpr_request.DCPRRequest)
+        .get(validated_data["csi_reference_id"])
     )
     if request_obj is not None:
-        can_be_moderated = (
-            request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value
+        next_status = (
+            approval_status if validated_data["approved"] else rejection_status
         )
-        if can_be_moderated:
-            final_status = (
-                DCPRRequestStatus.ACCEPTED.value
-                if validated_data["approved"]
-                else DCPRRequestStatus.REJECTED.value
-            )
-            request_obj.status = final_status
-            model.Session.commit()
-        else:
-            raise RuntimeError("DCPR Request can not currently be moderated by CSI")
+        request_obj.status = next_status.value
+        context["model"].Session.commit()
     else:
         raise toolkit.ObjectNotFound
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
@@ -197,46 +177,49 @@ def dcpr_request_csi_moderate(
 def claim_dcpr_request_nsif_reviewer(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    schema = dcpr_schema.claim_nsif_reviewer_schema()
-    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
-    if errors:
-        raise toolkit.ValidationError(errors)
-
-    toolkit.check_access(
-        "dcpr_request_claim_nsif_reviewer_auth", context, validated_data
+    return _claim_reviewer(
+        context,
+        data_dict,
+        auth_function="dcpr_request_claim_nsif_reviewer_auth",
+        next_status=DCPRRequestStatus.UNDER_NSIF_REVIEW,
+        reviewer_request_attribute="nsif_reviewer",
     )
-    model = context["model"]
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        validated_data["csi_reference_id"]
-    )
-    if request_obj is not None:
-        next_status = DCPRRequestStatus.UNDER_NSIF_REVIEW.value
-        request_obj.status = next_status
-        model.Session.commit()
-    else:
-        raise toolkit.ObjectNotFound
-    # TODO: would be nice to add an activity here
-    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
-def claim_dcpr_request_csi_moderator(
+def claim_dcpr_request_csi_reviewer(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    schema = dcpr_schema.claim_csi_moderator_schema()
+    return _claim_reviewer(
+        context,
+        data_dict,
+        auth_function="dcpr_request_claim_csi_moderator_auth",
+        next_status=DCPRRequestStatus.UNDER_CSI_REVIEW,
+        reviewer_request_attribute="csi_moderator",
+    )
+
+
+def _claim_reviewer(
+    context: typing.Dict,
+    data_dict: typing.Dict,
+    auth_function: str,
+    next_status: DCPRRequestStatus,
+    reviewer_request_attribute: str,
+) -> typing.Dict:
+    schema = dcpr_schema.claim_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
 
-    toolkit.check_access(
-        "dcpr_request_claim_csi_moderator_auth", context, validated_data
-    )
+    toolkit.check_access(auth_function, context, validated_data)
     model = context["model"]
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        validated_data["csi_reference_id"]
+    request_obj = (
+        context["model"]
+        .Session.query(dcpr_request.DCPRRequest)
+        .get(validated_data["csi_reference_id"])
     )
     if request_obj is not None:
-        next_status = DCPRRequestStatus.UNDER_CSI_REVIEW.value
-        request_obj.status = next_status
+        request_obj.status = next_status.value
+        setattr(request_obj, reviewer_request_attribute, context["auth_user_obj"].id)
         model.Session.commit()
     else:
         raise toolkit.ObjectNotFound
@@ -247,47 +230,44 @@ def claim_dcpr_request_csi_moderator(
 def resign_dcpr_request_nsif_reviewer(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    schema = dcpr_schema.resign_nsif_reviewer_schema()
-    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
-    if errors:
-        raise toolkit.ValidationError(errors)
-
-    toolkit.check_access(
-        "dcpr_request_resign_nsif_moderator_auth", context, validated_data
+    return _resign_reviewer(
+        context,
+        data_dict,
+        auth_function="dcpr_request_resign_nsif_reviewer_auth",
+        next_status=DCPRRequestStatus.AWAITING_NSIF_REVIEW,
     )
-    model = context["model"]
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        validated_data["csi_reference_id"]
-    )
-    if request_obj is not None:
-        next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-        request_obj.status = next_status
-        model.Session.commit()
-    else:
-        raise toolkit.ObjectNotFound
-    # TODO: would be nice to add an activity here
-    return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
 def resign_dcpr_request_csi_reviewer(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    schema = dcpr_schema.resign_csi_moderator_schema()
+    return _resign_reviewer(
+        context,
+        data_dict,
+        auth_function="dcpr_request_resign_csi_reviewer_auth",
+        next_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
+    )
+
+
+def _resign_reviewer(
+    context: typing.Dict,
+    data_dict: typing.Dict,
+    auth_function: str,
+    next_status: DCPRRequestStatus,
+) -> typing.Dict:
+    schema = dcpr_schema.resign_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
-
-    toolkit.check_access(
-        "dcpr_request_resign_csi_moderator_auth", context, validated_data
-    )
-    model = context["model"]
-    request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
-        validated_data["csi_reference_id"]
+    toolkit.check_access(auth_function, context, validated_data)
+    request_obj = (
+        context["model"]
+        .Session.query(dcpr_request.DCPRRequest)
+        .get(validated_data["csi_reference_id"])
     )
     if request_obj is not None:
-        next_status = DCPRRequestStatus.AWAITING_CSI_REVIEW.value
-        request_obj.status = next_status
-        model.Session.commit()
+        request_obj.status = next_status.value
+        context["model"].Session.commit()
     else:
         raise toolkit.ObjectNotFound
     # TODO: would be nice to add an activity here

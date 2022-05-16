@@ -13,15 +13,15 @@
 
 {% if has_multiple_request_types %}
     {% block content_primary_nav %}
-        {{ h.build_nav("dcpr.get_public_dcpr_requests", _("Public DCPR Requests")) }}
+        {{ h.build_nav("dcpr.get_public_dcpr_requests", _("Public requests")) }}
         {% if able_to_create_request %}
-            {{ h.build_nav("dcpr.get_my_dcpr_requests", _("My DCPR Requests")) }}
+            {{ h.build_nav("dcpr.get_my_dcpr_requests", _("My requests")) }}
         {% endif %}
         {%  if is_nsif_member %}
-            {{ h.build_nav("dcpr.get_awaiting_nsif_moderation_dcpr_requests", _("DCPR Requests awaiting nsif moderation")) }}
+            {{ h.build_nav("dcpr.get_awaiting_nsif_moderation_dcpr_requests", _("Requests awaiting nsif moderation")) }}
         {% endif %}
         {%  if is_csi_member %}
-            {{ h.build_nav("dcpr.get_awaiting_csi_moderation_dcpr_requests", _("DCPR Requests awaiting CSI moderation")) }}
+            {{ h.build_nav("dcpr.get_awaiting_csi_moderation_dcpr_requests", _("Requests awaiting CSI moderation")) }}
         {% endif %}
     {% endblock %}
 {% endif %}

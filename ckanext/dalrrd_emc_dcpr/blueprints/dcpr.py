@@ -236,17 +236,8 @@ def dcpr_request_show(csi_reference_id):
     except toolkit.NotAuthorized:
         result = toolkit.base.abort(401, toolkit._("Not authorized"))
     else:
-
-        is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
-            "nsif", toolkit.g.userobj
-        )
-        is_csi_reviewer = toolkit.h["emc_user_is_org_member"]("csi", toolkit.g.userobj)
-
         extra_vars = {
             "dcpr_request": dcpr_request,
-            "is_owner": dcpr_request["owner_user"] == toolkit.g.userobj.id,
-            "is_nsif_reviewer": is_nsif_reviewer,
-            "is_csi_reviewer": is_csi_reviewer,
         }
         result = toolkit.render("dcpr/show.html", extra_vars=extra_vars)
     return result
@@ -359,28 +350,102 @@ def dcpr_request_submit(csi_reference_id):
     return result
 
 
-class DcprRequestSubmitView(MethodView):
-    def get(self, csi_reference_id: str):
-        # show a template for the user to confirm submission
+class DcprRequestModerate(MethodView):
+    template_name = "dcpr/moderate.html"
+    actions = {
+        "nsif": {
+            "message": "Moderate DCPR request on behalf of NSIF",
+            "ckan_action": "dcpr_request_nsif_moderate",
+        },
+        "csi": {
+            "message": "Moderate DCPR request on behalf of CSI",
+            "ckan_action": "dcpr_request_csi_moderate",
+        },
+    }
+
+    def get(self, csi_reference_id: str, organization: str):
         context = _prepare_context()
         try:
             dcpr_request = toolkit.get_action("dcpr_request_show")(
                 context, data_dict={"csi_reference_id": csi_reference_id}
             )
         except toolkit.ObjectNotFound:
-            return toolkit.abort(404, toolkit._("DCPR request not found"))
+            result = toolkit.abort(404, toolkit._("DCPR request not found"))
         except toolkit.NotAuthorized:
-            return toolkit.abort(403, toolkit._("Unauthorized to submit DCPR request"))
-        return toolkit.render(
-            "dcpr/ask_for_confirmation.html",
-            extra_vars={
-                "dcpr_request": dcpr_request,
-                "action": "submit",
-                "action_url": toolkit.h["url_for"](
-                    "dcpr.dcpr_request_submit", csi_reference_id=csi_reference_id
-                ),
-            },
-        )
+            result = toolkit.abort(
+                403, toolkit._("Unauthorized to moderate DCPR request")
+            )
+        else:
+            result = toolkit.render(
+                self.template_name,
+                extra_vars={
+                    "dcpr_request": dcpr_request,
+                    "action": self.actions.get(organization, {}).get("message"),
+                    "action_url": toolkit.h["url_for"](
+                        "dcpr.dcpr_request_moderate",
+                        csi_reference_id=csi_reference_id,
+                        organization=organization,
+                    ),
+                },
+            )
+        return result
+
+    def post(self, csi_reference_id: str, organization: str):
+        data_dict = {
+            "csi_reference_id": csi_reference_id,
+            "approved": "true" if "yes" in request.form.keys() else "false",
+        }
+        try:
+            ckan_action = self.actions.get(organization, {}).get("ckan_action")
+            toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
+        except toolkit.ObjectNotFound:
+            result = toolkit.abort(404, toolkit._("Dataset not found"))
+        except toolkit.NotAuthorized:
+            result = toolkit.abort(
+                403, toolkit._("Unauthorized to submit moderation for DCPR request")
+            )
+        else:
+            toolkit.h["flash_notice"](toolkit._("Moderation submitted"))
+            result = toolkit.redirect_to(
+                toolkit.h["url_for"](
+                    "dcpr.dcpr_request_show", csi_reference_id=csi_reference_id
+                )
+            )
+        return result
+
+
+moderate_dcpr_request_view = DcprRequestModerate.as_view("dcpr_request_moderate")
+dcpr_blueprint.add_url_rule(
+    "/request/<csi_reference_id>/moderate/<organization>",
+    view_func=moderate_dcpr_request_view,
+)
+
+
+class DcprRequestSubmitView(MethodView):
+    def get(self, csi_reference_id: str):
+        context = _prepare_context()
+        try:
+            dcpr_request = toolkit.get_action("dcpr_request_show")(
+                context, data_dict={"csi_reference_id": csi_reference_id}
+            )
+        except toolkit.ObjectNotFound:
+            result = toolkit.abort(404, toolkit._("DCPR request not found"))
+        except toolkit.NotAuthorized:
+            result = toolkit.abort(
+                403, toolkit._("Unauthorized to submit DCPR request")
+            )
+        else:
+            result = toolkit.render(
+                "dcpr/ask_for_confirmation.html",
+                extra_vars={
+                    "dcpr_request": dcpr_request,
+                    "action": "submit",
+                    "action_url": toolkit.h["url_for"](
+                        "dcpr.dcpr_request_submit", csi_reference_id=csi_reference_id
+                    ),
+                },
+            )
+        return result
 
     def post(self, csi_reference_id: str):
         if "cancel" not in request.form.keys():
@@ -472,7 +537,7 @@ dcpr_blueprint.add_url_rule(
 )
 
 
-class DcprRequestClaimView(MethodView):
+class DcprRequestResignReviewerView(MethodView):
     def get(self, csi_reference_id: str, organization: str):
         context = _prepare_context()
         try:
@@ -482,10 +547,15 @@ class DcprRequestClaimView(MethodView):
         except toolkit.ObjectNotFound:
             return toolkit.abort(404, toolkit._("DCPR request not found"))
         except toolkit.NotAuthorized:
-            return toolkit.abort(403, toolkit._("Unauthorized to claim DCPR request"))
+            return toolkit.abort(
+                403,
+                toolkit._(
+                    "Unauthorized to resign from the role of reviewer of DCPR request"
+                ),
+            )
         action = {
-            "nsif": "become NSIF reviewer",
-            "csi": "become CSI reviewer",
+            "nsif": "Resign from being the NSIF reviewer",
+            "csi": "Resign from being the CSI reviewer",
         }.get(organization)
         return toolkit.render(
             "dcpr/ask_for_confirmation.html",
@@ -493,7 +563,7 @@ class DcprRequestClaimView(MethodView):
                 "dcpr_request": dcpr_request,
                 "action": action,
                 "action_url": toolkit.h["url_for"](
-                    "dcpr.dcpr_request_claim_reviewer",
+                    "dcpr.dcpr_request_resign_reviewer",
                     csi_reference_id=csi_reference_id,
                     organization=organization,
                 ),
@@ -504,8 +574,8 @@ class DcprRequestClaimView(MethodView):
         if "cancel" not in request.form.keys():
             context = _prepare_context()
             action_name = {
-                "nsif": "claim_dcpr_request_nsif_reviewer",
-                "csi": "claim_dcpr_request_csi_moderator",
+                "nsif": "resign_dcpr_request_nsif_reviewer",
+                "csi": "resign_dcpr_request_csi_reviewer",
             }.get(organization)
             try:
                 toolkit.get_action(action_name)(
@@ -515,10 +585,15 @@ class DcprRequestClaimView(MethodView):
                 result = toolkit.abort(404, toolkit._("Dataset not found"))
             except toolkit.NotAuthorized:
                 result = toolkit.abort(
-                    403, toolkit._("Unauthorized to claim DCPR request")
+                    403,
+                    toolkit._(
+                        "Unauthorized to resign from the role of DCPR request reviewer"
+                    ),
                 )
             else:
-                toolkit.h["flash_notice"](toolkit._("DCPR request has been claimed."))
+                toolkit.h["flash_notice"](
+                    toolkit._("You are no longer the reviewer for the DCPR request.")
+                )
                 result = toolkit.redirect_to(
                     toolkit.h["url_for"](
                         "dcpr.dcpr_request_show", csi_reference_id=csi_reference_id
@@ -533,9 +608,87 @@ class DcprRequestClaimView(MethodView):
         return result
 
 
-claim_dcpr_request_view = DcprRequestClaimView.as_view("dcpr_request_claim_reviewer")
+resign_dcpr_request_view = DcprRequestResignReviewerView.as_view(
+    "dcpr_request_resign_reviewer"
+)
 dcpr_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/claim/<organization>",
+    "/request/<csi_reference_id>/resign/<organization>",
+    view_func=resign_dcpr_request_view,
+)
+
+
+class DcprRequestBecomeReviewerView(MethodView):
+    def get(self, csi_reference_id: str, organization: str):
+        context = _prepare_context()
+        try:
+            dcpr_request = toolkit.get_action("dcpr_request_show")(
+                context, data_dict={"csi_reference_id": csi_reference_id}
+            )
+        except toolkit.ObjectNotFound:
+            result = toolkit.abort(404, toolkit._("DCPR request not found"))
+        except toolkit.NotAuthorized:
+            result = toolkit.abort(
+                403, toolkit._("Unauthorized to become the reviewer for DCPR request")
+            )
+        else:
+            action = {
+                "nsif": "become NSIF reviewer",
+                "csi": "become CSI reviewer",
+            }.get(organization)
+            result = toolkit.render(
+                "dcpr/ask_for_confirmation.html",
+                extra_vars={
+                    "dcpr_request": dcpr_request,
+                    "action": action,
+                    "action_url": toolkit.h["url_for"](
+                        "dcpr.dcpr_request_become_reviewer",
+                        csi_reference_id=csi_reference_id,
+                        organization=organization,
+                    ),
+                },
+            )
+        return result
+
+    def post(self, csi_reference_id: str, organization: str):
+        if "cancel" not in request.form.keys():
+            context = _prepare_context()
+            action_name = {
+                "nsif": "claim_dcpr_request_nsif_reviewer",
+                "csi": "claim_dcpr_request_csi_reviewer",
+            }.get(organization)
+            try:
+                toolkit.get_action(action_name)(
+                    context, data_dict={"csi_reference_id": csi_reference_id}
+                )
+            except toolkit.ObjectNotFound:
+                result = toolkit.abort(404, toolkit._("Dataset not found"))
+            except toolkit.NotAuthorized:
+                result = toolkit.abort(
+                    403, toolkit._("Unauthorized to claim DCPR request")
+                )
+            else:
+                toolkit.h["flash_notice"](
+                    toolkit._("You are now the reviewer for the DCPR request.")
+                )
+                result = toolkit.redirect_to(
+                    toolkit.h["url_for"](
+                        "dcpr.dcpr_request_show", csi_reference_id=csi_reference_id
+                    )
+                )
+        else:
+            result = toolkit.h.redirect_to(
+                toolkit.h["url_for"](
+                    "dcpr.dcpr_request_show", csi_reference_id=csi_reference_id
+                )
+            )
+        return result
+
+
+claim_dcpr_request_view = DcprRequestBecomeReviewerView.as_view(
+    "dcpr_request_become_reviewer"
+)
+dcpr_blueprint.add_url_rule(
+    "/request/<csi_reference_id>/review/<organization>",
     view_func=claim_dcpr_request_view,
 )
 

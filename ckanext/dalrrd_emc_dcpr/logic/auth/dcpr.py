@@ -363,7 +363,7 @@ def dcpr_request_claim_csi_moderator_auth(
     return result
 
 
-def dcpr_request_resign_nsif_moderator_auth(
+def dcpr_request_resign_nsif_reviewer_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     """
@@ -394,7 +394,7 @@ def dcpr_request_resign_nsif_moderator_auth(
     return result
 
 
-def dcpr_request_resign_csi_moderator_auth(
+def dcpr_request_resign_csi_reviewer_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     """
