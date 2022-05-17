@@ -8,16 +8,16 @@ log = getLogger(__name__)
 
 from sqlalchemy import orm, types, Column, Table, ForeignKey
 
-from ckan.model import core, domain_object, meta, types as _types, Session
+from ckan import model
 
 dcpr_request_table = Table(
     "dcpr_request",
-    meta.metadata,
+    model.meta.metadata,
     Column(
         "csi_reference_id",
         types.UnicodeText,
         primary_key=True,
-        default=_types.make_uuid,
+        default=model.types.make_uuid,
     ),
     Column(
         "owner_user",
@@ -67,8 +67,10 @@ dcpr_request_table = Table(
 
 dcpr_request_dataset_table = Table(
     "dcpr_request_dataset",
-    meta.metadata,
-    Column("dataset_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+    model.meta.metadata,
+    Column(
+        "dataset_id", types.UnicodeText, primary_key=True, default=model.types.make_uuid
+    ),
     Column("dcpr_request_id", ForeignKey("dcpr_request.csi_reference_id")),
     Column("dataset_custodian", types.Boolean, default=False),
     Column("data_type", types.UnicodeText),
@@ -85,8 +87,10 @@ dcpr_request_dataset_table = Table(
 
 dcpr_request_notification_table = Table(
     "dcpr_request_notification",
-    meta.metadata,
-    Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+    model.meta.metadata,
+    Column(
+        "target_id", types.UnicodeText, primary_key=True, default=model.types.make_uuid
+    ),
     Column(
         "dcpr_request_id",
         types.UnicodeText,
@@ -98,12 +102,12 @@ dcpr_request_notification_table = Table(
 
 dcpr_geospatial_request_table = Table(
     "dcpr_geospatial_request",
-    meta.metadata,
+    model.meta.metadata,
     Column(
         "csi_reference_id",
         types.UnicodeText,
         primary_key=True,
-        default=_types.make_uuid,
+        default=model.types.make_uuid,
     ),
     Column(
         "owner_user",
@@ -144,8 +148,10 @@ dcpr_geospatial_request_table = Table(
 
 dcpr_geospatial_request_notification_table = Table(
     "dcpr_geospatial_request_notification",
-    meta.metadata,
-    Column("target_id", types.UnicodeText, primary_key=True, default=_types.make_uuid),
+    model.meta.metadata,
+    Column(
+        "target_id", types.UnicodeText, primary_key=True, default=model.types.make_uuid
+    ),
     Column(
         "dcpr_geospatial_request_id",
         types.UnicodeText,
@@ -170,19 +176,21 @@ class DCPRRequestUrgency(enum.Enum):
     HIGH = "High"
 
 
-class DCPRRequestDataset(core.StatefulObjectMixin, domain_object.DomainObject):
+class DCPRRequestDataset(
+    model.core.StatefulObjectMixin, model.domain_object.DomainObject
+):
     def __init__(self, **kw):
         super(DCPRRequestDataset, self).__init__(**kw)
 
     @classmethod
     def get(cls, **kw) -> Optional["DCPRRequestDataset"]:
         """Finds a single request entity in the model."""
-        query = meta.Session.query(cls).autoflush(False)
+        query = model.meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
 
 class DCPRRequestNotificationTarget(
-    core.StatefulObjectMixin, domain_object.DomainObject
+    model.core.StatefulObjectMixin, model.domain_object.DomainObject
 ):
     def __init__(self, **kw):
         super(DCPRRequestNotificationTarget, self).__init__(**kw)
@@ -190,12 +198,12 @@ class DCPRRequestNotificationTarget(
     @classmethod
     def get(cls, **kw) -> Optional["DCPRRequestNotificationTarget"]:
         """Finds a single request entity in the model."""
-        query = meta.Session.query(cls).autoflush(False)
+        query = model.meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
 
 class DCPRGeospatialRequestNotificationTarget(
-    core.StatefulObjectMixin, domain_object.DomainObject
+    model.core.StatefulObjectMixin, model.domain_object.DomainObject
 ):
     def __init__(self, **kw):
         super(DCPRGeospatialRequestNotificationTarget, self).__init__(**kw)
@@ -203,11 +211,11 @@ class DCPRGeospatialRequestNotificationTarget(
     @classmethod
     def get(cls, **kw) -> Optional["DCPRGeospatialRequestNotificationTarget"]:
         """Finds a single request entity in the model."""
-        query = meta.Session.query(cls).autoflush(False)
+        query = model.meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
 
-class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
+class DCPRRequest(model.core.StatefulObjectMixin, model.domain_object.DomainObject):
     def __init__(self, **kw):
         super(DCPRRequest, self).__init__(**kw)
         self.csi_reference_id = kw.get("csi_reference_id", None)
@@ -215,12 +223,12 @@ class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
     @classmethod
     def get(cls, csi_reference_id) -> Optional["DCPRRequest"]:
         """Finds a single request entity in the model."""
-        query = meta.Session.query(cls)
+        query = model.meta.Session.query(cls)
         return query.get(csi_reference_id)
 
     def get_dataset_elements(self) -> Optional[DCPRRequestDataset]:
         datasets = (
-            meta.Session.query(DCPRRequest)
+            model.meta.Session.query(DCPRRequest)
             .join(
                 DCPRRequestDataset,
                 DCPRRequestDataset.dcpr_request_id == DCPRRequest.csi_reference_id,
@@ -233,7 +241,7 @@ class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
 
     def get_notification_targets(self) -> Optional[DCPRRequestNotificationTarget]:
         targets = (
-            meta.Session.query(DCPRRequest)
+            model.meta.Session.query(DCPRRequest)
             .join(
                 DCPRRequestNotificationTarget,
                 DCPRRequestNotificationTarget.dcpr_request_id
@@ -248,7 +256,9 @@ class DCPRRequest(core.StatefulObjectMixin, domain_object.DomainObject):
         return targets
 
 
-class DCPRGeospatialRequest(core.StatefulObjectMixin, domain_object.DomainObject):
+class DCPRGeospatialRequest(
+    model.core.StatefulObjectMixin, model.domain_object.DomainObject
+):
     def __init__(self, **kw):
         super(DCPRGeospatialRequest, self).__init__(**kw)
         self.csi_reference_id = kw.get("csi_reference_id", None)
@@ -256,14 +266,14 @@ class DCPRGeospatialRequest(core.StatefulObjectMixin, domain_object.DomainObject
     @classmethod
     def get(cls, **kw) -> Optional["DCPRGeospatialRequest"]:
         """Finds a single request entity in the model."""
-        query = meta.Session.query(cls).autoflush(False)
+        query = model.meta.Session.query(cls).autoflush(False)
         return query.filter_by(**kw).first()
 
     def get_notification_targets(
         self,
     ) -> Optional[DCPRGeospatialRequestNotificationTarget]:
         targets = (
-            meta.Session.query(DCPRGeospatialRequest)
+            model.meta.Session.query(DCPRGeospatialRequest)
             .join(
                 DCPRGeospatialRequestNotificationTarget,
                 DCPRGeospatialRequestNotificationTarget.dcpr_request_id
@@ -279,9 +289,29 @@ class DCPRGeospatialRequest(core.StatefulObjectMixin, domain_object.DomainObject
         return targets
 
 
-meta.mapper(DCPRRequest, dcpr_request_table)
-meta.mapper(DCPRRequestNotificationTarget, dcpr_request_notification_table)
-meta.mapper(
+model.meta.mapper(
+    DCPRRequest,
+    dcpr_request_table,
+    properties={
+        "owner": orm.relationship(
+            model.User,
+            backref="dcpr_requests",
+            foreign_keys=dcpr_request_table.c.owner_user,
+        ),
+        "user_nsif_reviewer": orm.relationship(
+            model.User,
+            backref="nsif_reviewer_dcpr_requests",
+            foreign_keys=dcpr_request_table.c.nsif_reviewer,
+        ),
+        "user_csi_reviewer": orm.relationship(
+            model.User,
+            backref="csi_reviewer_dcpr_requests",
+            foreign_keys=dcpr_request_table.c.csi_moderator,
+        ),
+    },
+)
+model.meta.mapper(DCPRRequestNotificationTarget, dcpr_request_notification_table)
+model.meta.mapper(
     DCPRRequestDataset,
     dcpr_request_dataset_table,
     properties={
@@ -291,7 +321,7 @@ meta.mapper(
         )
     },
 )
-meta.mapper(DCPRGeospatialRequest, dcpr_geospatial_request_table)
-meta.mapper(
+model.meta.mapper(DCPRGeospatialRequest, dcpr_geospatial_request_table)
+model.meta.mapper(
     DCPRGeospatialRequestNotificationTarget, dcpr_geospatial_request_notification_table
 )
