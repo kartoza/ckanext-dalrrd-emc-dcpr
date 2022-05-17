@@ -51,7 +51,7 @@
             {% link_for _('Manage (CSI)'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
         {% endif %}
         {% if h.check_access("dcpr_request_csi_moderate_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
-            {% link_for _('Submit CSI review'), named_route="dcpr.dcpr_request_moderate", csi_reference_id=dcpr_request.csi_reference_id, organization="nsif", class_='btn btn-warning', icon='envelope-o' %}
+            {% link_for _('Submit CSI review'), named_route="dcpr.dcpr_request_moderate", csi_reference_id=dcpr_request.csi_reference_id, organization="csi", class_='btn btn-warning', icon='envelope-o' %}
         {% endif %}
     {% endif %}
 {% endblock %}

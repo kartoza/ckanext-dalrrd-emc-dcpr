@@ -11,8 +11,8 @@
     {% snippet 'dcpr/snippets/info.html', dcpr_requests=dcpr_requests %}
 {% endblock%}
 
-{% if has_multiple_request_types %}
-    {% block content_primary_nav %}
+{% block content_primary_nav %}
+    {% if has_multiple_request_types %}
         {{ h.build_nav("dcpr.get_public_dcpr_requests", _("Public requests")) }}
         {% if able_to_create_request %}
             {{ h.build_nav("dcpr.get_my_dcpr_requests", _("My requests")) }}
@@ -23,8 +23,8 @@
         {%  if is_csi_member %}
             {{ h.build_nav("dcpr.get_awaiting_csi_moderation_dcpr_requests", _("Requests awaiting CSI moderation")) }}
         {% endif %}
-    {% endblock %}
-{% endif %}
+    {% endif %}
+{% endblock %}
 
 {% block primary_content_inner %}
     <section class="module">
@@ -41,6 +41,7 @@
                                         </h2>
                                         <div >CSI Reference ID: {{ dcpr_request.csi_reference_id }}</div>
                                         <div >Status: {{ dcpr_request.status }}</div>
+                                        <div >Creator: {{ dcpr_request.owner }}</div>
                                     </div>
                                 </div>
                             </div>
