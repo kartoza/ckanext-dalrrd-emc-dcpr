@@ -5,6 +5,7 @@ from urllib.parse import quote
 from html import escape as html_escape
 
 from shapely import geometry
+from ckan import model
 from ckan.plugins import toolkit
 from ckan.lib.helpers import build_nav_main as core_build_nav_main
 
@@ -282,3 +283,18 @@ def user_is_dcpr_request_owner(user_id, dcpr_request_id) -> bool:
     else:
         result = False
     return result
+
+
+def get_org_memberships(user_id: str):
+    """Return a list of organizations and roles where the input user is a member"""
+    query = (
+        model.Session.query(model.Group, model.Member.capacity)
+        .join(model.Member, model.Member.group_id == model.Group.id)
+        .join(model.User, model.User.id == model.Member.table_id)
+        .filter(
+            model.User.id == user_id,
+            model.Member.state == "active",
+            model.Group.is_organization == True,
+        )
+    )
+    return query.all()

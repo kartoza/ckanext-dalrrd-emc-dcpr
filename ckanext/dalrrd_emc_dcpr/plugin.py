@@ -326,6 +326,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_get_recently_modified_datasets": helpers.get_recently_modified_datasets,
             "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
             "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
+            "emc_org_memberships": helpers.get_org_memberships,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
