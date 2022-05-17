@@ -25,48 +25,34 @@ dcpr_blueprint = Blueprint(
 
 @dcpr_blueprint.route("/")
 def get_public_dcpr_requests():
-    logger.debug("Inside the dcpr_home view")
-    existing_public_requests = toolkit.get_action("dcpr_request_list_public")(
-        data_dict={}
-    )
-    extra_vars = {
-        "dcpr_requests": existing_public_requests,
-        "statuses": get_status_labels(),
-    }
-    return toolkit.render("dcpr/list.html", extra_vars=extra_vars)
+    return _get_dcpr_request_list("dcpr_request_list_public")
 
 
 @dcpr_blueprint.route("/my-dcpr-requests")
 def get_my_dcpr_requests():
-    dcpr_requests = toolkit.get_action("my_dcpr_request_list")(
-        context={"user": toolkit.g.user}
-    )
-    extra_vars = {
-        "dcpr_requests": dcpr_requests,
-        "statuses": get_status_labels(),
-    }
-    return toolkit.render("dcpr/list.html", extra_vars=extra_vars)
-
-
-@dcpr_blueprint.route("/awaiting-csi-moderation-dcpr-requests")
-def get_awaiting_csi_moderation_dcpr_requests():
-    raise NotImplementedError
+    return _get_dcpr_request_list("my_dcpr_request_list")
 
 
 @dcpr_blueprint.route("/awaiting-nsif-moderation-dcpr-requests")
 def get_awaiting_nsif_moderation_dcpr_requests():
+    return _get_dcpr_request_list("dcpr_request_list_awaiting_nsif_moderation")
+
+
+@dcpr_blueprint.route("/awaiting-csi-moderation-dcpr-requests")
+def get_awaiting_csi_moderation_dcpr_requests():
+    return _get_dcpr_request_list("dcpr_request_list_awaiting_csi_moderation")
+
+
+def _get_dcpr_request_list(ckan_action: str):
     try:
-        dcpr_requests = toolkit.get_action(
-            "dcpr_request_list_awaiting_nsif_moderation"
-        )(
+        dcpr_requests = toolkit.get_action(ckan_action)(
             context={"user": toolkit.g.user},
+            data_dict={},
         )
     except toolkit.NotAuthorized:
         result = toolkit.abort(
             403,
-            toolkit._(
-                "You are not authorized to list DCPR requests awaiting NSIF moderation"
-            ),
+            toolkit._("Not authorized to list DCPR requests"),
         )
     else:
         result = toolkit.render(
@@ -350,7 +336,7 @@ def dcpr_request_submit(csi_reference_id):
     return result
 
 
-class DcprRequestModerate(MethodView):
+class DcprRequestModerateView(MethodView):
     template_name = "dcpr/moderate.html"
     actions = {
         "nsif": {
@@ -397,6 +383,7 @@ class DcprRequestModerate(MethodView):
         }
         try:
             ckan_action = self.actions.get(organization, {}).get("ckan_action")
+            logger.debug(f"{ckan_action=}")
             toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
         except toolkit.ObjectNotFound:
             result = toolkit.abort(404, toolkit._("Dataset not found"))
@@ -414,7 +401,7 @@ class DcprRequestModerate(MethodView):
         return result
 
 
-moderate_dcpr_request_view = DcprRequestModerate.as_view("dcpr_request_moderate")
+moderate_dcpr_request_view = DcprRequestModerateView.as_view("dcpr_request_moderate")
 dcpr_blueprint.add_url_rule(
     "/request/<csi_reference_id>/moderate/<organization>",
     view_func=moderate_dcpr_request_view,
