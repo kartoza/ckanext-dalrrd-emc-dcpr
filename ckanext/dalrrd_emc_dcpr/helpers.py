@@ -296,5 +296,6 @@ def get_org_memberships(user_id: str):
             model.Member.state == "active",
             model.Group.is_organization == True,
         )
+        .order_by(model.Group.name)
     )
     return query.all()

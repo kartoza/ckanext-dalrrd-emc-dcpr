@@ -21,14 +21,21 @@ from .model import dcpr_request as dcpr_request_model
 
 
 def dcpr_request_dictize(
-    dcpr_request: dcpr_request_model.DCPRRequest, context: typing.Dict
+    dcpr_request: dcpr_request_model.DCPRRequest,
+    context: typing.Dict,
 ) -> typing.Dict:
     result_dict = ckan_dictization.table_dictize(dcpr_request, context)
-    result_dict["owner"] = dcpr_request.owner.name
     result_dict["datasets"] = []
     for dcpr_dataset in dcpr_request.datasets:
         dataset_dict = dcpr_request_dataset_dictize(dcpr_dataset, context)
         result_dict["datasets"].append(dataset_dict)
+    if context.get("dictize_for_ui", False):
+        result_dict.update(
+            {
+                "owner": dcpr_request.owner.name,
+                "organization": dcpr_request.organization.name,
+            }
+        )
     return result_dict
 
 

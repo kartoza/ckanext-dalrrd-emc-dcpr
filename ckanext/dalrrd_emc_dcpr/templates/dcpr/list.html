@@ -26,8 +26,14 @@
     {% endif %}
 {% endblock %}
 
+{% block page_primary_action %}
+    {% if able_to_create_request and show_create_button %}
+        {% link_for _('Create DCPR request'), named_route="dcpr.new_dcpr_request", class_='btn btn-primary', icon='plus-square' %}
+    {% endif %}
+{% endblock %}
+
 {% block primary_content_inner %}
-    <section class="module">
+    <section class="module" xmlns="http://www.w3.org/1999/html">
         <div class="module-content">
             {% if dcpr_requests %}
                 <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
@@ -38,9 +44,9 @@
                                     <div>
                                         <h2 class="dataset-heading">
                                             {{ h.link_to(h.truncate(dcpr_request.proposed_project_name, 80), h.url_for('dcpr.dcpr_request_show', csi_reference_id=dcpr_request.csi_reference_id)) }}
+                                            <small>{{ dcpr_request.csi_reference_id }}</small>
                                         </h2>
-                                        <div >CSI Reference ID: {{ dcpr_request.csi_reference_id }}</div>
-                                        <div >Status: {{ dcpr_request.status }}</div>
+                                        <div><span {% if dcpr_request.status == "REJECTED" %}class="text-danger"{% endif %}>{{ dcpr_request.status }}</span></div>
                                         <div >Creator: {{ dcpr_request.owner }}</div>
                                     </div>
                                 </div>
@@ -51,11 +57,8 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <div>
-                    <h5> {{ _('There are no DCPR requests yet.') }}</h5>
-                </div>
+                <p class="empty">{{ _('There are no DCPR requests here yet.') }}</p>
             {% endif %}
-
         </div>
     </section>
 {% endblock %}

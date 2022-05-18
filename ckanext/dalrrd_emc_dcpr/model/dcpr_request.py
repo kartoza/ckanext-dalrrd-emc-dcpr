@@ -298,6 +298,10 @@ model.meta.mapper(
             backref="dcpr_requests",
             foreign_keys=dcpr_request_table.c.owner_user,
         ),
+        "organization": orm.relationship(
+            model.Group,
+            backref="dcpr_requests",
+        ),
         "user_nsif_reviewer": orm.relationship(
             model.User,
             backref="nsif_reviewer_dcpr_requests",

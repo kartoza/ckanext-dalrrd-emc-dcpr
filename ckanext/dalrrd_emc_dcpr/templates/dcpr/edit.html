@@ -18,17 +18,20 @@
     {% if csi_reference_id %}
         <h1>{{ _('Edit DCPR request') }}</h1>
     {% else %}
-        <h1>{{ _('Create new DCPR request') }}</h1>
+        <h1>{{ _('Create new DCPR request') }}{% if data.organization_id %} for organization {{ data.organization_id }}{% endif %}</h1>
     {% endif %}
     {% block form %}
-
         {{- h.snippet(
             form_snippet,
             csi_reference_id=csi_reference_id,
             data=data,
+            relevant_organizations=relevant_organizations,
+            enable_owner_fieldset=enable_owner_fieldset,
+            enable_nsif_fieldset=enable_nsif_fieldset,
+            enable_csi_fieldset=enable_csi_fieldset,
             errors=errors,
             error_summary=error_summary,
-            data_urgency=data_urgency)
+            data_urgency_options=data_urgency_options)
         -}}
 
     {% endblock %}

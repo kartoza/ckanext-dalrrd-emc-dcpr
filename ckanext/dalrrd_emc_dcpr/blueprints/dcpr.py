@@ -30,7 +30,9 @@ def get_public_dcpr_requests():
 
 @dcpr_blueprint.route("/my-dcpr-requests")
 def get_my_dcpr_requests():
-    return _get_dcpr_request_list("my_dcpr_request_list")
+    return _get_dcpr_request_list(
+        "my_dcpr_request_list", should_show_create_action=True
+    )
 
 
 @dcpr_blueprint.route("/awaiting-nsif-moderation-dcpr-requests")
@@ -43,10 +45,13 @@ def get_awaiting_csi_moderation_dcpr_requests():
     return _get_dcpr_request_list("dcpr_request_list_awaiting_csi_moderation")
 
 
-def _get_dcpr_request_list(ckan_action: str):
+def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = False):
     try:
         dcpr_requests = toolkit.get_action(ckan_action)(
-            context={"user": toolkit.g.user},
+            context={
+                "user": toolkit.g.user,
+                "dictize_for_ui": True,
+            },
             data_dict={},
         )
     except toolkit.NotAuthorized:
@@ -55,13 +60,12 @@ def _get_dcpr_request_list(ckan_action: str):
             toolkit._("Not authorized to list DCPR requests"),
         )
     else:
-        result = toolkit.render(
-            "dcpr/list.html",
-            extra_vars={
-                "dcpr_requests": dcpr_requests,
-                "statuses": get_status_labels(),
-            },
-        )
+        extra_vars = {
+            "dcpr_requests": dcpr_requests,
+            "statuses": get_status_labels(),
+        }
+        extra_vars["show_create_button"] = should_show_create_action
+        result = toolkit.render("dcpr/list.html", extra_vars=extra_vars)
     return result
 
 
@@ -73,6 +77,17 @@ class DcprRequestCreateView(MethodView):
                 tuplize_dict(parse_params(request.args, ignore_keys=CACHE_PARAMETERS))
             )
         )
+        if "organization_id" not in request.args:
+            # if we don't already have an org id, need to let user choose from those orgs where she is a member
+            current_memberships = toolkit.h["emc_org_memberships"](toolkit.g.userobj.id)
+            relevant_orgs = [
+                {"value": org.id, "text": org.name} for org, _ in current_memberships
+            ]
+        else:
+            # if we have an org id in request.args then there is no need to show the orgs select
+            relevant_orgs = None
+        logger.debug(f"{relevant_orgs=}")
+
         serialized_errors = json.dumps(errors or {})
         serialized_error_summary = json.dumps(error_summary or {})
         logger.info(f"{data_to_show=}")
@@ -80,16 +95,21 @@ class DcprRequestCreateView(MethodView):
         logger.info(f"{serialized_error_summary=}")
         extra_vars = {
             "form_snippet": "dcpr/snippets/request_form.html",
+            "enable_owner_fieldset": True,
+            "enable_nsif_fieldset": False,
+            "enable_csi_fieldset": False,
             "csi_reference_id": None,
             "data": data_to_show,
             "errors": errors or {},
             "error_summary": error_summary or {},
-            "data_urgency": [
+            "relevant_organizations": relevant_orgs,
+            "data_urgency_options": [
                 {"value": level.value, "text": level.value}
                 for level in DCPRRequestUrgency
             ],
             # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be different according with the user role
         }
+        logger.debug(f"{extra_vars=}")
         return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
 
     def post(self):
@@ -100,7 +120,8 @@ class DcprRequestCreateView(MethodView):
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
         else:
-            data_dict["organization_id"] = request.args.get("organization_id")
+            if data_dict.get("organization_id") is None:
+                data_dict["organization_id"] = request.args.get("organization_id")
             try:
                 dcpr_request = toolkit.get_action("dcpr_request_create")(
                     context={
@@ -171,6 +192,9 @@ class DcprRequestOwnerUpdateView(MethodView):
                     "dcpr/edit.html",
                     extra_vars={
                         "form_snippet": "dcpr/snippets/request_form.html",
+                        "enable_owner_fieldset": True,
+                        "enable_nsif_fieldset": False,
+                        "enable_csi_fieldset": False,
                         "data": data,
                         "csi_reference_id": csi_reference_id,
                         "errors": errors or {},
@@ -182,6 +206,9 @@ class DcprRequestOwnerUpdateView(MethodView):
                     },
                 )
         return result
+
+    def post(self):
+        raise NotImplementedError
 
 
 owner_edit_dcpr_request_view = DcprRequestOwnerUpdateView.as_view(
@@ -215,7 +242,8 @@ dcpr_blueprint.add_url_rule(
 def dcpr_request_show(csi_reference_id):
     try:
         dcpr_request = toolkit.get_action("dcpr_request_show")(
-            context={}, data_dict={"csi_reference_id": csi_reference_id}
+            context={"dictize_for_ui": True},
+            data_dict={"csi_reference_id": csi_reference_id},
         )
     except toolkit.ObjectNotFound:
         result = toolkit.abort(404, toolkit._("DCPR request not found"))
