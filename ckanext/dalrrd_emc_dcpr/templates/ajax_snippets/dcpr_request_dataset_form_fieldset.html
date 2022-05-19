@@ -1,0 +1,91 @@
+{% import 'macros/form.html' as form %}
+
+<fieldset class="dynamic-dataset-fieldset" id="dataset-fieldset-{{ index }}">
+    <legend>
+        Dataset #{{ index }} fields
+    </legend>
+    {% call form.input(
+                'data_type',
+                label=_('Data type'),
+                id='ds{}-field-data_type'.format(index),
+                placeholder=_('e.g. Vector line'),
+                value=data_type,
+                error=data_type_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
+    {% endcall %}
+    {% call form.input(
+                'proposed_dataset_title',
+                label=_('Proposed dataset title'),
+                id='ds{}-field-proposed_dataset_title'.format(index),
+                value=proposed_dataset_title,
+                error=proposed_dataset_title_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Proposed title for the dataset being collected.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'proposed_dataset_abstract',
+                label=_('Proposed dataset abstract'),
+                id='ds{}-field-proposed_dataset_abstract'.format(index),
+                value=proposed_dataset_abstract,
+                error=proposed_dataset_abstract_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'dataset_purpose',
+                label=_('Purpose of the dataset'),
+                id='ds{}-field-dataset_purpose'.format(index),
+                value=dataset_purpose,
+                error=dataset_purpose_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'dataset_lineage',
+                label=_('Dataset lineage statement'),
+                id='ds{}-field-dataset_lineage'.format(index),
+                value=lineage_statement,
+                error=lineage_statement_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Information about the lineage of the dataset being collected (if it is based on previous data, etc.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'dataset_associated_attributes',
+                label=_('Dataset associated attributes'),
+                id='ds{}-field-dataset_associated_attributes'.format(index),
+                value=dataset_associated_attributes,
+                error=dataset_associated_attributes_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(
+                _('Additional alphanumeric attributes that shall be collected, in addition to the geospatial information.
+                If possible, provide a detailed description of each attribute.')
+                ) }}
+    {% endcall %}
+    {% call form.markdown(
+                'dataset_usage_restrictions',
+                label=_('Dataset usage restrictions'),
+                id='ds{}-field-dataset_usage_restrictions'.format(index),
+                value=dataset_usage_restrictions,
+                error=dataset_usage_restrictions_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Description of dataset usage restrictions')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'dataset_capture_method',
+                label=_('Dataset capture method'),
+                id='ds{}-field-dataset_capture_method'.format(index),
+                value=dataset_capture_method,
+                error=dataset_capture_method_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Method to be employed for collecting the raw data (Aerial photography, cadastral survey, etc.)')) }}
+    {% endcall %}
+</fieldset>

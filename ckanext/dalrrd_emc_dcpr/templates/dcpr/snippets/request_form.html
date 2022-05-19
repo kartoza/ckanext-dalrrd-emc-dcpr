@@ -1,9 +1,11 @@
 {% import 'macros/form.html' as form %}
 
+{% asset "ckanext-dalrrdemcdcpr/dcpr-request-datasets-js" %}
+
 
 <form class="dataset-form" method="post" data-module="basic-form" novalidate>
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
-    <fieldset {% if not enable_owner_fieldset %}disabled{% endif %}>
+    <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
         <legend>DCPR request owner fields</legend>
         {% if not data.organization_id %}
             {% call form.select(
@@ -118,94 +120,39 @@
         ) %}
             {{ form.info(_('Any additional details about the project that the user deems relevant for aiding the NSIF and CSI in their review and moderation process')) }}
         {% endcall %}
-        <fieldset>
-            <legend>Dataset-related fields</legend>
-            {% call form.input(
-                'data_type',
-                label=_('Data type'),
-                id='field-data_type',
-                placeholder=_('e.g. Vector line'),
-                value=data.data_type,
-                error=errors.data_type,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
-            {% endcall %}
-            {% call form.input(
-                'proposed_dataset_title',
-                label=_('Proposed dataset title'),
-                id='field-proposed_dataset_title',
-                value=data.proposed_dataset_title,
-                error=errors.proposed_dataset_title,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Proposed title for the dataset being collected.')) }}
-            {% endcall %}
-            {% call form.markdown(
-                'proposed_dataset_abstract',
-                label=_('Proposed dataset abstract'),
-                id='field-proposed_dataset_abstract',
-                value=data.proposed_dataset_abstract,
-                error=errors.proposed_dataset_abstract,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
-            {% endcall %}
-            {% call form.markdown(
-                'dataset_purpose',
-                label=_('Purpose of the dataset'),
-                id='field-dataset_purpose',
-                value=data.dataset_purpose,
-                error=errors.dataset_purpose,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
-            {% endcall %}
-            {% call form.markdown(
-                'dataset_lineage',
-                label=_('Dataset lineage statement'),
-                id='field-dataset_lineage',
-                value=data.lineage_statement,
-                error=errors.lineage_statement,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Information about the lineage of the dataset being collected (if it is based on previous data, etc.')) }}
-            {% endcall %}
-            {% call form.markdown(
-                'dataset_associated_attributes',
-                label=_('Dataset associated attributes'),
-                id='field-dataset_associated_attributes',
-                value=data.dataset_associated_attributes,
-                error=errors.dataset_associated_attributes,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(
-                _('Additional alphanumeric attributes that shall be collected, in addition to the geospatial information.
-                If possible, provide a detailed description of each attribute.')
-                ) }}
-            {% endcall %}
-            {% call form.markdown(
-                'dataset_usage_restrictions',
-                label=_('Dataset usage restrictions'),
-                id='field-dataset_usage_restrictions',
-                value=data.dataset_usage_restrictions,
-                error=errors.dataset_usage_restrictions,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Description of dataset usage restrictions')) }}
-            {% endcall %}
-            {% call form.markdown(
-                'dataset_capture_method',
-                label=_('Dataset capture method'),
-                id='field-dataset_capture_method',
-                value=data.dataset_capture_method,
-                error=errors.dataset_capture_method,
-                classes=['control-medium']
-            ) %}
-                {{ form.info(_('Method to be employed for collecting the raw data (Aerial photography, cadastral survey, etc.)')) }}
-            {% endcall %}
-        </fieldset>
-        <button type="button" class="btn btn-default">Add another dataset</button>
+        {{ h.snippet(
+                "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
+                index=1,
+                data_type=data.data_type,
+                proposed_dataset_title=data.proposed_dataset_title,
+                proposed_dataset_abstract=data.proposed_dataset_abstract,
+                dataset_purpose=data.dataset_purpose,
+                lineage_statement=data.lineage_statement,
+                dataset_associated_attributes=data.dataset_associated_attributes,
+                dataset_usage_restrictions=data.dataset_usage_restrictions,
+                dataset_capture_method=data.dataset_capture_method,
+                data_type_error=errors.data_type,
+                proposed_dataset_title_error=errors.proposed_dataset_title,
+                proposed_dataset_abstract_error=errors.proposed_dataset_abstract,
+                dataset_purpose_error=errors.dataset_purpose,
+                lineage_statement_error=errors.lineage_statement,
+                dataset_associated_attributes_error=errors.dataset_associated_attributes,
+                dataset_usage_restrictions_error=errors.dataset_usage_restrictions,
+                dataset_capture_method_error=errors.dataset_capture_method
+        ) }}
+        <button
+                id="insert-dataset-fieldset-button"
+                type="button"
+                class="btn btn-default btn-sm"
+                data-module="dcprRequestDatasets"
+                data-module-index="1"
+        >Add another dataset</button>
+        <button
+                id="remove-previous-dataset-button"
+                type="button"
+                class="btn btn-danger btn-sm"
+                disabled
+        >Remove previous dataset</button>
     </fieldset>
     <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
         <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>

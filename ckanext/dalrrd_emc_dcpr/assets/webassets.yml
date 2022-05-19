@@ -31,6 +31,15 @@ dataset-spatial-extent-map-css:
     preload:
       - ckanext-dalrrdemcdcpr/vendorized-leaflet-geoman-css
 
+dcpr-request-datasets-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_dcprRequestDatasets.js
+  contents:
+    - js/dcprRequestDatasets.js
+  filter: rjsmin
+  extra:
+    preload:
+      - base/main
+
 ckan-base-css:
   output: ckanext-dalrrdemcdcpr/%(version)s_ckan_base.css
   contents:
