@@ -5,45 +5,36 @@
         Dataset #{{ index }} fields
     </legend>
     {% call form.input(
-                'data_type',
-                label=_('Data type'),
-                id='ds{}-field-data_type'.format(index),
-                placeholder=_('e.g. Vector line'),
-                value=data_type,
-                error=data_type_error,
-                classes=['control-medium']
-            ) %}
-        {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
-    {% endcall %}
-    {% call form.input(
                 'proposed_dataset_title',
-                label=_('Proposed dataset title'),
+                label=_('Dataset title'),
                 id='ds{}-field-proposed_dataset_title'.format(index),
                 value=proposed_dataset_title,
                 error=proposed_dataset_title_error,
-                classes=['control-medium']
+                classes=['control-medium'],
+                is_required=True
             ) %}
         {{ form.info(_('Proposed title for the dataset being collected.')) }}
     {% endcall %}
     {% call form.markdown(
+                'dataset_purpose',
+                label=_('Dataset purpose'),
+                id='ds{}-field-dataset_purpose'.format(index),
+                value=dataset_purpose,
+                error=dataset_purpose_error,
+                classes=['control-medium'],
+                is_required=True
+            ) %}
+        {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
+    {% endcall %}
+    {% call form.markdown(
                 'proposed_dataset_abstract',
-                label=_('Proposed dataset abstract'),
+                label=_('Dataset abstract'),
                 id='ds{}-field-proposed_dataset_abstract'.format(index),
                 value=proposed_dataset_abstract,
                 error=proposed_dataset_abstract_error,
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
-    {% endcall %}
-    {% call form.markdown(
-                'dataset_purpose',
-                label=_('Purpose of the dataset'),
-                id='ds{}-field-dataset_purpose'.format(index),
-                value=dataset_purpose,
-                error=dataset_purpose_error,
-                classes=['control-medium']
-            ) %}
-        {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
     {% endcall %}
     {% call form.markdown(
                 'dataset_lineage',
@@ -54,6 +45,17 @@
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Information about the lineage of the dataset being collected (if it is based on previous data, etc.')) }}
+    {% endcall %}
+    {% call form.input(
+                'data_type',
+                label=_('Data type'),
+                id='ds{}-field-data_type'.format(index),
+                placeholder=_('e.g. Vector line'),
+                value=data_type,
+                error=data_type_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
     {% endcall %}
     {% call form.markdown(
                 'dataset_associated_attributes',

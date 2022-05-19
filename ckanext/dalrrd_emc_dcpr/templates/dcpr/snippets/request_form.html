@@ -16,7 +16,7 @@
                 selected=relevant_organizations[0].text,
                 is_required=true
             ) %}
-                {{ form.info(_('Organization that shall be responsible for this DCPR request')) }}
+                {{ form.info(_('Organization that shall be responsible for this DCPR request - This field only shows organizations that the current user is a member of.')) }}
             {% endcall %}
         {% endif %}
         {% call form.input(

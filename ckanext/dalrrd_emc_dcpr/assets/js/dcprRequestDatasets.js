@@ -38,15 +38,16 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             removeButtonEl.removeAttribute('disabled')
         },
 
-        // _onReceiveRenderedTemplateError: function (error) {
-        //     console.log(error)
-        // },
-
         _onRemoveDatasetFieldset: function (event) {
-            let datasetFieldsets = document.querySelectorAll('dynamic-dataset-fieldset')
-            if (datasetFieldsets.length > 1) {
-                let indexToRemove = datasetFieldsets.length - 1
-                console.log(`Was asked to remove previous dataset, which has index ${indexToRemove}`)
+            let fieldsetSelector = '.dynamic-dataset-fieldset'
+            let datasetFieldsets = document.querySelectorAll(fieldsetSelector)
+            let indexToRemove = datasetFieldsets.length - 1
+            console.log(`Was asked to remove previous dataset, which has index ${indexToRemove}`)
+            let lastDatasetFieldset = datasetFieldsets[datasetFieldsets.length - 1]
+            lastDatasetFieldset.remove()
+            if (document.querySelectorAll(fieldsetSelector).length < 2) {
+                let removeButton = document.querySelector('#remove-previous-dataset-button')
+                removeButton.setAttribute('disabled', true)
             }
         },
 

@@ -114,12 +114,15 @@ class DcprRequestCreateView(MethodView):
 
     def post(self):
         try:
-            data_dict = clean_dict(
+            flat_data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
+            data_dict = _unflatten_dcpr_request_datasets(flat_data_dict)
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
         else:
+            logger.debug(f"{flat_data_dict=}")
+            logger.debug(f"{data_dict=}")
             if data_dict.get("organization_id") is None:
                 data_dict["organization_id"] = request.args.get("organization_id")
             try:
@@ -968,3 +971,38 @@ def _prepare_context() -> typing.Dict:
         "auth_user_obj": toolkit.g.userobj,
     }
     return context
+
+
+def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict:
+    dataset_fields = [
+        "data_type",
+        "dataset_associated_attributes",
+        "dataset_capture_method",
+        "dataset_lineage",
+        "dataset_purpose",
+        "dataset_usage_restrictions",
+        "proposed_dataset_abstract",
+        "proposed_dataset_title",
+    ]
+    # how many datasets have been submitted?
+    first_ds_field_value = flat_data_dict.get(dataset_fields[0])
+    num_datasets = (
+        len(first_ds_field_value) if isinstance(first_ds_field_value, list) else 1
+    )
+    logger.debug(f"{num_datasets=}")
+
+    data_dict = {}
+    datasets: typing.List[typing.Dict] = [{} for i in range(num_datasets)]
+    for name, value in flat_data_dict.items():
+        if name in dataset_fields:
+            logger.debug(f"Processing {name=} {value=}...")
+            if num_datasets == 1:
+                datasets[0][name] = value
+            else:
+                for ds_index, ds_value in enumerate(value):
+                    logger.debug(f"Processing {ds_index=} {ds_value=}...")
+                    datasets[ds_index][name] = ds_value
+        else:
+            data_dict[name] = value
+    data_dict["datasets"] = datasets
+    return data_dict
