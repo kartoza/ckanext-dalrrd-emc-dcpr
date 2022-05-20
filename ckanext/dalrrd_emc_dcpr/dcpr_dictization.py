@@ -29,6 +29,10 @@ def dcpr_request_dictize(
     for dcpr_dataset in dcpr_request.datasets:
         dataset_dict = dcpr_request_dataset_dictize(dcpr_dataset, context)
         result_dict["datasets"].append(dataset_dict)
+    result_dict["capture_start_date"] = result_dict["capture_start_date"].partition(
+        "T"
+    )[0]
+    result_dict["capture_end_date"] = result_dict["capture_end_date"].partition("T")[0]
     if context.get("dictize_for_ui", False):
         result_dict.update(
             {

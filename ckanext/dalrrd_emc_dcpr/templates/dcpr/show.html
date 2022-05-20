@@ -304,5 +304,50 @@
         </table>
     </section>
 
+    <section>
+        <h2>Datasets</h2>
+        {% if dcpr_request.datasets %}
+            {% for ds in dcpr_request.datasets %}
+                <h3>{{ ds.proposed_dataset_title }}</h3>
+                <table class="table table-striped table-bordered table-condensed">
+                    <tbody>
+                    <tr>
+                        <th scope="row">{{ _("Proposed dataset title") }}</th>
+                        <td>{{ ds.proposed_dataset_title }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Purpose") }}</th>
+                        <td>{{ ds.dataset_purpose }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Abstract") }}</th>
+                        <td>{{ ds.proposed_dataset_abstract }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Lineage") }}</th>
+                        <td>{{ ds.dataset_lineage }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Data type") }}</th>
+                        <td>{{ ds.data_type }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Associated attributes") }}</th>
+                        <td>{{ ds.dataset_associated_attributes }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Usage restrictions") }}</th>
+                        <td>{{ ds.dataset_usage_restrictions }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">{{ _("Capture method") }}</th>
+                        <td>{{ ds.dataset_capture_method }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            {% endfor %}
+        {% else %}
+            <p class="empty">{{ _('This DCPR request does not have any datasets.') }}</p>
+        {% endif %}
 
 {% endblock %}

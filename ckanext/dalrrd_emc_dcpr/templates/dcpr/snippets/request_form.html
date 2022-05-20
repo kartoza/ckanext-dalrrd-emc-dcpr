@@ -120,17 +120,18 @@
         ) %}
             {{ form.info(_('Any additional details about the project that the user deems relevant for aiding the NSIF and CSI in their review and moderation process')) }}
         {% endcall %}
-        {{ h.snippet(
+        {% for ds in data.datasets %}
+            {{ h.snippet(
                 "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
-                index=1,
-                data_type=data.data_type,
-                proposed_dataset_title=data.proposed_dataset_title,
-                proposed_dataset_abstract=data.proposed_dataset_abstract,
-                dataset_purpose=data.dataset_purpose,
-                lineage_statement=data.lineage_statement,
-                dataset_associated_attributes=data.dataset_associated_attributes,
-                dataset_usage_restrictions=data.dataset_usage_restrictions,
-                dataset_capture_method=data.dataset_capture_method,
+                index=loop.index,
+                data_type=ds.data_type,
+                proposed_dataset_title=ds.proposed_dataset_title,
+                proposed_dataset_abstract=ds.proposed_dataset_abstract,
+                dataset_purpose=ds.dataset_purpose,
+                lineage_statement=ds.lineage_statement,
+                dataset_associated_attributes=ds.dataset_associated_attributes,
+                dataset_usage_restrictions=ds.dataset_usage_restrictions,
+                dataset_capture_method=ds.dataset_capture_method,
                 data_type_error=errors.data_type,
                 proposed_dataset_title_error=errors.proposed_dataset_title,
                 proposed_dataset_abstract_error=errors.proposed_dataset_abstract,
@@ -140,12 +141,13 @@
                 dataset_usage_restrictions_error=errors.dataset_usage_restrictions,
                 dataset_capture_method_error=errors.dataset_capture_method
         ) }}
+        {% endfor %}
         <button
                 id="insert-dataset-fieldset-button"
                 type="button"
                 class="btn btn-default btn-sm"
                 data-module="dcprRequestDatasets"
-                data-module-index="1"
+                data-module-index="{{ data.datasets | count }}"
         >Add another dataset</button>
         <button
                 id="remove-previous-dataset-button"
