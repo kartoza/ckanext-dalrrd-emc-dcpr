@@ -108,7 +108,8 @@ def dcpr_request_show_auth(context: typing.Dict, data_dict: typing.Dict) -> typi
             DCPRRequestStatus.AWAITING_NSIF_REVIEW.value,
             DCPRRequestStatus.UNDER_NSIF_REVIEW.value,
         )
-        if context["auth_user_obj"].id == request_obj.owner_user:
+        auth_user_obj = context["auth_user_obj"]
+        if auth_user_obj is not None and auth_user_obj.id == request_obj.owner_user:
             # this is the owner, allow regardless of current status
             result["success"] = True
         elif request_obj.status in published_statuses:
