@@ -15,6 +15,16 @@
             ) %}
         {{ form.info(_('Proposed title for the dataset being collected.')) }}
     {% endcall %}
+    {% call form.checkbox(
+            'dataset_custodian',
+            label=_('Organization is custodian?'),
+            value='ds-{}'.format(index),
+            id='ds{}-field-dataset_custodian'.format(index),
+            checked=dataset_custodian,
+            error=dataset_custodian_error
+        ) %}
+        {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
+    {% endcall %}
     {% call form.markdown(
                 'dataset_purpose',
                 label=_('Dataset purpose'),
@@ -27,19 +37,19 @@
         {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
     {% endcall %}
     {% call form.markdown(
-                'proposed_dataset_abstract',
+                'proposed_abstract',
                 label=_('Dataset abstract'),
-                id='ds{}-field-proposed_dataset_abstract'.format(index),
-                value=proposed_dataset_abstract,
-                error=proposed_dataset_abstract_error,
+                id='ds{}-field-proposed_abstract'.format(index),
+                value=proposed_abstract,
+                error=proposed_abstract_error,
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
     {% endcall %}
     {% call form.markdown(
-                'dataset_lineage',
+                'lineage_statement',
                 label=_('Dataset lineage statement'),
-                id='ds{}-field-dataset_lineage'.format(index),
+                id='ds{}-field-lineage_statement'.format(index),
                 value=lineage_statement,
                 error=lineage_statement_error,
                 classes=['control-medium']
@@ -58,11 +68,11 @@
         {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
     {% endcall %}
     {% call form.markdown(
-                'dataset_associated_attributes',
+                'associated_attributes',
                 label=_('Dataset associated attributes'),
-                id='ds{}-field-dataset_associated_attributes'.format(index),
-                value=dataset_associated_attributes,
-                error=dataset_associated_attributes_error,
+                id='ds{}-field-associated_attributes'.format(index),
+                value=associated_attributes,
+                error=associated_attributes_error,
                 classes=['control-medium']
             ) %}
         {{ form.info(
@@ -71,21 +81,21 @@
                 ) }}
     {% endcall %}
     {% call form.markdown(
-                'dataset_usage_restrictions',
+                'data_usage_restrictions',
                 label=_('Dataset usage restrictions'),
-                id='ds{}-field-dataset_usage_restrictions'.format(index),
-                value=dataset_usage_restrictions,
-                error=dataset_usage_restrictions_error,
+                id='ds{}-field-data_usage_restrictions'.format(index),
+                value=data_usage_restrictions,
+                error=data_usage_restrictions_error,
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Description of dataset usage restrictions')) }}
     {% endcall %}
     {% call form.markdown(
-                'dataset_capture_method',
+                'capture_method',
                 label=_('Dataset capture method'),
-                id='ds{}-field-dataset_capture_method'.format(index),
-                value=dataset_capture_method,
-                error=dataset_capture_method_error,
+                id='ds{}-field-capture_method'.format(index),
+                value=capture_method,
+                error=capture_method_error,
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Method to be employed for collecting the raw data (Aerial photography, cadastral survey, etc.)')) }}

@@ -202,7 +202,7 @@ class DcprRequestOwnerUpdateView(MethodView):
                         "csi_reference_id": csi_reference_id,
                         "errors": errors or {},
                         "error_summary": error_summary or {},
-                        "data_urgency": [
+                        "data_urgency_options": [
                             {"value": level.value, "text": level.value}
                             for level in DCPRRequestUrgency
                         ],
@@ -211,10 +211,12 @@ class DcprRequestOwnerUpdateView(MethodView):
         return result
 
     def post(self, csi_reference_id: str):
+        logger.debug(f"raw form data: {request.form}")
         try:
             flat_data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
+            logger.debug(f"form data after CKAN's vanilla parsing: {flat_data_dict}")
             data_dict = _unflatten_dcpr_request_datasets(flat_data_dict)
             data_dict["csi_reference_id"] = csi_reference_id
         except dict_fns.DataError:
@@ -226,7 +228,7 @@ class DcprRequestOwnerUpdateView(MethodView):
             context = _prepare_context()
 
             try:
-                toolkit.get_action("dcpr_request_update")(context, data_dict)
+                toolkit.get_action("dcpr_request_update_by_owner")(context, data_dict)
             except toolkit.NotAuthorized as exc:
                 result = toolkit.base.abort(
                     403,
@@ -762,14 +764,15 @@ def _prepare_context() -> typing.Dict:
 
 def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict:
     dataset_fields = [
-        "data_type",
-        "dataset_associated_attributes",
-        "dataset_capture_method",
-        "dataset_lineage",
-        "dataset_purpose",
-        "dataset_usage_restrictions",
-        "proposed_dataset_abstract",
         "proposed_dataset_title",
+        "dataset_purpose",
+        "dataset_custodian",
+        "data_type",
+        "proposed_abstract",
+        "lineage_statement",
+        "associated_attributes",
+        "data_usage_restrictions",
+        "capture_method",
     ]
     # how many datasets have been submitted?
     first_ds_field_value = flat_data_dict.get(dataset_fields[0])
@@ -783,7 +786,14 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
     for name, value in flat_data_dict.items():
         if name in dataset_fields:
             logger.debug(f"Processing {name=} {value=}...")
-            if num_datasets == 1:
+            if name == "dataset_custodian":
+                if isinstance(value, list):
+                    for i in range(num_datasets):
+                        target_value = f"ds-{i+1}"
+                        datasets[i][name] = target_value in value
+                else:
+                    datasets[0][name] = value.partition("-")[-1] == "1"
+            elif num_datasets == 1:
                 datasets[0][name] = value
             else:
                 for ds_index, ds_value in enumerate(value):

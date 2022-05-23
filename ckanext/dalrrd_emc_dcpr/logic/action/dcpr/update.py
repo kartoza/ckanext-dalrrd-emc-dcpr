@@ -14,8 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 def dcpr_request_update_by_owner(context, data_dict):
+    logger.debug(f"raw_data_dict input to the CKAN action: {data_dict}")
     schema = dcpr_schema.update_dcpr_request_by_owner_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    logger.debug(f"{validated_data=}")
+    logger.debug(f"{errors=}")
     if errors:
         raise toolkit.ValidationError(errors)
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)

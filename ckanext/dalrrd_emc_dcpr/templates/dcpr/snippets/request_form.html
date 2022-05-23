@@ -69,15 +69,6 @@
         ) %}
             {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
         {% endcall %}
-        {% call form.checkbox(
-            'dataset_custodian',
-            label=_('Organization is custodian?'),
-            id='field-dataset_custodian',
-            checked=data.dataset_custodian,
-            error=errors.dataset_custodian
-        ) %}
-            {{ form.info(_('Whether the request is being made by a user acting on behalf of the dataset custodian for the specified dataset(s) or not.')) }}
-        {% endcall %}
         {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
         {% call form.input(
             'spatial_resolution',
@@ -109,39 +100,41 @@
             error=errors.additional_project_context,
             placeholder=_('e.g. Additional relevant information about the project.')
         ) %}
-            {{ form.info(_('Additional information about the scope of the DCPR request.')) }}
+            {{ form.info(_('Additional information about the project and this DCPR request. Please include any relevant
+            information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
-        {% call form.markdown(
-            'additional_information',
-            label=_('Additional information'),
-            id='field-additional_information',
-            value=data.additional_information,
-            error=errors.additional_information
-        ) %}
-            {{ form.info(_('Any additional details about the project that the user deems relevant for aiding the NSIF and CSI in their review and moderation process')) }}
-        {% endcall %}
-        {% for ds in data.datasets %}
+        {% if data.datasets %}
+            {% for ds in data.datasets %}
+                {{ h.snippet(
+                    "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
+                    index=loop.index,
+                    dataset_custodian=ds.dataset_custodian,
+                    data_type=ds.data_type,
+                    proposed_dataset_title=ds.proposed_dataset_title,
+                    proposed_abstract=ds.proposed_abstract,
+                    dataset_purpose=ds.dataset_purpose,
+                    lineage_statement=ds.lineage_statement,
+                    associated_attributes=ds.associated_attributes,
+                    feature_description=ds.feature_description,
+                    data_usage_restrictions=ds.data_usage_restrictions,
+                    capture_method=ds.capture_method,
+                    dataset_custodian_error=errors.dataset_custodian,
+                    data_type_error=errors.data_type,
+                    proposed_dataset_title_error=errors.proposed_dataset_title,
+                    proposed_abstract_error=errors.proposed_abstract,
+                    dataset_purpose_error=errors.dataset_purpose,
+                    lineage_statement_error=errors.lineage_statement,
+                    associated_attributes_error=errors.associated_attributes,
+                    data_usage_restrictions_error=errors.data_usage_restrictions,
+                    capture_method_error=errors.capture_method
+                ) }}
+            {% endfor %}
+        {% else %}
             {{ h.snippet(
-                "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
-                index=loop.index,
-                data_type=ds.data_type,
-                proposed_dataset_title=ds.proposed_dataset_title,
-                proposed_dataset_abstract=ds.proposed_dataset_abstract,
-                dataset_purpose=ds.dataset_purpose,
-                lineage_statement=ds.lineage_statement,
-                dataset_associated_attributes=ds.dataset_associated_attributes,
-                dataset_usage_restrictions=ds.dataset_usage_restrictions,
-                dataset_capture_method=ds.dataset_capture_method,
-                data_type_error=errors.data_type,
-                proposed_dataset_title_error=errors.proposed_dataset_title,
-                proposed_dataset_abstract_error=errors.proposed_dataset_abstract,
-                dataset_purpose_error=errors.dataset_purpose,
-                lineage_statement_error=errors.lineage_statement,
-                dataset_associated_attributes_error=errors.dataset_associated_attributes,
-                dataset_usage_restrictions_error=errors.dataset_usage_restrictions,
-                dataset_capture_method_error=errors.dataset_capture_method
-        ) }}
-        {% endfor %}
+                    "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
+                    index=1
+            ) }}
+        {% endif %}
         <button
                 id="insert-dataset-fieldset-button"
                 type="button"

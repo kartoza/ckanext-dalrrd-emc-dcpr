@@ -36,7 +36,6 @@ def create_dcpr_request_schema(
         "spatial_extent": [ignore_missing, unicode_safe],
         "spatial_resolution": [ignore_missing, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
-        "additional_information": [ignore_missing, unicode_safe],
         "additional_documents": [unicode_safe, ignore_missing],
         "datasets": create_dcpr_request_dataset_schema(),
     }
@@ -68,7 +67,6 @@ def update_dcpr_request_by_owner_schema(
         "spatial_extent": [ignore_missing, unicode_safe],
         "spatial_resolution": [ignore_missing, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
-        "additional_information": [ignore_missing, unicode_safe],
         "additional_documents": [unicode_safe, ignore_missing],
         "datasets": create_dcpr_request_dataset_schema(),
     }
@@ -142,15 +140,13 @@ def create_dcpr_request_dataset_schema(
         "dataset_id": [ignore],
         "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_purpose": [not_empty, not_missing, unicode_safe],
-        "dataset_custodian": [ignore_missing, boolean_validator],
+        "dataset_custodian": [boolean_validator],
         "data_type": [ignore_missing, unicode_safe],
         "proposed_abstract": [ignore_missing, unicode_safe],
         "lineage_statement": [ignore_missing, unicode_safe],
         "associated_attributes": [ignore_missing, unicode_safe],
-        "feature_description": [ignore_missing, unicode_safe],
         "data_usage_restrictions": [ignore_missing, unicode_safe],
         "capture_method": [ignore_missing, unicode_safe],
-        "capture_method_detail": [ignore_missing, unicode_safe],
     }
 
 

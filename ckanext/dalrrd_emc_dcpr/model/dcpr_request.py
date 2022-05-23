@@ -226,18 +226,19 @@ class DCPRRequest(model.core.StatefulObjectMixin, model.domain_object.DomainObje
         query = model.meta.Session.query(cls)
         return query.get(csi_reference_id)
 
-    def get_dataset_elements(self) -> Optional[DCPRRequestDataset]:
-        datasets = (
-            model.meta.Session.query(DCPRRequest)
-            .join(
-                DCPRRequestDataset,
-                DCPRRequestDataset.dcpr_request_id == DCPRRequest.csi_reference_id,
-            )
-            .filter(DCPRRequestDataset.dcpr_request_id == str(self.csi_reference))
-            .all()
-        )
-
-        return datasets
+    #
+    # def get_dataset_elements(self) -> Optional[DCPRRequestDataset]:
+    #     datasets = (
+    #         model.meta.Session.query(DCPRRequest)
+    #         .join(
+    #             DCPRRequestDataset,
+    #             DCPRRequestDataset.dcpr_request_id == DCPRRequest.csi_reference_id,
+    #         )
+    #         .filter(DCPRRequestDataset.dcpr_request_id == str(self.csi_reference))
+    #         .all()
+    #     )
+    #
+    #     return datasets
 
     def get_notification_targets(self) -> Optional[DCPRRequestNotificationTarget]:
         targets = (

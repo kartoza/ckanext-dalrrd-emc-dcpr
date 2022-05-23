@@ -13,11 +13,14 @@ which builds the dictionary by iterating over the table columns.
 
 """
 
+import logging
 import typing
 
 import ckan.lib.dictization as ckan_dictization
 
 from .model import dcpr_request as dcpr_request_model
+
+logger = logging.getLogger(__name__)
 
 
 def dcpr_request_dictize(
@@ -61,6 +64,8 @@ def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dic
         validated_data_dict, dcpr_request_model.DCPRRequest, context
     )
     context["session"].flush()
+    for ds in dcpr_request.datasets:
+        context["session"].delete(ds)
     dcpr_request_dataset_list_save(
         validated_data_dict.get("datasets", []), dcpr_request, context
     )
@@ -78,6 +83,7 @@ def dcpr_request_dataset_list_save(
 def dcpr_dataset_save(dcpr_dataset_dict: typing.Dict, context: typing.Dict):
     session = context["session"]
     obj = dcpr_request_model.DCPRRequestDataset()
+    logger.debug(f"{dcpr_dataset_dict=}")
     obj.from_dict(dcpr_dataset_dict)
     session.add(obj)
     return obj
