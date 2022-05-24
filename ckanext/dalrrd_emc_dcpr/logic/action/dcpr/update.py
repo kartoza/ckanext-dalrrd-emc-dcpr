@@ -4,6 +4,7 @@ import typing
 
 from ckan.plugins import toolkit
 
+from .... import jobs
 from ....constants import (
     DcprRequestModerationAction,
     DcprManagementActivityType,
@@ -119,10 +120,14 @@ def dcpr_request_submit(context, data_dict):
     if request_obj is not None:
         _update_dcpr_request_status(request_obj)
         model.Session.commit()
-        create_dcpr_management_activity(
+        activity = create_dcpr_management_activity(
             request_obj,
             activity_type=DcprManagementActivityType.SUBMIT_DCPR_REQUEST,
             context=context,
+        )
+        toolkit.enqueue_job(
+            jobs.notify_dcpr_actors_of_relevant_status_change,
+            args=[activity["id"]],
         )
     else:
         raise toolkit.ObjectNotFound
@@ -168,8 +173,12 @@ def dcpr_request_nsif_moderate(
                 DcprRequestModerationAction.REJECT: DcprManagementActivityType.REJECT_DCPR_REQUEST_NSIF,
                 DcprRequestModerationAction.REQUEST_CLARIFICATION: DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_NSIF,
             }[moderation_action]
-            create_dcpr_management_activity(
+            activity = create_dcpr_management_activity(
                 request_obj, activity_type=activity_type, context=context
+            )
+            toolkit.enqueue_job(
+                jobs.notify_org_admins_of_dataset_management_request,
+                args=[activity["id"]],
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
     else:
@@ -209,8 +218,12 @@ def dcpr_request_csi_moderate(
                 DcprRequestModerationAction.REJECT: DcprManagementActivityType.REJECT_DCPR_REQUEST_CSI,
                 DcprRequestModerationAction.REQUEST_CLARIFICATION: DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_CSI,
             }[moderation_action]
-            create_dcpr_management_activity(
+            activity = create_dcpr_management_activity(
                 request_obj, activity_type=activity_type, context=context
+            )
+            toolkit.enqueue_job(
+                jobs.notify_org_admins_of_dataset_management_request,
+                args=[activity["id"]],
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
     else:
@@ -318,8 +331,12 @@ def _resign_reviewer(
         context["model"].Session.commit()
     else:
         raise toolkit.ObjectNotFound
-    create_dcpr_management_activity(
+    activity = create_dcpr_management_activity(
         request_obj, activity_type=activity_type, context=context
+    )
+    toolkit.enqueue_job(
+        jobs.notify_org_admins_of_dataset_management_request,
+        args=[activity["id"]],
     )
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
