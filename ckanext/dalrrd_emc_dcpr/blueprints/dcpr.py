@@ -157,7 +157,17 @@ new_dcpr_request_view = DcprRequestCreateView.as_view("new_dcpr_request")
 dcpr_blueprint.add_url_rule("/request/new/", view_func=new_dcpr_request_view)
 
 
-class DcprRequestOwnerUpdateView(MethodView):
+class _DcprUpdateView(MethodView):
+    show_action = "dcpr_request_show"
+    success_redirect_to_view = "dcpr.dcpr_request_show"
+    update_auth: typing.Optional[str] = None
+    update_action: typing.Optional[str] = None
+    template_path = "dcpr/edit.html"
+    form_snippet = "dcpr/snippets/request_form.html"
+    enable_owner_fieldset = True
+    enable_nsif_fieldset = False
+    enable_csi_fieldset = False
+
     def get(
         self,
         csi_reference_id: str,
@@ -167,7 +177,7 @@ class DcprRequestOwnerUpdateView(MethodView):
     ):
         context = _prepare_context()
         try:
-            old_data = toolkit.get_action("dcpr_request_show")(
+            old_data = toolkit.get_action(self.show_action)(
                 context, data_dict={"csi_reference_id": csi_reference_id}
             )
             # old data is from the database and data is passed from the
@@ -180,7 +190,7 @@ class DcprRequestOwnerUpdateView(MethodView):
         else:
             try:
                 toolkit.check_access(
-                    "dcpr_request_update_by_owner_auth",
+                    self.update_auth,
                     context,
                     data_dict={"csi_reference_id": csi_reference_id},
                 )
@@ -192,12 +202,12 @@ class DcprRequestOwnerUpdateView(MethodView):
                 )
             else:
                 result = toolkit.render(
-                    "dcpr/edit.html",
+                    self.template_path,
                     extra_vars={
-                        "form_snippet": "dcpr/snippets/request_form.html",
-                        "enable_owner_fieldset": True,
-                        "enable_nsif_fieldset": False,
-                        "enable_csi_fieldset": False,
+                        "form_snippet": self.form_snippet,
+                        "enable_owner_fieldset": self.enable_owner_fieldset,
+                        "enable_nsif_fieldset": self.enable_nsif_fieldset,
+                        "enable_csi_fieldset": self.enable_csi_fieldset,
                         "data": data,
                         "csi_reference_id": csi_reference_id,
                         "errors": errors or {},
@@ -228,7 +238,7 @@ class DcprRequestOwnerUpdateView(MethodView):
             context = _prepare_context()
 
             try:
-                toolkit.get_action("dcpr_request_update_by_owner")(context, data_dict)
+                toolkit.get_action(self.update_action)(context, data_dict)
             except toolkit.NotAuthorized as exc:
                 result = toolkit.base.abort(
                     403,
@@ -247,10 +257,34 @@ class DcprRequestOwnerUpdateView(MethodView):
                 )
             else:
                 url = toolkit.h.url_for(
-                    "dcpr.dcpr_request_show", csi_reference_id=csi_reference_id
+                    self.success_redirect_to_view, csi_reference_id=csi_reference_id
                 )
                 result = toolkit.h.redirect_to(url)
         return result
+
+
+class DcprRequestOwnerUpdateView(_DcprUpdateView):
+    update_auth = "dcpr_request_update_by_owner_auth"
+    update_action = "dcpr_request_update_by_owner"
+    enable_owner_fieldset = True
+    enable_nsif_fieldset = False
+    enable_csi_fieldset = False
+
+
+class DcprRequestNsifUpdateView(_DcprUpdateView):
+    update_auth = "dcpr_request_update_by_nsif_auth"
+    update_action = "dcpr_request_update_by_nsif"
+    enable_owner_fieldset = False
+    enable_nsif_fieldset = True
+    enable_csi_fieldset = False
+
+
+class DcprRequestCsifUpdateView(_DcprUpdateView):
+    update_auth = "dcpr_request_update_by_csi_auth"
+    update_action = "dcpr_request_update_by_csi"
+    enable_owner_fieldset = False
+    enable_nsif_fieldset = False
+    enable_csi_fieldset = True
 
 
 owner_edit_dcpr_request_view = DcprRequestOwnerUpdateView.as_view(
@@ -260,24 +294,140 @@ dcpr_blueprint.add_url_rule(
     "/request/<csi_reference_id>/owner_edit/", view_func=owner_edit_dcpr_request_view
 )
 
-
-class DcprRequestNsifUpdateView(MethodView):
-    def get(
-        self,
-        csi_reference_id: str,
-        data: typing.Optional[typing.Dict] = None,
-        errors: typing.Optional[typing.Dict] = None,
-        error_summary=None,
-    ):
-        raise NotImplementedError
-
-
 nsif_edit_dcpr_request_view = DcprRequestNsifUpdateView.as_view(
     "nsif_edit_dcpr_request"
 )
 dcpr_blueprint.add_url_rule(
     "/request/<csi_reference_id>/nsif_edit/", view_func=nsif_edit_dcpr_request_view
 )
+
+csi_edit_dcpr_request_view = DcprRequestCsifUpdateView.as_view("csi_edit_dcpr_request")
+dcpr_blueprint.add_url_rule(
+    "/request/<csi_reference_id>/csi_edit/", view_func=csi_edit_dcpr_request_view
+)
+
+
+# class DcprRequestOwnerUpdateView(MethodView):
+#     def get(
+#         self,
+#         csi_reference_id: str,
+#         data: typing.Optional[typing.Dict] = None,
+#         errors: typing.Optional[typing.Dict] = None,
+#         error_summary=None,
+#     ):
+#         context = _prepare_context()
+#         try:
+#             old_data = toolkit.get_action("dcpr_request_show")(
+#                 context, data_dict={"csi_reference_id": csi_reference_id}
+#             )
+#             # old data is from the database and data is passed from the
+#             # user. if there is a validation error. Use user's data, if there.
+#             if data is not None:
+#                 old_data.update(data)
+#             data = old_data
+#         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+#             result = toolkit.abort(404, toolkit._("Dataset not found"))
+#         else:
+#             try:
+#                 toolkit.check_access(
+#                     "dcpr_request_update_by_owner_auth",
+#                     context,
+#                     data_dict={"csi_reference_id": csi_reference_id},
+#                 )
+#             except toolkit.NotAuthorized:
+#                 result = toolkit.abort(
+#                     403,
+#                     toolkit._("User %r not authorized to edit %s")
+#                     % (toolkit.g.user, csi_reference_id),
+#                 )
+#             else:
+#                 result = toolkit.render(
+#                     "dcpr/edit.html",
+#                     extra_vars={
+#                         "form_snippet": "dcpr/snippets/request_form.html",
+#                         "enable_owner_fieldset": True,
+#                         "enable_nsif_fieldset": False,
+#                         "enable_csi_fieldset": False,
+#                         "data": data,
+#                         "csi_reference_id": csi_reference_id,
+#                         "errors": errors or {},
+#                         "error_summary": error_summary or {},
+#                         "data_urgency_options": [
+#                             {"value": level.value, "text": level.value}
+#                             for level in DCPRRequestUrgency
+#                         ],
+#                     },
+#                 )
+#         return result
+#
+#     def post(self, csi_reference_id: str):
+#         logger.debug(f"raw form data: {request.form}")
+#         try:
+#             flat_data_dict = clean_dict(
+#                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+#             )
+#             logger.debug(f"form data after CKAN's vanilla parsing: {flat_data_dict}")
+#             data_dict = _unflatten_dcpr_request_datasets(flat_data_dict)
+#             data_dict["csi_reference_id"] = csi_reference_id
+#         except dict_fns.DataError:
+#             result = toolkit.abort(400, toolkit._("Integrity Error"))
+#         else:
+#             logger.debug(f"{flat_data_dict=}")
+#             logger.debug(f"{data_dict=}")
+#
+#             context = _prepare_context()
+#
+#             try:
+#                 toolkit.get_action("dcpr_request_update_by_owner")(context, data_dict)
+#             except toolkit.NotAuthorized as exc:
+#                 result = toolkit.base.abort(
+#                     403,
+#                     toolkit._("Unauthorized to update DCPR request, %s") % exc,
+#                 )
+#             except toolkit.ObjectNotFound:
+#                 result = toolkit.base.abort(404, toolkit._("DCPR request not found"))
+#             except toolkit.ValidationError as exc:
+#                 errors = exc.error_dict
+#                 error_summary = exc.error_summary
+#                 result = self.get(
+#                     csi_reference_id,
+#                     data=data_dict,
+#                     errors=errors,
+#                     error_summary=error_summary,
+#                 )
+#             else:
+#                 url = toolkit.h.url_for(
+#                     "dcpr.dcpr_request_show", csi_reference_id=csi_reference_id
+#                 )
+#                 result = toolkit.h.redirect_to(url)
+#         return result
+#
+#
+# owner_edit_dcpr_request_view = DcprRequestOwnerUpdateView.as_view(
+#     "owner_edit_dcpr_request"
+# )
+# dcpr_blueprint.add_url_rule(
+#     "/request/<csi_reference_id>/owner_edit/", view_func=owner_edit_dcpr_request_view
+# )
+#
+#
+# class DcprRequestNsifUpdateView(MethodView):
+#     def get(
+#         self,
+#         csi_reference_id: str,
+#         data: typing.Optional[typing.Dict] = None,
+#         errors: typing.Optional[typing.Dict] = None,
+#         error_summary=None,
+#     ):
+#         raise NotImplementedError
+#
+#
+# nsif_edit_dcpr_request_view = DcprRequestNsifUpdateView.as_view(
+#     "nsif_edit_dcpr_request"
+# )
+# dcpr_blueprint.add_url_rule(
+#     "/request/<csi_reference_id>/nsif_edit/", view_func=nsif_edit_dcpr_request_view
+# )
 
 
 @dcpr_blueprint.route("/request/<csi_reference_id>")
@@ -451,7 +601,7 @@ class DcprRequestModerateView(MethodView):
     def post(self, csi_reference_id: str, organization: str):
         data_dict = {
             "csi_reference_id": csi_reference_id,
-            "approved": "true" if "yes" in request.form.keys() else "false",
+            "action": list(request.form.keys())[0],
         }
         try:
             ckan_action = self.actions.get(organization, {}).get("ckan_action")
@@ -787,12 +937,20 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
         if name in dataset_fields:
             logger.debug(f"Processing {name=} {value=}...")
             if name == "dataset_custodian":
+                # the `dataset_custodian` form field is problematic - it is represented
+                # by a checkbox and is only submitted if the HTML element has the
+                # `checked` property. This means that if this `dataset_custodian` field
+                # is not checked, then parsing the form response when there are multiple
+                # datasets becomes trickier - the below code is just an attempt to deal
+                # with this in a less complex way.
                 if isinstance(value, list):
                     for i in range(num_datasets):
                         target_value = f"ds-{i+1}"
                         datasets[i][name] = target_value in value
                 else:
-                    datasets[0][name] = value.partition("-")[-1] == "1"
+                    for i in range(num_datasets):
+                        target_value = f"ds-{i+1}"
+                        datasets[i][name] = value == target_value
             elif num_datasets == 1:
                 datasets[0][name] = value
             else:

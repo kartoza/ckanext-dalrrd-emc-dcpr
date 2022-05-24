@@ -6,7 +6,20 @@ from ckan.lib.navl.dictization_functions import (
     Missing,
 )  # note: imported for type hints only
 
+from ..constants import DcprRequestModerationAction
+
 logger = logging.getLogger(__name__)
+
+
+def dcpr_moderation_choices_validator(value: str):
+    choices = [
+        DcprRequestModerationAction.APPROVE.value,
+        DcprRequestModerationAction.REJECT.value,
+        DcprRequestModerationAction.REQUEST_CLARIFICATION.value,
+    ]
+    if value not in choices:
+        raise toolkit.Invalid(toolkit._(f"Value must be one of {', '.join(choices)}"))
+    return value
 
 
 def dcpr_end_date_after_start_date_validator(key, flattened_data, errors, context):

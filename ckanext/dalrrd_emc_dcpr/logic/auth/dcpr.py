@@ -144,7 +144,26 @@ def dcpr_request_show_auth(context: typing.Dict, data_dict: typing.Dict) -> typi
 def dcpr_request_update_by_owner_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    return dcpr_request_submit_auth(context, data_dict)
+    request_obj = dcpr_request.DCPRRequest.get(data_dict["csi_reference_id"])
+    result = {"success": False}
+    if request_obj is not None:
+        owner_updatable_statuses = [
+            DCPRRequestStatus.UNDER_PREPARATION.value,
+            DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_NSIF.value,
+            DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_CSI.value,
+        ]
+        if request_obj.status in owner_updatable_statuses:
+            if context["auth_user_obj"].id == request_obj.owner_user:
+                result["success"] = True
+            else:
+                result["msg"] = toolkit._(
+                    "Current user is not authorized to update this DCPR request"
+                )
+        else:
+            result["msg"] = toolkit._("DCPR request cannot currently be updated")
+    else:
+        result["msg"] = toolkit._("Request not found")
+    return result
 
 
 def dcpr_request_update_by_nsif_auth(
@@ -219,21 +238,7 @@ def dcpr_request_submit_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     """DCPR request owners are the only users that are authorized to submit a request"""
-    request_obj = dcpr_request.DCPRRequest.get(data_dict["csi_reference_id"])
-    result = {"success": False}
-    if request_obj is not None:
-        if request_obj.status == DCPRRequestStatus.UNDER_PREPARATION.value:
-            if context["auth_user_obj"].id == request_obj.owner_user:
-                result["success"] = True
-            else:
-                result["msg"] = toolkit._(
-                    "Current user is not authorized to submit this DCPR request"
-                )
-        else:
-            result["msg"] = toolkit._("DCPR request cannot currently be submitted")
-    else:
-        result["msg"] = toolkit._("Request not found")
-    return result
+    return dcpr_request_update_by_owner_auth(context, data_dict)
 
 
 def dcpr_request_nsif_moderate_auth(

@@ -86,6 +86,7 @@ def dcpr_request_create(context, data_dict):
         }
     )
     logger.debug(f"{validated_data=}")
+    context["updated_by"] = "owner"
     dcpr_request = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     model.Session.commit()
     logger.debug(f"{dcpr_request=}")

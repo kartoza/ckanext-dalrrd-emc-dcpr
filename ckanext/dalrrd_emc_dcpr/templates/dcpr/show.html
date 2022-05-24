@@ -14,7 +14,8 @@
 {% endblock %}
 
 {% block content_action %}
-    {% if dcpr_request.status == "UNDER_PREPARATION" %}
+    {% set owner_updatable_statuses = ["UNDER_PREPARATION", "UNDER_MODIFICATION_REQUESTED_BY_NSIF", "UNDER_MODIFICATION_REQUESTED_BY_CSI"] %}
+    {% if dcpr_request.status in owner_updatable_statuses %}
         {% if h.check_access("dcpr_request_update_by_owner_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
             {% link_for _('Update DCPR request'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
         {% endif %}
@@ -29,7 +30,7 @@
 
     {% elif dcpr_request.status == "UNDER_NSIF_REVIEW" %}
         {% if h.check_access("dcpr_request_update_by_nsif_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
-            {% link_for _('Update NSIF review'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
+            {% link_for _('Update NSIF review'), named_route="dcpr.nsif_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
         {% endif %}
         {% if h.check_access("dcpr_request_resign_nsif_reviewer_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
             {% link_for _('Resign from being NSIF Reviewer'), named_route="dcpr.dcpr_request_resign_reviewer", csi_reference_id=dcpr_request.csi_reference_id, organization="nsif", class_='btn btn-default', icon='ban' %}
@@ -44,11 +45,11 @@
         {% endif %}
 
     {% elif dcpr_request.status == "UNDER_CSI_REVIEW" %}
+        {% if h.check_access("dcpr_request_update_by_csi_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
+            {% link_for _('Manage (CSI)'), named_route="dcpr.csi_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
+        {% endif %}
         {% if h.check_access("dcpr_request_resign_csi_reviewer_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
             {% link_for _('Resign from being CSI reviewer'), named_route="dcpr.dcpr_request_resign_reviewer", csi_reference_id=dcpr_request.csi_reference_id, organization="csi", class_='btn btn-default', icon='ban' %}
-        {% endif %}
-        {% if h.check_access("dcpr_request_update_by_csi_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
-            {% link_for _('Manage (CSI)'), named_route="dcpr.owner_edit_dcpr_request", csi_reference_id=dcpr_request.csi_reference_id, class_='btn btn-default', icon='wrench' %}
         {% endif %}
         {% if h.check_access("dcpr_request_csi_moderate_auth", {"csi_reference_id": dcpr_request.csi_reference_id}) %}
             {% link_for _('Submit CSI review'), named_route="dcpr.dcpr_request_moderate", csi_reference_id=dcpr_request.csi_reference_id, organization="csi", class_='btn btn-warning', icon='envelope-o' %}
@@ -157,7 +158,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row" class="dataset-label">{{ _("CSI moderation notes") }}</th>
+                    <th scope="row" class="dataset-label">{{ _("CSI review notes") }}</th>
                     <td class="dataset-details">
                         {{ dcpr_request.csi_moderation_notes }}
                     </td>

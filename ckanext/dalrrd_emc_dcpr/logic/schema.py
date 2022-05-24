@@ -110,13 +110,13 @@ def dcpr_request_submit_schema():
 def moderate_dcpr_request_schema(
     not_missing,
     not_empty,
-    boolean_validator,
+    dcpr_moderation_choices_validator,
 ):
     result = show_dcpr_request_schema()
-    result["approved"] = [
+    result["action"] = [
         not_missing,
         not_empty,
-        boolean_validator,
+        dcpr_moderation_choices_validator,
     ]
     return result
 

@@ -146,7 +146,9 @@
                 id="remove-previous-dataset-button"
                 type="button"
                 class="btn btn-danger btn-sm"
-                disabled
+                {% if data.datasets | count < 2 %}
+                    disabled
+                {% endif %}
         >Remove previous dataset</button>
     </fieldset>
     <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
@@ -165,11 +167,11 @@
     <fieldset {% if not enable_csi_fieldset %}disabled{% endif %}>
         <legend>CSI reviewer fields (only enabled for CSI reviewer)</legend>
         {% call form.markdown(
-            'csi_review_notes',
+            'csi_moderation_notes',
             label=_('CSI review notes'),
-            id='field-csi_review_notes',
-            value=data.csi_review_notes,
-            error=errors.csi_review_notes,
+            id='field-csi_moderation_notes',
+            value=data.csi_moderation_notes,
+            error=errors.csi_moderation_notes,
             classes=['control-medium']
         ) %}
             {{ form.info(_('DCPR review notes, as provided by the CSI reviewers')) }}

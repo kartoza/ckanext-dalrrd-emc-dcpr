@@ -3,9 +3,11 @@ import logging
 import typing
 
 from ckan.plugins import toolkit
-from sqlalchemy import exc
 
-from ....constants import DCPRRequestStatus
+from ....constants import (
+    DcprRequestModerationAction,
+    DCPRRequestStatus,
+)
 from ... import schema as dcpr_schema
 from ....model import dcpr_request
 from .... import dcpr_dictization
@@ -23,6 +25,7 @@ def dcpr_request_update_by_owner(context, data_dict):
         raise toolkit.ValidationError(errors)
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id
+    context["updated_by"] = "owner"
     request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     context["model"].Session.commit()
     # TODO: would be nice to add an activity here
@@ -104,8 +107,9 @@ def dcpr_request_submit(context, data_dict):
     )
     logger.debug(f"{request_obj=}")
     if request_obj is not None:
-        next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-        request_obj.status = next_status
+        # next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
+        # request_obj.status = next_status
+        _update_dcpr_request_status(request_obj)
         model.Session.commit()
     else:
         raise toolkit.ObjectNotFound
@@ -126,7 +130,7 @@ def dcpr_request_nsif_moderate(
         context,
         data_dict,
         auth_function="dcpr_request_nsif_moderate_auth",
-        approval_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
+        # approval_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
         nsif_moderation_date=dt.datetime.now(dt.timezone.utc),
     )
 
@@ -146,8 +150,8 @@ def _moderate(
     context: typing.Dict,
     data_dict: typing.Dict,
     auth_function: str,
-    approval_status: DCPRRequestStatus = DCPRRequestStatus.ACCEPTED,
-    rejection_status: DCPRRequestStatus = DCPRRequestStatus.REJECTED,
+    # approval_status: DCPRRequestStatus = DCPRRequestStatus.ACCEPTED,
+    # rejection_status: DCPRRequestStatus = DCPRRequestStatus.REJECTED,
     **additional_data,
 ) -> typing.Dict:
     logger.debug(f"inside _moderate - {data_dict=}")
@@ -167,14 +171,25 @@ def _moderate(
         .get(validated_data["csi_reference_id"])
     )
     if request_obj is not None:
-        next_status = (
-            approval_status if validated_data["approved"] else rejection_status
-        )
-        request_obj.status = next_status.value
-        context["model"].Session.commit()
+        try:
+            moderation_action = DcprRequestModerationAction(
+                validated_data.get("action")
+            )
+        except ValueError:
+            result = toolkit.abort(status_code=404, detail="Invalid moderation action")
+        else:
+            _update_dcpr_request_status(
+                request_obj, transition_action=moderation_action
+            )
+            # next_status = (
+            #     approval_status if validated_data["approved"] else rejection_status
+            # )
+            # request_obj.status = next_status.value
+            context["model"].Session.commit()
+            result = toolkit.get_action("dcpr_request_show")(context, validated_data)
     else:
         raise toolkit.ObjectNotFound
-    return toolkit.get_action("dcpr_request_show")(context, validated_data)
+    return result
 
 
 def claim_dcpr_request_nsif_reviewer(
@@ -184,7 +199,7 @@ def claim_dcpr_request_nsif_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_claim_nsif_reviewer_auth",
-        next_status=DCPRRequestStatus.UNDER_NSIF_REVIEW,
+        # next_status=DCPRRequestStatus.UNDER_NSIF_REVIEW,
         reviewer_request_attribute="nsif_reviewer",
     )
 
@@ -196,7 +211,7 @@ def claim_dcpr_request_csi_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_claim_csi_moderator_auth",
-        next_status=DCPRRequestStatus.UNDER_CSI_REVIEW,
+        # next_status=DCPRRequestStatus.UNDER_CSI_REVIEW,
         reviewer_request_attribute="csi_moderator",
     )
 
@@ -205,7 +220,7 @@ def _claim_reviewer(
     context: typing.Dict,
     data_dict: typing.Dict,
     auth_function: str,
-    next_status: DCPRRequestStatus,
+    # next_status: DCPRRequestStatus,
     reviewer_request_attribute: str,
 ) -> typing.Dict:
     schema = dcpr_schema.claim_reviewer_schema()
@@ -221,7 +236,8 @@ def _claim_reviewer(
         .get(validated_data["csi_reference_id"])
     )
     if request_obj is not None:
-        request_obj.status = next_status.value
+        _update_dcpr_request_status(request_obj)
+        # request_obj.status = next_status.value
         setattr(request_obj, reviewer_request_attribute, context["auth_user_obj"].id)
         model.Session.commit()
     else:
@@ -237,7 +253,7 @@ def resign_dcpr_request_nsif_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_resign_nsif_reviewer_auth",
-        next_status=DCPRRequestStatus.AWAITING_NSIF_REVIEW,
+        # next_status=DCPRRequestStatus.AWAITING_NSIF_REVIEW,
     )
 
 
@@ -248,7 +264,7 @@ def resign_dcpr_request_csi_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_resign_csi_reviewer_auth",
-        next_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
+        # next_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
     )
 
 
@@ -256,7 +272,7 @@ def _resign_reviewer(
     context: typing.Dict,
     data_dict: typing.Dict,
     auth_function: str,
-    next_status: DCPRRequestStatus,
+    # next_status: DCPRRequestStatus,
 ) -> typing.Dict:
     schema = dcpr_schema.resign_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -269,9 +285,82 @@ def _resign_reviewer(
         .get(validated_data["csi_reference_id"])
     )
     if request_obj is not None:
-        request_obj.status = next_status.value
+        _update_dcpr_request_status(
+            request_obj, transition_action=DcprRequestModerationAction.RESIGN
+        )
+        # request_obj.status = next_status.value
         context["model"].Session.commit()
     else:
         raise toolkit.ObjectNotFound
     # TODO: would be nice to add an activity here
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
+
+
+def _update_dcpr_request_status(
+    dcpr_request_obj: dcpr_request.DCPRRequest,
+    transition_action: typing.Optional[DcprRequestModerationAction] = None,
+) -> dcpr_request.DCPRRequest:
+    current_status = DCPRRequestStatus(dcpr_request_obj.status)
+    logger.debug(f"{current_status=}")
+    try:
+        next_status = _determine_next_dcpr_request_status(
+            current_status, transition_action
+        )
+        logger.debug(f"{next_status=}")
+    except NotImplementedError:
+        logger.exception(msg="Unable to update DCPR request status")
+    else:
+        if next_status is not None:
+            dcpr_request_obj.status = next_status.value
+    return dcpr_request_obj
+
+
+def _determine_next_dcpr_request_status(
+    current_status: DCPRRequestStatus,
+    transition_action: typing.Optional[DcprRequestModerationAction] = None,
+) -> typing.Optional[DCPRRequestStatus]:
+    # statuses related to request preparation/modification by the owner
+    if current_status == DCPRRequestStatus.UNDER_PREPARATION:
+        next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW
+    elif current_status == DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_NSIF:
+        next_status = DCPRRequestStatus.UNDER_NSIF_REVIEW
+    elif current_status == DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_CSI:
+        next_status = DCPRRequestStatus.UNDER_CSI_REVIEW
+
+    # statuses related to awaiting for a user to claim the role of reviewer
+    elif current_status == DCPRRequestStatus.AWAITING_NSIF_REVIEW:
+        next_status = DCPRRequestStatus.UNDER_NSIF_REVIEW
+    elif current_status == DCPRRequestStatus.AWAITING_CSI_REVIEW:
+        next_status = DCPRRequestStatus.UNDER_CSI_REVIEW
+
+    # statuses related to review and moderation
+    elif current_status == DCPRRequestStatus.UNDER_NSIF_REVIEW:
+        if transition_action == DcprRequestModerationAction.APPROVE:
+            next_status = DCPRRequestStatus.AWAITING_CSI_REVIEW
+        elif transition_action == DcprRequestModerationAction.REJECT:
+            next_status = DCPRRequestStatus.REJECTED
+        elif transition_action == DcprRequestModerationAction.REQUEST_CLARIFICATION:
+            next_status = DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_NSIF
+        elif transition_action == DcprRequestModerationAction.RESIGN:
+            next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW
+        else:
+            raise NotImplementedError
+    elif current_status == DCPRRequestStatus.UNDER_CSI_REVIEW:
+        if transition_action == DcprRequestModerationAction.APPROVE:
+            next_status = DCPRRequestStatus.ACCEPTED
+        elif transition_action == DcprRequestModerationAction.REJECT:
+            next_status = DCPRRequestStatus.REJECTED
+        elif transition_action == DcprRequestModerationAction.REQUEST_CLARIFICATION:
+            next_status = DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_CSI
+        elif transition_action == DcprRequestModerationAction.RESIGN:
+            next_status = DCPRRequestStatus.AWAITING_CSI_REVIEW
+        else:
+            raise NotImplementedError
+
+    # final statuses
+    elif current_status in (DCPRRequestStatus.ACCEPTED, DCPRRequestStatus.REJECTED):
+        next_status = None
+
+    else:
+        raise NotImplementedError
+    return next_status

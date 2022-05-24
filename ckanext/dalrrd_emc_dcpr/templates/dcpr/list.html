@@ -38,6 +38,7 @@
             {% if dcpr_requests %}
                 <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
                     {% for dcpr_request in dcpr_requests %}
+                        {% set num_datasets = dcpr_request.datasets | length %}
                         <li class="request-item">
                             <div class="row request-row">
                                 <div class="col-md-12">
@@ -46,8 +47,9 @@
                                             {{ h.link_to(h.truncate(dcpr_request.proposed_project_name, 80), h.url_for('dcpr.dcpr_request_show', csi_reference_id=dcpr_request.csi_reference_id)) }}
                                             <small>{{ dcpr_request.csi_reference_id }}</small>
                                         </h2>
+                                        <div>{{ num_datasets }} {% if num_datasets == 1 %}{{ _('dataset') }}{% else %}{{ _('datasets') }}{% endif %}</div>
                                         <div><span {% if dcpr_request.status == "REJECTED" %}class="text-danger"{% endif %}>{{ dcpr_request.status }}</span></div>
-                                        <div >Creator: {{ dcpr_request.owner }}</div>
+                                        <div>Creator: {{ dcpr_request.owner }}</div>
                                     </div>
                                 </div>
                             </div>

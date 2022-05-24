@@ -59,16 +59,17 @@ def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dic
     # vanilla ckan's table_dict_save expects the input data_dict to have an `id` key,
     # otherwise it will not be able to find pre-existing table rows
     validated_data_dict["id"] = validated_data_dict.get("csi_reference_id")
-
     dcpr_request = ckan_dictization.table_dict_save(
         validated_data_dict, dcpr_request_model.DCPRRequest, context
     )
     context["session"].flush()
-    for ds in dcpr_request.datasets:
-        context["session"].delete(ds)
-    dcpr_request_dataset_list_save(
-        validated_data_dict.get("datasets", []), dcpr_request, context
-    )
+    if context.get("updated_by") == "owner":
+        # allow modification of a request's datasets only if current save was requested by the owner
+        for ds in dcpr_request.datasets:
+            context["session"].delete(ds)
+        dcpr_request_dataset_list_save(
+            validated_data_dict.get("datasets", []), dcpr_request, context
+        )
     return dcpr_request
 
 
