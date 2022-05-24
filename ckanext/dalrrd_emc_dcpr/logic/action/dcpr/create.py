@@ -6,7 +6,11 @@ from sqlalchemy import exc
 from .... import dcpr_dictization
 from ...schema import create_dcpr_request_schema
 from ....model import dcpr_error_report, dcpr_request
-from ....constants import DCPRRequestStatus
+from ....constants import (
+    DcprManagementActivityType,
+    DCPRRequestStatus,
+)
+from .. import create_dcpr_management_activity
 
 logger = logging.getLogger(__name__)
 
@@ -87,39 +91,17 @@ def dcpr_request_create(context, data_dict):
     )
     logger.debug(f"{validated_data=}")
     context["updated_by"] = "owner"
-    dcpr_request = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     model.Session.commit()
-    logger.debug(f"{dcpr_request=}")
-
-    # TODO - would be nice to have an activity being created here
-    # notification_targets = []
-    #
-    # for target in data_dict.get("notification_targets", []):
-    #     target = dcpr_request.DCPRRequestNotificationTarget(
-    #         dcpr_request_id=request.csi_reference_id,
-    #         user_id=target.get("user_id"),
-    #         group_id=target.get("group_id"),
-    #     )
-    #     notification_targets.append(target)
-    #
-    # try:
-    #     model = context["model"]
-    #     model.Session.add(request)
-    #     model.repo.commit()
-    #     request_dataset.dcpr_request_id = request.csi_reference_id
-    #     model.Session.add(request_dataset)
-    #
-    #     model.Session.add_all(notification_targets)
-    #
-    #     model.repo.commit()
-    #
-    # except exc.InvalidRequestError as exception:
-    #     model.Session.rollback()
-    # finally:
-    #     model.Session.close()
+    logger.debug(f"{request_obj=}")
+    create_dcpr_management_activity(
+        request_obj,
+        activity_type=DcprManagementActivityType.CREATE_DCPR_REQUEST,
+        context=context,
+    )
     return toolkit.get_action("dcpr_request_show")(
         context=context.copy(),
-        data_dict={"csi_reference_id": dcpr_request.csi_reference_id},
+        data_dict={"csi_reference_id": request_obj.csi_reference_id},
     )
 
 

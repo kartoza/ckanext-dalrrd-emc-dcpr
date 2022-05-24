@@ -1,10 +1,11 @@
 import logging
 
-from sqlalchemy import exc
 from ckan.plugins import toolkit
 
+from ....constants import DcprManagementActivityType
 from ....model import dcpr_request
 from ...schema import delete_dcpr_request_schema
+from .. import create_dcpr_management_activity
 
 logger = logging.getLogger(__name__)
 
@@ -27,32 +28,8 @@ def dcpr_request_delete(context, data_dict):
     )
     model.Session.delete(request_obj)
     model.Session.commit()
-    # TODO - would be nice to have an activity being created here
-
-    # request_dataset_obj = model.Session.query(dcpr_request.DCPRRequestDataset).filter(
-    #     dcpr_request.DCPRRequestDataset.dcpr_request_id == data_dict["request_id"]
-    # )
-    #
-    # notification_targets = model.Session.query(
-    #     dcpr_request.DCPRRequestNotificationTarget
-    # ).filter(
-    #     dcpr_request.DCPRRequestNotificationTarget.dcpr_request_id
-    #     == data_dict["request_id"]
-    # )
-    #
-    # for target in notification_targets:
-    #     target.delete()
-    #
-    # request_dataset_obj.delete()
-    # model.Session.delete(request_obj)
-    #
-    # try:
-    #     model.Session.commit()
-    #     model.repo.commit()
-    #
-    # except exc.InvalidRequestError as exception:
-    #     model.Session.rollback()
-    # finally:
-    #     model.Session.close()
-    #
-    # return request_obj
+    create_dcpr_management_activity(
+        request_obj,
+        activity_type=DcprManagementActivityType.DELETE_DCPR_REQUEST,
+        context=context,
+    )

@@ -36,6 +36,33 @@ class DatasetManagementActivityType(enum.Enum):
     REQUEST_PUBLICATION = "requested dataset publication"
 
 
+class DcprManagementActivityType(enum.Enum):
+    CREATE_DCPR_REQUEST = "created DCPR request"
+    DELETE_DCPR_REQUEST = "deleted DCPR request"
+    UPDATE_DCPR_REQUEST_BY_OWNER = "updated own DCPR request"
+    UPDATE_DCPR_REQUEST_BY_NSIF = "updated DCPR request on behalf of NSIF"
+    UPDATE_DCPR_REQUEST_BY_CSI = "updated DCPR request on behalf of CSI"
+    SUBMIT_DCPR_REQUEST = "submitted DCPR request for review and moderation"
+    BECOME_NSIF_REVIEWER_DCPR_REQUEST = "became DCPR request reviewer on behalf of NSIF"
+    RESIGN_NSIF_REVIEWER_DCPR_REQUEST = (
+        "resigned from DCPR request reviewer on behalf of NSIF"
+    )
+    BECOME_CSI_REVIEWER_DCPR_REQUEST = "became DCPR request reviewer on behalf of CSI"
+    RESIGN_CSI_REVIEWER_DCPR_REQUEST = (
+        "resigned from DCPR request reviewer on behalf of CSI"
+    )
+    ACCEPT_DCPR_REQUEST_NSIF = "accepted DCPR request on behalf of NSIF"
+    REJECT_DCPR_REQUEST_NSIF = "rejected DCPR request on behalf of NSIF"
+    REQUEST_CLARIFICATION_DCPR_REQUEST_NSIF = (
+        "requested clarification on DCPR request on behalf of NSIF"
+    )
+    ACCEPT_DCPR_REQUEST_CSI = "accepted DCPR request on behalf of CSI"
+    REJECT_DCPR_REQUEST_CSI = "rejected DCPR request on behalf of CSI"
+    REQUEST_CLARIFICATION_DCPR_REQUEST_CSI = (
+        "requested clarification on DCPR request on behalf of CSI"
+    )
+
+
 class DCPRRequestStatus(enum.Enum):
     UNDER_PREPARATION = "UNDER_PREPARATION"
     UNDER_MODIFICATION_REQUESTED_BY_NSIF = "UNDER_MODIFICATION_REQUESTED_BY_NSIF"

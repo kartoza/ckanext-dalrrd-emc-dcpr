@@ -6,21 +6,20 @@ from ckan.plugins import toolkit
 
 from ....constants import (
     DcprRequestModerationAction,
+    DcprManagementActivityType,
     DCPRRequestStatus,
 )
 from ... import schema as dcpr_schema
 from ....model import dcpr_request
 from .... import dcpr_dictization
+from .. import create_dcpr_management_activity
 
 logger = logging.getLogger(__name__)
 
 
 def dcpr_request_update_by_owner(context, data_dict):
-    logger.debug(f"raw_data_dict input to the CKAN action: {data_dict}")
     schema = dcpr_schema.update_dcpr_request_by_owner_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
-    logger.debug(f"{validated_data=}")
-    logger.debug(f"{errors=}")
     if errors:
         raise toolkit.ValidationError(errors)
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
@@ -28,7 +27,11 @@ def dcpr_request_update_by_owner(context, data_dict):
     context["updated_by"] = "owner"
     request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     context["model"].Session.commit()
-    # TODO: would be nice to add an activity here
+    create_dcpr_management_activity(
+        request_obj,
+        activity_type=DcprManagementActivityType.UPDATE_DCPR_REQUEST_BY_OWNER,
+        context=context,
+    )
     return dcpr_dictization.dcpr_request_dictize(request_obj, context)
 
 
@@ -55,7 +58,11 @@ def dcpr_request_update_by_nsif(context, data_dict):
     )
     request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     context["model"].Session.commit()
-    # TODO: would be nice to add an activity here
+    create_dcpr_management_activity(
+        request_obj,
+        activity_type=DcprManagementActivityType.UPDATE_DCPR_REQUEST_BY_NSIF,
+        context=context,
+    )
     return dcpr_dictization.dcpr_request_dictize(request_obj, context)
 
 
@@ -82,7 +89,11 @@ def dcpr_request_update_by_csi(context, data_dict):
     )
     request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     context["model"].Session.commit()
-    # TODO: would be nice to add an activity here
+    create_dcpr_management_activity(
+        request_obj,
+        activity_type=DcprManagementActivityType.UPDATE_DCPR_REQUEST_BY_CSI,
+        context=context,
+    )
     return dcpr_dictization.dcpr_request_dictize(request_obj, context)
 
 
@@ -105,12 +116,14 @@ def dcpr_request_submit(context, data_dict):
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         validated_data["csi_reference_id"]
     )
-    logger.debug(f"{request_obj=}")
     if request_obj is not None:
-        # next_status = DCPRRequestStatus.AWAITING_NSIF_REVIEW.value
-        # request_obj.status = next_status
         _update_dcpr_request_status(request_obj)
         model.Session.commit()
+        create_dcpr_management_activity(
+            request_obj,
+            activity_type=DcprManagementActivityType.SUBMIT_DCPR_REQUEST,
+            context=context,
+        )
     else:
         raise toolkit.ObjectNotFound
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
@@ -126,45 +139,13 @@ def dcpr_request_nsif_moderate(
 
     """
 
-    return _moderate(
-        context,
-        data_dict,
-        auth_function="dcpr_request_nsif_moderate_auth",
-        # approval_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
-        nsif_moderation_date=dt.datetime.now(dt.timezone.utc),
-    )
-
-
-def dcpr_request_csi_moderate(
-    context: typing.Dict, data_dict: typing.Dict
-) -> typing.Dict:
-    return _moderate(
-        context,
-        data_dict,
-        auth_function="dcpr_request_csi_moderate_auth",
-        csi_moderation_date=dt.datetime.now(dt.timezone.utc),
-    )
-
-
-def _moderate(
-    context: typing.Dict,
-    data_dict: typing.Dict,
-    auth_function: str,
-    # approval_status: DCPRRequestStatus = DCPRRequestStatus.ACCEPTED,
-    # rejection_status: DCPRRequestStatus = DCPRRequestStatus.REJECTED,
-    **additional_data,
-) -> typing.Dict:
-    logger.debug(f"inside _moderate - {data_dict=}")
     schema = dcpr_schema.moderate_dcpr_request_schema()
-    logger.debug(f"{schema=}")
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
-    logger.debug(f"validated_data - {validated_data=}")
-    logger.debug(f"errors - {errors=}")
     if errors:
         raise toolkit.ValidationError(errors)
 
-    toolkit.check_access(auth_function, context, validated_data)
-    validated_data.update(additional_data)
+    toolkit.check_access("dcpr_request_nsif_moderate_auth", context, validated_data)
+    validated_data.update(nsif_moderation_date=dt.datetime.now(dt.timezone.utc))
     request_obj = (
         context["model"]
         .Session.query(dcpr_request.DCPRRequest)
@@ -181,11 +162,56 @@ def _moderate(
             _update_dcpr_request_status(
                 request_obj, transition_action=moderation_action
             )
-            # next_status = (
-            #     approval_status if validated_data["approved"] else rejection_status
-            # )
-            # request_obj.status = next_status.value
             context["model"].Session.commit()
+            activity_type = {
+                DcprRequestModerationAction.APPROVE: DcprManagementActivityType.ACCEPT_DCPR_REQUEST_NSIF,
+                DcprRequestModerationAction.REJECT: DcprManagementActivityType.REJECT_DCPR_REQUEST_NSIF,
+                DcprRequestModerationAction.REQUEST_CLARIFICATION: DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_NSIF,
+            }[moderation_action]
+            create_dcpr_management_activity(
+                request_obj, activity_type=activity_type, context=context
+            )
+            result = toolkit.get_action("dcpr_request_show")(context, validated_data)
+    else:
+        raise toolkit.ObjectNotFound
+    return result
+
+
+def dcpr_request_csi_moderate(
+    context: typing.Dict, data_dict: typing.Dict
+) -> typing.Dict:
+    schema = dcpr_schema.moderate_dcpr_request_schema()
+    validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
+
+    toolkit.check_access("dcpr_request_csi_moderate_auth", context, validated_data)
+    validated_data.update(csi_moderation_date=dt.datetime.now(dt.timezone.utc))
+    request_obj = (
+        context["model"]
+        .Session.query(dcpr_request.DCPRRequest)
+        .get(validated_data["csi_reference_id"])
+    )
+    if request_obj is not None:
+        try:
+            moderation_action = DcprRequestModerationAction(
+                validated_data.get("action")
+            )
+        except ValueError:
+            result = toolkit.abort(status_code=404, detail="Invalid moderation action")
+        else:
+            _update_dcpr_request_status(
+                request_obj, transition_action=moderation_action
+            )
+            context["model"].Session.commit()
+            activity_type = {
+                DcprRequestModerationAction.APPROVE: DcprManagementActivityType.ACCEPT_DCPR_REQUEST_CSI,
+                DcprRequestModerationAction.REJECT: DcprManagementActivityType.REJECT_DCPR_REQUEST_CSI,
+                DcprRequestModerationAction.REQUEST_CLARIFICATION: DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_CSI,
+            }[moderation_action]
+            create_dcpr_management_activity(
+                request_obj, activity_type=activity_type, context=context
+            )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
     else:
         raise toolkit.ObjectNotFound
@@ -195,33 +221,33 @@ def _moderate(
 def claim_dcpr_request_nsif_reviewer(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    return _claim_reviewer(
+    return _become_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_claim_nsif_reviewer_auth",
-        # next_status=DCPRRequestStatus.UNDER_NSIF_REVIEW,
         reviewer_request_attribute="nsif_reviewer",
+        activity_type=DcprManagementActivityType.BECOME_NSIF_REVIEWER_DCPR_REQUEST,
     )
 
 
 def claim_dcpr_request_csi_reviewer(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    return _claim_reviewer(
+    return _become_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_claim_csi_moderator_auth",
-        # next_status=DCPRRequestStatus.UNDER_CSI_REVIEW,
         reviewer_request_attribute="csi_moderator",
+        activity_type=DcprManagementActivityType.BECOME_CSI_REVIEWER_DCPR_REQUEST,
     )
 
 
-def _claim_reviewer(
+def _become_reviewer(
     context: typing.Dict,
     data_dict: typing.Dict,
     auth_function: str,
-    # next_status: DCPRRequestStatus,
     reviewer_request_attribute: str,
+    activity_type: DcprManagementActivityType,
 ) -> typing.Dict:
     schema = dcpr_schema.claim_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -237,12 +263,13 @@ def _claim_reviewer(
     )
     if request_obj is not None:
         _update_dcpr_request_status(request_obj)
-        # request_obj.status = next_status.value
         setattr(request_obj, reviewer_request_attribute, context["auth_user_obj"].id)
         model.Session.commit()
     else:
         raise toolkit.ObjectNotFound
-    # TODO: would be nice to add an activity here
+    create_dcpr_management_activity(
+        request_obj, activity_type=activity_type, context=context
+    )
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
@@ -253,7 +280,7 @@ def resign_dcpr_request_nsif_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_resign_nsif_reviewer_auth",
-        # next_status=DCPRRequestStatus.AWAITING_NSIF_REVIEW,
+        activity_type=DcprManagementActivityType.RESIGN_NSIF_REVIEWER_DCPR_REQUEST,
     )
 
 
@@ -264,7 +291,7 @@ def resign_dcpr_request_csi_reviewer(
         context,
         data_dict,
         auth_function="dcpr_request_resign_csi_reviewer_auth",
-        # next_status=DCPRRequestStatus.AWAITING_CSI_REVIEW,
+        activity_type=DcprManagementActivityType.RESIGN_CSI_REVIEWER_DCPR_REQUEST,
     )
 
 
@@ -272,7 +299,7 @@ def _resign_reviewer(
     context: typing.Dict,
     data_dict: typing.Dict,
     auth_function: str,
-    # next_status: DCPRRequestStatus,
+    activity_type: DcprManagementActivityType,
 ) -> typing.Dict:
     schema = dcpr_schema.resign_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -288,11 +315,12 @@ def _resign_reviewer(
         _update_dcpr_request_status(
             request_obj, transition_action=DcprRequestModerationAction.RESIGN
         )
-        # request_obj.status = next_status.value
         context["model"].Session.commit()
     else:
         raise toolkit.ObjectNotFound
-    # TODO: would be nice to add an activity here
+    create_dcpr_management_activity(
+        request_obj, activity_type=activity_type, context=context
+    )
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
 
 
@@ -301,12 +329,10 @@ def _update_dcpr_request_status(
     transition_action: typing.Optional[DcprRequestModerationAction] = None,
 ) -> dcpr_request.DCPRRequest:
     current_status = DCPRRequestStatus(dcpr_request_obj.status)
-    logger.debug(f"{current_status=}")
     try:
         next_status = _determine_next_dcpr_request_status(
             current_status, transition_action
         )
-        logger.debug(f"{next_status=}")
     except NotImplementedError:
         logger.exception(msg="Unable to update DCPR request status")
     else:
