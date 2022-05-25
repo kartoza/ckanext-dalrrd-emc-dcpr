@@ -10,6 +10,7 @@ from ckan.views.home import CACHE_PARAMETERS
 from ckan.plugins import toolkit
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 
+from .. import constants
 from ..helpers import get_status_labels
 from ..model.dcpr_request import DCPRRequestUrgency
 
@@ -589,8 +590,8 @@ class DcprRequestBecomeReviewerView(MethodView):
             )
         else:
             action = {
-                "nsif": "become NSIF reviewer",
-                "csi": "become CSI reviewer",
+                constants.NSIF_ORG_NAME: "become NSIF reviewer",
+                constants.CSI_ORG_NAME: "become CSI reviewer",
             }.get(organization)
             result = toolkit.render(
                 "dcpr/ask_for_confirmation.html",
