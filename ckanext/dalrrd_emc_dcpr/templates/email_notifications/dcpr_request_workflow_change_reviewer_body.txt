@@ -33,7 +33,7 @@ If you wish to become the request's CSI reviewer, please follow the link below a
 
 Alternatively, please visit its detail page and take the appropriate action.
 
-{%- endif }
+{%- endif %}
 
 You may visit the DCPR request details page at:
 

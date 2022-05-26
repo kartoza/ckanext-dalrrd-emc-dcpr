@@ -1,10 +1,12 @@
 """Asynchronous jobs for EMC-DCPR"""
 
+import functools
+import contextlib
 import logging
 import typing
-from functools import lru_cache
 
 from ckan import model
+from ckan.config.middleware import make_app
 from ckan.plugins import toolkit
 
 from . import email_notifications
@@ -18,11 +20,26 @@ from .constants import (
 logger = logging.getLogger(__name__)
 
 
+def provide_request_context(func):
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        app = make_app(toolkit.config)
+        with app._wsgi_app.test_request_context() as context:
+            result = func(context, *args, **kwargs)
+        return result
+
+    return wrapped
+
+
 def test_job(*args, **kwargs):
-    logger.debug(f"inside test_job - {args=} {kwargs=}")
+    with _generate_request_context() as context:
+        logger.debug(f"inside test_job - {args=} {kwargs=}")
+        logger.debug(f"we now have a context: {context=}")
 
 
-def notify_dcpr_actors_of_relevant_status_change(activity_id: str):
+@provide_request_context
+def notify_dcpr_actors_of_relevant_status_change(context, activity_id: str):
+    logger.debug(f"{context=}")
     activity_obj = model.Activity.get(activity_id)
     if activity_obj is not None:
         activity_type = DcprManagementActivityType(activity_obj.activity_type)
@@ -262,3 +279,10 @@ def _get_org_members(org_name: str) -> typing.List:
         if user.get("state") == "active":
             members.append(user_obj)
     return members
+
+
+@contextlib.contextmanager
+def _generate_request_context():
+    app = make_app(toolkit.config)
+    with app._wsgi_app.test_request_context() as context:
+        yield context

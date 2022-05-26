@@ -58,7 +58,7 @@ Please go back to the DCPR request edit page at:
 and add sufficient detail in order to allow a thorough review by the members of NSIF and CSI.
 After you have modified the DCPR request, proceed to re-submit it for further review by the CSI.
 
-{%- endif }
+{%- endif %}
 
 Visit the DCPR request details page at:
 
