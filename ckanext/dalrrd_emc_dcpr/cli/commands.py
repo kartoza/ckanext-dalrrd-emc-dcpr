@@ -23,6 +23,7 @@ from ckan.lib.navl import dictization_functions
 from lxml import etree
 from sqlalchemy import text as sla_text
 
+from .. import provide_request_context
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
     DCPRRequest,
     DCPRGeospatialRequest,
@@ -685,7 +686,8 @@ def create_sample_users():
 
 
 @load_sample_data.command()
-def create_sample_organizations():
+@provide_request_context
+def create_sample_organizations(app_context):
     """Create sample organizations and members"""
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
     create_org_action = toolkit.get_action("organization_create")
