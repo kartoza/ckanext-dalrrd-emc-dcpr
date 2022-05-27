@@ -14,7 +14,6 @@ def dcpr_request_delete(context, data_dict):
     logger.debug("Inside the dcpr_request_delete action")
     schema = delete_dcpr_request_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
-    logger.debug(f"{errors=}")
     model = context["model"]
     if errors:
         model.Session.rollback()
