@@ -1,1 +1,1 @@
-{{ site_title }} - DCPR request {{ dcpr_request.proposed_project_name }} has been {{ activity_type.value }}
+{{ site_title }} - DCPR request {{ dcpr_request.proposed_project_name }} {{ action_subject_message }}

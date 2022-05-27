@@ -177,7 +177,7 @@ def dcpr_request_nsif_moderate(
                 request_obj, activity_type=activity_type, context=context
             )
             toolkit.enqueue_job(
-                jobs.notify_org_admins_of_dataset_management_request,
+                jobs.notify_dcpr_actors_of_relevant_status_change,
                 args=[activity["id"]],
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
@@ -222,7 +222,7 @@ def dcpr_request_csi_moderate(
                 request_obj, activity_type=activity_type, context=context
             )
             toolkit.enqueue_job(
-                jobs.notify_org_admins_of_dataset_management_request,
+                jobs.notify_dcpr_actors_of_relevant_status_change,
                 args=[activity["id"]],
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
@@ -335,7 +335,7 @@ def _resign_reviewer(
         request_obj, activity_type=activity_type, context=context
     )
     toolkit.enqueue_job(
-        jobs.notify_org_admins_of_dataset_management_request,
+        jobs.notify_dcpr_actors_of_relevant_status_change,
         args=[activity["id"]],
     )
     return toolkit.get_action("dcpr_request_show")(context, validated_data)
