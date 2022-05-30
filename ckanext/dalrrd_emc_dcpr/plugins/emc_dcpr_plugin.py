@@ -19,25 +19,25 @@ from .. import (
     constants,
     helpers,
 )
-from .blueprints.dcpr import dcpr_blueprint
-from .blueprints.emc import emc_blueprint
-from .cli import commands
-from .cli.legacy_sasdi import commands as legacy_sasdi_commands
-from .logic.action import ckan as ckan_actions
-from .logic.action.dcpr import create as dcpr_create_actions
-from .logic.action.dcpr import delete as dcpr_delete_actions
-from .logic.action.dcpr import get as dcpr_get_actions
-from .logic.action.dcpr import update as dcpr_update_actions
-from .logic.action import emc as emc_actions
-from .logic import (
+from ..blueprints.dcpr import dcpr_blueprint
+from ..blueprints.emc import emc_blueprint
+from ..cli import commands
+from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
+from ..logic.action import ckan as ckan_actions
+from ..logic.action.dcpr import create as dcpr_create_actions
+from ..logic.action.dcpr import delete as dcpr_delete_actions
+from ..logic.action.dcpr import get as dcpr_get_actions
+from ..logic.action.dcpr import update as dcpr_update_actions
+from ..logic.action import emc as emc_actions
+from ..logic import (
     converters,
     validators,
 )
-from .logic.auth import ckan as ckan_auth
-from .logic.auth import pages as ckanext_pages_auth
-from .logic.auth import dcpr as dcpr_auth
-from .logic.auth import emc as emc_auth
-from .model.user_extra_fields import UserExtraFields
+from ..logic.auth import ckan as ckan_auth
+from ..logic.auth import pages as ckanext_pages_auth
+from ..logic.auth import dcpr as dcpr_auth
+from ..logic.auth import emc as emc_auth
+from ..model.user_extra_fields import UserExtraFields
 
 logger = logging.getLogger(__name__)
 
