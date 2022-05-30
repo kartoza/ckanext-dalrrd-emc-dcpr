@@ -5,11 +5,15 @@ from urllib.parse import quote
 from html import escape as html_escape
 
 from shapely import geometry
+from ckan import model
 from ckan.plugins import toolkit
 from ckan.lib.helpers import build_nav_main as core_build_nav_main
 
 from . import constants
 from .logic.action.emc import show_version
+from .constants import DCPRRequestStatus
+from .model.dcpr_request import DCPRRequest
+
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +89,18 @@ def convert_geojson_to_bbox(
     return result
 
 
+def convert_string_extent_to_bbox(extent: str) -> typing.List[float]:
+    if extent is None:
+        return []
+    coords_extent = []
+    for value in extent.split(","):
+        try:
+            coords_extent.append(float(value))
+        except ValueError:
+            continue
+    return coords_extent
+
+
 def helper_show_version(*args, **kwargs) -> typing.Dict:
     return show_version()
 
@@ -107,6 +123,19 @@ def user_is_org_member(
                     result = True
                 break
     return result
+
+
+def org_member_list(org_id: str, role: typing.Optional[str] = None) -> typing.List:
+    """Return list of organization members with the specified role"""
+    member_list_action = toolkit.get_action("member_list")
+    org_members = member_list_action(data_dict={"id": org_id, "object_type": "user"})
+
+    results = []
+    for member_id, _, member_role in org_members:
+        if role is None or member_role.lower() == role.lower():
+            results.append(member_id)
+
+    return results
 
 
 def user_is_staff_member(user_id: str) -> bool:
@@ -200,3 +229,73 @@ def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)
     oriented_padded = geometry.polygon.orient(padded)
     return geometry.mapping(oriented_padded)
+
+
+def get_status_labels() -> typing.Dict:
+    """Get status labels for the DCPR requests"""
+    status_labels = {
+        constants.DCPRRequestStatus.UNDER_PREPARATION.value: (
+            toolkit._("Under preparation"),
+            "info",
+        ),
+        constants.DCPRRequestStatus.AWAITING_NSIF_REVIEW.value: (
+            toolkit._("Waiting for NSIF review"),
+            "info",
+        ),
+        constants.DCPRRequestStatus.AWAITING_CSI_REVIEW.value: (
+            toolkit._("Waiting for CSI review"),
+            "info",
+        ),
+        constants.DCPRRequestStatus.ACCEPTED.value: (toolkit._("Accepted"), "success"),
+        constants.DCPRRequestStatus.REJECTED.value: (toolkit._("Rejected"), "danger"),
+    }
+
+    return status_labels
+
+
+def get_next_intermediate_dcpr_status(current_status: str) -> typing.Optional[str]:
+    workflow_order = [
+        DCPRRequestStatus.UNDER_PREPARATION,
+        DCPRRequestStatus.AWAITING_NSIF_REVIEW,
+        DCPRRequestStatus.UNDER_NSIF_REVIEW,
+        DCPRRequestStatus.AWAITING_CSI_REVIEW,
+        DCPRRequestStatus.UNDER_CSI_REVIEW,
+    ]
+    result = None
+    try:
+        current_index = workflow_order.index(DCPRRequestStatus(current_status))
+        try:
+            next_status = workflow_order[current_index + 1]
+            result = next_status.value
+        except IndexError:
+            # current_index + 1 is out of bounds for the workflow_list
+            pass
+    except ValueError:
+        # input status is not present in the workflow_order list
+        pass
+    return result
+
+
+def user_is_dcpr_request_owner(user_id, dcpr_request_id) -> bool:
+    request_obj = DCPRRequest.get(dcpr_request_id)
+    if request_obj is not None:
+        result = user_id == request_obj.owner_user
+    else:
+        result = False
+    return result
+
+
+def get_org_memberships(user_id: str):
+    """Return a list of organizations and roles where the input user is a member"""
+    query = (
+        model.Session.query(model.Group, model.Member.capacity)
+        .join(model.Member, model.Member.group_id == model.Group.id)
+        .join(model.User, model.User.id == model.Member.table_id)
+        .filter(
+            model.User.id == user_id,
+            model.Member.state == "active",
+            model.Group.is_organization == True,
+        )
+        .order_by(model.Group.name)
+    )
+    return query.all()

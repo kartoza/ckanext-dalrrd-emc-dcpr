@@ -81,6 +81,14 @@ runs:
     - name: Run integration tests
       shell: bash
       run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan \
+            --config docker/ckan-ci-settings.ini dalrrd-emc-dcpr \
+            load-sample-data create-sample-users
+
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan \
+            --config docker/ckan-ci-settings.ini dalrrd-emc-dcpr \
+            load-sample-data create-sample-organizations
+
         docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
             --ckan-ini docker/ckan-ci-settings.ini \
             -m integration \

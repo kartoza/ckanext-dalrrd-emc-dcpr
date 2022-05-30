@@ -1,0 +1,59 @@
+{% extends 'page.html' %}
+
+{% block subtitle %}
+    {% if csi_reference_id %}
+        {{ _('Edit DCPR request') }}
+    {% else %}
+        {{ _('Create DCPR request') }}
+    {% endif %}
+{% endblock %}
+
+{% block content_action %}
+    {% if csi_reference_id %}
+        {% link_for _('View DCPR request'), named_route="dcpr.dcpr_request_show", csi_reference_id=csi_reference_id, class_='btn btn-default', icon='eye' %}
+    {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+    {% if csi_reference_id %}
+        <h1>{{ _('Edit DCPR request') }}</h1>
+    {% else %}
+        <h1>{{ _('Create new DCPR request') }}{% if data.organization_id %} for organization {{ data.organization_id }}{% endif %}</h1>
+    {% endif %}
+    {% block form %}
+        {{- h.snippet(
+            form_snippet,
+            csi_reference_id=csi_reference_id,
+            data=data,
+            relevant_organizations=relevant_organizations,
+            enable_owner_fieldset=enable_owner_fieldset,
+            enable_nsif_fieldset=enable_nsif_fieldset,
+            enable_csi_fieldset=enable_csi_fieldset,
+            errors=errors,
+            error_summary=error_summary,
+            data_urgency_options=data_urgency_options)
+        -}}
+
+    {% endblock %}
+{% endblock %}
+
+{% block secondary_content %}
+  {% block request_info %}
+    <section class="module module-narrow module-shallow">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+                  <h4>
+                      <i class="fa fa-info-circle"></i>
+                      {{ _('DCPR Request Info') }}
+                  </h4>
+          </div>
+          <div class="panel-body">
+              <p>The Data Capture Project Registry (DCPR) provides a mechanism by which SASDI stakeholders can request
+                  that new geospatial data collecting missions be managed more efficiently by the central
+                  SASDI-governing institutions.
+              </p>
+          </div>
+      </div>
+    </section>
+  {% endblock %}
+{% endblock %}

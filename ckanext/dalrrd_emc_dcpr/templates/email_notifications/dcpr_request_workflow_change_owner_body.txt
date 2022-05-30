@@ -1,0 +1,69 @@
+{%- if admin_team_email %}This is an automated email, please do not respond to it as it will not be monitored. If you have an inquiry about the SASDI EMC, please contact its admin team at {{ admin_team_email }} at {{ admin_team_email }}.{% endif %}
+
+You are receiving this email because you are the owner of the DCPR request {{ dcpr_request.proposed_project_name }}, with a CSI reference id of {{ dcpr_request.csi_reference_id}} in the SASDI Electronic Metadata Catalogue.
+
+{%- if activity_type.name == "ACCEPT_DCPR_REQUEST_NSIF" %}
+User {{ nsif_reviewer_obj.name }} ({{ nsif_reviewer_obj.email }}) has accepted the DCPR request on behalf of the NSIF.
+
+These are the NSIF review notes:
+
+{{ dcpr_request.nsif_review_notes }}
+
+The DCPR request is now awaiting to be reviewed by a member of the CSI.
+
+{%- elif activity_type.name == "REJECT_DCPR_REQUEST_NSIF" %}
+User {{ nsif_reviewer_obj.name }} ({{ nsif_reviewer_obj.email }}) has rejected the DCPR request on behalf of the NSIF.
+
+These are the NSIF review notes:
+
+{{ dcpr_request.nsif_review_notes }}
+
+{%- elif activity_type.name == "REQUEST_CLARIFICATION_DCPR_REQUEST_NSIF" %}
+User {{ nsif_reviewer_obj.name }} ({{ nsif_reviewer_obj.email }}) has requested further clarification pertaining to the DCPR request on behalf of the NSIF.
+These are the NSIF review notes:
+
+{{ dcpr_request.nsif_review_notes }}
+
+Please go back to the DCPR request edit page at:
+
+{{ site_url }}{{ dcpr_request_edit_url }}
+
+and add sufficient detail in order to allow a thorough review by the members of NSIF and CSI.
+After you have modified the DCPR request, proceed to re-submit it for further review by the NSIF.
+
+{%- elif activity_type.name == "ACCEPT_DCPR_REQUEST_CSI" %}
+User {{ csi_reviewer_obj.name }} ({{ csi_reviewer_obj.email }}) has accepted the DCPR request on behalf of the CSI.
+
+These are the CSI review notes:
+
+{{ dcpr_request.csi_moderation_notes }}
+
+{%- elif activity_type.name == "REJECT_DCPR_REQUEST_CSI" %}
+User {{ csi_reviewer_obj.name }} ({{ csi_reviewer_obj.email }}) has rejected the DCPR request on behalf of the CSI.
+
+These are the CSI review notes:
+
+{{ dcpr_request.csi_moderation_notes }}
+
+{%- elif activity_type.name == "REQUEST_CLARIFICATION_DCPR_REQUEST_CSI" %}
+User {{ csi_reviewer_obj.name }} ({{ csi_reviewer_obj.email }}) has requested further clarification about the DCPR request on behalf of the NSIF.
+
+These are the CSI review notes:
+
+{{ dcpr_request.csi_moderation_notes }}
+
+Please go back to the DCPR request edit page at:
+
+{{ site_url }}{{ dcpr_request_edit_url }}
+
+and add sufficient detail in order to allow a thorough review by the members of NSIF and CSI.
+After you have modified the DCPR request, proceed to re-submit it for further review by the CSI.
+
+{%- endif %}
+
+Visit the DCPR request details page at:
+
+{{ site_url }}{{ dcpr_request_detail_url }}
+
+
+Best regards, the team at {{ site_title }}

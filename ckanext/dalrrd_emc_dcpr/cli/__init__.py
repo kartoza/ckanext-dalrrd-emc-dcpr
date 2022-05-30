@@ -10,13 +10,10 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class _CkanBootstrapOrganization:
+    name: str
     title: str
     description: str
     image_url: typing.Optional[Path] = None
-
-    @property
-    def name(self):
-        return self.title.replace(" ", "-").lower()[:100]
 
 
 @dataclasses.dataclass
@@ -135,8 +132,8 @@ class _CkanBootstrapDCPRRequest:
     csi_moderation_date: str
     dataset_custodian: bool
     data_type: str
-    purposed_dataset_title: str
-    purposed_abstract: str
+    proposed_dataset_title: str
+    proposed_abstract: str
     dataset_purpose: str
     lineage_statement: str
     associated_attributes: str

@@ -5,10 +5,11 @@ import typing
 
 import ckan.plugins.toolkit as toolkit
 import sqlalchemy
-from ckan.logic.schema import default_create_activity_schema
 
 from ... import jobs
 from ...constants import DatasetManagementActivityType
+
+from . import create_dataset_management_activity
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
     """
 
     toolkit.check_access("emc_request_dataset_maintenance", context, data_dict)
-    activity = _create_dataset_management_activity(
+    activity = create_dataset_management_activity(
         data_dict["pkg_id"], DatasetManagementActivityType.REQUEST_MAINTENANCE
     )
     _ensure_user_is_notifiable(context["user"], data_dict["pkg_id"])
@@ -77,7 +78,7 @@ def request_dataset_maintenance(context: typing.Dict, data_dict: typing.Dict):
 
 def request_dataset_publication(context: typing.Dict, data_dict: typing.Dict):
     toolkit.check_access("emc_request_dataset_publication", context, data_dict)
-    activity = _create_dataset_management_activity(
+    activity = create_dataset_management_activity(
         data_dict["pkg_id"], DatasetManagementActivityType.REQUEST_PUBLICATION
     )
     _ensure_user_is_notifiable(context["user"], data_dict["pkg_id"])
@@ -97,45 +98,3 @@ def _ensure_user_is_notifiable(user_id: str, dataset_id):
         )
     except toolkit.ValidationError:
         pass  # user is already following the dataset
-
-
-def _create_dataset_management_activity(
-    dataset_id: str, activity_type: DatasetManagementActivityType
-) -> typing.Dict:
-    """
-    This is a hacky way to relax the activity type schema validation
-    we remove the default activity_type_exists validator because it is not possible
-    to extend it with a custom activity
-    """
-
-    activity_schema = default_create_activity_schema()
-    to_remove = None
-    for index, validator in enumerate(activity_schema["activity_type"]):
-        if validator.__name__ == "activity_type_exists":
-            to_remove = validator
-            break
-    if to_remove:
-        activity_schema["activity_type"].remove(to_remove)
-    to_remove = None
-    for index, validator in enumerate(activity_schema["object_id"]):
-        if validator.__name__ == "object_id_validator":
-            to_remove = validator
-            break
-    if to_remove:
-        activity_schema["object_id"].remove(to_remove)
-    activity_schema["object_id"].append(toolkit.get_validator("package_id_exists"))
-    dataset = toolkit.get_action("package_show")(data_dict={"id": dataset_id})
-    return toolkit.get_action("activity_create")(
-        context={
-            "ignore_auth": True,
-            "schema": activity_schema,
-        },
-        data_dict={
-            "user_id": toolkit.g.userobj.id,
-            "object_id": dataset_id,
-            "activity_type": activity_type.value,
-            "data": {
-                "package": dataset,
-            },
-        },
-    )

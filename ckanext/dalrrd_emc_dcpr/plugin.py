@@ -11,7 +11,7 @@ import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
 from ckan import model
-from ckan.common import _, config, g
+from ckan.common import _, g
 from flask import Blueprint
 from sqlalchemy import orm
 
@@ -24,7 +24,10 @@ from .blueprints.emc import emc_blueprint
 from .cli import commands
 from .cli.legacy_sasdi import commands as legacy_sasdi_commands
 from .logic.action import ckan as ckan_actions
-from .logic.action import dcpr as dcpr_actions
+from .logic.action.dcpr import create as dcpr_create_actions
+from .logic.action.dcpr import delete as dcpr_delete_actions
+from .logic.action.dcpr import get as dcpr_get_actions
+from .logic.action.dcpr import update as dcpr_update_actions
 from .logic.action import emc as emc_actions
 from .logic import (
     converters,
@@ -217,7 +220,27 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_patch": ckan_auth.package_patch,
             "dcpr_error_report_create_auth": dcpr_auth.dcpr_report_create_auth,
             "dcpr_request_create_auth": dcpr_auth.dcpr_request_create_auth,
-            "dcpr_request_list_auth": dcpr_auth.dcpr_request_list_auth,
+            "my_dcpr_request_list_auth": dcpr_auth.my_dcpr_request_list_auth,
+            "dcpr_request_list_public_auth": dcpr_auth.dcpr_request_list_public_auth,
+            "dcpr_request_list_private_auth": dcpr_auth.dcpr_request_list_private_auth,
+            "dcpr_request_list_pending_csi_auth": (
+                dcpr_auth.dcpr_request_list_pending_csi_auth
+            ),
+            "dcpr_request_list_pending_nsif_auth": (
+                dcpr_auth.dcpr_request_list_pending_nsif_auth
+            ),
+            "dcpr_request_show_auth": dcpr_auth.dcpr_request_show_auth,
+            "dcpr_request_update_by_owner_auth": dcpr_auth.dcpr_request_update_by_owner_auth,
+            "dcpr_request_update_by_nsif_auth": dcpr_auth.dcpr_request_update_by_nsif_auth,
+            "dcpr_request_update_by_csi_auth": dcpr_auth.dcpr_request_update_by_csi_auth,
+            "dcpr_request_submit_auth": dcpr_auth.dcpr_request_submit_auth,
+            "dcpr_request_claim_nsif_reviewer_auth": dcpr_auth.dcpr_request_claim_nsif_reviewer_auth,
+            "dcpr_request_claim_csi_moderator_auth": dcpr_auth.dcpr_request_claim_csi_moderator_auth,
+            "dcpr_request_resign_nsif_reviewer_auth": dcpr_auth.dcpr_request_resign_nsif_reviewer_auth,
+            "dcpr_request_resign_csi_reviewer_auth": dcpr_auth.dcpr_request_resign_csi_reviewer_auth,
+            "dcpr_request_nsif_moderate_auth": dcpr_auth.dcpr_request_nsif_moderate_auth,
+            "dcpr_request_csi_moderate_auth": dcpr_auth.dcpr_request_csi_moderate_auth,
+            "dcpr_request_delete_auth": dcpr_auth.dcpr_request_delete_auth,
             "ckanext_pages_update": ckanext_pages_auth.authorize_edit_page,
             "ckanext_pages_delete": ckanext_pages_auth.authorize_delete_page,
             "ckanext_pages_show": ckanext_pages_auth.authorize_show_page,
@@ -234,10 +257,33 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "package_create": ckan_actions.package_create,
             "package_update": ckan_actions.package_update,
             "package_patch": ckan_actions.package_patch,
-            "dcpr_error_report_create": dcpr_actions.dcpr_error_report_create,
-            "dcpr_request_create": dcpr_actions.dcpr_request_create,
-            "dcpr_geospatial_request_create": dcpr_actions.dcpr_geospatial_request_create,
-            "dcpr_request_list": dcpr_actions.dcpr_request_list,
+            "dcpr_error_report_create": dcpr_create_actions.dcpr_error_report_create,
+            "dcpr_request_create": dcpr_create_actions.dcpr_request_create,
+            "dcpr_geospatial_request_create": (
+                dcpr_create_actions.dcpr_geospatial_request_create
+            ),
+            "dcpr_request_list_public": dcpr_get_actions.dcpr_request_list_public,
+            "my_dcpr_request_list": dcpr_get_actions.my_dcpr_request_list,
+            # TODO: This action does not seem to be needed
+            "dcpr_request_list_private": dcpr_get_actions.dcpr_request_list_private,
+            "dcpr_request_list_awaiting_csi_moderation": (
+                dcpr_get_actions.dcpr_request_list_awaiting_csi_moderation
+            ),
+            "dcpr_request_list_awaiting_nsif_moderation": (
+                dcpr_get_actions.dcpr_request_list_awaiting_nsif_moderation
+            ),
+            "dcpr_request_show": dcpr_get_actions.dcpr_request_show,
+            "dcpr_request_update_by_owner": dcpr_update_actions.dcpr_request_update_by_owner,
+            "dcpr_request_submit": dcpr_update_actions.dcpr_request_submit,
+            "dcpr_request_update_by_nsif": dcpr_update_actions.dcpr_request_update_by_nsif,
+            "dcpr_request_update_by_csi": dcpr_update_actions.dcpr_request_update_by_csi,
+            "claim_dcpr_request_nsif_reviewer": dcpr_update_actions.claim_dcpr_request_nsif_reviewer,
+            "claim_dcpr_request_csi_reviewer": dcpr_update_actions.claim_dcpr_request_csi_reviewer,
+            "resign_dcpr_request_nsif_reviewer": dcpr_update_actions.resign_dcpr_request_nsif_reviewer,
+            "resign_dcpr_request_csi_reviewer": dcpr_update_actions.resign_dcpr_request_csi_reviewer,
+            "dcpr_request_nsif_moderate": dcpr_update_actions.dcpr_request_nsif_moderate,
+            "dcpr_request_csi_moderate": dcpr_update_actions.dcpr_request_csi_moderate,
+            "dcpr_request_delete": dcpr_delete_actions.dcpr_request_delete,
             "emc_version": emc_actions.show_version,
             "emc_request_dataset_maintenance": emc_actions.request_dataset_maintenance,
             "emc_request_dataset_publication": emc_actions.request_dataset_publication,
@@ -252,10 +298,12 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "value_or_true": validators.emc_value_or_true_validator,
             "emc_srs_validator": validators.emc_srs_validator,
             "emc_bbox_converter": converters.emc_bbox_converter,
+            "dcpr_end_date_after_start_date_validator": validators.dcpr_end_date_after_start_date_validator,
+            "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
         }
 
     def is_fallback(self) -> bool:
-        return True
+        return False
 
     def package_types(self) -> typing.List:
         return []
@@ -268,13 +316,18 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_build_nav_main": helpers.build_pages_nav_main,
             "emc_default_bounding_box": helpers.get_default_bounding_box,
             "emc_convert_geojson_to_bounding_box": helpers.convert_geojson_to_bbox,
+            "emc_extent_to_bbox": helpers.convert_string_extent_to_bbox,
             "emc_sasdi_themes": helpers.get_sasdi_themes,
             "emc_iso_topic_categories": helpers.get_iso_topic_categories,
             "emc_show_version": helpers.helper_show_version,
             "emc_user_is_org_member": helpers.user_is_org_member,
+            "emc_org_member_list": helpers.org_member_list,
             "emc_user_is_staff_member": helpers.user_is_staff_member,
             "emc_get_featured_datasets": helpers.get_featured_datasets,
             "emc_get_recently_modified_datasets": helpers.get_recently_modified_datasets,
+            "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
+            "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
+            "emc_org_memberships": helpers.get_org_memberships,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

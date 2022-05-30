@@ -19,7 +19,9 @@ SAMPLE_ORGANIZATIONS: typing.Final[
     ]
 ] = [
     (
-        _CkanBootstrapOrganization("Sample org 1", _SAMPLE_ORG_DESCRIPTION),
+        _CkanBootstrapOrganization(
+            "sample-org-1", "Sample org 1", _SAMPLE_ORG_DESCRIPTION
+        ),
         [
             ("tester1", "member"),
             ("tester2", "editor"),
@@ -36,7 +38,27 @@ SAMPLE_ORGANIZATIONS: typing.Final[
         ],
     ),
     (
-        _CkanBootstrapOrganization("Sample org 2", _SAMPLE_ORG_DESCRIPTION),
+        _CkanBootstrapOrganization(
+            "sample-org-2", "Sample org 2", _SAMPLE_ORG_DESCRIPTION
+        ),
+        [
+            ("tester4", "member"),
+            ("tester5", "editor"),
+            ("tester6", "publisher"),
+        ],
+        [],
+    ),
+    (
+        _CkanBootstrapOrganization("nsif", "NSIF", _SAMPLE_ORG_DESCRIPTION),
+        [
+            ("tester1", "member"),
+            ("tester2", "editor"),
+            ("tester3", "publisher"),
+        ],
+        [],
+    ),
+    (
+        _CkanBootstrapOrganization("csi", "CSI", _SAMPLE_ORG_DESCRIPTION),
         [
             ("tester4", "member"),
             ("tester5", "editor"),

@@ -1,0 +1,197 @@
+{% import 'macros/form.html' as form %}
+
+{% asset "ckanext-dalrrdemcdcpr/dcpr-request-datasets-js" %}
+
+
+<form class="dataset-form" method="post" data-module="basic-form" novalidate>
+    {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
+    <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
+        <legend>DCPR request owner fields</legend>
+        {% if not data.organization_id %}
+            {% call form.select(
+                "organization_id",
+                id="field-organization_id",
+                label=_("Organization"),
+                options=relevant_organizations,
+                selected=relevant_organizations[0].text,
+                is_required=true
+            ) %}
+                {{ form.info(_('Organization that shall be responsible for this DCPR request - This field only shows organizations that the current user is a member of.')) }}
+            {% endcall %}
+        {% endif %}
+        {% call form.input(
+            'proposed_project_name',
+            label=_('Proposed Project Name'),
+            id='field-proposed_project_name',
+            placeholder=_('e.g. Data Request'),
+            value=data.proposed_project_name,
+            error=errors.proposed_project_name,
+            classes=['control-medium'],
+            is_required=True
+        ) %}
+            {{ form.info(_('Proposed name for the data capture project.')) }}
+        {% endcall %}
+        {% call form.input(
+            'capture_start_date',
+            label=_('Capture start date'),
+            id='field-capture_start_date',
+            type='date',
+            placeholder=_('eg. 2022-01-01'),
+            value=data.capture_start_date,
+            error=errors.capture_start_date,
+            classes=['control-medium'],
+            is_required=True
+        ) %}
+            {{ form.info(_('Proposed start date of the data capture.')) }}
+        {% endcall %}
+        {% call form.input(
+            'capture_end_date',
+            label=_('Capture end date'),
+            id='field-capture_end_date',
+            type='date',
+            placeholder=_('eg. 2022-01-01'),
+            value=data.capture_end_date,
+            error=errors.capture_end_date,
+            classes=['control-medium'],
+            is_required=True
+        ) %}
+            {{ form.info(_('Proposed end date of the data capture.')) }}
+        {% endcall %}
+        {% call form.input(
+            'cost',
+            label=_('Estimated cost'),
+            id='field-cost',
+            type='number',
+            value=data.cost,
+            error=errors.cost,
+            classes=['control-medium'],
+            is_required=True
+        ) %}
+            {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
+        {% endcall %}
+        {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
+        {% call form.input(
+            'spatial_resolution',
+            label=_('Spatial resolution'),
+            id='field-spatial_resolution',
+            type='number',
+            value=data.spatial_resolution,
+            error=errors.spatial_resolution,
+            classes=['control-medium']
+        ) %}
+            {{ form.info(_('Spatial resolution that is proposed for the data capture.')) }}
+        {% endcall %}
+        {% call form.select(
+            'data_capture_urgency',
+            label=_('Data capture urgency'),
+            id='field-data_capture_urgency',
+            options=data_urgency_options,
+            selected=data.data_capture_urgency,
+            error=errors.data_capture_urgency,
+            classes=['control-medium']
+        ) %}
+            {{ form.info(_('Urgency of the data capture project.')) }}
+        {% endcall %}
+        {% call form.markdown(
+            'additional_project_context',
+            label=_('Additional project context'),
+            id='field-additional_project_context',
+            value=data.additional_project_context,
+            error=errors.additional_project_context,
+            placeholder=_('e.g. Additional relevant information about the project.')
+        ) %}
+            {{ form.info(_('Additional information about the project and this DCPR request. Please include any relevant
+            information for aiding the NSIF and CSI in their review and moderation process.')) }}
+        {% endcall %}
+        {% if data.datasets %}
+            {% for ds in data.datasets %}
+                {{ h.snippet(
+                    "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
+                    index=loop.index,
+                    dataset_custodian=ds.dataset_custodian,
+                    data_type=ds.data_type,
+                    proposed_dataset_title=ds.proposed_dataset_title,
+                    proposed_abstract=ds.proposed_abstract,
+                    dataset_purpose=ds.dataset_purpose,
+                    lineage_statement=ds.lineage_statement,
+                    associated_attributes=ds.associated_attributes,
+                    feature_description=ds.feature_description,
+                    data_usage_restrictions=ds.data_usage_restrictions,
+                    capture_method=ds.capture_method,
+                    dataset_custodian_error=errors.dataset_custodian,
+                    data_type_error=errors.data_type,
+                    proposed_dataset_title_error=errors.proposed_dataset_title,
+                    proposed_abstract_error=errors.proposed_abstract,
+                    dataset_purpose_error=errors.dataset_purpose,
+                    lineage_statement_error=errors.lineage_statement,
+                    associated_attributes_error=errors.associated_attributes,
+                    data_usage_restrictions_error=errors.data_usage_restrictions,
+                    capture_method_error=errors.capture_method
+                ) }}
+            {% endfor %}
+        {% else %}
+            {{ h.snippet(
+                    "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
+                    index=1
+            ) }}
+        {% endif %}
+        <button
+                id="insert-dataset-fieldset-button"
+                type="button"
+                class="btn btn-default btn-sm"
+                data-module="dcprRequestDatasets"
+                data-module-index="{{ data.datasets | count }}"
+        >Add another dataset</button>
+        <button
+                id="remove-previous-dataset-button"
+                type="button"
+                class="btn btn-danger btn-sm"
+                {% if data.datasets | count < 2 %}
+                    disabled
+                {% endif %}
+        >Remove previous dataset</button>
+    </fieldset>
+    <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
+        <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
+        {% call form.markdown(
+            'nsif_review_notes',
+            label=_('NSIF review notes'),
+            id='field-nsif_review_notes',
+            value=data.nsif_review_notes,
+            error=errors.nsif_review_notes,
+            classes=['control-medium']
+        ) %}
+            {{ form.info(_('DCPR review notes, as provided by the NSIF reviewers')) }}
+        {% endcall %}
+    </fieldset>
+    <fieldset {% if not enable_csi_fieldset %}disabled{% endif %}>
+        <legend>CSI reviewer fields (only enabled for CSI reviewer)</legend>
+        {% call form.markdown(
+            'csi_moderation_notes',
+            label=_('CSI review notes'),
+            id='field-csi_moderation_notes',
+            value=data.csi_moderation_notes,
+            error=errors.csi_moderation_notes,
+            classes=['control-medium']
+        ) %}
+            {{ form.info(_('DCPR review notes, as provided by the CSI reviewers')) }}
+        {% endcall %}
+    </fieldset>
+    {% block form_actions %}
+        <div class="form-actions">
+            {% if csi_reference_id and h.check_access("dcpr_request_delete_auth", {"csi_reference_id": csi_reference_id}) %}
+                {% link_for _('Delete DCPR request'),
+                    named_route="dcpr.dcpr_request_delete",
+                    csi_reference_id=csi_reference_id,
+                    class_='btn btn-danger pull-left',
+                    icon='trash'
+                %}
+            {% endif %}
+            <input type="submit" class="btn btn-primary" value="{{ _('Save') }}">
+            {{ form.required_message() }}
+        </div>
+    {% endblock %}
+</form>
+
+{#data-module="confirm-action",#}
+{#data-module-content="{{ _('Are you sure you want to delete this DCPR request?') }}"#}
