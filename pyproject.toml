@@ -12,7 +12,8 @@ packages = [
 docker_entrypoint = "ckanext.dalrrd_emc_dcpr.cli.docker_entrypoint:cli"
 
 [tool.poetry.plugins."ckan.plugins"]
-dalrrd_emc_dcpr = "ckanext.dalrrd_emc_dcpr.plugin:DalrrdEmcDcprPlugin"
+dalrrd_emc_dcpr = "ckanext.dalrrd_emc_dcpr.plugins.emc_dcpr_plugin:DalrrdEmcDcprPlugin"
+dalrrd_emc_dcpr_harvesting = "ckanext.dalrrd_emc_dcpr.plugins.harvesting_plugin:HarvestingPlugin"
 
 [tool.poetry.plugins."babel.extractors"]
 ckan = "ckan.lib.extract:extract_ckan"

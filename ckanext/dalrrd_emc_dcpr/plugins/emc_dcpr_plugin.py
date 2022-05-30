@@ -15,7 +15,7 @@ from ckan.common import _, g
 from flask import Blueprint
 from sqlalchemy import orm
 
-from . import (
+from .. import (
     constants,
     helpers,
 )
