@@ -78,13 +78,13 @@ Werkzeug = {extras = ["watchdog"], version = "2.0.1"}
 ckan = {git = "https://github.com/ckan/ckan.git", rev = "ckan-2.9.5"}
 
 # ckan harvest plugin dependencies
-ckantoolkit = "0.0.3"
+ckantoolkit = "0.0.7"
 pika = "^1.1.0"
 pyOpenSSL = "18.0.0"
 redis = "3.5.3"
 six = "^1.12.0"
 
-ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.3.4"}
+ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.4.0"}
 
 # ckanext spatial v1.0.0 dependencies
 # lxml and pyproj versions have been changed to workaround
