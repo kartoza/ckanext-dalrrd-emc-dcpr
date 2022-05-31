@@ -8,6 +8,7 @@ most obvious being that rather than a bash script, this is a Python module.
 import os
 import sys
 import time
+import traceback
 
 import click
 
@@ -77,9 +78,10 @@ def _wait_for_ckan_env(
         try:
             load_environment(config)
         except Exception as exc:
+            formatted_exc = traceback.format_exc()
             click.secho(
                 f"({current_attempt}/{total_tries}) - ckan environment is not "
-                f"available yet: {str(exc)}",
+                f"available yet: {formatted_exc}",
                 fg="red",
             )
             click.secho(f"Retrying in {pause_for} seconds...")
