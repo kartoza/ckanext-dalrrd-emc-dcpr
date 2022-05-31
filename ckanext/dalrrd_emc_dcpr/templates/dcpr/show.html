@@ -87,11 +87,11 @@
             </tr>
             <tr>
                 <th scope="row">{{ _("Capture start date") }}</th>
-                <td>{% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.capture_start_date %}</td>
+                <td>{% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=dcpr_request.capture_start_date %}</td>
             </tr>
             <tr>
                 <th scope="row">{{ _("Capture end date") }}</th>
-                <td>{% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.capture_end_date %}</td>
+                <td>{% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=dcpr_request.capture_end_date %}</td>
             </tr>
             <tr>
                 <th scope="row">{{ _("Cost") }}</th>
@@ -118,33 +118,29 @@
             <tr>
                 <th scope="row" class="dataset-label">{{ _("Additional documents") }}</th>
                 <td class="dataset-details">
-                    {{ dcpr_request.additional_documents }}
+                    {{ dcpr_request.additional_documents if dcpr_request.additional_documents is not none else 'None'}}
                 </td>
             </tr>
             <tr>
                 <th scope="row" class="dataset-label">{{ _("Request date") }}</th>
                 <td class="dataset-details">
-                    {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.request_date %}
+                    {% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=dcpr_request.request_date %}
+
                 </td>
             </tr>
             <tr>
                 <th scope="row" class="dataset-label">{{ _("Submission date") }}</th>
                 <td class="dataset-details">
-                    {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.submission_date %}
+                    {% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=dcpr_request.submission_date %}
                 </td>
             </tr>
             <tr>
                 <th scope="row" class="dataset-label">{{ _("NSIF review date") }}</th>
                 <td class="dataset-details">
-                    {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.nsif_review_date %}
+                    {% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=dcpr_request.nsif_review_date %}
                 </td>
             </tr>
-            <tr>
-                <th scope="row" class="dataset-label">{{ _("NSIF recommendation") }}</th>
-                <td class="dataset-details">
-                    {{ dcpr_request.nsif_recommendation }}
-                </td>
-            </tr>
+
                 <tr>
                     <th scope="row" class="dataset-label">{{ _("NSIF review notes") }}</th>
                     <td class="dataset-details">
@@ -172,7 +168,7 @@
                 <tr>
                     <th scope="row" class="dataset-label">{{ _("CSI moderation date") }}</th>
                     <td class="dataset-details">
-                        {% snippet 'snippets/local_friendly_datetime.html', datetime_obj=dcpr_request.csi_moderation_date %}
+                        {% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=dcpr_request.csi_moderation_date %}
                     </td>
                 </tr>
             </tbody>
