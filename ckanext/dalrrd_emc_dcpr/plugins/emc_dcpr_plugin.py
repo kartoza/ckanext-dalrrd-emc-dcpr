@@ -15,6 +15,8 @@ from ckan.common import _, g
 from flask import Blueprint
 from sqlalchemy import orm
 
+from ckanext.harvest.utils import DATASET_TYPE_NAME as HARVEST_DATASET_TYPE_NAME
+
 from .. import (
     constants,
     helpers,
@@ -339,13 +341,15 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def dataset_facets(
         self, facets_dict: typing.OrderedDict, package_type: str
     ) -> typing.OrderedDict:
-        facets_dict[f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._(
-            "SASDI Theme"
-        )
-        facets_dict[f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"] = toolkit._(
-            "ISO Topic Category"
-        )
-        facets_dict["reference_date"] = toolkit._("Reference Date")
+        if package_type != HARVEST_DATASET_TYPE_NAME:
+            facets_dict[f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._(
+                "SASDI Theme"
+            )
+            facets_dict[
+                f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"
+            ] = toolkit._("ISO Topic Category")
+            facets_dict["reference_date"] = toolkit._("Reference Date")
+            facets_dict["harvest_source_title"] = toolkit._("Harvest source")
         return facets_dict
 
     def group_facets(
