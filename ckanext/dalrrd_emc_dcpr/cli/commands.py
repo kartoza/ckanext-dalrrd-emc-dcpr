@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import sys
+import time
 import traceback
 import typing
 from concurrent import futures
@@ -22,6 +23,8 @@ from ckan import model
 from ckan.lib.navl import dictization_functions
 from lxml import etree
 from sqlalchemy import text as sla_text
+
+from ckanext.harvest import utils as harvest_utils
 
 from .. import provide_request_context
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
@@ -1142,4 +1145,41 @@ def drop_materialized_view():
         conn.execute(
             sla_text(f"DROP MATERIALIZED VIEW {_PYCSW_MATERIALIZED_VIEW_NAME}")
         )
+    logger.info("Done!")
+
+
+@extra_commands.command()
+@click.option(
+    "--post-run-delay-seconds",
+    help="How much time to sleep after performing the harvesting command",
+    default=(60 * 5),
+)
+@click.pass_context
+def harvesting_dispatcher(ctx, post_run_delay_seconds: int):
+    """Manages the harvesting queue and then sleeps a while after that.
+
+    This command takes care of submitting pending jubs and marking done jobs as finished.
+
+    It is similar to ckanext.harvest's `harvester run` CLI command, with the difference
+    being that this command is designed to run and then wait a specific amount of time
+    before exiting. This is a workaround for the fact that it is not possible to
+    specify a delay period when restarting docker containers in docker-compose's normal
+    mode.
+
+    NOTE: This command is not needed when running under k8s or docker-compose swarm
+    mode, as these offer other ways to control periodic services. In that case you can
+    simply configure the periodic service and then use
+
+    `launch-ckan-cli harvester run`
+
+    as the container's CMD instruction.
+
+    """
+
+    flask_app = ctx.meta["flask_app"]
+    with flask_app.test_request_context():
+        logger.info(f"Calling harvester run command...")
+        harvest_utils.run_harvester()
+    logger.info(f"Sleeping for {post_run_delay_seconds!r} seconds...")
+    time.sleep(post_run_delay_seconds)
     logger.info("Done!")
