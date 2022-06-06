@@ -1319,6 +1319,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "types-pyyaml"
+version = "6.0.8"
+description = "Typing stubs for PyYAML"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-setuptools"
 version = "57.4.11"
 description = "Typing stubs for setuptools"
@@ -1443,7 +1451,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "d3d3c59f5e1a604bffeb49269b0693a41639a93e6f1fc48ade765141782edfcb"
+content-hash = "caaa3e54ba379dedb311b8b9e39ba2b9fb4605fa8516143adaf5f71a39e7385f"
 
 [metadata.files]
 alembic = [
@@ -2181,6 +2189,10 @@ types-python-dateutil = [
 types-python-slugify = [
     {file = "types-python-slugify-5.0.3.tar.gz", hash = "sha256:76169f4a6d40896fea76fb45a25c50ac7ba2ca03eee759ecac322a05fe4dd21c"},
     {file = "types_python_slugify-5.0.3-py3-none-any.whl", hash = "sha256:a5761d3c55e949f8ace0694eb5be81210087084bb78df495de14ee5eaad6ac54"},
+]
+types-pyyaml = [
+    {file = "types-PyYAML-6.0.8.tar.gz", hash = "sha256:d9495d377bb4f9c5387ac278776403eb3b4bb376851025d913eea4c22b4c6438"},
+    {file = "types_PyYAML-6.0.8-py3-none-any.whl", hash = "sha256:56a7b0e8109602785f942a11ebfbd16e97d5d0e79f5fbb077ec4e6a0004837ff"},
 ]
 types-setuptools = [
     {file = "types-setuptools-57.4.11.tar.gz", hash = "sha256:262f7406e0c7d705ad6bb4526b5b761fa500bf99eab74de85ac3592187d62935"},
