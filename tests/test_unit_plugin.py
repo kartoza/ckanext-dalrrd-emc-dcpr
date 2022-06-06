@@ -1,6 +1,6 @@
 import pytest
 
-from ckanext.dalrrd_emc_dcpr import plugin
+from ckanext.dalrrd_emc_dcpr.plugins import emc_dcpr_plugin
 
 pytestmark = pytest.mark.unit
 
@@ -14,5 +14,5 @@ pytestmark = pytest.mark.unit
     ],
 )
 def test_parse_date(raw_date, expected):
-    result = plugin._parse_date(raw_date)
+    result = emc_dcpr_plugin._parse_date(raw_date)
     assert result == expected
