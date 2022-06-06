@@ -89,7 +89,7 @@ def package_create(original_action, context, data_dict):
     Intercepts the core `package_create` action to check if package
      is being published after being created.
     """
-    return _package_publish_check(original_action, context, data_dict)
+    return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
 @toolkit.chained_action
@@ -98,7 +98,7 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
-    return _package_publish_check(original_action, context, data_dict)
+    return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
 @toolkit.chained_action
@@ -106,7 +106,7 @@ def package_patch(original_action, context, data_dict):
     """
     Intercepts the core `package_patch` action to check if package is being published.
     """
-    return _package_publish_check(original_action, context, data_dict)
+    return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
 def user_patch(context: typing.Dict, data_dict: typing.Dict) -> typing.Dict:
@@ -138,7 +138,9 @@ def user_patch(context: typing.Dict, data_dict: typing.Dict) -> typing.Dict:
     return update_action(context, patched)
 
 
-def _package_publish_check(action, context, data):
+def _act_depending_on_package_visibility(
+    action: typing.Callable, context: typing.Dict, data: typing.Dict
+):
     remains_private = toolkit.asbool(data.get("private", True))
     if remains_private:
         result = action(context, data)

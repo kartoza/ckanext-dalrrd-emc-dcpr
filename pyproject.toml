@@ -12,7 +12,8 @@ packages = [
 docker_entrypoint = "ckanext.dalrrd_emc_dcpr.cli.docker_entrypoint:cli"
 
 [tool.poetry.plugins."ckan.plugins"]
-dalrrd_emc_dcpr = "ckanext.dalrrd_emc_dcpr.plugin:DalrrdEmcDcprPlugin"
+dalrrd_emc_dcpr = "ckanext.dalrrd_emc_dcpr.plugins.emc_dcpr_plugin:DalrrdEmcDcprPlugin"
+dalrrd_emc_dcpr_harvesting = "ckanext.dalrrd_emc_dcpr.plugins.harvesting_plugin:HarvestingPlugin"
 
 [tool.poetry.plugins."babel.extractors"]
 ckan = "ckan.lib.extract:extract_ckan"
@@ -77,13 +78,13 @@ Werkzeug = {extras = ["watchdog"], version = "2.0.1"}
 ckan = {git = "https://github.com/ckan/ckan.git", rev = "ckan-2.9.5"}
 
 # ckan harvest plugin dependencies
-ckantoolkit = "0.0.3"
+ckantoolkit = "0.0.7"
 pika = "^1.1.0"
 pyOpenSSL = "18.0.0"
 redis = "3.5.3"
 six = "^1.12.0"
 
-ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.3.4"}
+ckanext-harvest = {git = "https://github.com/ckan/ckanext-harvest.git", rev = "v1.4.0"}
 
 # ckanext spatial v1.0.0 dependencies
 # lxml and pyproj versions have been changed to workaround
@@ -96,7 +97,7 @@ pyparsing = "^2.1.10"
 pyproj = "3.2.1"
 Shapely = "^1.2.13"
 
-ckanext-spatial = {git = "https://github.com/ckan/ckanext-spatial.git", rev = "v1.0.0"}
+ckanext-spatial = {git = "https://github.com/ckan/ckanext-spatial", rev = "f00ad5b"}
 
 # ckanext-geoview v0.0.18 dependencies are already met (requests, ckantoolkit)
 ckanext-geoview = {git = "https://github.com/ckan/ckanext-geoview.git", rev = "v0.0.18"}
@@ -107,6 +108,7 @@ ckanext-scheming = {git = "https://github.com/ckan/ckanext-scheming.git", rev = 
 ckanext-pages = {git = "https://github.com/ckan/ckanext-pages.git", rev = "v0.3.4"}
 httpx = "^0.22.0"
 python-slugify = "^6.1.1"
+langcodes = {git = "https://github.com/rspeer/langcodes.git", rev = "v3.2.1"}
 
 
 [tool.poetry.dev-dependencies]
@@ -120,6 +122,7 @@ mypy = "^0.931"
 types-setuptools = "^57.4.9"
 types-python-dateutil = "^2.8.9"
 types-python-slugify = "^5.0.3"
+types-PyYAML = "^6.0.8"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

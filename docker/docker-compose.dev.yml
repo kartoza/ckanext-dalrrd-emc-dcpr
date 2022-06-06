@@ -64,6 +64,15 @@ services:
 
   ckan-harvesting-runner:
     <<: *partial-ckan-volumes
+    command: [
+      "launch-ckan-cli",
+      "dalrrd-emc-dcpr",
+      "extra-commands",
+      "harvesting-dispatcher",
+      "--post-run-delay-seconds",
+      "60"
+    ]
+    restart: always
 
   ckan-mail-sender:
     <<: *partial-ckan-volumes

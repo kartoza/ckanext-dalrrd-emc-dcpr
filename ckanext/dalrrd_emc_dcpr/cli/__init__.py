@@ -73,6 +73,10 @@ class _CkanEmcDataset:
     sasdi_theme: typing.Optional[str] = None
     tags: typing.List[typing.Dict] = dataclasses.field(default_factory=list)
     source: typing.Optional[str] = None
+    license_id: typing.Optional[str] = None
+    version: typing.Optional[str] = None
+    lineage: typing.Optional[str] = None
+    featured: typing.Optional[bool] = False
 
     def to_data_dict(self) -> typing.Dict:
         result = {}

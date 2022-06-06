@@ -2,6 +2,9 @@ import logging
 import typing
 
 import ckan.plugins.toolkit as toolkit
+from ckan.logic.auth import get_package_object
+
+from ckanext.harvest.utils import DATASET_TYPE_NAME as CKANEXT_HARVEST_DATASET_TYPE_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -16,45 +19,42 @@ def package_update(next_auth, context, data_dict=None):
     """
 
     user = context["auth_user_obj"]
-    if data_dict is None:
+    if user.sysadmin:
         final_result = next_auth(context, data_dict)
-    else:
-        package = toolkit.get_action("package_show")(
-            context=context, data_dict=data_dict
-        )
-        logger.debug(f"{package=}")
-        if user.sysadmin:
-            result = {"success": True}
-        elif package.get("private", False):
-            result = {"success": True}
-        elif package.get("state") == "draft":
-            result = {"success": True}
-        else:
-            org_id = data_dict.get("owner_org", package.get("owner_org"))
-            if org_id is not None:
-                members_action = toolkit.get_action("member_list")
-                members = members_action(
-                    data_dict={"id": org_id, "object_type": "user"}
-                )
-                for member_id, _, role in members:
-                    if member_id == user.id and role.lower() == "admin":
-                        result = {"success": True}
-                        break
-                else:
-                    org_name = package.get("organization", {}).get("name", "") or org_id
-                    result = {
-                        "success": False,
-                        "msg": (
-                            f"Only administrators of organization {org_name!r} are "
-                            f"authorized to edit one of its public datasets"
-                        ),
-                    }
-            else:
-                result = {"success": False}
-        if result["success"]:
+    elif data_dict is not None:
+        # NOTE: we do not call toolkit.get_action("package_show") here but rather do it
+        # the same as vanilla CKAN which uses a custom way to retrieve the object from
+        # the context - this is in order to ensure other extensions
+        # (e.g. ckanext.harvest) are able to function correctly
+        package = get_package_object(context, data_dict)
+        if package.type == CKANEXT_HARVEST_DATASET_TYPE_NAME:
+            # defer auth to the ckanext.harvest extension
             final_result = next_auth(context, data_dict)
         else:
-            final_result = result
+            result = {"success": False}
+            if package.private or package.state == "draft":
+                result["success"] = True
+            else:
+                org_id = data_dict.get("owner_org", package.owner_org)
+                if org_id is not None:
+                    members = toolkit.get_action("member_list")(
+                        data_dict={"id": org_id, "object_type": "user"}
+                    )
+                    for member_id, _, role in members:
+                        if member_id == user.id and role.lower() == "admin":
+                            result["success"] = True
+                            break
+                    else:
+                        result["msg"] = (
+                            f"Only administrators of organization {org_id!r} are "
+                            f"authorized to edit one of its public datasets"
+                        )
+            if result["success"]:
+                final_result = next_auth(context, data_dict)
+            else:
+                final_result = result
+    else:
+        final_result = next_auth(context, data_dict)
     return final_result
 
 
