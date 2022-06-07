@@ -15,6 +15,8 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             this.el.on('click', this._onAddDatasetFieldset)
             let removeButtonEl = document.querySelector('#remove-previous-dataset-button')
             removeButtonEl.addEventListener('pointerdown', this._onRemoveDatasetFieldset)
+            let captureEndDate = document.querySelector('#field-capture_end_date')
+            captureEndDate.addEventListener('change', this._validateEndDate);
         },
 
         _onAddDatasetFieldset: function () {
@@ -41,9 +43,9 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         _onRemoveDatasetFieldset: function (event) {
             let fieldsetSelector = '.dynamic-dataset-fieldset'
             let datasetFieldsets = document.querySelectorAll(fieldsetSelector)
-            let indexToRemove = datasetFieldsets.length - 1
+            let indexToRemove = datasetFieldsets.length
             console.log(`Was asked to remove previous dataset, which has index ${indexToRemove}`)
-            let lastDatasetFieldset = datasetFieldsets[datasetFieldsets.length - 1]
+            let lastDatasetFieldset = datasetFieldsets[datasetFieldsets.length]
             lastDatasetFieldset.remove()
             if (document.querySelectorAll(fieldsetSelector).length < 2) {
                 let removeButton = document.querySelector('#remove-previous-dataset-button')
@@ -54,6 +56,10 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         _getNumDatasetFieldsets: function () {
             let parent = document.querySelector('fieldset#dcpr-request-owner-fields')
             return parent.querySelectorAll('fieldset').length
+        },
+
+        _validateEndDate: function (){
+            let captureStartDate = document.querySelector('#field-capture_start_date')
         }
     }
 })
