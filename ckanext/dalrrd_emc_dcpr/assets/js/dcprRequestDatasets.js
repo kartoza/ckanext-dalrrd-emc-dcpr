@@ -15,8 +15,6 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             this.el.on('click', this._onAddDatasetFieldset)
             let removeButtonEl = document.querySelector('#remove-previous-dataset-button')
             removeButtonEl.addEventListener('pointerdown', this._onRemoveDatasetFieldset)
-            let captureEndDate = document.querySelector('#field-capture_end_date')
-            captureEndDate.addEventListener('change', this._validateEndDate);
         },
 
         _onAddDatasetFieldset: function () {
@@ -57,9 +55,5 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             let parent = document.querySelector('fieldset#dcpr-request-owner-fields')
             return parent.querySelectorAll('fieldset').length
         },
-
-        _validateEndDate: function (){
-            let captureStartDate = document.querySelector('#field-capture_start_date')
-        }
     }
 })
