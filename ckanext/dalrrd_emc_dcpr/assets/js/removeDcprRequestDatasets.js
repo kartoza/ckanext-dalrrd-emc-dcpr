@@ -1,6 +1,6 @@
 "use strict";
 
-ckan.module('remoceDcprRequestDatasets', function(jQuery, _){
+ckan.module('removeDcprRequestDatasets', function(jQuery, _){
 
     return {
         initialize: function (){

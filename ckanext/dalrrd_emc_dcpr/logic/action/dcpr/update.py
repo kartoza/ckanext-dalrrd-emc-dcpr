@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 def dcpr_request_update_by_owner(context, data_dict):
     schema = dcpr_schema.update_dcpr_request_by_owner_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+    if errors:
+        raise toolkit.ValidationError(errors)
+
     # add validation error to capture_end_date
     date_start = data_dict["capture_start_date"]
     date_end = data_dict["capture_end_date"]
@@ -28,12 +31,10 @@ def dcpr_request_update_by_owner(context, data_dict):
         raise toolkit.ValidationError(
             {
                 "capture_end_date": [
-                    "Capture end date must more or equal to capture start date."
+                    "Invalid value. Please select a date after capture start date."
                 ],
             }
         )
-    if errors:
-        raise toolkit.ValidationError(errors)
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id
     context["updated_by"] = "owner"

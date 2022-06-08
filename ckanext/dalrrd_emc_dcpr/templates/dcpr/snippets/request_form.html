@@ -115,9 +115,12 @@
                             <button
                                     type="button"
                                     class="btn btn-danger btn-sm pull-right"
-                                    data-module="remoceDcprRequestDatasets"
+                                    data-module="removeDcprRequestDatasets"
                                     data-module-index="{{ loop.index }}"
                                     style="margin-top: -2.5px;"
+                                     {% if data.datasets | count < 2 %}
+                                            disabled
+                                     {% endif %}
                             >Remove</button>
                     </h4>
                  </div>
