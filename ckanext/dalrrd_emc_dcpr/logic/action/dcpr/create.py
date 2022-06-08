@@ -76,14 +76,16 @@ def dcpr_request_create(context, data_dict):
     logger.debug(f"{schema=}")
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     logger.debug(f"{errors=}")
-    # add validation to capture_end_date
-    date_start = data_dict['capture_start_date']
-    date_end = data_dict['capture_end_date']
+    # add validation error to capture_end_date
+    date_start = data_dict["capture_start_date"]
+    date_end = data_dict["capture_end_date"]
     if date_end < date_start:
         raise toolkit.ValidationError(
             {
-                "capture_end_date": ["Capture end date must more or equal to capture start date."],
-             }
+                "capture_end_date": [
+                    "Capture end date must more or equal to capture start date."
+                ],
+            }
         )
     if errors:
         model.Session.rollback()
