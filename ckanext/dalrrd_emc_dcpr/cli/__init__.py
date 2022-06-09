@@ -110,41 +110,55 @@ class _CkanBootstrapDCPRErrorReport:
 
 
 @dataclasses.dataclass
+class _CkanBootstrapDcprDataset:
+    proposed_dataset_title: str
+    dataset_purpose: str
+    dataset_custodian: typing.Optional[bool] = False
+    data_type: typing.Optional[str] = None
+    proposed_abstract: typing.Optional[str] = None
+    lineage_statement: typing.Optional[str] = None
+    associated_attributes: typing.Optional[str] = None
+    data_usage_restrictions: typing.Optional[str] = None
+    capture_method: typing.Optional[str] = None
+
+    def to_data_dict(self) -> typing.Dict:
+        result = {}
+        for name, value in vars(self).items():
+            if value is not None:
+                result[name] = _to_data_dict(value)
+        return result
+
+
+@dataclasses.dataclass
 class _CkanBootstrapDCPRRequest:
-    csi_reference_id: uuid.UUID
-    status: str
-    organization_name: str
-    organization_level: str
-    organization_address: str
     proposed_project_name: str
-    additional_project_context: str
     capture_start_date: str
     capture_end_date: str
-    cost: str
-    spatial_extent: str
-    spatial_resolution: str
-    data_capture_urgency: str
-    additional_information: str
+    cost: int
+    organization_id: str
     request_date: str
-    submission_date: str
-    nsif_review_date: str
-    nsif_recommendation: str
-    nsif_review_notes: str
-    nsif_review_additional_documents: str
-    csi_moderation_notes: str
-    csi_moderation_additional_documents: str
-    csi_moderation_date: str
-    dataset_custodian: bool
-    data_type: str
-    proposed_dataset_title: str
-    proposed_abstract: str
-    dataset_purpose: str
-    lineage_statement: str
-    associated_attributes: str
-    feature_description: str
-    data_usage_restrictions: str
-    capture_method: str
-    capture_method_detail: str
+    csi_reference_id: typing.Optional[str] = None
+    csi_moderator: typing.Optional[str] = None
+    nsif_reviewer: typing.Optional[str] = None
+    additional_project_context: typing.Optional[str] = ""
+    spatial_extent: typing.Optional[str] = None
+    spatial_resolution: typing.Optional[str] = None
+    data_capture_urgency: typing.Optional[str] = "low"
+    submission_date: typing.Optional[str] = None
+    nsif_review_date: typing.Optional[str] = None
+    nsif_review_notes: typing.Optional[str] = None
+    csi_moderation_date: typing.Optional[str] = None
+    datasets: typing.List[_CkanBootstrapDcprDataset] = dataclasses.field(
+        default_factory=list
+    )
+    # organization_name: str
+    # organization_level: str
+    # organization_address: str
+    # additional_information: str
+    # nsif_recommendation: str
+    # nsif_review_additional_documents: str
+    # csi_moderation_notes: str
+    # csi_moderation_additional_documents: str
 
     def to_data_dict(self) -> typing.Dict:
         result = {}
@@ -203,15 +217,12 @@ class _CkanExtBootstrapPage:
 
 
 def _to_data_dict(value):
-    if isinstance(value, str):
+    if isinstance(value, (str, int, float)):
         result = value
     elif isinstance(value, Iterable):
-        try:
-            result = [i.to_data_dict() for i in value]
-        except AttributeError:
-            result = list(value)
+        result = [_to_data_dict(i) for i in value]
     elif getattr(value, "to_data_dict", None) is not None:
         result = value.to_data_dict()
     else:
-        result = value
+        result = _to_data_dict(value)
     return result
