@@ -54,11 +54,18 @@ def my_dcpr_request_list(
 
 
 @toolkit.side_effect_free
-def dcpr_request_list_private(
+def dcpr_request_list_under_preparation(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List[typing.Dict]:
-    """Return a list of private DCPR requests"""
-    toolkit.check_access("dcpr_request_list_private_auth", context, data_dict or {})
+    """Return a list of DCPR requests that are still being prepared.
+
+    This function returns all DCPR requests that are being prepared by all users.
+
+    """
+
+    toolkit.check_access(
+        "dcpr_request_list_under_preparation_auth", context, data_dict or {}
+    )
     return _get_dcpr_request_list(
         context,
         data_dict,
