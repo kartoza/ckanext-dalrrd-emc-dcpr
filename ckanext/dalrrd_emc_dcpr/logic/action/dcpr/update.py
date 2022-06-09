@@ -112,12 +112,12 @@ def dcpr_request_submit(context, data_dict):
         raise toolkit.ValidationError(errors)
 
     toolkit.check_access("dcpr_request_submit_auth", context, validated_data)
-    validated_data["submission_date"] = dt.datetime.now(dt.timezone.utc)
     model = context["model"]
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         validated_data["csi_reference_id"]
     )
     if request_obj is not None:
+        request_obj.submission_date = dt.datetime.now(dt.timezone.utc)
         _update_dcpr_request_status(request_obj)
         # the sysadmin is authorized to submit a DCPR request - however we want
         # to track that this action has been carried out by the sysadmin and not
