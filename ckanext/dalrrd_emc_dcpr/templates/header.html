@@ -37,9 +37,9 @@
                     {% set new_activities = h.new_activities() %}
                     {% if h.emc_org_memberships(c.userobj.id) %}
                         <li>
-                          <a href="/harvest" title="{{ _('Harvest') }}">
-                            <i class="fa fa-leaf" aria-hidden="true"></i>
-                            <span class="text">{{ _('Harvest') }}</span>
+                          <a href="{{ h.url_for('harvest.search') }}" title="{{ _('Harvesting Settings') }}">
+                            <i class="fa fa-cloud" aria-hidden="true"></i>
+                            <span class="text">{{ _('Harvesting Settings') }}</span>
                           </a>
                         </li>
                     {% endif %}
