@@ -108,8 +108,10 @@
             <legend>Dataset(s)</legend>
             {% for ds in data.datasets %}
                 {% set dataset_id = 'dataset'+ loop.index|string %}
+
                 <div class="panel panel-default" style="margin-bottom: 10px; display: block" id="{{ dataset_id }}">
-                 <div class="panel-heading">
+                    {% if  ds.proposed_dataset_title %}
+                    <div class="panel-heading">
                     <h4 class="panel-title">
                                 {{ ds.proposed_dataset_title }}
                             <button
@@ -118,12 +120,10 @@
                                     data-module="removeDcprRequestDatasets"
                                     data-module-index="{{ loop.index }}"
                                     style="margin-top: -2.5px;"
-                                     {% if data.datasets | count < 2 %}
-                                            disabled
-                                     {% endif %}
                             >Remove</button>
                     </h4>
                  </div>
+                {% endif %}
                 <div class="panel-body">
 
                 {{ h.snippet(
