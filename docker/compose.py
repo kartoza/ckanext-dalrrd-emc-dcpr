@@ -12,6 +12,7 @@ from subprocess import check_output
 logger = logging.getLogger(__name__)
 
 _FALLBACK_GIT_BRANCH = "main"
+_IMAGE_NAME = "kartoza/ckanext-dalrrd-emc-dcpr"
 
 
 def main():
@@ -73,14 +74,13 @@ def _get_image_tag_name() -> typing.Optional[str]:
         .strip("\n")
         .replace("/", "-")
     )
-    image_name = "kartoza/ckanext-dalrrd-emc-dcpr"
     existing_image_tags = check_output(
-        shlex.split(f"docker images {image_name} --format '{{{{.Tag}}}}'"), text=True
+        shlex.split(f"docker images {_IMAGE_NAME} --format '{{{{.Tag}}}}'"), text=True
     ).split("\n")
     if current_git_branch in existing_image_tags:
         logger.info("The current branch already has a built tag, lets use that")
         result = current_git_branch
-    elif "main" in existing_image_tags:
+    elif _FALLBACK_GIT_BRANCH in existing_image_tags:
         logger.info(
             f"The current branch does not have a built tag yet, lets use the "
             f"{_FALLBACK_GIT_BRANCH!r} image tag"
