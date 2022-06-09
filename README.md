@@ -517,8 +517,6 @@ To run the tests you will need to:
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db init
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini harvester initdb
    docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini db upgrade -p dalrrd_emc_dcpr
-   docker exec -t emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr load-sample-data create-sample-users
-   docker exec -t emc-dcpr_ckan-web_1 poetry run ckan --config docker/ckan-test-settings.ini dalrrd-emc-dcpr load-sample-data create-sample-organizations
    ```
 
 3. When there are model changes you will need to upgrade the DB too. Run this:

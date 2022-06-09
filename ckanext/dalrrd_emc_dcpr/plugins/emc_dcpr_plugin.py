@@ -15,29 +15,31 @@ from ckan.common import _, g
 from flask import Blueprint
 from sqlalchemy import orm
 
-from . import (
+from ckanext.harvest.utils import DATASET_TYPE_NAME as HARVEST_DATASET_TYPE_NAME
+
+from .. import (
     constants,
     helpers,
 )
-from .blueprints.dcpr import dcpr_blueprint
-from .blueprints.emc import emc_blueprint
-from .cli import commands
-from .cli.legacy_sasdi import commands as legacy_sasdi_commands
-from .logic.action import ckan as ckan_actions
-from .logic.action.dcpr import create as dcpr_create_actions
-from .logic.action.dcpr import delete as dcpr_delete_actions
-from .logic.action.dcpr import get as dcpr_get_actions
-from .logic.action.dcpr import update as dcpr_update_actions
-from .logic.action import emc as emc_actions
-from .logic import (
+from ..blueprints.dcpr import dcpr_blueprint
+from ..blueprints.emc import emc_blueprint
+from ..cli import commands
+from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
+from ..logic.action import ckan as ckan_actions
+from ..logic.action.dcpr import create as dcpr_create_actions
+from ..logic.action.dcpr import delete as dcpr_delete_actions
+from ..logic.action.dcpr import get as dcpr_get_actions
+from ..logic.action.dcpr import update as dcpr_update_actions
+from ..logic.action import emc as emc_actions
+from ..logic import (
     converters,
     validators,
 )
-from .logic.auth import ckan as ckan_auth
-from .logic.auth import pages as ckanext_pages_auth
-from .logic.auth import dcpr as dcpr_auth
-from .logic.auth import emc as emc_auth
-from .model.user_extra_fields import UserExtraFields
+from ..logic.auth import ckan as ckan_auth
+from ..logic.auth import pages as ckanext_pages_auth
+from ..logic.auth import dcpr as dcpr_auth
+from ..logic.auth import emc as emc_auth
+from ..model.user_extra_fields import UserExtraFields
 
 logger = logging.getLogger(__name__)
 
@@ -202,9 +204,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return entity
 
     def update_config(self, config_):
-        toolkit.add_template_directory(config_, "templates")
-        toolkit.add_public_directory(config_, "public")
-        toolkit.add_resource("assets", "ckanext-dalrrdemcdcpr")
+        toolkit.add_template_directory(config_, "../templates")
+        toolkit.add_public_directory(config_, "../public")
+        toolkit.add_resource("../assets", "ckanext-dalrrdemcdcpr")
 
     def get_commands(self):
         return [
@@ -339,13 +341,15 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     def dataset_facets(
         self, facets_dict: typing.OrderedDict, package_type: str
     ) -> typing.OrderedDict:
-        facets_dict[f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._(
-            "SASDI Theme"
-        )
-        facets_dict[f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"] = toolkit._(
-            "ISO Topic Category"
-        )
-        facets_dict["reference_date"] = toolkit._("Reference Date")
+        if package_type != HARVEST_DATASET_TYPE_NAME:
+            facets_dict[f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._(
+                "SASDI Theme"
+            )
+            facets_dict[
+                f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"
+            ] = toolkit._("ISO Topic Category")
+            facets_dict["reference_date"] = toolkit._("Reference Date")
+            facets_dict["harvest_source_title"] = toolkit._("Harvest source")
         return facets_dict
 
     def group_facets(

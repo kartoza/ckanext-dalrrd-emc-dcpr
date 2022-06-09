@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import sys
+import time
 import traceback
 import typing
 from concurrent import futures
@@ -22,6 +23,8 @@ from ckan import model
 from ckan.lib.navl import dictization_functions
 from lxml import etree
 from sqlalchemy import text as sla_text
+
+from ckanext.harvest import utils as harvest_utils
 
 from .. import provide_request_context
 from ckanext.dalrrd_emc_dcpr.model.dcpr_request import (
@@ -516,143 +519,33 @@ def create_sample_dcpr_error_reports():
 
 
 @load_sample_data.command()
-def create_sample_dcpr_requests():
+@click.option("-o", "--owner-user", default="tester3")
+def create_sample_dcpr_requests(owner_user: str):
     """Create sample DCPR requests"""
-    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-
-    convert_user_name_or_id_to_id = toolkit.get_converter(
-        "convert_user_name_or_id_to_id"
-    )
-    user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
-
-    create_request_action = toolkit.get_action("dcpr_request_create")
     logger.info(f"Creating sample dcpr requests ...")
     for request in SAMPLE_REQUESTS:
-        logger.info(f"Creating request with id {request.csi_reference_id!r}...")
-        try:
-            create_request_action(
-                context={
-                    "user": user["name"],
-                },
-                data_dict={
-                    "csi_reference_id": request.csi_reference_id,
-                    "owner_user": user_id,
-                    "csi_moderator": user_id,
-                    "nsif_reviewer": user_id,
-                    "notification_targets": [{"user_id": user_id, "group_id": None}],
-                    "status": request.status,
-                    "organization_name": request.organization_name,
-                    "organization_level": request.organization_level,
-                    "organization_address": request.organization_address,
-                    "proposed_project_name": request.proposed_project_name,
-                    "additional_project_context": request.additional_project_context,
-                    "capture_start_date": request.capture_start_date,
-                    "capture_end_date": request.capture_end_date,
-                    "cost": request.cost,
-                    "spatial_extent": request.spatial_extent,
-                    "spatial_resolution": request.spatial_resolution,
-                    "data_capture_urgency": request.data_capture_urgency,
-                    "additional_information": request.additional_information,
-                    "request_date": request.request_date,
-                    "submission_date": request.submission_date,
-                    "nsif_review_date": request.nsif_review_date,
-                    "nsif_recommendation": request.nsif_recommendation,
-                    "nsif_review_notes": request.nsif_review_notes,
-                    "nsif_review_additional_documents": request.nsif_review_additional_documents,
-                    "csi_moderation_notes": request.csi_moderation_notes,
-                    "csi_moderation_additional_documents": request.csi_moderation_additional_documents,
-                    "csi_moderation_date": request.csi_moderation_date,
-                    "dataset_custodian": request.dataset_custodian,
-                    "data_type": request.data_type,
-                    "proposed_dataset_title": request.proposed_dataset_title,
-                    "proposed_abstract": request.proposed_abstract,
-                    "dataset_purpose": request.dataset_purpose,
-                    "lineage_statement": request.lineage_statement,
-                    "associated_attributes": request.associated_attributes,
-                    "feature_description": request.feature_description,
-                    "data_usage_restrictions": request.data_usage_restrictions,
-                    "capture_method": request.capture_method,
-                    "capture_method_detail": request.capture_method_detail,
-                },
+        logger.info(f"Creating DCPR request {request.proposed_project_name!r}...")
+        existing = (
+            model.Session.query(DCPRRequest)
+            .filter(DCPRRequest.proposed_project_name == request.proposed_project_name)
+            .all()
+        )
+        if len(existing) > 0:
+            logger.info(
+                f"DCPR request {request.proposed_project_name!r} already exists, skipping..."
             )
-        except toolkit.ValidationError:
-            logger.exception(
-                f"Could not create request with id {request.csi_reference_id!r}"
-            )
-            logger.info("Attempting to re-enable possibly deleted request...")
-            sample_request = DCPRRequest.get(request.id)
-            if sample_request is None:
-                logger.error(
-                    f"Could not find sample request with "
-                    f"id {request.csi_reference_id!r}"
+        else:
+            try:
+                toolkit.get_action("dcpr_request_create")(
+                    context={
+                        "user": owner_user,
+                    },
+                    data_dict=request.to_data_dict(),
                 )
-                continue
-            else:
-                sample_request.undelete()
-                model.repo.commit()
-
-
-@load_sample_data.command()
-def create_sample_geospatial_dcpr_requests():
-    """Create sample DCPR requests for geospatial data"""
-    user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
-
-    convert_user_name_or_id_to_id = toolkit.get_converter(
-        "convert_user_name_or_id_to_id"
-    )
-    user_id = convert_user_name_or_id_to_id(user["name"], {"session": model.Session})
-
-    create_geospatial_request_action = toolkit.get_action(
-        "dcpr_geospatial_request_create"
-    )
-    logger.info(f"Creating sample dcpr requests ...")
-    for request in SAMPLE_GEOSPATIAL_REQUESTS:
-        logger.info(f"Creating request with id {request.csi_reference_id!r}...")
-        try:
-            create_geospatial_request_action(
-                context={
-                    "user": user["name"],
-                },
-                data_dict={
-                    "csi_reference_id": request.csi_reference_id,
-                    "owner_user": user_id,
-                    "csi_reviewer": user_id,
-                    "nsif_reviewer": user_id,
-                    "notification_targets": [{"user_id": user_id, "group_id": None}],
-                    "status": request.status,
-                    "organization_name": request.organization_name,
-                    "dataset_purpose": request.dataset_purpose,
-                    "interest_region": request.interest_region,
-                    "resolution_scale": request.resolution_scale,
-                    "additional_information": request.additional_information,
-                    "request_date": request.request_date,
-                    "submission_date": request.submission_date,
-                    "nsif_review_date": request.nsif_review_date,
-                    "nsif_review_notes": request.nsif_review_notes,
-                    "nsif_review_additional_documents": request.nsif_review_additional_documents,
-                    "csi_moderation_notes": request.csi_moderation_notes,
-                    "csi_review_additional_documents": request.csi_review_additional_documents,
-                    "csi_moderation_date": request.csi_moderation_date,
-                    "dataset_sasdi_category": request.dataset_sasdi_category,
-                    "custodian_organization": request.custodian_organization,
-                    "data_type": request.data_type,
-                },
-            )
-        except toolkit.ValidationError:
-            logger.exception(
-                f"Could not create request with id {request.csi_reference_id!r}"
-            )
-            logger.info(f"Attempting to re-enable possibly deleted request...")
-            sample_request = DCPRGeospatialRequest.get(request.id)
-            if sample_request is None:
-                logger.error(
-                    f"Could not find sample request with "
-                    f"id {request.csi_reference_id!r}"
+            except toolkit.ValidationError:
+                logger.exception(
+                    f"Could not create DCPR request {request.proposed_project_name!r}"
                 )
-                continue
-            else:
-                sample_request.undelete()
-                model.repo.commit()
 
 
 @load_sample_data.command()
@@ -1142,4 +1035,41 @@ def drop_materialized_view():
         conn.execute(
             sla_text(f"DROP MATERIALIZED VIEW {_PYCSW_MATERIALIZED_VIEW_NAME}")
         )
+    logger.info("Done!")
+
+
+@extra_commands.command()
+@click.option(
+    "--post-run-delay-seconds",
+    help="How much time to sleep after performing the harvesting command",
+    default=(60 * 5),
+)
+@click.pass_context
+def harvesting_dispatcher(ctx, post_run_delay_seconds: int):
+    """Manages the harvesting queue and then sleeps a while after that.
+
+    This command takes care of submitting pending jubs and marking done jobs as finished.
+
+    It is similar to ckanext.harvest's `harvester run` CLI command, with the difference
+    being that this command is designed to run and then wait a specific amount of time
+    before exiting. This is a workaround for the fact that it is not possible to
+    specify a delay period when restarting docker containers in docker-compose's normal
+    mode.
+
+    NOTE: This command is not needed when running under k8s or docker-compose swarm
+    mode, as these offer other ways to control periodic services. In that case you can
+    simply configure the periodic service and then use
+
+    `launch-ckan-cli harvester run`
+
+    as the container's CMD instruction.
+
+    """
+
+    flask_app = ctx.meta["flask_app"]
+    with flask_app.test_request_context():
+        logger.info(f"Calling harvester run command...")
+        harvest_utils.run_harvester()
+    logger.info(f"Sleeping for {post_run_delay_seconds!r} seconds...")
+    time.sleep(post_run_delay_seconds)
     logger.info("Done!")

@@ -21,6 +21,7 @@ services:
 
   ckan-harvesting-runner:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    command: ["launch-ckan-cli", "harvester", "run"]
 
   ckan-mail-sender:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
