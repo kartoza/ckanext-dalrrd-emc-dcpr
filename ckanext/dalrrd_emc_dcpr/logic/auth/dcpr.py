@@ -244,7 +244,7 @@ def dcpr_request_update_by_csi_auth(
     if request_obj is not None:
         if request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
             is_moderator = request_obj.csi_moderator == context["auth_user_obj"].id
-            if is_moderator or request_obj["auth_user_obj"].sysadmin:
+            if is_moderator or context["auth_user_obj"].sysadmin:
                 result["success"] = True
             else:
                 result["msg"] = toolkit._(
