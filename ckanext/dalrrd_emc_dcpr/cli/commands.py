@@ -1048,7 +1048,7 @@ def drop_materialized_view():
 def harvesting_dispatcher(ctx, post_run_delay_seconds: int):
     """Manages the harvesting queue and then sleeps a while after that.
 
-    This command takes care of submitting pending jubs and marking done jobs as finished.
+    This command takes care of submitting pending jobs and marking done jobs as finished.
 
     It is similar to ckanext.harvest's `harvester run` CLI command, with the difference
     being that this command is designed to run and then wait a specific amount of time
@@ -1070,6 +1070,41 @@ def harvesting_dispatcher(ctx, post_run_delay_seconds: int):
     with flask_app.test_request_context():
         logger.info(f"Calling harvester run command...")
         harvest_utils.run_harvester()
+    logger.info(f"Sleeping for {post_run_delay_seconds!r} seconds...")
+    time.sleep(post_run_delay_seconds)
+    logger.info("Done!")
+
+
+@extra_commands.command()
+@click.option(
+    "--post-run-delay-seconds",
+    help="How much time to sleep after refreshing the materialized view",
+    default=(60 * 5),
+)
+@click.pass_context
+def refresh_pycsw_materialized_view(ctx, post_run_delay_seconds: int):
+    """Refreshes the pycsw materiolized view and then sleeps for a while
+
+    This is similar to our own `ckan run pycsw refresh-materialized-view`, with the
+    difference being that this command is designed to run and then wait a specific
+    amount of time before exiting. This is a workaround for the fact that it is not
+    possible to specify a delay period when restarting docker containers in
+    docker-compose's normal mode.
+
+    NOTE: This command is not needed when running under k8s or docker-compose swarm
+    mode, as these offer other ways to control periodic services. In that case you can
+    simply configure a periodic service and then use
+
+    `launch-ckan-cli dalrrd-emc-dcpr pycsw refresh-materizalied-view`
+
+    as the container's CMD instruction.
+
+    """
+
+    flask_app = ctx.meta["flask_app"]
+    with flask_app.test_request_context():
+        logger.info(f"Calling the pycsw refresh-materialized-view command...")
+        ctx.invoke(refresh_materialized_view)
     logger.info(f"Sleeping for {post_run_delay_seconds!r} seconds...")
     time.sleep(post_run_delay_seconds)
     logger.info("Done!")
