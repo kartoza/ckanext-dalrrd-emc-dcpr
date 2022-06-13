@@ -3,6 +3,8 @@ import logging
 import typing
 
 import ckan.lib.navl.dictization_functions as dict_fns
+import ckan.lib.helpers as h
+from ckan.common import config
 import ckan.model
 from flask import Blueprint, redirect, request
 from flask.views import MethodView
@@ -57,12 +59,20 @@ def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = F
             403,
             toolkit._("Not authorized to list DCPR requests"),
         )
+
     else:
+        page = h.get_page_number(request.args)
         extra_vars = {
             "dcpr_requests": dcpr_requests,
             "statuses": get_status_labels(),
+            "show_create_button": should_show_create_action,
+            "page": h.Page(
+                collection=dcpr_requests,
+                items_per_page=2,
+                page=page,
+                item_count=len(dcpr_requests),
+            ),
         }
-        extra_vars["show_create_button"] = should_show_create_action
         result = toolkit.render("dcpr/list.html", extra_vars=extra_vars)
     return result
 

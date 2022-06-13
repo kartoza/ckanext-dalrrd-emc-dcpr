@@ -62,5 +62,8 @@
                 <p class="empty">{{ _('There are no DCPR requests here yet.') }}</p>
             {% endif %}
         </div>
+        {% block page_pagination %}
+            {{ page.pager(q=q) }}
+        {% endblock %}
     </section>
 {% endblock %}
