@@ -80,7 +80,7 @@ services:
       *partial-email-environment-values
 
   pycsw:
-    image: ricardogsilva/pycsw:747-allow-using-db-view-as-repo-table
+    image: "geopython/pycsw@sha256:84382cbbd18e9788e9b1bb75299ce24b31403f3b3a4afc036c55c4a96a78cdae"
     environment:
       - PYCSW_SERVER_URL=http://localhost:5001
       - PYCSW_REPOSITORY_DB_USERNAME=ckan-dev
