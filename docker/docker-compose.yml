@@ -19,6 +19,8 @@ services:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
     command: ["launch-ckan-cli", "harvester", "fetch-consumer"]
 
+  # NOTE: This needs to be ran as a periodic command, check the
+  # docker-compose.dev.yml file for additional comment
   ckan-harvesting-runner:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
     command: ["launch-ckan-cli", "harvester", "run"]
@@ -27,8 +29,7 @@ services:
     image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
 
   pycsw:
-    # TODO: replace this with an official pycsw docker release
-    image: ricardogsilva/pycsw:9f1ef474
+    image: "geopython/pycsw@sha256:84382cbbd18e9788e9b1bb75299ce24b31403f3b3a4afc036c55c4a96a78cdae"
     volumes:
       - type: bind
         source: $PWD/pycsw/pycsw-config.cfg
@@ -36,6 +37,11 @@ services:
       - type: bind
         source: $PWD/pycsw/pycsw_repository_mappings.py
         target: /etc/pycsw/pycsw_repository_mappings.py
+
+  # NOTE: This needs to be ran as a periodic command, check the
+  # docker-compose.dev.yml file for additional comment
+  pycsw-refresher:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
 
   ckan-db:
     image: postgis/postgis:13-3.1
