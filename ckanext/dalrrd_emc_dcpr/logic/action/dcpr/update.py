@@ -112,13 +112,25 @@ def dcpr_request_submit(context, data_dict):
         raise toolkit.ValidationError(errors)
 
     toolkit.check_access("dcpr_request_submit_auth", context, validated_data)
-    validated_data["submission_date"] = dt.datetime.now(dt.timezone.utc)
     model = context["model"]
     request_obj = model.Session.query(dcpr_request.DCPRRequest).get(
         validated_data["csi_reference_id"]
     )
     if request_obj is not None:
+        request_obj.submission_date = dt.datetime.now(dt.timezone.utc)
         _update_dcpr_request_status(request_obj)
+        # the sysadmin is authorized to submit a DCPR request - however we want
+        # to track that this action has been carried out by the sysadmin and not
+        # by the DCPR request's original owner. If the sysadmin submits a DCPR request
+        # then it effectively becomes the responsible for the DCPR request, so we make
+        # it the owner of the request.
+        if context["auth_user_obj"].sysadmin:
+            request_obj.owner_user = context["auth_user_obj"].id
+            logger.info(
+                f"sysadmin {context['auth_user_obj'].id} has now been made the owner "
+                f"of DCPR request {request_obj.csi_reference_id}"
+            )
+
         model.Session.commit()
         activity = create_dcpr_management_activity(
             request_obj,
@@ -167,6 +179,16 @@ def dcpr_request_nsif_moderate(
             _update_dcpr_request_status(
                 request_obj, transition_action=moderation_action
             )
+            # the sysadmin is authorized to moderate a DCPR request - however we want
+            # to track that this action has been carried out by the sysadmin and not
+            # by the DCPR request's original NSIF reviewer. As such we change the NSIF
+            # reviewer of the DCPR request if the current moderator is a sysadmin
+            if context["auth_user_obj"].sysadmin:
+                request_obj.nsif_reviewer = context["auth_user_obj"].id
+                logger.info(
+                    f"sysadmin {context['auth_user_obj'].id} has now been made the "
+                    f"NSIF reviewer for DCPR request {request_obj.csi_reference_id}"
+                )
             context["model"].Session.commit()
             activity_type = {
                 DcprRequestModerationAction.APPROVE: DcprManagementActivityType.ACCEPT_DCPR_REQUEST_NSIF,
@@ -212,6 +234,16 @@ def dcpr_request_csi_moderate(
             _update_dcpr_request_status(
                 request_obj, transition_action=moderation_action
             )
+            # The sysadmin is authorized to moderate a DCPR request - however we want
+            # to track that this action has been carried out by the sysadmin and not
+            # by the DCPR request's original CSI moderator. As such we change the CSI
+            # moderator of the DCPR request if the current moderator is a sysadmin
+            if context["auth_user_obj"].sysadmin:
+                request_obj.csi_moderator = context["auth_user_obj"].id
+                logger.info(
+                    f"sysadmin {context['auth_user_obj'].id} has now been made the "
+                    f"CSI moderator for DCPR request {request_obj.csi_reference_id}"
+                )
             context["model"].Session.commit()
             activity_type = {
                 DcprRequestModerationAction.APPROVE: DcprManagementActivityType.ACCEPT_DCPR_REQUEST_CSI,

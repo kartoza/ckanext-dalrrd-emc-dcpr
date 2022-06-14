@@ -2,7 +2,7 @@ import dataclasses
 import logging
 import typing
 import uuid
-from collections.abc import Iterable
+import collections.abc
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -219,7 +219,9 @@ class _CkanExtBootstrapPage:
 def _to_data_dict(value):
     if isinstance(value, (str, int, float)):
         result = value
-    elif isinstance(value, Iterable):
+    elif isinstance(value, collections.abc.Mapping):
+        result = value
+    elif isinstance(value, collections.abc.Iterable):
         result = [_to_data_dict(i) for i in value]
     elif getattr(value, "to_data_dict", None) is not None:
         result = value.to_data_dict()

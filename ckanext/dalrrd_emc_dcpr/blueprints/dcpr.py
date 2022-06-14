@@ -45,6 +45,11 @@ def get_awaiting_csi_moderation_dcpr_requests():
     return _get_dcpr_request_list("dcpr_request_list_awaiting_csi_moderation")
 
 
+@dcpr_blueprint.route("/under-preparation-dcpr-requests")
+def get_under_preparation_dcpr_requests():
+    return _get_dcpr_request_list("dcpr_request_list_under_preparation")
+
+
 def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = False):
     try:
         dcpr_requests = toolkit.get_action(ckan_action)(
@@ -87,10 +92,23 @@ class DcprRequestCreateView(MethodView):
         )
         if "organization_id" not in request.args:
             # if we don't already have an org id, need to let user choose from those orgs where she is a member
-            current_memberships = toolkit.h["emc_org_memberships"](toolkit.g.userobj.id)
-            relevant_orgs = [
-                {"value": org.id, "text": org.name} for org, _ in current_memberships
-            ]
+            if toolkit.g.userobj.sysadmin:
+                current_memberships = (
+                    ckan.model.Session.query(ckan.model.Group)
+                    .filter(ckan.model.Group.is_organization)
+                    .all()
+                )
+                relevant_orgs = [
+                    {"value": org.id, "text": org.name} for org in current_memberships
+                ]
+            else:
+                current_memberships = toolkit.h["emc_org_memberships"](
+                    toolkit.g.userobj.id
+                )
+                relevant_orgs = [
+                    {"value": org.id, "text": org.name}
+                    for org, _ in current_memberships
+                ]
         else:
             # if we have an org id in request.args then there is no need to show the orgs select
             relevant_orgs = None
