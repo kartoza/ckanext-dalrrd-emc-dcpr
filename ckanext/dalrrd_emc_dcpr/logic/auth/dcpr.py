@@ -276,6 +276,10 @@ def dcpr_request_nsif_moderate_auth(
         if request_obj.status == DCPRRequestStatus.UNDER_NSIF_REVIEW.value:
             if context["auth_user_obj"].sysadmin:
                 result["success"] = True
+            elif context["auth_user_obj"].id == request_obj.owner_user:
+                result["msg"] = toolkit._(
+                    "The DCPR request owner cannot be involved in the moderation stage"
+                )
             elif context["auth_user_obj"].id == request_obj.nsif_reviewer:
                 result["success"] = True
             else:
@@ -302,6 +306,10 @@ def dcpr_request_csi_moderate_auth(
         if request_obj.status == DCPRRequestStatus.UNDER_CSI_REVIEW.value:
             if context["auth_user_obj"].sysadmin:
                 result["success"] = True
+            elif context["auth_user_obj"].id == request_obj.owner_user:
+                result["msg"] = toolkit._(
+                    "The DCPR request owner cannot be involved in the moderation stage"
+                )
             elif context["auth_user_obj"].id == request_obj.csi_moderator:
                 result["success"] = True
             else:
@@ -352,6 +360,10 @@ def dcpr_request_claim_nsif_reviewer_auth(
     if request_obj is not None:
         if context["auth_user_obj"].sysadmin:
             result["success"] = True
+        elif context["auth_user_obj"].id == request_obj.owner_user:
+            result["msg"] = toolkit._(
+                "The DCPR request owner cannot be involved in the moderation stage"
+            )
         else:
             is_nsif_member = toolkit.h["emc_user_is_org_member"](
                 NSIF_ORG_NAME, context["auth_user_obj"]
@@ -383,6 +395,10 @@ def dcpr_request_claim_csi_moderator_auth(
     if request_obj is not None:
         if context["auth_user_obj"].sysadmin:
             result["success"] = True
+        elif context["auth_user_obj"].id == request_obj.owner_user:
+            result["msg"] = toolkit._(
+                "The DCPR request owner cannot be involved in the moderation stage"
+            )
         else:
             is_csi_member = toolkit.h["emc_user_is_org_member"](
                 CSI_ORG_NAME, context["auth_user_obj"]
