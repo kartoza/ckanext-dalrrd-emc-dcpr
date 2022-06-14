@@ -43,7 +43,7 @@ def create_single_dataset(
         toolkit.get_action("package_create")({"user": user["name"]}, data_dict=dataset)
         result = DatasetCreationResult.CREATED
     else:
-        # logger.debug(f"dataset {dataset['name']!r} already exists, skipping...")
+        logger.debug(f"dataset {dataset['name']!r} already exists, skipping...")
         result = DatasetCreationResult.NOT_CREATED_ALREADY_EXISTS
     if close_session:
         model.Session.remove()
