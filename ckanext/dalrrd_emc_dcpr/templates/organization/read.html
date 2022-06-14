@@ -4,7 +4,4 @@
     {% if h.check_access('package_create', {'owner_org': group_dict.id}) %}
         {% snippet 'snippets/add_dataset.html', group=group_dict.id %}
     {% endif %}
-    {% if h.check_access('dcpr_request_create_auth') %}
-        {% link_for _('Create DCPR request'), named_route='dcpr.new_dcpr_request', class_='btn btn-primary', icon='plus-square', organization_id=group_dict.id %}
-    {% endif %}
 {% endblock %}
