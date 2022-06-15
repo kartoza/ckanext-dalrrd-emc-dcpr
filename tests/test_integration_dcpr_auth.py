@@ -172,11 +172,11 @@ def test_dcpr_request_show_auth():
             },
             "statuses": [
                 (DCPRRequestStatus.UNDER_PREPARATION, False),
-                (DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_NSIF, False),
+                (DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_NSIF, True),
                 (DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_CSI, False),
                 (DCPRRequestStatus.AWAITING_NSIF_REVIEW, True),
                 (DCPRRequestStatus.UNDER_NSIF_REVIEW, True),
-                (DCPRRequestStatus.AWAITING_CSI_REVIEW, False),
+                (DCPRRequestStatus.AWAITING_CSI_REVIEW, True),
                 (DCPRRequestStatus.UNDER_CSI_REVIEW, False),
             ],
         },
@@ -188,7 +188,7 @@ def test_dcpr_request_show_auth():
             "statuses": [
                 (DCPRRequestStatus.UNDER_PREPARATION, False),
                 (DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_NSIF, False),
-                (DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_CSI, False),
+                (DCPRRequestStatus.UNDER_MODIFICATION_REQUESTED_BY_CSI, True),
                 (DCPRRequestStatus.AWAITING_NSIF_REVIEW, False),
                 (DCPRRequestStatus.UNDER_NSIF_REVIEW, False),
                 (DCPRRequestStatus.AWAITING_CSI_REVIEW, True),
