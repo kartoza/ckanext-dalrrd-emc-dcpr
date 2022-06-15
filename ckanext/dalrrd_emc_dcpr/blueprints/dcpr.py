@@ -1,7 +1,7 @@
 import json
 import logging
 import typing
-
+from functools import partial
 import ckan.lib.navl.dictization_functions as dict_fns
 import ckan.lib.helpers as h
 from ckan.common import config
@@ -9,6 +9,7 @@ import ckan.model
 from flask import Blueprint, redirect, request
 from flask.views import MethodView
 from ckan.views.home import CACHE_PARAMETERS
+from ckan.views.dataset import url_with_params
 from ckan.plugins import toolkit
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 
@@ -50,6 +51,14 @@ def get_under_preparation_dcpr_requests():
     return _get_dcpr_request_list("dcpr_request_list_under_preparation")
 
 
+def _request_url_(params_nopage, requests_type, q=None, page=None):
+    params = list(params_nopage)
+    params.append(("page", page))
+    url = request.url_rule.rule
+
+    return url_with_params(url, params)
+
+
 def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = False):
     try:
         dcpr_requests = toolkit.get_action(ckan_action)(
@@ -66,6 +75,11 @@ def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = F
         )
 
     else:
+        params_nopage = [
+            (k, v) for k, v in request.args.items(multi=True) if k != "page"
+        ]
+        params_nosort = [(k, v) for k, v in params_nopage]
+        pager_url = partial(_request_url_, params_nosort, None)
         page = h.get_page_number(request.args)
         extra_vars = {
             "dcpr_requests": dcpr_requests,
@@ -73,7 +87,8 @@ def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = F
             "show_create_button": should_show_create_action,
             "page": h.Page(
                 collection=dcpr_requests,
-                items_per_page=2,
+                items_per_page=20,
+                url=pager_url,
                 page=page,
                 item_count=len(dcpr_requests),
             ),
@@ -722,11 +737,11 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
                 # with this in a less complex way.
                 if isinstance(value, list):
                     for i in range(num_datasets):
-                        target_value = f"ds-{i+1}"
+                        target_value = f"ds-{i + 1}"
                         datasets[i][name] = target_value in value
                 else:
                     for i in range(num_datasets):
-                        target_value = f"ds-{i+1}"
+                        target_value = f"ds-{i + 1}"
                         datasets[i][name] = value == target_value
             elif num_datasets == 1:
                 datasets[0][name] = value
