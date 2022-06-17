@@ -41,7 +41,7 @@
         <div class="module-content">
             {% if dcpr_requests %}
                 <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
-                    {% for dcpr_request in dcpr_requests %}
+                    {% for dcpr_request in page.items %}
                         {% set num_datasets = dcpr_request.datasets | length %}
                         <li class="request-item">
                             <div class="row request-row">
@@ -59,12 +59,14 @@
                             </div>
                         </li>
 
-
                     {% endfor %}
                 </ul>
             {% else %}
                 <p class="empty">{{ _('There are no DCPR requests here yet.') }}</p>
             {% endif %}
+            {% block page_pagination %}
+                {{ page.pager(q=q) }}
+            {% endblock %}
         </div>
     </section>
 {% endblock %}
