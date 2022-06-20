@@ -375,7 +375,7 @@ In order to be able to serve the system's datasets through various OGC standards
 in order to integrate with pycsw:
 
 ```bash
-docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan dalrrd-emc-dcpr ckan create-materialized-view
+docker exec -ti emc-dcpr_ckan-web_1 poetry run ckan dalrrd-emc-dcpr pycsw create-materialized-view
 ```
 
 
