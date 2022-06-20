@@ -214,67 +214,77 @@ def import_records_csw(records_dir: Path, thumbnails_dir: Path):
     default=_DEFAULTS_SAEON_ODP_RECORDS_DIR,
     show_default=True,
 )
-def import_records_saeon_odp(records_dir: Path):
+@click.pass_context
+def import_records_saeon_odp(ctx, records_dir: Path):
     seen_names: typing.Set[str] = set()
-    for idx, path in enumerate(p for p in records_dir.iterdir() if p.is_file()):
-        parsed_record = saeon_importer.parse_record(path)
-        fixed_name = _fix_name(parsed_record.name, seen_names)
-        seen_names.add(fixed_name)
-        parsed_record.name = fixed_name
-        org_name = parsed_record.owner_org
-        owner_org, _ = utils.maybe_create_organization(
-            org_name,
-            title=CUSTODIAN_MAP[org_name].get("title"),
-            description=CUSTODIAN_MAP[org_name].get("description"),
-        )
-        logger.debug(f"({idx}) - Creating {parsed_record.name!r}...")
-        org_admin = [u for u in owner_org.get("users", []) if u["capacity"] == "admin"][
-            0
-        ]
-        utils.create_single_dataset(org_admin, parsed_record.to_data_dict())
+    flask_app = ctx.meta["flask_app"]
+    with flask_app.test_request_context():
+        for idx, path in enumerate(p for p in records_dir.iterdir() if p.is_file()):
+            parsed_record = saeon_importer.parse_record(path)
+            fixed_name = _fix_name(parsed_record.name, seen_names)
+            seen_names.add(fixed_name)
+            parsed_record.name = fixed_name
+            org_name = parsed_record.owner_org
+            owner_org, _ = utils.maybe_create_organization(
+                org_name,
+                title=CUSTODIAN_MAP[org_name].get("title"),
+                description=CUSTODIAN_MAP[org_name].get("description"),
+            )
+            logger.debug(f"({idx}) - Creating {parsed_record.name!r}...")
+            org_admin = [
+                u for u in owner_org.get("users", []) if u["capacity"] == "admin"
+            ][0]
+            data_dict = parsed_record.to_data_dict()
+            utils.create_single_dataset(org_admin, data_dict)
     logger.info("Done!")
 
 
 @saeon_odp.command()
 @click.option("--page-size", type=int, default=10)
-def purge_imported_records(page_size: int):
+@click.pass_context
+def purge_imported_records(ctx, page_size: int):
     """Delete imported records
 
     Imported records are found by the presence of a specially named tag.
 
     """
 
-    get_number_result = toolkit.get_action("package_search")(
-        context={"ignore_auth": True},
-        data_dict={
-            "include_private": True,
-            "fq": f"tags:{IMPORT_TAG_NAME}",
-            "rows": 0,
-        },
-    )
+    flask_app = ctx.meta["flask_app"]
+    with flask_app.test_request_context():
+        get_number_result = toolkit.get_action("package_search")(
+            context={"ignore_auth": True},
+            data_dict={
+                "include_private": True,
+                "fq": f"tags:{IMPORT_TAG_NAME}",
+                "rows": 0,
+            },
+        )
     num_datasets = get_number_result.get("count")
     if num_datasets is not None and num_datasets > 0:
         num_pages, remainder = divmod(num_datasets, page_size)
         num_pages = num_pages + 1 if remainder > 0 else num_pages
         num_done = 0
         for page in reversed(range(num_pages)):
-            get_datasets_result = toolkit.get_action("package_search")(
-                context={"ignore_auth": True},
-                data_dict={
-                    "include_private": True,
-                    "fq": f"tags:{IMPORT_TAG_NAME}",
-                    "start": page * page_size,
-                    "rows": page_size,
-                },
-            )
+            with flask_app.test_request_context():
+                get_datasets_result = toolkit.get_action("package_search")(
+                    context={"ignore_auth": True},
+                    data_dict={
+                        "include_private": True,
+                        "fq": f"tags:{IMPORT_TAG_NAME}",
+                        "start": page * page_size,
+                        "rows": page_size,
+                    },
+                )
             datasets = get_datasets_result.get("results", [])
             for dataset in datasets:
                 logger.info(
-                    f"({num_done + 1}/{num_datasets}) Deleting dataset {dataset}..."
+                    f"({num_done + 1}/{num_datasets}) Deleting dataset {dataset.get('id')}..."
                 )
-                toolkit.get_action("dataset_purge")(
-                    context={"ignore_auth": True}, data_dict={"id": dataset["id"]}
-                )
+                with flask_app.test_request_context():
+                    toolkit.get_action("dataset_purge")(
+                        context={"ignore_auth": True}, data_dict={"id": dataset["id"]}
+                    )
+                    num_done += 1
         logger.info("Done!")
     elif num_datasets == 0:
         logger.info(f"There are no datasets to delete")

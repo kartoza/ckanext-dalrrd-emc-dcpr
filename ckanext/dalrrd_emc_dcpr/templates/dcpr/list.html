@@ -3,6 +3,7 @@
 {% set able_to_create_request = h.check_access('dcpr_request_create_auth') %}
 {% set is_nsif_member = h.emc_user_is_org_member('nsif', g.userobj) %}
 {% set is_csi_member = h.emc_user_is_org_member('csi', g.userobj) %}
+{% set is_sysadmin = g.userobj.sysadmin %}
 {% set has_multiple_request_types = able_to_create_request or is_nsif_member or is_csi_member %}
 
 {% block subtitle %}{{ _('DCPR Requests') }} - {{ super() }}{% endblock %}
@@ -12,16 +13,19 @@
 {% endblock%}
 
 {% block content_primary_nav %}
-    {% if has_multiple_request_types %}
+    {% if has_multiple_request_types or is_sysadmin %}
         {{ h.build_nav("dcpr.get_public_dcpr_requests", _("Public requests")) }}
         {% if able_to_create_request %}
             {{ h.build_nav("dcpr.get_my_dcpr_requests", _("My requests")) }}
         {% endif %}
-        {%  if is_nsif_member %}
-            {{ h.build_nav("dcpr.get_awaiting_nsif_moderation_dcpr_requests", _("Requests awaiting nsif moderation")) }}
+        {%  if is_nsif_member or is_sysadmin %}
+            {{ h.build_nav("dcpr.get_awaiting_nsif_moderation_dcpr_requests", _("Requests awaiting NSIF moderation")) }}
         {% endif %}
-        {%  if is_csi_member %}
+        {%  if is_csi_member or is_sysadmin %}
             {{ h.build_nav("dcpr.get_awaiting_csi_moderation_dcpr_requests", _("Requests awaiting CSI moderation")) }}
+        {% endif %}
+        {%  if is_sysadmin %}
+            {{ h.build_nav("dcpr.get_under_preparation_dcpr_requests", _("Requests under preparation")) }}
         {% endif %}
     {% endif %}
 {% endblock %}
@@ -37,7 +41,7 @@
         <div class="module-content">
             {% if dcpr_requests %}
                 <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
-                    {% for dcpr_request in dcpr_requests %}
+                    {% for dcpr_request in page.items %}
                         {% set num_datasets = dcpr_request.datasets | length %}
                         <li class="request-item">
                             <div class="row request-row">
@@ -55,12 +59,14 @@
                             </div>
                         </li>
 
-
                     {% endfor %}
                 </ul>
             {% else %}
                 <p class="empty">{{ _('There are no DCPR requests here yet.') }}</p>
             {% endif %}
+            {% block page_pagination %}
+                {{ page.pager(q=q) }}
+            {% endblock %}
         </div>
     </section>
 {% endblock %}

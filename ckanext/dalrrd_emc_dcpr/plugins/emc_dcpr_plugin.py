@@ -225,6 +225,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "my_dcpr_request_list_auth": dcpr_auth.my_dcpr_request_list_auth,
             "dcpr_request_list_public_auth": dcpr_auth.dcpr_request_list_public_auth,
             "dcpr_request_list_private_auth": dcpr_auth.dcpr_request_list_private_auth,
+            "dcpr_request_list_under_preparation_auth": dcpr_auth.dcpr_request_list_under_preparation_auth,
             "dcpr_request_list_pending_csi_auth": (
                 dcpr_auth.dcpr_request_list_pending_csi_auth
             ),
@@ -265,9 +266,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 dcpr_create_actions.dcpr_geospatial_request_create
             ),
             "dcpr_request_list_public": dcpr_get_actions.dcpr_request_list_public,
+            "dcpr_request_list_under_preparation": dcpr_get_actions.dcpr_request_list_under_preparation,
             "my_dcpr_request_list": dcpr_get_actions.my_dcpr_request_list,
-            # TODO: This action does not seem to be needed
-            "dcpr_request_list_private": dcpr_get_actions.dcpr_request_list_private,
             "dcpr_request_list_awaiting_csi_moderation": (
                 dcpr_get_actions.dcpr_request_list_awaiting_csi_moderation
             ),

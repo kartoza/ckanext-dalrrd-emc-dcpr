@@ -302,6 +302,12 @@ fieldset[disabled] .btn-default.focus {
     background-color: #fff;
 }
 
+.request-item:last-of-type {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 0;
+  padding-bottom: 20px;
+}
+
 .request-heading {
   font-size: 15px;
   margin-top: 0;

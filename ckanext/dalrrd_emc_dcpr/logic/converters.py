@@ -11,7 +11,6 @@ def emc_bbox_converter(value: str) -> str:
         "Invalid bounding box. Please provide a comma-separated list of values "
         "with upper left lat, upper left lon, lower right lat, lower right lon."
     )
-    logger.debug(f"inside emc_bbox_converter {value=}")
     try:  # is it already a geojson?
         parsed_value = json.loads(value)
         coordinates = parsed_value["coordinates"][0]
@@ -45,5 +44,4 @@ def emc_bbox_converter(value: str) -> str:
             ]
         ],
     }
-    logger.debug(f"{parsed=}")
     return json.dumps(parsed)
