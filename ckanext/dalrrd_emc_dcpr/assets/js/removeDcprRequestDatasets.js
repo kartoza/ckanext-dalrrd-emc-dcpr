@@ -4,7 +4,8 @@ ckan.module('removeDcprRequestDatasets', function(jQuery, _){
 
     return {
         initialize: function (){
-            this.el.on('click', this._onRemoveDatasetFieldset)
+
+            this.el.on('click', '.remove-dataset', this._onRemoveDatasetFieldset)
         },
 
         _onRemoveDatasetFieldset: function (event) {
@@ -12,22 +13,20 @@ ckan.module('removeDcprRequestDatasets', function(jQuery, _){
             let datasetFieldsets = document.querySelectorAll(fieldsetSelector)
             let self = this
             let indexToRemove = self.dataset['moduleIndex']
-            let datasetID = '#dataset'+indexToRemove
             console.log(`Was asked to remove previous dataset, which has index ${indexToRemove}`)
-            let index = indexToRemove -1
-            if(datasetFieldsets.length == 1){
-                index = 0
+
+            if(datasetFieldsets.length < 2){
                 let addButton = document.querySelector('#insert-dataset-fieldset-button')
+                datasetFieldsets[0].remove()
                 addButton.click()
             }
-            try {
-                datasetFieldsets[index].remove()
+            try{
+                datasetFieldsets[indexToRemove -1].remove()
             }
             catch (e) {
-                datasetFieldsets[index - 1].remove()
+                let index = datasetFieldsets.length-1
+                datasetFieldsets[index].remove()
             }
-            let datasetPanel = document.querySelector(datasetID)
-            datasetPanel.style.display = 'none'
 
         },
     }

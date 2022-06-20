@@ -1,9 +1,23 @@
 {% import 'macros/form.html' as form %}
 
 <fieldset class="dynamic-dataset-fieldset" id="dataset-fieldset-{{ index }}">
-    <legend>
-        Dataset #{{ index }} fields
-    </legend>
+   <div class="panel panel-default" style="margin-bottom: 10px; display: block" >
+                    <div class="panel-heading" >
+                    <h4 class="panel-title">
+                                 Dataset #{{ index }} fields
+                            <button
+                                    id="remove-previous-dataset-button-{{ index }}"
+                                    type="button"
+                                    class="btn btn-danger btn-sm pull-right remove-dataset"
+                                    data-module-index="{{ index }}"
+                                    style="margin-top: -2.5px;"
+                                    {% if lenght|int < 2 %}
+                                        disabled
+                                    {% endif %}
+                            >Remove</button>
+                    </h4>
+                 </div>
+    <div class="panel-body">
     {% call form.input(
                 'proposed_dataset_title',
                 label=_('Dataset title'),
@@ -100,4 +114,6 @@
             ) %}
         {{ form.info(_('Method to be employed for collecting the raw data (Aerial photography, cadastral survey, etc.)')) }}
     {% endcall %}
+    </div>
+   </div>
 </fieldset>

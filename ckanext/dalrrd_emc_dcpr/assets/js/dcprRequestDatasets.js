@@ -13,13 +13,12 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             jQuery.proxyAll(this, /_on/);
             console.log('inside the initialize function for module dcprRequestDatasets')
             this.el.on('click', this._onAddDatasetFieldset)
-            let removeButtonEl = document.querySelector('#remove-previous-dataset-button')
-            removeButtonEl.addEventListener('pointerdown', this._onRemoveDatasetFieldset)
         },
 
         _onAddDatasetFieldset: function () {
             let numExisting = this._getNumDatasetFieldsets()
             this.options.index = numExisting + 1
+            this.options.lenght = numExisting + 1
             if (!this._renderedTemplateReceived) {
                 this.sandbox.client.getTemplate(
                     'dcpr_request_dataset_form_fieldset.html',
@@ -34,7 +33,7 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             let parent = document.querySelector('#insert-dataset-fieldset-button')
             parent.insertAdjacentHTML('beforebegin', renderedHtml)
             this._renderedTemplateReceived = false
-            let removeButtonEl = document.querySelector('#remove-previous-dataset-button')
+            let removeButtonEl = document.querySelector('#remove-previous-dataset-button-1')
             removeButtonEl.removeAttribute('disabled')
         },
 
