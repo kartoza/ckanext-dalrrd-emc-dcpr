@@ -14,18 +14,16 @@ ckan.module('removeDcprRequestDatasets', function(jQuery, _){
             let self = this
             let indexToRemove = self.dataset['moduleIndex']
             console.log(`Was asked to remove previous dataset, which has index ${indexToRemove}`)
-
-            if(datasetFieldsets.length < 2){
-                let addButton = document.querySelector('#insert-dataset-fieldset-button')
-                datasetFieldsets[0].remove()
-                addButton.click()
-            }
             try{
                 datasetFieldsets[indexToRemove -1].remove()
             }
             catch (e) {
                 let index = datasetFieldsets.length-1
                 datasetFieldsets[index].remove()
+            }
+             if(document.querySelectorAll(fieldsetSelector).length  < 2){
+                let removeButton = document.querySelector('#remove-previous-dataset-button')
+                removeButton.setAttribute('disabled', true)
             }
 
         },

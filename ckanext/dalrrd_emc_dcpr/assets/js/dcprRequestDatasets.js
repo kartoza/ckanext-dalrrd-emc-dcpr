@@ -33,7 +33,7 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             let parent = document.querySelector('#insert-dataset-fieldset-button')
             parent.insertAdjacentHTML('beforebegin', renderedHtml)
             this._renderedTemplateReceived = false
-            let removeButtonEl = document.querySelector('#remove-previous-dataset-button-1')
+            let removeButtonEl = document.querySelector('#remove-previous-dataset-button')
             removeButtonEl.removeAttribute('disabled')
         },
 
