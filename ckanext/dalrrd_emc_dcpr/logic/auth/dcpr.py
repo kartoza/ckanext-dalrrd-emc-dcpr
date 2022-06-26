@@ -3,7 +3,12 @@ import typing
 
 from ckan.plugins import toolkit
 from ...model import dcpr_request as dcpr_request
-from ...constants import DcprRequestModerationAction, DCPRRequestStatus, CSI_ORG_NAME, NSIF_ORG_NAME
+from ...constants import (
+    DcprRequestModerationAction,
+    DCPRRequestStatus,
+    CSI_ORG_NAME,
+    NSIF_ORG_NAME,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -279,7 +284,8 @@ def dcpr_request_nsif_moderate_auth(
             elif context["auth_user_obj"].id == request_obj.nsif_reviewer:
                 try:
                     moderate_action = DcprRequestModerationAction(
-                        data_dict.get("action"))
+                        data_dict.get("action")
+                    )
                 except ValueError:
                     moderate_action = None
 
