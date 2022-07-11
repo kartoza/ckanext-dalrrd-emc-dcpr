@@ -379,6 +379,42 @@ fieldset[disabled] .btn-default.focus {
   background-color: transparent;
 }
 
+.panel-title {
+  position: relative;
+}
+
+.panel-title-link::after {
+  content: "\f107";
+  color: #333;
+  right: 0px;
+  position: absolute;
+  cursor: pointer;
+  font-family: "FontAwesome"
+}
+
+.panel-title-link[aria-expanded="true"]::after {
+  content: "\f106";
+  color: #F3881C;
+}
+
+.panel-title-link[aria-expanded="true"]{
+  color: #F3881C;
+}
+
+
+.panel-heading-full.panel-heading {
+  padding: 0;
+}
+
+.panel-heading-full .panel-title {
+  padding: 10px 15px;
+}
+
+.panel-heading-full .panel-title::after {
+  top: 10px;
+  right: 15px;
+}
+
 /* End of datasets*/
 
 /* Filters */

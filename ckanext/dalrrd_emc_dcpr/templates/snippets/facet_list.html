@@ -28,7 +28,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="head{{ item_id }}">
                   <h2 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="true" aria-controls="{{ item_id }}">
+                    <a class="panel-title-link" role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="false" aria-controls="{{ item_id }}">
                       <i class="{{ filters[title] }}"></i>
                         {% set title = title or h.get_facet_title(name) %}
                         {{ title }}
