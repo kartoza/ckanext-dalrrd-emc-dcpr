@@ -153,7 +153,8 @@ class DcprRequestCreateView(MethodView):
             flat_data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
-            data_dict = _unflatten_dcpr_request_datasets(flat_data_dict) # these the submitted requests form fields with the data 
+            # these the submitted requests form fields with the data
+            data_dict = _unflatten_dcpr_request_datasets(flat_data_dict)
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
         else:
@@ -295,6 +296,7 @@ class DcprRequestOwnerUpdateView(_DcprUpdateView):
     enable_nsif_fieldset = False
     enable_csi_fieldset = False
 
+
 # came back here to feature data in the EMC
 class DcprRequestNsifUpdateView(_DcprUpdateView):
     update_auth = "dcpr_request_update_by_nsif_auth"
@@ -331,8 +333,8 @@ dcpr_blueprint.add_url_rule(
     "/request/<csi_reference_id>/csi_edit/", view_func=csi_edit_dcpr_request_view
 )
 
-
-@dcpr_blueprint.route("/request/<csi_reference_id>") # request show page
+# request show page
+@dcpr_blueprint.route("/request/<csi_reference_id>")
 def dcpr_request_show(csi_reference_id):
     try:
         dcpr_request = toolkit.get_action("dcpr_request_show")(
