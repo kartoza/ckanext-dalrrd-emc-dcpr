@@ -40,6 +40,15 @@ dcpr-request-datasets-js:
     preload:
       - base/main
 
+remove-dcpr-request-datasets-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_removeDcprRequestDatasets.js
+  contents:
+    - js/removeDcprRequestDatasets.js
+  filter: rjsmin
+  extra:
+    preload:
+      - base/main
+
 ckan-base-css:
   output: ckanext-dalrrdemcdcpr/%(version)s_ckan_base.css
   contents:

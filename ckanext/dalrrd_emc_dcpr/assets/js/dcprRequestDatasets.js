@@ -13,13 +13,12 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             jQuery.proxyAll(this, /_on/);
             console.log('inside the initialize function for module dcprRequestDatasets')
             this.el.on('click', this._onAddDatasetFieldset)
-            let removeButtonEl = document.querySelector('#remove-previous-dataset-button')
-            removeButtonEl.addEventListener('pointerdown', this._onRemoveDatasetFieldset)
         },
 
         _onAddDatasetFieldset: function () {
             let numExisting = this._getNumDatasetFieldsets()
             this.options.index = numExisting + 1
+            this.options.lenght = numExisting + 1
             if (!this._renderedTemplateReceived) {
                 this.sandbox.client.getTemplate(
                     'dcpr_request_dataset_form_fieldset.html',
@@ -41,9 +40,9 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         _onRemoveDatasetFieldset: function (event) {
             let fieldsetSelector = '.dynamic-dataset-fieldset'
             let datasetFieldsets = document.querySelectorAll(fieldsetSelector)
-            let indexToRemove = datasetFieldsets.length - 1
+            let indexToRemove = datasetFieldsets.length
             console.log(`Was asked to remove previous dataset, which has index ${indexToRemove}`)
-            let lastDatasetFieldset = datasetFieldsets[datasetFieldsets.length - 1]
+            let lastDatasetFieldset = datasetFieldsets[datasetFieldsets.length]
             lastDatasetFieldset.remove()
             if (document.querySelectorAll(fieldsetSelector).length < 2) {
                 let removeButton = document.querySelector('#remove-previous-dataset-button')
@@ -54,6 +53,6 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         _getNumDatasetFieldsets: function () {
             let parent = document.querySelector('fieldset#dcpr-request-owner-fields')
             return parent.querySelectorAll('fieldset').length
-        }
+        },
     }
 })
