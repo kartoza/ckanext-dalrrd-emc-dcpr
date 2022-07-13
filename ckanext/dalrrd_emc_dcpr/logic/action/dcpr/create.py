@@ -79,6 +79,18 @@ def dcpr_request_create(context, data_dict):
     if errors:
         model.Session.rollback()
         raise toolkit.ValidationError(errors)
+
+    # add validation error to capture_end_date
+    date_start = data_dict["capture_start_date"]
+    date_end = data_dict["capture_end_date"]
+    if date_end < date_start:
+        raise toolkit.ValidationError(
+            {
+                "capture_end_date": [
+                    "Invalid value. Please select a date after capture start date."
+                ],
+            }
+        )
     toolkit.check_access("dcpr_request_create_auth", context, validated_data)
 
     # after validation of user-supplied data, enrich the data dict with additional

@@ -1,60 +1,68 @@
 {% ckan_extends %}
 
 {% block package_item %}
-    <li class="{{ item_class or "dataset-item" }}">
-    {% block content %}
-        {% set date = package['metadata_modified'].split('T')[0] %}
-        <div class="row dataset-row">
-        <div class="col-md-3"></div>
-        <div class="col-md-9 ">
-      <div class="dataset-content">
-        {% block heading %}
-          <h2 class="dataset-heading">
-          {% block heading_title %}
-                {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
-            {% endblock %}
-            {% block heading_private %}
-              {% if package.private %}
-                <span class="dataset-private label label-inverse">
-                    <i class="fa fa-lock"></i>
-                    {{ _('Private') }}
-                </span>
-              {% endif %}
-            {% endblock %}
-            {% block heading_meta %}
-              {% if package.get('state', '').startswith('draft') %}
-                <span class="label label-info">{{ _('Draft') }}</span>
-              {% elif package.get('state', '').startswith('deleted') %}
-                <span class="label label-danger">{{ _('Deleted') }}</span>
-              {% endif %}
-              {{ h.popular('recent views', package.tracking_summary.recent, min=10) if package.tracking_summary }}
-            {% endblock %}
-          </h2>
-        {% endblock %}
-        {% block banner %}
-          {% if banner %}
-            <span class="banner">{{ _('Popular') }}</span>
-          {% endif %}
-        {% endblock %}
-        {% block notes %}
-          {% if notes %}
-            <div>{{ notes|urlize }}</div>
-          {% else %}
-            <p class="empty">{{ _("This dataset has no description") }}</p>
-          {% endif %}
-        {% endblock %}
-      </div>
-            {% block resources %}
-            {% endblock %}
-            <div class="row datasets-date-actions">
-                <div class="datasets-date">
-                    Dataset Updated {{ date }}
-                </div>
-            </div>
-
+    {# this is a dcpr request #}
+    {% if 'csi_reference_id' in package %}
+      {% for request in package["datasets"] %}
+        <li class="{{ item_class or "dataset-item" }}"> 
+          {% snippet 'snippets/dcpr_request_item.html', dataset=request, package=package %}
+        </li>
+      {% endfor %}
+    {% else %}
+      <li class="{{ item_class or "dataset-item" }}">
+      {% block content %}
+          {% set date = package['metadata_modified'].split('T')[0] %}
+          <div class="row dataset-row">
+          <div class="col-md-3"></div>
+          <div class="col-md-9 ">
+        <div class="dataset-content">
+          {% block heading %}
+            <h2 class="dataset-heading">
+            {% block heading_title %}
+                  {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
+              {% endblock %}
+              {% block heading_private %}
+                {% if package.private %}
+                  <span class="dataset-private label label-inverse">
+                      <i class="fa fa-lock"></i>
+                      {{ _('Private') }}
+                  </span>
+                {% endif %}
+              {% endblock %}
+              {% block heading_meta %}
+                {% if package.get('state', '').startswith('draft') %}
+                  <span class="label label-info">{{ _('Draft') }}</span>
+                {% elif package.get('state', '').startswith('deleted') %}
+                  <span class="label label-danger">{{ _('Deleted') }}</span>
+                {% endif %}
+                {{ h.popular('recent views', package.tracking_summary.recent, min=10) if package.tracking_summary }}
+              {% endblock %}
+            </h2>
+          {% endblock %}
+          {% block banner %}
+            {% if banner %}
+              <span class="banner">{{ _('Popular') }}</span>
+            {% endif %}
+          {% endblock %}
+          {% block notes %}
+            {% if notes %}
+              <div>{{ notes|urlize }}</div>
+            {% else %}
+              <p class="empty">{{ _("This dataset has no description") }}</p>
+            {% endif %}
+          {% endblock %}
         </div>
-        </div>
+              {% block resources %}
+              {% endblock %}
+              <div class="row datasets-date-actions">
+                  <div class="datasets-date">
+                      Dataset Updated {{ date }}
+                  </div>
+              </div>
 
+          </div>
+          </div>
     {% endblock %}
   </li>
+  {% endif %}
 {% endblock %}

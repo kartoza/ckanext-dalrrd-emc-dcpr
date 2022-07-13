@@ -23,6 +23,18 @@ def dcpr_request_update_by_owner(context, data_dict):
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
+
+    # add validation error to capture_end_date
+    date_start = data_dict["capture_start_date"]
+    date_end = data_dict["capture_end_date"]
+    if date_end < date_start:
+        raise toolkit.ValidationError(
+            {
+                "capture_end_date": [
+                    "Invalid value. Please select a date after capture start date."
+                ],
+            }
+        )
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id
     context["updated_by"] = "owner"
@@ -108,6 +120,7 @@ def dcpr_request_submit(context, data_dict):
 
     schema = dcpr_schema.dcpr_request_submit_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
+
     if errors:
         raise toolkit.ValidationError(errors)
 
