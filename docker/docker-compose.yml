@@ -63,6 +63,8 @@ services:
   # unfortunately still the most recent supported version. More info:
   # - https://github.com/ckan/ckan/issues/5585
   # - https://github.com/ckan/ckan/pull/5143
+  # mohab comment, now there is a solr8 image working with ckan 2.9
+  # need to check how it will be integrated.
   solr:
     image: ckan/solr
     volumes:
