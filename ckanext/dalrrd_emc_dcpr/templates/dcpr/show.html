@@ -58,6 +58,14 @@
 {% endblock %}
 
 {% block primary_content_inner %}
+    {% set request_status = ["UNDER_MODIFICATION_REQUESTED_BY_NSIF", "UNDER_MODIFICATION_REQUESTED_BY_CSI"] %}
+    {% if dcpr_request.status in request_status %}
+        <div class="flash-messages">
+            <div class="warning-explanation alert alert-warning ">
+                This DCPR request needs further clarification.
+            </div>
+        </div>
+    {% endif %}
     <h1>{{ dcpr_request.proposed_project_name }}<small> {{ dcpr_request.csi_reference_id }}</small></h1>
     <section class="additional-info">
         <table class="table table-striped table-bordered table-condensed">
