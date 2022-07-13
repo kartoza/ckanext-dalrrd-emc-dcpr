@@ -1,7 +1,7 @@
 {% import 'macros/form.html' as form %}
 
 {% asset "ckanext-dalrrdemcdcpr/dcpr-request-datasets-js" %}
-
+{% asset "ckanext-dalrrdemcdcpr/remove-dcpr-request-datasets-js" %}
 
 <form class="dataset-form" method="post" data-module="basic-form" novalidate>
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
@@ -104,10 +104,14 @@
             information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
         {% if data.datasets %}
+            <legend>Dataset(s)</legend>
+            <div class="list-datasets" data-module="removeDcprRequestDatasets">
             {% for ds in data.datasets %}
+                {% set dataset_id = 'dataset'+ loop.index|string %}
                 {{ h.snippet(
                     "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
                     index=loop.index,
+                    lenght= data.datasets|length,
                     dataset_custodian=ds.dataset_custodian,
                     data_type=ds.data_type,
                     proposed_dataset_title=ds.proposed_dataset_title,
@@ -129,27 +133,24 @@
                     capture_method_error=errors.capture_method
                 ) }}
             {% endfor %}
+
         {% else %}
             {{ h.snippet(
                     "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
-                    index=1
+                    index=1, lenght=0
             ) }}
         {% endif %}
+
         <button
                 id="insert-dataset-fieldset-button"
                 type="button"
                 class="btn btn-default btn-sm"
                 data-module="dcprRequestDatasets"
                 data-module-index="{{ data.datasets | count }}"
+                style="margin-bottom: 30px;"
         >Add another dataset</button>
-        <button
-                id="remove-previous-dataset-button"
-                type="button"
-                class="btn btn-danger btn-sm"
-                {% if data.datasets | count < 2 %}
-                    disabled
-                {% endif %}
-        >Remove previous dataset</button>
+        </div>
+
     </fieldset>
     <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
         <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
@@ -178,17 +179,18 @@
         {% endcall %}
     </fieldset>
     {% block form_actions %}
+        {{ form.required_message() }}
         <div class="form-actions">
             {% if csi_reference_id and h.check_access("dcpr_request_delete_auth", {"csi_reference_id": csi_reference_id}) %}
                 {% link_for _('Delete DCPR request'),
                     named_route="dcpr.dcpr_request_delete",
                     csi_reference_id=csi_reference_id,
-                    class_='btn btn-danger pull-left',
+                    class_='btn btn-danger',
                     icon='trash'
                 %}
             {% endif %}
-            <input type="submit" class="btn btn-primary" value="{{ _('Save') }}">
-            {{ form.required_message() }}
+            <input type="submit" class="btn btn-default" value="{{ _('Save') }}">
+
         </div>
     {% endblock %}
 </form>
