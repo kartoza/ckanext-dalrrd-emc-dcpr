@@ -7,6 +7,9 @@
         <h5>Total number of datasets: {{ total }}</h5>
         <h5>{{ page.item_count }} datasets found</h5>
         {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + dataset_type + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
+        {% if h.check_access('package_create') %}
+          <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add Dataset') }}</a>
+        {% endif %}
     </div>
 {% endblock %}
 
