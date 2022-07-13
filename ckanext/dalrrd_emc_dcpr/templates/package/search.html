@@ -12,7 +12,8 @@
 
 {% block primary_content %}
     {% block package_search_results_list %}
-        {{ h.snippet('snippets/package_list.html', packages=page.items) }}
+    {% set dcpr_requests_approved_by_nsif = h.dcpr_requests_approved_by_nsif() %}
+        {{ h.snippet('snippets/package_list.html', packages=page.items+dcpr_requests_approved_by_nsif) }}
     {% endblock %}
     {% block page_pagination %}
       {{ page.pager(q=q) }}

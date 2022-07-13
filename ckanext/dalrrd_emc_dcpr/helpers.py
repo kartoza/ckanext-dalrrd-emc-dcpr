@@ -299,3 +299,14 @@ def get_org_memberships(user_id: str):
         .order_by(model.Group.name)
     )
     return query.all()
+
+def get_dcpr_requests_approved_by_nsif():
+    """
+        this feature required by the nsif team,
+        as soon as the dcpr_request approved by
+        the nsif, it should appear in emc search
+        page. 
+    """
+    # if the request awaits for csi, it already passed nsif
+    dcpr_requests_approved_by_nsif = toolkit.get_action("dcpr_request_list_awaiting_csi_moderation")()
+    return dcpr_requests_approved_by_nsif
