@@ -63,14 +63,12 @@ services:
   # unfortunately still the most recent supported version. More info:
   # - https://github.com/ckan/ckan/issues/5585
   # - https://github.com/ckan/ckan/pull/5143
-  # mohab comment, this istance is solr8, testing for now if it's working well
   solr:
-    image:  ckan/solr
+    image: ckan/solr
     volumes:
       - type: bind
         source: $PWD/solr/schema.xml
-        target:  /opt/solr/server/solr/ckan/conf/schema.xml
-    # ports:
-    #   - "8985:8983"
+        target: /opt/solr/server/solr/ckan/conf/schema.xml
+
   redis:
     image: redis:6.2
