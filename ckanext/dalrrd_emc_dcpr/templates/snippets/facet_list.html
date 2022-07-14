@@ -54,7 +54,13 @@
 						<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" data-module="emc-factes-avtive">
 						    <span class="item-label">{{ label_truncated }}</span>
 						    <span class="hidden separator"> - </span>
-						    <span class="item-count badge">{{ count }}</span>
+						    <span class="item-count">({{ count }})</span>
+                            <div class="progress">
+                                {% set percent = count | int *100/total %}
+                              <div class="progress-bar" role="progressbar" aria-valuenow="{{ count }}"
+                              aria-valuemin="0" aria-valuemax="{{ total }}" style="width:{{ percent }}%">
+                              </div>
+                            </div>
 						</a>
 					    </li>
 					{% endfor %}
