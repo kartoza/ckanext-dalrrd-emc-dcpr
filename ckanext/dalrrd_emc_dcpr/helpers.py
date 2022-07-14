@@ -301,7 +301,7 @@ def get_org_memberships(user_id: str):
     return query.all()
 
 
-def get_dcpr_requests_approved_by_nsif():
+def get_dcpr_requests_approved_by_nsif(request_origin):
     """
     this feature required by the nsif team,
     as soon as the dcpr_request approved by
@@ -309,7 +309,11 @@ def get_dcpr_requests_approved_by_nsif():
     page.
     """
     # if the request awaits for csi, it already passed nsif
+    # do to authorization, i had to add a request_oring
+    # thus if it's coming from dataset it won't be checked
+    # at first stage, but when a user tries to access the
+    # request.
     dcpr_requests_approved_by_nsif = toolkit.get_action(
         "dcpr_request_list_awaiting_csi_moderation"
-    )()
+    )({"request_origin": request_origin})
     return dcpr_requests_approved_by_nsif
