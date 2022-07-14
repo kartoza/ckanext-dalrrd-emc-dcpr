@@ -360,12 +360,18 @@ fieldset[disabled] .btn-default.focus {
   margin-top: 0;
 }
 
-.datasets-action-items > li> i{
+.dataset-action a {
+  text-decoration: none;
+  color: #3A744E;
+  font-weight: 300;
+}
+
+.dataset-action-items {
   margin-right: 0.5em;
 }
 
-.datasets-action-items > li {
-  margin-right: 1.5em;
+.dataset-action-items:last-of-type {
+  margin-right: 0;
 }
 
 .dataset-heading a {
