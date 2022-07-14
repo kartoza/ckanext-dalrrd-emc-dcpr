@@ -47,3 +47,27 @@ ckan.module('emc-factes-avtive', function (jQuery, _) {
     }
 
 })
+
+// =====================
+/**
+    as the dcpr_request has a public page,
+    facet only need to change the window
+    location to the dcpr requests public
+    page.
+*/
+
+ckan.module("dcpr_request_facet", function($){
+    return{
+        initialize:function(){
+            $.proxyAll(this,/_on/);
+            this.el.on("click", this._onClick)
+        },
+
+        _onClick:function(){
+            let text = this.el.text()
+            if(text.toLowerCase().indexOf("dcpr request") != -1){
+                window.location.href = window.location.origin + '/dcpr/'
+            }
+        }
+    }
+})

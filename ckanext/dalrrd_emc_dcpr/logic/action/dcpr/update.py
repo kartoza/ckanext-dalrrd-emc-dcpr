@@ -205,7 +205,6 @@ def dcpr_request_nsif_moderate(
             context["model"].Session.commit()
             activity_type = {
                 DcprRequestModerationAction.APPROVE: DcprManagementActivityType.ACCEPT_DCPR_REQUEST_NSIF,
-                DcprRequestModerationAction.REJECT: DcprManagementActivityType.REJECT_DCPR_REQUEST_NSIF,
                 DcprRequestModerationAction.REQUEST_CLARIFICATION: DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_NSIF,
             }[moderation_action]
             activity = create_dcpr_management_activity(
