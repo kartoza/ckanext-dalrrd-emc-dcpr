@@ -349,6 +349,30 @@ def dcpr_request_show(csi_reference_id):
         extra_vars = {
             "dcpr_request": dcpr_request,
         }
+        context = _prepare_context()
+        model = context["model"]
+
+        if dcpr_request.get("owner_user") == context[
+            "auth_user_obj"
+        ].id and dcpr_request.get("status") in [
+            constants.DCPRRequestStatus.UNDER_NSIF_REVIEW.value,
+            constants.DCPRRequestStatus.UNDER_CSI_REVIEW.value,
+        ]:
+
+            target_user_role = {
+                constants.DCPRRequestStatus.UNDER_NSIF_REVIEW.value: "nsif_reviewer",
+                constants.DCPRRequestStatus.UNDER_CSI_REVIEW.value: "csi_moderator",
+            }[dcpr_request.get("status")]
+
+            current_reviewer = (
+                model.User.get(dcpr_request.get(target_user_role))
+                if dcpr_request.get(target_user_role)
+                else None
+            )
+
+            if current_reviewer:
+                extra_vars["current_reviewer"] = current_reviewer
+
         result = toolkit.render("dcpr/show.html", extra_vars=extra_vars)
     return result
 
