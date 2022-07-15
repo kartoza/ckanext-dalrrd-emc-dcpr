@@ -302,6 +302,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_bbox_converter": converters.emc_bbox_converter,
             "dcpr_end_date_after_start_date_validator": validators.dcpr_end_date_after_start_date_validator,
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
+            "spatial_resolution_converter": converters.spatial_resolution_converter,
         }
 
     def is_fallback(self) -> bool:

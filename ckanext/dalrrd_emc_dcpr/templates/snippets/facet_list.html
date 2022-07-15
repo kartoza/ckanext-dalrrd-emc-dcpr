@@ -22,7 +22,8 @@
                         'Tags': 'fa fa-tags',
                         'SASDI Theme': 'fa fa-tasks',
                         'ISO Topic Category': 'fa fa-filter',
-                        'Harvest source': 'fa fa-cloud'
+                        'Harvest source': 'fa fa-cloud',
+						'DCPR Request': 'fa fa-file'
 
                     } %}
             <div class="panel panel-default">
@@ -41,16 +42,26 @@
                 {% set item_id = title.replace(' ', '') %}
                 <div id="{{ item_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ item_id }}">
                 <div class="panel-body">
-			{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
-             			    {% if items %}
+					{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
+					{% if item_id == 'DCPRRequest' %}
+					{% set items = {'Public requests':"", 'My requests':"my-dcpr-requests", 'Requests awaiting NSIF moderation':"awaiting-nsif-moderation-dcpr-requests", 'Requests awaiting CSI moderation':"awaiting-csi-moderation-dcpr-requests", 'Requests under preparation':"under-preparation-dcpr-requests"} %}
+					{% endif %}
+					{% if items %}
 				<nav aria-label="{{ title }}">
 				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
 					{% for item in items %}
-					    {% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
-					    {% set label = label_function(item) if label_function else item.display_name %}
-					    {% set label_truncated = h.truncate(label, 22) if not label_function else label %}
-					    {% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
-					    <li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %}">
+						{% if item_id == 'DCPRRequest' %}
+							{% set href = request.url_root + "dcpr/" + items[item]%}
+							{% set label = item %}
+							{% set label_truncated = h.truncate(label, 22) %}
+							{% set count = '' %}
+						{% else %}
+							{% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
+					    	{% set label = label_function(item) if label_function else item.display_name %}
+					    	{% set label_truncated = h.truncate(label, 22) if not label_function else label %}
+							{% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
+					    {% endif %}
+						<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %}">
 						<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" data-module="emc-factes-avtive">
 						    <span class="item-label">{{ label_truncated }}</span>
 						    <span class="hidden separator"> - </span>
@@ -70,7 +81,7 @@
 					<a href="{{ h.remove_url_param('_%s_limit' % name, extras=extras, alternative_url=alternative_url) }}" class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }}</a>
 				    {% endif %}
 				</p>
-			    {% else %}
+				{% else %}
 				<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
 			    {% endif %}
 			{% endwith %}

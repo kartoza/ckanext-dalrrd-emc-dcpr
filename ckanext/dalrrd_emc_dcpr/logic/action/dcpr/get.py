@@ -79,7 +79,17 @@ def dcpr_request_list_awaiting_csi_moderation(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List:
     """Return a list of DCPR requests that are awaiting moderation by CSI members."""
-    toolkit.check_access("dcpr_request_list_pending_csi_auth", context, data_dict or {})
+    # mohab: we are adding request_origin
+    # so the check is not applied when it
+    # comes from /dataset/ page.
+    try:
+        request_origin = context["request_origin"]
+    except KeyError:
+        request_origin = ""
+    if "/dataset/" not in request_origin:
+        toolkit.check_access(
+            "dcpr_request_list_pending_csi_auth", context, data_dict or {}
+        )
     relevant_statuses = (
         DCPRRequestStatus.AWAITING_CSI_REVIEW.value,
         DCPRRequestStatus.UNDER_CSI_REVIEW.value,
