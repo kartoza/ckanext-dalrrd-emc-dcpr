@@ -87,16 +87,6 @@
                 <th scope="row" class="dataset-label">{{ _('Status') }} </th>
                 <td><span class="label label-default">{{ dcpr_request.status }}</span></td>
             </tr>
-            {% if current_reviewer %}
-            <tr>
-                <th scope="row" class="dataset-label">{{ _('Current reviewer name') }} </th>
-                <td>{{ current_reviewer.name }}</td>
-            </tr>
-            <tr>
-                <th scope="row" class="dataset-label">{{ _('Current reviewer contact') }} </th>
-                <td>{{ current_reviewer.email }}</td>
-            </tr>
-            {% endif %}
             <tr>
                 <th scope="row" class="dataset-label">{{ _("Additional project context") }}</th>
                 <td class="dataset-details">
