@@ -547,6 +547,14 @@ fieldset[disabled] .btn-default.focus {
   background-color: #ec971f;
 }
 
+.masthead {
+  padding: 0 0;
+}
+
+.masthead a {
+  color: #fff;
+}
+
 .btn-warning:focus,
 .btn-warning.focus {
   color: #fff;
@@ -557,15 +565,6 @@ fieldset[disabled] .btn-default.focus {
   color: #fff;
   background-color: #F3881C;
   border-color: #F3881C;
-}
-
-header.masthead {
-  position: relative;
-  background: url("/images/emc.jpg") no-repeat center center;
-  background-size: auto;
-  background-size: cover;
-  padding-top: 8rem;
-  padding-bottom: 8rem;
 }
 
 .header-title {
@@ -603,6 +602,10 @@ header.masthead {
 
 .index-datasets {
   min-height: 400px;
+}
+
+.carousel-inner-img {
+  width: 100%;
 }
 
 
