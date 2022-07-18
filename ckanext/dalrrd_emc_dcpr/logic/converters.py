@@ -8,6 +8,11 @@ import ckan.lib.navl.dictization_functions as df
 Invalid = df.Invalid
 
 
+from ckan.common import _
+import ckan.lib.navl.dictization_functions as df
+
+Invalid = df.Invalid
+
 logger = logging.getLogger(__name__)
 
 

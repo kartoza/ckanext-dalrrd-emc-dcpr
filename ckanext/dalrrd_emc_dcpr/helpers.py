@@ -312,6 +312,11 @@ def get_dcpr_requests_approved_by_nsif():
     page.
     """
     # if the request awaits for csi, it already passed nsif
+    # do to authorization, i had to add a request_oring
+    # thus if it's coming from dataset it won't be checked
+    # at first stage, but when a user tries to access the
+    # request.
+    # comment to update the repo head
     dcpr_requests_approved_by_nsif = toolkit.get_action(
         "dcpr_request_list_awaiting_csi_moderation"
     )()
