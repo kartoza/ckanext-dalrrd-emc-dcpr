@@ -353,6 +353,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ] = toolkit._("ISO Topic Category")
             facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
+            facets_dict["dcpr_request"] = toolkit._("DCPR Request")
         return facets_dict
 
     def group_facets(
