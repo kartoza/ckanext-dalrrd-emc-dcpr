@@ -86,7 +86,6 @@ def dcpr_request_list_awaiting_csi_moderation(
         request_origin = context["request_origin"]
     except KeyError:
         request_origin = ""
-    request_origin = context["request_origin"]
     if "/dataset/" not in request_origin:
         toolkit.check_access(
             "dcpr_request_list_pending_csi_auth", context, data_dict or {}

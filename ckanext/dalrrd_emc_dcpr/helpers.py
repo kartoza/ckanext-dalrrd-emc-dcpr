@@ -304,7 +304,7 @@ def get_org_memberships(user_id: str):
     return query.all()
 
 
-def get_dcpr_requests_approved_by_nsif():
+def get_dcpr_requests_approved_by_nsif(request_origin):
     """
     this feature required by the nsif team,
     as soon as the dcpr_request approved by
@@ -316,8 +316,7 @@ def get_dcpr_requests_approved_by_nsif():
     # thus if it's coming from dataset it won't be checked
     # at first stage, but when a user tries to access the
     # request.
-    # comment to update the repo head
     dcpr_requests_approved_by_nsif = toolkit.get_action(
         "dcpr_request_list_awaiting_csi_moderation"
-    )()
+    )({"request_origin": request_origin})
     return dcpr_requests_approved_by_nsif
