@@ -237,7 +237,7 @@ dataset_fields:
   - field_name: equivalent_scale
     label: Spatial resolution
     required: true
-    validators: natural_number_validator
+    preset: spatial_resolution_checker
     help_text: >-
       Level of detail expressed as the scale of a comparable hardcopy map or
       chart. Provide it as the denominator of a representative fraction,

@@ -82,6 +82,10 @@ def dcpr_request_list_awaiting_csi_moderation(
     # mohab: we are adding request_origin
     # so the check is not applied when it
     # comes from /dataset/ page.
+    try:
+        request_origin = context["request_origin"]
+    except KeyError:
+        request_origin = ""
     request_origin = context["request_origin"]
     if "/dataset/" not in request_origin:
         toolkit.check_access(

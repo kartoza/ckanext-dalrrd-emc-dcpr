@@ -3,6 +3,11 @@ import logging
 
 from ckan.plugins import toolkit
 
+from ckan.common import _
+import ckan.lib.navl.dictization_functions as df
+
+Invalid = df.Invalid
+
 logger = logging.getLogger(__name__)
 
 
@@ -45,3 +50,15 @@ def emc_bbox_converter(value: str) -> str:
         ],
     }
     return json.dumps(parsed)
+
+
+def spatial_resolution_converter(value: str):
+    """
+    the natural numbers validator used with
+    spatial resolution field causes
+    internal server error when the type
+    is None, handled here
+    """
+    if value == "":
+        return -1
+    return value

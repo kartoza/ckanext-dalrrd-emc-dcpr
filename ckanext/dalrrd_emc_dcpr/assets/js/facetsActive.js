@@ -58,7 +58,7 @@ ckan.module("dcpr_request_facet", function($){
         _onClick:function(){
             let text = this.el.text()
             if(text.toLowerCase().indexOf("dcpr request") != -1){
-                window.location.href = window.location.origin + '/dcpr/'
+               // window.location.href = window.location.origin + '/dcpr/'
             }
         }
     }
