@@ -316,6 +316,7 @@ def get_dcpr_requests_approved_by_nsif(request_origin):
     # thus if it's coming from dataset it won't be checked
     # at first stage, but when a user tries to access the
     # request.
+    # comment to update the repo head
     dcpr_requests_approved_by_nsif = toolkit.get_action(
         "dcpr_request_list_awaiting_csi_moderation"
     )({"request_origin": request_origin})
