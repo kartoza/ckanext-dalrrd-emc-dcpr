@@ -32,3 +32,7 @@ presets:
   - preset_name: emc_checkbox
     values:
       form_snippet: "dataset_featured.html"
+
+  - preset_name: spatial_resolution_checker
+    values:
+      validators: spatial_resolution_converter natural_number_validator

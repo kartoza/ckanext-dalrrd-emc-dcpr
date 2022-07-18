@@ -102,6 +102,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "groups": _("Groups"),
             "tags": _("Tags"),
         }
+
         for facet in h.facets():
             if facet in default_facet_titles:
                 facets[facet] = default_facet_titles[facet]
@@ -301,6 +302,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_bbox_converter": converters.emc_bbox_converter,
             "dcpr_end_date_after_start_date_validator": validators.dcpr_end_date_after_start_date_validator,
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
+            "spatial_resolution_converter": converters.spatial_resolution_converter,
         }
 
     def is_fallback(self) -> bool:
@@ -351,7 +353,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ] = toolkit._("ISO Topic Category")
             facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
-            facets_dict["dcpr_request"] = toolkit._("DCPR Request")
         return facets_dict
 
     def group_facets(

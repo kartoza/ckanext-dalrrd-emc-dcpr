@@ -112,9 +112,12 @@ def user_is_org_member(
     result = False
     if user is not None:
         member_list_action = toolkit.get_action("member_list")
-        org_members = member_list_action(
-            data_dict={"id": org_id, "object_type": "user"}
-        )
+        try:
+            org_members = member_list_action(
+                data_dict={"id": org_id, "object_type": "user"}
+            )
+        except:
+            return result
         logger.debug(f"{user.id=}")
         logger.debug(f"{org_members=}")
         for member_id, _, member_role in org_members:
