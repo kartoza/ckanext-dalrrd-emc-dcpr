@@ -19,7 +19,7 @@
           {% block heading %}
             <h2 class="dataset-heading">
             {% block heading_title %}
-                {{ title }}
+                {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
               {% endblock %}
               {% block heading_private %}
                 {% if package.private %}
@@ -58,7 +58,7 @@
                   <div class="datasets-date">
                       Dataset Updated {{ date }}
                   </div>
-                  <div class="dataset-action pull-right">
+                  <div class="dataset-action pull-right" style="display: none">
                       <a class="dataset-action-items" href="{{ h.url_for('%s.read' % package.type, id=package.name)}}"><i class="fa fa-bars"></i>
                           Metadata
                       </a>
