@@ -20,8 +20,8 @@
                     {% set filters = {
                         'Organizations': 'fa fa-users',
                         'Tags': 'fa fa-tags',
-                        'SASDI Theme': 'fa fa-tasks',
-                        'ISO Topic Category': 'fa fa-filter',
+                        'SASDI Themes': 'fa fa-tasks',
+                        'ISO Topic Categories': 'fa fa-filter',
                         'Harvest source': 'fa fa-cloud',
 						'DCPR Request': 'fa fa-file'
 
@@ -32,6 +32,9 @@
                     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="true" aria-controls="{{ item_id }}">
 						<i class="{{ filters[title] }}"></i>
                         {% set title = title or h.get_facet_title(name) %}
+                        {% if title == 'Organizations' %}
+                            {% set title = 'Organisations' %}
+                        {% endif %}
                         {{ title }}
                     </a>
                   </h2>
