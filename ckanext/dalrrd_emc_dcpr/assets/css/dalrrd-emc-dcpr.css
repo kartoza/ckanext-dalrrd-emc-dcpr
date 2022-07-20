@@ -379,6 +379,10 @@ fieldset[disabled] .btn-default.focus {
   background-color: transparent;
 }
 
+.sasdi-theme-name{
+  margin-left: 5px;
+}
+
 /* End of datasets*/
 
 /* Filters */
