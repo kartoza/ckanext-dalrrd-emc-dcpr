@@ -2,7 +2,7 @@
 
 {% block breadcrumb_content %}
     <div class="page-header">
-    {% set total =  page.item_count %}
+    {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
         <h1>Electronic Metadata Catalogue (EMC)</h1>
         <h5>Total number of datasets: {{ total }}</h5>
         <h5>{{ page.item_count }} datasets found</h5>

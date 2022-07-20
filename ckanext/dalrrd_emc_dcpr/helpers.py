@@ -227,6 +227,21 @@ def get_recently_modified_datasets():
     return result["results"]
 
 
+def get_all_datasets_count(user_obj):
+    """
+    fixes a bug when applying
+    solr active search
+    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/116
+    """
+    search_action = toolkit.get_action("package_search")
+    # 32000 rows is the maximum of what can be retrieved
+    # by ckan at once.
+    result = search_action(
+        context={"user": user_obj.id}, data_dict={"q": "*:*", "rows": 32000}
+    )
+    return result["count"]
+
+
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     geom = geometry.shape(extent)
     padded = geom.buffer(padding, join_style=geometry.JOIN_STYLE.mitre)
