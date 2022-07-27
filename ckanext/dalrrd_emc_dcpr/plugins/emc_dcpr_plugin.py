@@ -328,6 +328,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_user_is_staff_member": helpers.user_is_staff_member,
             "emc_get_featured_datasets": helpers.get_featured_datasets,
             "emc_get_recently_modified_datasets": helpers.get_recently_modified_datasets,
+            "emc_get_all_datasets_count": helpers.get_all_datasets_count,
             "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
             "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
             "emc_org_memberships": helpers.get_org_memberships,
@@ -353,6 +354,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             ] = toolkit._("ISO Topic Category")
             facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
+            facets_dict["dcpr_request"] = toolkit._("DCPR Request")
         return facets_dict
 
     def group_facets(
