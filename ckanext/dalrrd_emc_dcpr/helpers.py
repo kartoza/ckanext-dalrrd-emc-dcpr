@@ -236,9 +236,14 @@ def get_all_datasets_count(user_obj):
     search_action = toolkit.get_action("package_list")
     # 32000 rows is the maximum of what can be retrieved
     # by ckan at once.
-    result = search_action(context={"user": user_obj.id}, data_dict={})
-    package_count = len(result)
-    return package_count
+    if user_obj is not None:
+        result = search_action(context={"user": user_obj.id}, data_dict={})
+        package_count = len(result)
+        return package_count
+    else:
+        result = search_action(data_dict={})
+        package_count = len(result)
+        return package_count
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
