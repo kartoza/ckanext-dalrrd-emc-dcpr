@@ -42,6 +42,17 @@ def emc_bbox_converter(value: str) -> str:
     except IndexError:
         logger.exception(msg="something failed")
         raise toolkit.Invalid(error_msg)
+
+    except TypeError:
+        if value == "":
+            value = "-22.1265, 16.4699, -34.8212, 32.8931"
+        values = value.split(",")
+        bbox_coords = [float(i) for i in values]
+        upper_lat = bbox_coords[0]
+        left_lon = bbox_coords[1]
+        lower_lat = bbox_coords[2]
+        right_lon = bbox_coords[3]
+
     parsed = {
         "type": "Polygon",
         "coordinates": [
