@@ -28,8 +28,8 @@
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="head{{ item_id }}">
                   <h2 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="true" aria-controls="{{ item_id }}">
-						<i class="{{ filters[title] }}"></i>
+                    <a class="panel-title-link" role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="false" aria-controls="{{ item_id }}">
+                      <i class="{{ filters[title] }}"></i>
                         {% set title = title or h.get_facet_title(name) %}
                         {{ title }}
                     </a>
@@ -83,7 +83,13 @@
                             {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
 						    <span class="item-label">{% if title == "SASDI Theme" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px">{% endif %} {{ label_truncated }}</span>
 						    <span class="hidden separator"> - </span>
-						    <span class="item-count badge">{{ count }}</span>
+						    <span class="item-count">({{ count }})</span>
+                            <div class="progress">
+                                {% set percent = count | int *100/total %}
+                              <div class="progress-bar" role="progressbar" aria-valuenow="{{ count }}"
+                              aria-valuemin="0" aria-valuemax="{{ total }}" style="width:{{ percent }}%">
+                              </div>
+                            </div>
 						</a>
 					    </li>
 						{% endif %}
