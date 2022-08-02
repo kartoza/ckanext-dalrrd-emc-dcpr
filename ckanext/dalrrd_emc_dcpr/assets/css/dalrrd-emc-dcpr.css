@@ -455,6 +455,10 @@ fieldset[disabled] .btn-default.focus {
   color: #FFF;
   background-color: #F3881C;
 }
+.nav-item.active > a > .progress{
+  display: none;
+}
+
 .nav-item.active > a:hover,
 .nav-facet li.active a:hover {
   color: #FFF;
