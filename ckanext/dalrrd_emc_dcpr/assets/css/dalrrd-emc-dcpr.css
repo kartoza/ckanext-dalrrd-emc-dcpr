@@ -385,6 +385,10 @@ fieldset[disabled] .btn-default.focus {
   background-color: transparent;
 }
 
+.sasdi-theme-name{
+  margin-left: 5px;
+}
+
 .panel-title {
   position: relative;
 }
@@ -545,14 +549,6 @@ fieldset[disabled] .btn-default.focus {
 /* Landing page */
 .btn-warning {
   background-color: #ec971f;
-}
-
-.masthead {
-  padding: 0 0;
-}
-
-.masthead a {
-  color: #fff;
 }
 
 .btn-warning:focus,
