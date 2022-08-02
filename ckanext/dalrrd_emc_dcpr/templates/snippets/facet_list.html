@@ -20,7 +20,7 @@
                     {% set filters = {
                         'Organizations': 'fa fa-users',
                         'Tags': 'fa fa-tags',
-                        'SASDI Theme': 'fa fa-tasks',
+                        'SASDI Theme': 'fa fa-bars',
                         'ISO Topic Category': 'fa fa-filter',
                         'Harvest source': 'fa fa-cloud',
 						'DCPR Request': 'fa fa-file',
@@ -40,7 +40,7 @@
 		    {% block facet_list_items %}
                 {% set item_id = title.replace(' ', '') %}
                 <div id="{{ item_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ item_id }}">
-                <div class="panel-body">
+                <div class="panel-body" style="padding: 0px">
 			{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
 				{% if item_id == 'DCPRRequest' %}
 					{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth"},
@@ -79,7 +79,9 @@
 
 						<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %}">
 						<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" data-module="emc-factes-avtive">
-						    <span class="item-label">{{ label_truncated }}</span>
+                            {% set sasdi = label if label != label_truncated else label_truncated %}
+                            {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
+						    <span class="item-label">{% if title == "SASDI Theme" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px">{% endif %} {{ label_truncated }}</span>
 						    <span class="hidden separator"> - </span>
 						    <span class="item-count badge">{{ count }}</span>
 						</a>
