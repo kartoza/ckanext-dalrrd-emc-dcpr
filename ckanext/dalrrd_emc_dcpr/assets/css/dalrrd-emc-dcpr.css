@@ -604,6 +604,14 @@ fieldset[disabled] .btn-default.focus {
   width: 100%;
 }
 
+.masthead {
+  padding: 0 0;
+}
+
+.masthead a {
+  color: #fff;
+}
+
 
 /* Footer */
 
