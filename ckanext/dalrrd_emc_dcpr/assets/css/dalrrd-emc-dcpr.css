@@ -621,10 +621,21 @@ fieldset[disabled] .btn-default.focus {
 
 .site-footer {
   margin-bottom: initial;
-  padding: 10px 0;
   color: #3A744E;
   background: #3A744E url("../../../base/images/bg.png");
-  padding: 20px 0;
+  padding: 23px 0;
+}
+
+.footer-text {
+  text-align: center;
+  color: #CCDEE3;
+  font-size: 14px;
+  margin-top:3px
+}
+
+.language {
+  float: right;
+  width: 20%;
 }
 
 /* End Footer */

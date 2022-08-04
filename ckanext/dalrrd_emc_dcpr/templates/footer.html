@@ -4,10 +4,26 @@
     below we reimplement the default footer_links block in order to include the current version of
     CKAN and of the EMC
 #}
-
+{% block footer_content %}
+    <div class="content">
+        <div class="row">
+        <div class="col-lg-6 footer-text">Copyright &copy; - 2022 SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE</div>
+        <div class="col-lg-6 pull-right">
+            <div class="language">
+            {% block footer_lang %}
+                {% snippet "snippets/language_selector.html" %}
+            {% endblock %}
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
 {% set emc_version = h.emc_show_version() %}
 
-{% block footer_links %}
-    <li>SASDI EMC/DCPR v{{ emc_version.version }} (git sha: {{ emc_version.git_sha }})</li>
-    <li>CKAN v{{ h.ckan_version() }}</li>
+{#{% block footer_links %}#}
+{#    <li>SASDI EMC/DCPR v{{ emc_version.version }} (git sha: {{ emc_version.git_sha }})</li>#}
+{#    <li>CKAN v{{ h.ckan_version() }}</li>#}
+{#{% endblock %}#}
+
+{% block footer_debug %}
 {% endblock %}
