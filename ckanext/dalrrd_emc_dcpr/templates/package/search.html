@@ -1,13 +1,30 @@
 {% ckan_extends %}
+{# currently adding this js file isn't working
+  it might have to do with droping volumes
+#}
+{% asset "ckanext-dalrrdemcdcpr/xml-parser-js" %}
 
 {% block breadcrumb_content %}
     <div class="page-header">
-    {% set total =  page.item_count %}
+    {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
         <h1>Electronic Metadata Catalogue (EMC)</h1>
         <h5>Total number of datasets: {{ total }}</h5>
         <h5>{{ page.item_count }} datasets found</h5>
         {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + dataset_type + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
         {% if h.check_access('package_create') %}
+        <button class="btn btn-primary pull-right" onclick="document.getElementById('upload_input').click()"
+          style="margin-left: 10px;"
+          >
+          <i class="fa fa-cloud-upload"></i>{{ _("Add datasets from xml file") }}
+        </button>
+        <input type="file"
+          id = "upload_input"
+          name = "xml_dataset_files"
+          onclick=""
+          style="display: none;"
+          multiple
+          data-module="xml_parser"
+          >
           <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add Dataset') }}</a>
         {% endif %}
     </div>
@@ -30,10 +47,10 @@
     <div>
       {% for facet in facet_titles %}
           {% if facet!= 'tags' %}
-        {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, search_facets=search_facets) }}
+        {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, search_facets=search_facets, total=page.item_count) }}
           {% endif %}
       {% endfor %}
-    {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name='tags', search_facets=search_facets) }}
+    {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name='tags', search_facets=search_facets, total=page.item_count) }}
     </div>
     <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
   </div>
