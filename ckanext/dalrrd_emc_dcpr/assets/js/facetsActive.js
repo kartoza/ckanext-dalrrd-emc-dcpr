@@ -1,7 +1,7 @@
 "use strict";
 
 
-ckan.module('emc-factes-avtive', function (jQuery, _) {
+ckan.module('emc-facets-active', function (jQuery, _) {
 
     function getUrlParameter(param) {
           let sPageURL = window.location.search.substring(1),
@@ -42,6 +42,12 @@ ckan.module('emc-factes-avtive', function (jQuery, _) {
                     a[0].setAttribute('aria-expanded', 'true')
 
                 }
+                const head = document.getElementById('head' + filters[keys[i]]);
+                const title = head.querySelector('.panel-title');
+                const link = title.querySelector('.panel-title-link');
+                if(link.getAttribute('aria-expanded')==true){
+                    alert(head);
+                }
        }
         }
     }
@@ -66,4 +72,29 @@ ckan.module("xml_parser",function($){
             then(()=>{window.location.reload()})
         }
     }
+})
+
+ckan.module("emc-filter-expand", function ($){
+    return {
+        initialize: function(){
+
+            $.proxyAll(this,/_on/);
+            this.el.on('click', this._onClick);
+
+        },
+
+        _onClick: function (event) {
+            const parents = event.target.parentNode.parentNode.parentNode;
+            const expand = event.target.getAttribute('aria-expanded');
+            const classes = parents.classList
+            if(parents.classList.contains('expanded')){
+                parents.classList.remove('expanded');
+            }
+            else {
+                parents.classList.add('expanded')
+            }
+        }
+    }
+
+
 })
