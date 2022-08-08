@@ -10,10 +10,11 @@ Displays a date selector in order to let user choose the temporal range for a se
 {% set previous_end = request.args.get(end_identifier) %}
 
 <section id="temporal-search" class="module module-narrow module-shallow">
-    <div class="panel panel-default">
+    <div class="panel panel-default expanded">
     <div class="panel-heading" role="tab" id="headTemporal">
       <h4 class="panel-title">
-        <a class="panel-title-link" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDateRange" aria-expanded="true" aria-controls="collapseDateRange">
+        <a class="panel-title-link" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseDateRange"
+           aria-expanded="true" aria-controls="collapseDateRange" data-module="emc-filter-expand">
           <i class="fa fa-calendar"></i>
             {{ _('Temporal range') }}
         </a>
