@@ -16,15 +16,5 @@
             <p>{{ pkg.iso_topic_category|first }}</p>
         </div>
     </section>
-    {% if pkg.sasdi_theme|length > 0 %}
-        <section class="sasdi-theme">
-            <h3> {{ _("SASDI Theme") }}</h3>
-            <div class="row">
-                {% set sasdi = pkg.sasdi_theme|first %}
-                {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
-            <p><img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="35px">
-            <span class="sasdi-theme-name">{{ pkg.sasdi_theme|first }}</span></p>
-            </div>
-        </section>
-    {% endif %}
+
 {% endblock %}

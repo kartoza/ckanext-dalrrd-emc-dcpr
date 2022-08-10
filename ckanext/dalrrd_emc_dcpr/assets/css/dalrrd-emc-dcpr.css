@@ -714,3 +714,46 @@ fieldset[disabled] .btn-default.focus {
 .page-list-item > .span11 {
   margin: 8px;
 }
+
+/* Dataset */
+.context-info .nums {
+  margin-top: 0px;
+  padding-top: 5px;
+  padding-bottom: 0;
+  border-top: none;
+  float: left;
+  width: 50%;
+}
+
+.context-info .nums dl {
+  width: 100%;
+  margin: 0;
+}
+
+.context-info .follower {
+  margin-right: 0;
+}
+
+.follower-heading{
+  margin-top: 10px;
+  border-top: 1px solid #ddd;;
+}
+
+.follower-heading .module-content {
+  padding: 5px 15px;
+}
+
+.context-info .follow_button {
+  padding-top: 2px;
+  margin: 0;
+}
+
+.context-info .follow_button .btn-success {
+  color: #fff;
+  background-color: #F3881C;
+  border-color: #F3881C;
+}
+
+.context-info .follow_button .btn {
+  padding: 5px 10px;
+}
