@@ -411,7 +411,6 @@ fieldset[disabled] .btn-default.focus {
   color: #F3881C;
 }
 
-
 .panel-heading-full.panel-heading {
   padding: 0;
 }
@@ -431,10 +430,16 @@ fieldset[disabled] .btn-default.focus {
 .panel {
   margin-bottom: 0;
   background-color: #fff;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-top: 0;
+  border-bottom: 0;
+  border-radius: 0;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.expanded{
+  border: 1px solid #F3881C;
 }
 
 .nav-simple > li, .nav-aside > li {
@@ -604,6 +609,14 @@ fieldset[disabled] .btn-default.focus {
   width: 100%;
 }
 
+.masthead {
+  padding: 0 0;
+}
+
+.masthead a {
+  color: #fff;
+}
+
 
 /* Footer */
 
@@ -613,10 +626,21 @@ fieldset[disabled] .btn-default.focus {
 
 .site-footer {
   margin-bottom: initial;
-  padding: 10px 0;
   color: #3A744E;
   background: #3A744E url("../../../base/images/bg.png");
-  padding: 20px 0;
+  padding: 23px 0;
+}
+
+.footer-text {
+  text-align: center;
+  color: #CCDEE3;
+  font-size: 14px;
+  margin-top:3px
+}
+
+.language {
+  float: right;
+  width: 20%;
 }
 
 /* End Footer */
