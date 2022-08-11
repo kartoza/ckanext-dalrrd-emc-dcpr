@@ -41,7 +41,7 @@
             <section class="module-content">
                 {% set sasdi = pkg.sasdi_theme|first %}
                 {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
-            <p><img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="35px">
+            <p><img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="{{ sasdi }}" width="35px">
             <span class="sasdi-theme-name">{{ pkg.sasdi_theme|first }}</span></p>
             </section>
         </div>
