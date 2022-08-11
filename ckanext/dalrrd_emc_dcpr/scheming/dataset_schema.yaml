@@ -35,11 +35,32 @@ dataset_fields:
     form_placeholder: eg. Some useful notes about the data
     help_text: Brief narrative summary of the content of the resource - This is a SANS 1878 mandatory field
 
+  - field_name: purpose
+    label: Purpose
+    required: true
+    help_text: >-
+      Yet to be added.
+
+  - field_name: status
+    label: Status
+    required: true
+    help_text: >-
+      Yet to be added.
+
+
   - field_name: reference_date
     label: Reference date
     required: true
     preset: date
     help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
+
+  - field_name: reference_system_info
+    label: Reference System Information
+    required: true
+    help_text: >-
+      Yet to be added.
+
+
 
   - field_name: iso_topic_category
     label: Topic Category

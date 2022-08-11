@@ -80,3 +80,24 @@ class DcprRequestModerationAction(enum.Enum):
     REJECT = "REJECT"
     REQUEST_CLARIFICATION = "REQUEST_CLARIFICATION"
     RESIGN = "RESIGN"
+
+
+DATASET_MINIMAL_SET_OF_FIELDS = [
+    "title",
+    "notes",
+    "purpose",
+    "reference_date",
+    "reference_system_info",
+    "iso_topic_category",
+    "organization",
+    "private",
+    "status",
+    "dataset_language",
+    "metadata_language" "dataset_character_set",
+    "lineage",
+    "maintainer",
+    "spatial",
+    "equivalent_scale",
+    "spatial_representation type",
+    "spatial_reference_system",
+]

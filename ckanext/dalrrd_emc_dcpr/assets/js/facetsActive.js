@@ -63,7 +63,17 @@ ckan.module("xml_parser",function($){
                 formData.append("xml_dataset_files",_file)
             }
             fetch(window.location.href.split('?')[0]+'xml_parser/',{method:"POST", body:formData}).
-            then(()=>{window.location.reload()})
+            then(res=>res.json()).then(
+                (data)=>{
+                    let flash_box = document.getElementsByClassName("flash-messages")[0]
+                    let warning = document.createElement("div")
+                    warning.classList.add("warning-explanation","alert","alert-danger")
+                    warning.innerHTML = data
+                    flash_box.append(warning)
+                }
+                ).catch(err=>console.log(err))
+
+            //window.location.reload()
         }
     }
 })
