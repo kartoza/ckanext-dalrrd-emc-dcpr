@@ -24,6 +24,7 @@ from .. import (
 from ..blueprints.dcpr import dcpr_blueprint
 from ..blueprints.emc import emc_blueprint
 from ..blueprints.xml_parser import xml_parser_blueprint
+from ..blueprints.publish import publish_blueprint
 from ..cli import commands
 from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
 from ..logic.action import ckan as ckan_actions
@@ -342,6 +343,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             dcpr_blueprint,
             emc_blueprint,
             xml_parser_blueprint,
+            publish_blueprint,
         ]
 
     def dataset_facets(
