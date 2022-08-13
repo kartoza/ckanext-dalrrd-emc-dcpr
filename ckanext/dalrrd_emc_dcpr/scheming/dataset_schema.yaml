@@ -11,13 +11,13 @@ dataset_fields:
 
   - field_name: title
     label: Title
-    help_text: Name by which the cited resource is known - This is a SANS 1878 mandatory field
+    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifer for the dataset - This is a SANS 1878 mandatory field
     preset: title
     required: true
     form_placeholder: eg. A descriptive title
 
   - field_name: name
-    label: URL
+    label: Field identifier
     preset: dataset_slug
     form_placeholder: eg. my-dataset
 
@@ -28,8 +28,36 @@ dataset_fields:
     validators: boolean_validator
     preset: emc_checkbox
 
+  # this multiple checkbox is better to be implemented these two fields,
+  # but multiple checkbox has an issue
+  # - field_name: metadata_standard_name
+  #   label: Metadata standard name
+  #   preset: multiple_checkbox
+  #   required: true
+  #   choices:
+  #     - value: sans_1878
+  #       label: SANS 1878
+  #     - value: iso_19115
+  #       label: ISO 19115
+  #   help_text: Name of metadata standard used - This is a SANS 1878 mandatory field
+
+  # these two fields are better to be implemented as above
+  - field_name: metadata_standard_name
+    label: Metadata standard name
+    required: true
+    help_text: >-
+      Name(s) of metadata standard used, if multiple standards used, separate them by comma
+      - This is a SANS 1878 mandatory field
+
+  - field_name: metadata_standard_version
+    label: Metadata standard version
+    required: true
+    help_text: >-
+      Version(s) of metadata standard used, if multiple standards used, separate versions by comma
+      - This is a SANS 1878 mandatory field
+
   - field_name: notes
-    label: Description
+    label: Abstract
     required: true
     form_snippet: markdown.html
     form_placeholder: eg. Some useful notes about the data
@@ -39,27 +67,107 @@ dataset_fields:
     label: Purpose
     required: true
     help_text: >-
-      Yet to be added.
+      Breif description why this dataset is created - This is a SANS 1878 mandatory field
+
+  - field_name: acknowledgement
+    label: Acknowledgement
+    required: false
+    help_text: >-
+      Recognition of those who contributed to the dataset - This is a SANS 1878 mandatory field
 
   - field_name: status
     label: Status
     required: true
+    preset: select
+    choices:
+      - value: completed
+        label: completed
+      - value: historical_archive
+        label: historical archive
+      - value: obsolete
+        label: obsolete
+      - value: ongoing
+        label: ongoing
+      - value: planned
+        label: planned
+      - value: required
+        label: required
+      - value: under_development
+        label: under development
     help_text: >-
-      Yet to be added.
+      Status of the dataset- This is a SANS 1878 mandatory field
 
+# owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
+  # vanilla ckanext-scheming too
+  - field_name: metadata_point_of_contact
+    label: Metadata point of contact
+    repeating_subfields:
+      - field_name: individual_name
+        label: Individual name
+        required: false
+        help_text: name - with surname of the person responsible of this dataset
+
+      - field_name: owner_org
+        label: Organization
+        required: true
+        preset: emc_dataset_organization
+        help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
+
+      - field_name: position_name
+        label: Role / Position of the responsible individual
+        required: false
+        help_text: Role/ position of responsible individual in the orgnization
+
+      - field_name: contact_point_address_city
+        label: City
+        required: false
+
+      - field_name: contact_point_address_administrative_area
+        label: Administrative area
+        required: false
+        help_text: province of the contact location
+
+      - field_name: contact_point_postal_code
+        label: Postal Code
+        required: false
+
+      - field_name: contact_point_electronic_mail_address
+        label: Electronic mail address
+        required: false
+        help_text: Address of the electronic mailbox of the responsible organization or individual
+
+      # this to be implemented as multiple choices.
+      - field_name: orgnizational_role
+        label: Organization role
+        required: true
+        preset: select
+        choices:
+          - value: resource_provider
+            label: resource provider
+          - value: custodian
+            label: custodian
+          - value: owner
+            label: owner
+          - value: user
+            label: user
+          - value: distributor
+            label: distributor
+          - value: originator
+            label: originator
+          - value: point_of_contact
+            label: point of contact
+          - value: principal_investigator
+            label: principal investigator
+          - value: processor
+            label: processor
+          - value: publisher
+            label: publisher
 
   - field_name: reference_date
     label: Reference date
     required: true
     preset: date
     help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
-
-  - field_name: reference_system_info
-    label: Reference System Information
-    required: true
-    help_text: >-
-      Yet to be added.
-
 
 
   - field_name: iso_topic_category
@@ -107,14 +215,6 @@ dataset_fields:
     form_snippet: license.html
     help_text: License definitions and additional information can be found at http://opendefinition.org/
 
-  # owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
-  # vanilla ckanext-scheming too
-  - field_name: owner_org
-    label: Organization
-    required: true
-    preset: emc_dataset_organization
-    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
-
   - field_name: url
     label: Source
     form_placeholder: http://example.com/dataset.json
@@ -122,7 +222,7 @@ dataset_fields:
     display_snippet: link.html
 
   - field_name: version
-    label: Version
+    label: Dataset version
     validators: ignore_missing unicode package_version_validator
     form_placeholder: '1.0'
 
@@ -229,6 +329,56 @@ dataset_fields:
 #    display_snippet: email.html
 #    display_email_name_field: author
 
+  - field_name: distribution
+    label: Distribution information
+    repeating_label: Distribution information
+    repeating_subfields:
+      # - field_name: distribution_format_name
+      #   label: Distribution format name
+      #   required: true
+      #   form_placeholder: Distribution format(s) name - This is a SANS 1878 mandatory field
+
+      # - field_name: distribution_format_version
+      #   label: Distribution format version
+      #   required: true
+      #   form_placeholder: Distribution format version (date, number ..etc.)- This is a SANS 1878 mandatory field
+
+      # - field_name: distribution_format_amendment_number
+      #   label: Distribution format amendment number
+      #   required: false
+      #   form_placeholder: Amendment number of the format version
+
+      # - field_name: distribution_format_specification
+      #   label: Distribution format specification
+      #   required: false
+      #   form_placeholder: Name of subset, profile or product specification of format
+
+      # - field_name: distribution_format_specification
+      #   label: Distribution format specification
+      #   required: false
+      #   form_placeholder: Name of subset, profile or product specification of format
+
+      - field_name: distributor_contact
+        label: Distributior Contact
+        required: true
+        help_text:  Name of party from whom the dataset can be obtained - This is a SANS 1878 mandatory field
+
+      - field_name: distribution_order_process
+        label: Distributior Order Process
+        required: false
+        form_snippet: markdown.html
+        help_text: information about how the dataset may be obtained, and related instructions and fee information
+
+      - field_name: units_of_distribution
+        label: Units of distribution
+        required: false
+        help_text: tiles, layers, geographic areas ..etc., in which data is available
+
+      - field_name: distribution_online_source
+        label: Distribution online source
+        required: false
+        help_text: information about online source from which the resource can be obtained
+
   - field_name: maintainer
     label: Maintainer
     required: true
@@ -244,6 +394,52 @@ dataset_fields:
     display_property: dc:contributor
     display_snippet: email.html
     display_email_name_field: maintainer
+
+  - field_name: maintenance_information
+    label: Maintenance information
+    repeating_subfields:
+      - field_name: maintenance_and_update_frequency
+        label: Maintenance and update frequency
+        required: false
+        preset: select
+        choices:
+          - value: monthly
+            label: monthly
+          - value: yearly
+            label: yearly
+          - value: other
+            label: other
+            preset: text
+
+        help_text: frequency with which changes and additions are made to the dataset after it's submitted
+
+      - field_name: maintenance_date_of_next_update
+        label: Date of next update
+        required: false
+        preset: date
+        help_text: scheduled revision date
+
+      - field_name: user_defined_maintenance_frequency
+        label: User defined maintenance frequency
+        required: false
+        preset: date
+        help_text: additional maintenance periods other than the scheduled update
+
+      - field_name: update_scope
+        label: Update scope
+        required: false
+        help_text: scope of data to which maintenance is applied
+
+      - field_name: update_scope_description
+        label: Update scope description
+        required: false
+        help_text: additional information about the range or extent of the dataset
+
+      - field_name: maintenance_notes
+        label: Maintenance notes
+        required: false
+        help_text: additional information about the requirements for maintaining the resource
+
 
   - field_name: spatial
     label: Geographic location bounding box
@@ -301,6 +497,41 @@ dataset_fields:
       (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
       www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
       coordinate reference systems  - This is a SANS 1878 mandatory field"
+
+  - field_name: temporal_reference_system
+    label: Temporal Reference System Information
+    required: false
+    help_text: >-
+      Description about the temporal reference system used (if any) - This is partly a SANS 1878 mandatory field"
+
+  - field_name: reference_system_additional_info
+    label: Additional information about Reference Systems
+    repeating_subfields:
+      - field_name: temporal_extent_period_duration_from
+        label: Temporal extent duration (from)
+        preset: date
+        required: false
+
+      - field_name: temporal_extent_period_duration_to
+        label: Temporal extent duration (to)
+        preset: date
+        required: false
+
+      - field_name: minimum_vertical_extent
+        label: Minimum vertical extent
+        required: false
+
+      - field_name: maximum_vertical_extent
+        label: Maximum vertical extent
+        required: false
+
+  - field_name: metadata_date_stamp
+    label: Metadata date stamp
+    required: true
+    preset: date
+    help_text: >-
+      date that the metadata was created
+
 
 
 resource_fields:
