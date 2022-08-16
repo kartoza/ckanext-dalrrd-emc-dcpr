@@ -774,14 +774,6 @@ fieldset[disabled] .btn-default.focus {
   color: #F3881C;
 }
 
-.page-header .nav-tabs {
-  float: left;
-  margin-bottom: -1px;
-  width: 80%;
-  background: #fff;
-  border: 1px solid #ccc;
-}
-
 .publish-heading{
   margin: auto;
   width: 50%;
