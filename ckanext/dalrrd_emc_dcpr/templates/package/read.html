@@ -1,5 +1,11 @@
 {% ckan_extends %}
 
+{% block package_description  %}
+    <section class="dataset-title-description">
+     {{ super() }}
+    </section>
+{% endblock %}
+
 {% block package_tags %}
     {#
         note: the package_tags block is overridden in order to only show free tags (i.e. those that did not

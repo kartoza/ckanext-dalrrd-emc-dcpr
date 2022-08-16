@@ -757,3 +757,19 @@ fieldset[disabled] .btn-default.focus {
 .context-info .follow_button .btn {
   padding: 5px 10px;
 }
+
+.dataset-title-description, .iso-topic-category, .additional-info, .resources{
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.module .read-more {
+  font-weight: bold;
+  color: #F3881C;
+}
+
+.module .read-more a{
+  color: #F3881C;
+}
