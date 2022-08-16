@@ -252,7 +252,9 @@ fieldset[disabled] .btn-default.focus {
   margin-bottom: 3rem !important;
 }
 
-
+.projects {
+  min-height: 350px;
+}
 
 /* Datasets */
 
