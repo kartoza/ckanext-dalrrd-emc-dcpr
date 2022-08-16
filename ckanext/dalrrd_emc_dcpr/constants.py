@@ -80,3 +80,4 @@ class DcprRequestModerationAction(enum.Enum):
     REJECT = "REJECT"
     REQUEST_CLARIFICATION = "REQUEST_CLARIFICATION"
     RESIGN = "RESIGN"
+

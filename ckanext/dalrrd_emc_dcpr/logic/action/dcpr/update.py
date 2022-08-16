@@ -160,7 +160,7 @@ def dcpr_request_submit(context, data_dict):
 
 
 def dcpr_request_nsif_moderate(
-    context: typing.Dict, data_dict: typing.Dict
+        context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     """Provide the NSIF's moderation for a DCPR request.
 
@@ -222,7 +222,7 @@ def dcpr_request_nsif_moderate(
 
 
 def dcpr_request_csi_moderate(
-    context: typing.Dict, data_dict: typing.Dict
+        context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     schema = dcpr_schema.moderate_dcpr_request_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -271,13 +271,50 @@ def dcpr_request_csi_moderate(
                 args=[activity["id"]],
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
+
+            if moderation_action == DcprRequestModerationAction.APPROVE:
+                create_package_from_dcpr_request(context, request_obj)
     else:
         raise toolkit.ObjectNotFound
     return result
 
 
+def create_package_from_dcpr_request(
+        context: typing.Dict, request_obj: dcpr_request.DCPRRequest
+) -> typing.Dict:
+    result = None
+    if request_obj is not None:
+        try:
+            data_dict = {}
+
+            ## TODO update the below mapping to use constants stored values
+
+            data_dict['name'] = request_obj.csi_reference_id
+            data_dict['title'] = request_obj.csi_reference_id
+            data_dict['extras'] = [{'key': 'origin', 'value': "DCPR"}]
+            data_dict['private'] = False
+            data_dict['owner_org'] = request_obj.organization_id
+            data_dict['spatial_reference_system'] = 'EPSG:4326'
+            data_dict['dataset_language'] = 'en'
+            data_dict['dataset_character_set'] = 'ucs-2'
+            data_dict['metadata_language'] = 'en'
+            data_dict['reference_date'] = dt.datetime.now(dt.timezone.utc)
+            data_dict['iso_topic_category'] = 'location'
+            data_dict['lineage'] = 'Formed from a DCPR request'
+            data_dict['maintainer'] = request_obj.owner_user
+            data_dict['equivalent_scale'] = "10"
+            data_dict['spatial_representation_type'] = "001"
+            data_dict['notes'] = 'Default notes'
+
+            result = toolkit.get_action("package_create")(context, data_dict)
+        except toolkit.NotAuthorized:
+            result = None
+
+    return result
+
+
 def claim_dcpr_request_nsif_reviewer(
-    context: typing.Dict, data_dict: typing.Dict
+        context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     return _become_reviewer(
         context,
@@ -289,7 +326,7 @@ def claim_dcpr_request_nsif_reviewer(
 
 
 def claim_dcpr_request_csi_reviewer(
-    context: typing.Dict, data_dict: typing.Dict
+        context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     return _become_reviewer(
         context,
@@ -301,11 +338,11 @@ def claim_dcpr_request_csi_reviewer(
 
 
 def _become_reviewer(
-    context: typing.Dict,
-    data_dict: typing.Dict,
-    auth_function: str,
-    reviewer_request_attribute: str,
-    activity_type: DcprManagementActivityType,
+        context: typing.Dict,
+        data_dict: typing.Dict,
+        auth_function: str,
+        reviewer_request_attribute: str,
+        activity_type: DcprManagementActivityType,
 ) -> typing.Dict:
     schema = dcpr_schema.claim_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -332,7 +369,7 @@ def _become_reviewer(
 
 
 def resign_dcpr_request_nsif_reviewer(
-    context: typing.Dict, data_dict: typing.Dict
+        context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     return _resign_reviewer(
         context,
@@ -343,7 +380,7 @@ def resign_dcpr_request_nsif_reviewer(
 
 
 def resign_dcpr_request_csi_reviewer(
-    context: typing.Dict, data_dict: typing.Dict
+        context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     return _resign_reviewer(
         context,
@@ -354,10 +391,10 @@ def resign_dcpr_request_csi_reviewer(
 
 
 def _resign_reviewer(
-    context: typing.Dict,
-    data_dict: typing.Dict,
-    auth_function: str,
-    activity_type: DcprManagementActivityType,
+        context: typing.Dict,
+        data_dict: typing.Dict,
+        auth_function: str,
+        activity_type: DcprManagementActivityType,
 ) -> typing.Dict:
     schema = dcpr_schema.resign_reviewer_schema()
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -387,8 +424,8 @@ def _resign_reviewer(
 
 
 def _update_dcpr_request_status(
-    dcpr_request_obj: dcpr_request.DCPRRequest,
-    transition_action: typing.Optional[DcprRequestModerationAction] = None,
+        dcpr_request_obj: dcpr_request.DCPRRequest,
+        transition_action: typing.Optional[DcprRequestModerationAction] = None,
 ) -> dcpr_request.DCPRRequest:
     current_status = DCPRRequestStatus(dcpr_request_obj.status)
     try:
@@ -404,8 +441,8 @@ def _update_dcpr_request_status(
 
 
 def _determine_next_dcpr_request_status(
-    current_status: DCPRRequestStatus,
-    transition_action: typing.Optional[DcprRequestModerationAction] = None,
+        current_status: DCPRRequestStatus,
+        transition_action: typing.Optional[DcprRequestModerationAction] = None,
 ) -> typing.Optional[DCPRRequestStatus]:
     # statuses related to request preparation/modification by the owner
     if current_status == DCPRRequestStatus.UNDER_PREPARATION:

@@ -29,6 +29,17 @@
                   </span>
                 {% endif %}
               {% endblock %}
+
+                {% block dcpr %}
+                {% if h.is_dcpr_request(package) %}
+                 <span class="dataset-dcpr badge bg-secondary pull-right">
+                    <i class="fa"></i>
+                    {{ _('DCPR') }}
+                </span>
+                {% endif %}
+
+                {% endblock %}
+
               {% block heading_meta %}
                 {% if package.get('state', '').startswith('draft') %}
                   <span class="label label-info">{{ _('Draft') }}</span>

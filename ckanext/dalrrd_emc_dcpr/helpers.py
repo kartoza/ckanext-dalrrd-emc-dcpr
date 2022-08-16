@@ -342,3 +342,11 @@ def get_dcpr_requests_approved_by_nsif(request_origin):
         "dcpr_request_list_awaiting_csi_moderation"
     )({"request_origin": request_origin})
     return dcpr_requests_approved_by_nsif
+
+
+def is_dcpr_request(package):
+
+    for extra in package.get('extras') or []:
+        if extra.get('key') == 'origin' and extra.get('value') == 'DCPR':
+            return True
+    return False
