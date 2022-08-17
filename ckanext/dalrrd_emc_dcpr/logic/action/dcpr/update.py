@@ -286,7 +286,7 @@ def dcpr_request_csi_moderate(
 
 def create_package_from_dcpr_request(
     context: typing.Dict, request_obj: dcpr_request.DCPRRequest, action
-) -> typing.Dict:
+) -> typing.Optional[typing.Any]:
     result = None
     if request_obj is not None:
         try:
@@ -294,8 +294,8 @@ def create_package_from_dcpr_request(
 
             ## TODO update the below mapping to use constants stored values
 
-            data_dict["name"] = request_obj.csi_reference_id
-            data_dict["title"] = request_obj.csi_reference_id
+            data_dict["name"] = request_obj.proposed_project_name
+            data_dict["title"] = request_obj.proposed_project_name
             data_dict["extras"] = [
                 {"key": "origin", "value": "DCPR"},
                 {"key": "type", "value": action},
