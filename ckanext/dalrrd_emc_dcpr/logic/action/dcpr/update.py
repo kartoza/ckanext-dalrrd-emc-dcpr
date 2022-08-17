@@ -272,15 +272,20 @@ def dcpr_request_csi_moderate(
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
 
-            if moderation_action == DcprRequestModerationAction.APPROVE:
-                create_package_from_dcpr_request(context, request_obj)
+            if moderation_action in [
+                DcprRequestModerationAction.APPROVE,
+                DcprRequestModerationAction.REJECT,
+            ]:
+                create_package_from_dcpr_request(
+                    context, request_obj, moderation_action
+                )
     else:
         raise toolkit.ObjectNotFound
     return result
 
 
 def create_package_from_dcpr_request(
-    context: typing.Dict, request_obj: dcpr_request.DCPRRequest
+    context: typing.Dict, request_obj: dcpr_request.DCPRRequest, action
 ) -> typing.Dict:
     result = None
     if request_obj is not None:
@@ -291,7 +296,10 @@ def create_package_from_dcpr_request(
 
             data_dict["name"] = request_obj.csi_reference_id
             data_dict["title"] = request_obj.csi_reference_id
-            data_dict["extras"] = [{"key": "origin", "value": "DCPR"}]
+            data_dict["extras"] = [
+                {"key": "origin", "value": "DCPR"},
+                {"key": "type", "value": action},
+            ]
             data_dict["private"] = False
             data_dict["owner_org"] = request_obj.organization_id
             data_dict["spatial_reference_system"] = "EPSG:4326"

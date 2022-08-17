@@ -36,6 +36,17 @@
                     <i class="fa"></i>
                     {{ _('DCPR') }}
                 </span>
+                {% set action = h.get_dcpr_request_action(package) %}
+                {% if action == "ACCEPT" %}
+                <span class="dataset-dcpr badge bg-primary pull-right">
+                    <i class="fa"></i>
+                    {{ _('Accepted') }}
+                </span>
+                {% else %}
+                <span class="dataset-dcpr badge bg-danger pull-right">
+                    <i class="fa"></i>
+                    {{ _('Rejected') }}
+                </span>
                 {% endif %}
 
                 {% endblock %}
