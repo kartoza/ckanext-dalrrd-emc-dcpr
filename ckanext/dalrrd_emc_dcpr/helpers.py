@@ -355,6 +355,6 @@ def is_dcpr_request(package):
 def get_dcpr_request_action(package):
 
     for extra in package.get("extras") or []:
-        if extra.get("key") == "action" and extra.get("value") == "ACCEPT":
+        if extra.get("key") == "action" and extra.get("value") == "APPROVE":
             return "ACCEPT"
     return "REJECT"

@@ -38,7 +38,7 @@
                  </span>
                 <br>
                 {% set action = h.get_dcpr_request_action(package) %}
-                {% if action.value == "ACCEPT" %}
+                {% if action == "ACCEPT" %}
                 <span class="dataset-dcpr label label-success pull-right"
                       title="Metadata record is from an approved DCPR request">
                     <i class="fa"></i>

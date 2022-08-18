@@ -292,9 +292,10 @@ def create_package_from_dcpr_request(
     if request_obj is not None:
         try:
             data_dict = {}
-            ## TODO update the below mapping to use constants stored values
 
-            data_dict["name"] = request_obj.proposed_project_name
+            package_name = request_obj.proposed_project_name.lower().replace(" ", "")
+
+            data_dict["name"] = package_name
             data_dict["title"] = request_obj.proposed_project_name
             data_dict["extras"] = [
                 {"key": "origin", "value": "DCPR"},
