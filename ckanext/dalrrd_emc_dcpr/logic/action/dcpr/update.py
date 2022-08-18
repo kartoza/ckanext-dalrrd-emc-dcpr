@@ -8,6 +8,7 @@ from .... import jobs
 from ....constants import (
     DcprRequestModerationAction,
     DcprManagementActivityType,
+    DCPRRequestRequiredFields,
     DCPRRequestStatus,
 )
 from ... import schema as dcpr_schema
@@ -291,28 +292,41 @@ def create_package_from_dcpr_request(
     if request_obj is not None:
         try:
             data_dict = {}
-
             ## TODO update the below mapping to use constants stored values
 
             data_dict["name"] = request_obj.proposed_project_name
             data_dict["title"] = request_obj.proposed_project_name
             data_dict["extras"] = [
                 {"key": "origin", "value": "DCPR"},
-                {"key": "type", "value": action},
+                {"key": "action", "value": action.value},
             ]
             data_dict["private"] = False
             data_dict["owner_org"] = request_obj.organization_id
-            data_dict["spatial_reference_system"] = "EPSG:4326"
-            data_dict["dataset_language"] = "en"
-            data_dict["dataset_character_set"] = "ucs-2"
-            data_dict["metadata_language"] = "en"
+            data_dict[
+                "spatial_reference_system"
+            ] = DCPRRequestRequiredFields.SPATIAL_REFERENCE_SYSTEM.value
+            data_dict[
+                "dataset_language"
+            ] = DCPRRequestRequiredFields.DATASET_LANGUAGE.value
+            data_dict[
+                "dataset_character_set"
+            ] = DCPRRequestRequiredFields.DATASET_CHARACTER_SET.value
+            data_dict[
+                "metadata_language"
+            ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
             data_dict["reference_date"] = dt.datetime.now(dt.timezone.utc)
-            data_dict["iso_topic_category"] = "location"
-            data_dict["lineage"] = "Formed from a DCPR request"
+            data_dict[
+                "iso_topic_category"
+            ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
+            data_dict["lineage"] = DCPRRequestRequiredFields.LINEAGE.value
             data_dict["maintainer"] = request_obj.owner_user
-            data_dict["equivalent_scale"] = "10"
-            data_dict["spatial_representation_type"] = "001"
-            data_dict["notes"] = "Default notes"
+            data_dict[
+                "equivalent_scale"
+            ] = DCPRRequestRequiredFields.EQUIVALENT_SCALE.value
+            data_dict[
+                "spatial_representation_type"
+            ] = DCPRRequestRequiredFields.SPATIAL_REPRESENTATION_TYPE.value
+            data_dict["notes"] = DCPRRequestRequiredFields.NOTES.value
 
             result = toolkit.get_action("package_create")(context, data_dict)
         except toolkit.NotAuthorized:

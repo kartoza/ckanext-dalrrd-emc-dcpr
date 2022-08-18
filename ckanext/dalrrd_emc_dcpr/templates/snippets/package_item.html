@@ -32,21 +32,25 @@
 
                 {% block dcpr %}
                 {% if h.is_dcpr_request(package) %}
-                 <span class="dataset-dcpr badge bg-secondary pull-right">
+                 <span class="dataset-dcpr label label-default pull-right">
                     <i class="fa"></i>
                     {{ _('DCPR') }}
-                </span>
+                 </span>
+                <br>
                 {% set action = h.get_dcpr_request_action(package) %}
-                {% if action == "ACCEPT" %}
-                <span class="dataset-dcpr badge bg-primary pull-right">
+                {% if action.value == "ACCEPT" %}
+                <span class="dataset-dcpr label label-success pull-right"
+                      title="Metadata record is from an approved DCPR request">
                     <i class="fa"></i>
                     {{ _('Accepted') }}
                 </span>
                 {% else %}
-                <span class="dataset-dcpr badge bg-danger pull-right">
+                <span class="dataset-dcpr label label-danger pull-right"
+                title="Metadata record is from a rejected DCPR request">
                     <i class="fa"></i>
                     {{ _('Rejected') }}
                 </span>
+                {% endif %}
                 {% endif %}
 
                 {% endblock %}
