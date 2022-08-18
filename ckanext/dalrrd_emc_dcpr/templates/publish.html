@@ -24,8 +24,14 @@
                     <h4 class="mb-0 fw-bolder mb-5">Metadata publication</h4>
                     <p>A registered and authenticated user can publish metadata using the following mechanism:</p>
                 </div>
-                <div class="row gx-5 justify-content-center">
+                {% set logged = False %}
+                {% if c.userobj %}
+                    {% set logged = True %}
+                {% endif %}
+                <div class="row gx-5 justify-content-center" data-module="check-access" data-access="{{ h.check_access('package_create') }}"
+                data-logged="{{ logged }}">
                      <!-- Manual publication -->
+                    <a href="#" data-link="{{ h.url_for('dataset.new') }}" class="new-dataset">
                     <div class="col-xs-6 col-md-4 publish-action">
                         <div class="card">
                             <div class="card-body p-5">
@@ -40,7 +46,18 @@
                             </div>
                         </div>
                     </div>
+                    </a>
                     <!-- XML upload -->
+                    <a href="#" onclick="document.getElementById('upload_input').click()" data-module="xml_parser" class="xml-upload"
+                    data-link="">
+                        <input type="file"
+                          id = "upload_input"
+                          name = "xml_dataset_files"
+                          onclick=""
+                          style="display: none;"
+                          multiple
+                          data-module="xml_parser"
+                        >
                     <div class="col-xs-6 col-md-4 publish-action">
                         <div class="card">
                             <div class="card-body p-5">
@@ -53,7 +70,9 @@
                             </div>
                         </div>
                     </div>
+                    </a>
                      <!-- Harvesting -->
+                    <a href="#" class="harvesting" data-link="">
                     <div class="col-xs-6 col-md-4 publish-action">
                         <div class="card">
                             <div class="card-body p-5">
@@ -66,7 +85,13 @@
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div>
         </section>
     </div>
+{% endblock %}
+{% block scripts %}
+    {{  super() }}
+    {% asset "ckanext-dalrrdemcdcpr/check-access-js" %}
+    {% asset "ckanext-dalrrdemcdcpr/xml-parser-js" %}
 {% endblock %}
