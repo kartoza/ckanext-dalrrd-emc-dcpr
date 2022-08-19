@@ -25,10 +25,10 @@ ckan.module('emc-facets-active', function (jQuery, _) {
             const filters = {
                 'organization': 'Organizations',
                 '_organization_limit': 'Organizations',
-                'vocab_sasdi_themes': 'SASDITheme',
+                'vocab_sasdi_themes': 'SASDIThemes',
                 '_vocab_sasdi_themes_limit': 'SASDITheme',
-                'vocab_iso_topic_categories': 'ISOTopicCategory',
-                '_vocab_iso_topic_categories_limit': 'ISOTopicCategory',
+                'vocab_iso_topic_categories': 'ISOTopicCategories',
+                '_vocab_iso_topic_categories_limit': 'ISOTopicCategories',
                 'tags': 'Tags',
                 '_tags_limit': 'Tags'
             };

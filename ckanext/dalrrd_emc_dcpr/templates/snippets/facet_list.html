@@ -20,8 +20,8 @@
                     {% set filters = {
                         'Organizations': 'fa fa-users',
                         'Tags': 'fa fa-tags',
-                        'SASDI Theme': 'fa fa-bars',
-                        'ISO Topic Category': 'fa fa-filter',
+                        'SASDI Themes': 'fa fa-bars',
+                        'ISO Topic Categories': 'fa fa-filter',
                         'Harvest source': 'fa fa-cloud',
 						'DCPR Request': 'fa fa-file',
                     } %}
@@ -32,6 +32,9 @@
                        aria-controls="{{ item_id }}" data-module="emc-filter-expand">
                       <i class="{{ filters[title] }}"></i>
                         {% set title = title or h.get_facet_title(name) %}
+                        {% if title == 'Organizations' %}
+                            {% set title = 'Organisations' %}
+                        {% endif %}
                         {{ title }}
                     </a>
                   </h2>

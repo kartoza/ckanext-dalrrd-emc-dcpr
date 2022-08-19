@@ -42,11 +42,16 @@ def emc_value_or_true_validator(value: typing.Union[str, Missing]):
 
 def emc_srs_validator(value: str) -> str:
     """Validator for a dataset's spatial_reference_system field"""
-    parsed_value = value.replace(" ", "").upper()
-    if parsed_value.count(":") == 0:
-        raise toolkit.Invalid(
-            toolkit._("Please provide a colon-separated value, e.g. EPSG:4326")
-        )
+
+    try:
+        parsed_value = value.replace(" ", "").upper()
+        if parsed_value.count(":") == 0:
+            raise toolkit.Invalid(
+                toolkit._("Please provide a colon-separated value, e.g. EPSG:4326")
+            )
+    except AttributeError:
+        value = "EPSG:4326"
+
     try:
         authority, code = value.split(":")
     except ValueError:
@@ -58,4 +63,5 @@ def emc_srs_validator(value: str) -> str:
             )
             % {"value": value}
         )
+
     return value

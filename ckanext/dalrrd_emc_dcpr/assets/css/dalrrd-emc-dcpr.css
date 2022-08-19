@@ -633,7 +633,7 @@ fieldset[disabled] .btn-default.focus {
 
 .footer-text {
   text-align: center;
-  color: #CCDEE3;
+  color: #fff;
   font-size: 14px;
   margin-top:3px
 }
@@ -772,4 +772,21 @@ fieldset[disabled] .btn-default.focus {
 
 .module .read-more a{
   color: #F3881C;
+}
+
+.publish-heading{
+  margin: auto;
+  width: 50%;
+}
+
+.heading-item{
+  float: left;
+}
+
+.publish-action {
+  min-height: 250px;
+}
+
+.publish-action .card{
+  min-height: 180px;
 }
