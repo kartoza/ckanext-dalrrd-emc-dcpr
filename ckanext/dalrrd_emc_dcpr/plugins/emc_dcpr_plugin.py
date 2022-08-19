@@ -335,6 +335,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_org_memberships": helpers.get_org_memberships,
             # added by mohab
             "dcpr_requests_approved_by_nsif": helpers.get_dcpr_requests_approved_by_nsif,
+            "is_dcpr_request": helpers.is_dcpr_request,
+            "get_dcpr_request_action": helpers.get_dcpr_request_action,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
