@@ -71,7 +71,7 @@
 							<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
 								<span class="item-label">{{ label_truncated }}</span>
 								<span class="hidden separator"> - </span>
-								<span class="item-count badge">{{ count }}</span>
+								<span class="item-count badge pull-righ">{{ count }}</span>
 							</a>
 							</li>
 							{% endif %}
@@ -87,13 +87,7 @@
                             {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
 						    <span class="item-label">{% if title == "SASDI Theme" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px" style="margin-bottom: 2px">{% endif %} {{ label_truncated }}</span>
 						    <span class="hidden separator"> - </span>
-						    <span class="item-count">({{ count }})</span>
-                            <div class="progress">
-                                {% set percent = count | int *100/total %}
-                              <div class="progress-bar" role="progressbar" aria-valuenow="{{ count }}"
-                              aria-valuemin="0" aria-valuemax="{{ total }}" style="width:{{ percent }}%">
-                              </div>
-                            </div>
+						    <span class="item-count badge pull-right">{{ count }}</span>
 						</a>
 					    </li>
 						{% endif %}
