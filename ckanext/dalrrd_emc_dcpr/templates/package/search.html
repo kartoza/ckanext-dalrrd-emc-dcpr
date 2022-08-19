@@ -2,6 +2,10 @@
 {# currently adding this js file isn't working
   it might have to do with droping volumes
 #}
+{% block scripts %}
+    {{ super() }}
+    {% asset "ckanext-dalrrdemcdcpr/xml-parser-js" %}
+{% endblock %}
 {% block breadcrumb_content %}
     <div class="page-header">
     {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
