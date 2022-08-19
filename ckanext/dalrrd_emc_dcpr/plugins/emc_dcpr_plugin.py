@@ -304,6 +304,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_end_date_after_start_date_validator": validators.dcpr_end_date_after_start_date_validator,
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
             "spatial_resolution_converter": converters.spatial_resolution_converter,
+            "extract_values_from_lineage_level_select": converters.extract_values_from_lineage_level_select,
         }
 
     def is_fallback(self) -> bool:

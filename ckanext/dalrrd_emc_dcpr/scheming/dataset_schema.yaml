@@ -19,7 +19,7 @@ dataset_fields:
   - field_name: name
     label: Field identifier
     preset: dataset_slug
-    form_placeholder: eg. my-dataset
+    form_placeholder: eg. my-dataset, this is auto-completed by default.
 
   - field_name: featured
     label: Feature dataset on EMC landing page?
@@ -101,17 +101,12 @@ dataset_fields:
   # vanilla ckanext-scheming too
   - field_name: metadata_point_of_contact
     label: Metadata point of contact
+    preset: modified_repeating_subfields
     repeating_subfields:
       - field_name: individual_name
         label: Individual name
         required: false
         help_text: name - with surname of the person responsible of this dataset
-
-      - field_name: owner_org
-        label: Organization
-        required: true
-        preset: emc_dataset_organization
-        help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
 
       - field_name: position_name
         label: Role / Position of the responsible individual
@@ -163,6 +158,12 @@ dataset_fields:
           - value: publisher
             label: publisher
 
+  - field_name: owner_org
+    label: Organization
+    required: true
+    preset: emc_dataset_organization
+    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
+
   - field_name: reference_date
     label: Reference date
     required: true
@@ -201,10 +202,18 @@ dataset_fields:
     display_snippet: vocab_tag_display.html
     # display_snippet: null
 
+  # - field_name: custom_tags
+  #   label: Custom_tags
+  # preset: emc_free_tags_tag_string_autocomplete
+  #   required: false
+  #   form_snippet: custom_tags.html tag_select
+
+
   - field_name: tag_string
     label: Tags
-    preset: emc_free_tags_tag_string_autocomplete
-    form_snippet: tag_select.html
+    # preset: emc_free_tags_tag_string_autocomplete
+    form_snippet: custom_tags.html
+    display_snippet: modified_repeating_subfields.html
     help_text: >-
       Additional keywords useful for describing the dataset. In order to optimize searchability, it is
       recommended to add at least three keywords
@@ -311,11 +320,99 @@ dataset_fields:
 
   - field_name: lineage
     label: Lineage
-    form_snippet: markdown.html
-    required: true
-    help_text: >-
-        General explanation of the data producer's knowledge about the lineage of
-        a dataset - This is a SANS 1878 mandatory field
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: level
+        label: Level
+        preset: select
+        validators: extract_values_from_lineage_level_select
+        choices:
+          - value: 001
+            label: Attribute
+          - value: 002
+            label: Attribute Type
+          - value: 003
+            label: Collection hardware
+          - value: 004
+            label: Collection session
+          - value: 005
+            label: Dataset
+          - value: 006
+            label: Series
+          - value: 007
+            label: Non geographic dataset
+          - value: 8
+            label: Dimension group
+          - value: 9
+            label: Feature
+          - value: 010
+            label: Property type
+          - value: 011
+            label: Field Session
+          - value: 012
+            label: Software
+          - value: 013
+            label: Service
+          - value: 014
+            label: Model
+      - field_name: lineage_statement
+        label: Statement
+        required: true
+        help_text: general explaination of the data producer's knowledge about the lineage of a dataset - - This is a SANS 1878 mandatory field
+      - field_name: process_step_description
+        label: Process step description
+        required: true
+        help_text: description of the event, including related parameters of tolerances
+      - field_name: process_step_rationale
+        label: Process step rationale
+        help_text: requirement purpose of the process setp
+
+      - field_name: process_step_datetime_from
+        label: Process step date time (from)
+        preset: date
+
+      - field_name: process_step_datetime_to
+        label: Process step date time (to)
+        preset: date
+
+
+      - field_name: processor_individual_name
+        label: Processor Individual name
+        required: false
+        help_text: name - with surname of the person responsible of processing this dataset
+
+      - field_name: processing_owner_org
+        label: Processing Organization
+        required: false
+        #preset: emc_dataset_organization
+        help_text: Organization responsible for processing the dataset
+
+      - field_name: processor_position_name
+        label: Role / Position of the processor individual
+        required: false
+        help_text: Role/ position of the responsible individual in the orgnization
+
+      - field_name: processor_address_city
+        label: Processor adderss - City
+        required: false
+
+      - field_name: processor_address_administrative_area
+        label: Processor address - Administrative area
+        required: false
+        help_text: province of the processor location
+
+      - field_name: processor_postal_code
+        label: Processor Postal Code
+        required: false
+
+      - field_name: processor_electronic_mail_address
+        label: Processor Electronic mail address
+        required: false
+        help_text: Address of the electronic mailbox of the responsible processing organization or individual
+
+
+
+
 
 #  - field_name: author
 #    label: Author
@@ -331,6 +428,7 @@ dataset_fields:
 
   - field_name: distribution
     label: Distribution information
+    preset: modified_repeating_subfields
     repeating_label: Distribution information
     repeating_subfields:
       # - field_name: distribution_format_name
@@ -397,6 +495,7 @@ dataset_fields:
 
   - field_name: maintenance_information
     label: Maintenance information
+    preset: modified_repeating_subfields
     repeating_subfields:
       - field_name: maintenance_and_update_frequency
         label: Maintenance and update frequency
@@ -506,6 +605,7 @@ dataset_fields:
 
   - field_name: reference_system_additional_info
     label: Additional information about Reference Systems
+    preset: modified_repeating_subfields
     repeating_subfields:
       - field_name: temporal_extent_period_duration_from
         label: Temporal extent duration (from)

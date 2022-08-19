@@ -78,3 +78,13 @@ def spatial_resolution_converter(value: str):
     if value == "":
         return -1
     return value
+
+
+def extract_values_from_lineage_level_select(data_dict, context):
+    """
+    while submitting the dataset the level field,
+    return the values as strings, we need to
+    submit the values instead.
+    """
+    logger.debug("extract values from lineage level ", data_dict)
+    return int(data_dict)

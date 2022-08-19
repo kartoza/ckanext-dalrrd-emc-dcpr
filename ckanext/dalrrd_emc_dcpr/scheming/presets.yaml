@@ -36,3 +36,10 @@ presets:
   - preset_name: spatial_resolution_checker
     values:
       validators: spatial_resolution_converter natural_number_validator
+
+
+  - preset_name: modified_repeating_subfields
+    values:
+      # validators: extract_values_from_lineage_level_select
+      form_snippet: modified_repeating_subfields.html
+      display_snippet: modified_repeating_subfields.html
