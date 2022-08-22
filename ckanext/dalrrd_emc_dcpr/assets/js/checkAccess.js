@@ -16,10 +16,26 @@ ckan.module("check-access", function ($){
 
         _onClick: function (event) {
             const logged = this.el.data('logged');
+            const access = this.el.data('access');
             const itself = event.target.closest("[data-link]")
             if(logged === 'False'){
                 itself.href='/user/login';
                 itself.click();
+            }
+            else {
+                if(access === 'False'){
+                    const modal = $('#notAuthorized');
+                    modal.modal('show');
+                }
+                else{
+                    if(itself.className !=='xml-upload'){
+                        console.log(itself)
+                        itself.href = itself.dataset['link']
+                    }
+                    else{
+                        $('#upload_input').click();
+                    }
+                }
             }
         }
     }
