@@ -576,7 +576,7 @@ fieldset[disabled] .btn-default.focus {
 
 .header-title {
   color: #FFFFFF;
-  font-size: 60px;
+  font-size: 50px;
 }
 
 .index-search {
@@ -609,6 +609,10 @@ fieldset[disabled] .btn-default.focus {
 
 .index-datasets {
   min-height: 400px;
+}
+
+.slide-img{
+  height: 300px;
 }
 
 .carousel-inner-img {
