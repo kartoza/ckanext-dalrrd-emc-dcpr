@@ -20,8 +20,8 @@
                     {% set filters = {
                         'Organizations': 'fa fa-users',
                         'Tags': 'fa fa-tags',
-                        'SASDI Theme': 'fa fa-bars',
-                        'ISO Topic Category': 'fa fa-filter',
+                        'SASDI Themes': 'fa fa-bars',
+                        'ISO Topic Categories': 'fa fa-filter',
                         'Harvest source': 'fa fa-cloud',
 						'DCPR Request': 'fa fa-file',
                     } %}
@@ -32,6 +32,9 @@
                        aria-controls="{{ item_id }}" data-module="emc-filter-expand">
                       <i class="{{ filters[title] }}"></i>
                         {% set title = title or h.get_facet_title(name) %}
+                        {% if title == 'Organizations' %}
+                            {% set title = 'Organisations' %}
+                        {% endif %}
                         {{ title }}
                     </a>
                   </h2>
@@ -68,7 +71,7 @@
 							<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
 								<span class="item-label">{{ label_truncated }}</span>
 								<span class="hidden separator"> - </span>
-								<span class="item-count badge">{{ count }}</span>
+								<span class="item-count badge pull-righ">{{ count }}</span>
 							</a>
 							</li>
 							{% endif %}
@@ -82,15 +85,9 @@
 						<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" data-module="emc-facets-active">
                             {% set sasdi = label if label != label_truncated else label_truncated %}
                             {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
-						    <span class="item-label">{% if title == "SASDI Theme" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px" style="margin-bottom: 2px">{% endif %} {{ label_truncated }}</span>
+						    <span class="item-label">{% if title == "SASDI Themes" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px" style="margin-bottom: 2px">{% endif %} {{ label_truncated }}</span>
 						    <span class="hidden separator"> - </span>
-						    <span class="item-count">({{ count }})</span>
-                            <div class="progress">
-                                {% set percent = count | int *100/total %}
-                              <div class="progress-bar" role="progressbar" aria-valuenow="{{ count }}"
-                              aria-valuemin="0" aria-valuemax="{{ total }}" style="width:{{ percent }}%">
-                              </div>
-                            </div>
+						    <span class="item-count badge pull-right">{{ count }}</span>
 						</a>
 					    </li>
 						{% endif %}

@@ -336,6 +336,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_org_memberships": helpers.get_org_memberships,
             # added by mohab
             "dcpr_requests_approved_by_nsif": helpers.get_dcpr_requests_approved_by_nsif,
+            "is_dcpr_request": helpers.is_dcpr_request,
+            "get_dcpr_request_action": helpers.get_dcpr_request_action,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
@@ -351,11 +353,11 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     ) -> typing.OrderedDict:
         if package_type != HARVEST_DATASET_TYPE_NAME:
             facets_dict[f"vocab_{constants.SASDI_THEMES_VOCABULARY_NAME}"] = toolkit._(
-                "SASDI Theme"
+                "SASDI Themes"
             )
             facets_dict[
                 f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"
-            ] = toolkit._("ISO Topic Category")
+            ] = toolkit._("ISO Topic Categories")
             facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
             facets_dict["dcpr_request"] = toolkit._("DCPR Request")

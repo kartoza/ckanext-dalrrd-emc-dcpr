@@ -8,6 +8,7 @@ from .... import jobs
 from ....constants import (
     DcprRequestModerationAction,
     DcprManagementActivityType,
+    DCPRRequestRequiredFields,
     DCPRRequestStatus,
 )
 from ... import schema as dcpr_schema
@@ -271,8 +272,67 @@ def dcpr_request_csi_moderate(
                 args=[activity["id"]],
             )
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
+
+            if moderation_action in [
+                DcprRequestModerationAction.APPROVE,
+                DcprRequestModerationAction.REJECT,
+            ]:
+                create_package_from_dcpr_request(
+                    context, request_obj, moderation_action
+                )
     else:
         raise toolkit.ObjectNotFound
+    return result
+
+
+def create_package_from_dcpr_request(
+    context: typing.Dict, request_obj: dcpr_request.DCPRRequest, action
+) -> typing.Optional[typing.Any]:
+    result = None
+    if request_obj is not None:
+        try:
+            data_dict = {}
+
+            package_name = request_obj.proposed_project_name.lower().replace(" ", "")
+
+            data_dict["name"] = package_name
+            data_dict["title"] = request_obj.proposed_project_name
+            data_dict["extras"] = [
+                {"key": "origin", "value": "DCPR"},
+                {"key": "action", "value": action.value},
+            ]
+            data_dict["private"] = False
+            data_dict["owner_org"] = request_obj.organization_id
+            data_dict[
+                "spatial_reference_system"
+            ] = DCPRRequestRequiredFields.SPATIAL_REFERENCE_SYSTEM.value
+            data_dict[
+                "dataset_language"
+            ] = DCPRRequestRequiredFields.DATASET_LANGUAGE.value
+            data_dict[
+                "dataset_character_set"
+            ] = DCPRRequestRequiredFields.DATASET_CHARACTER_SET.value
+            data_dict[
+                "metadata_language"
+            ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
+            data_dict["reference_date"] = dt.datetime.now(dt.timezone.utc)
+            data_dict[
+                "iso_topic_category"
+            ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
+            data_dict["lineage"] = DCPRRequestRequiredFields.LINEAGE.value
+            data_dict["maintainer"] = request_obj.owner_user
+            data_dict[
+                "equivalent_scale"
+            ] = DCPRRequestRequiredFields.EQUIVALENT_SCALE.value
+            data_dict[
+                "spatial_representation_type"
+            ] = DCPRRequestRequiredFields.SPATIAL_REPRESENTATION_TYPE.value
+            data_dict["notes"] = DCPRRequestRequiredFields.NOTES.value
+
+            result = toolkit.get_action("package_create")(context, data_dict)
+        except toolkit.NotAuthorized:
+            result = None
+
     return result
 
 
