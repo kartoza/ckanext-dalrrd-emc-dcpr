@@ -87,4 +87,19 @@ def extract_values_from_lineage_level_select(data_dict, context):
     submit the values instead.
     """
     logger.debug("extract values from lineage level ", data_dict)
-    return int(data_dict)
+    try:
+        return int(data_dict)
+    except:
+        raise toolkit.Invalid(
+            "lineage level should have an integer value per SANS 1878 code"
+        )
+
+
+def expand_tags_composite(data_dict, context):
+    """
+    expanding tags composite field
+    to a dict
+    """
+    # fieldnames -= set(data_dict)
+    # return data_dict
+    return data_dict

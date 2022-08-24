@@ -43,3 +43,9 @@ presets:
       # validators: extract_values_from_lineage_level_select
       form_snippet: modified_repeating_subfields.html
       display_snippet: modified_repeating_subfields.html
+
+  - preset_name: custom_tag_field
+    values:
+      form_snippet: custom_tags.html
+      display_snippet: modified_repeating_subfields.html
+      validators: ignore_missing expand_tags_composite

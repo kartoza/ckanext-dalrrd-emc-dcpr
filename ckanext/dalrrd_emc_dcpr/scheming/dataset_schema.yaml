@@ -28,7 +28,7 @@ dataset_fields:
     validators: boolean_validator
     preset: emc_checkbox
 
-  # this multiple checkbox is better to be implemented these two fields,
+  # this multiple checkbox is better to be implemented than these two fields,
   # but multiple checkbox has an issue
   # - field_name: metadata_standard_name
   #   label: Metadata standard name
@@ -211,13 +211,11 @@ dataset_fields:
 
   - field_name: tag_string
     label: Tags
-    # preset: emc_free_tags_tag_string_autocomplete
-    form_snippet: custom_tags.html
-    display_snippet: modified_repeating_subfields.html
+    #preset: emc_free_tags_tag_string_autocomplete
+    preset: custom_tag_field
     help_text: >-
       Additional keywords useful for describing the dataset. In order to optimize searchability, it is
       recommended to add at least three keywords
-    form_placeholder: eg. economy, mental health, government
 
   - field_name: license_id
     label: License

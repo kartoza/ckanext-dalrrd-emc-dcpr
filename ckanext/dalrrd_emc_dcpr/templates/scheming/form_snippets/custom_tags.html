@@ -1,6 +1,6 @@
 {% import 'macros/form.html' as form %}
 {% asset 'ckanext-dalrrdemcdcpr/facets-active-js' %}
-
+<!--
 {%
     set options=[
       {'value': '001', 'text': _('Discipline')}
@@ -10,21 +10,20 @@
     , {'value': "005", "text":_("Theme")}
     ]
 %}
-{% set tags_repeating_index = 0 %}
 {%- set extra_html = caller() if caller -%}
 {% set classes = (classes|list) %}
 {% call form.input_block(field.field_name, field.label, "", classes, extra_html=extra_html, is_required=false) %}
-<!-- <label class="control-label" for="repeating_custom_tag_row-index-0"> {{ field.label }} </label> -->
 <div class="repeating_custom_tag_row-index-0" id="repeating_custom_tag_row-index-0" data-module="repeating_tags_handler">
-    <div class="metadata_tags_holder">
+<p> {{ h.scheming_get_preset("custom_tag_field") }} </p> -->
+<!-- <div class="metadata_tags_holder">
         <div class="metadata_tags_styler">
             <div class="metadata_tags_input">
                     <label for="custom_delete" class="input-group-text">{{ _('Input tag') }}</label>
-                    <input class="form-control" id="repeating_custom_tag_row-index0-tag-input-index-0" type="text" name="repeating_custom_tag_row-index0-tag-input-index-0" value="" placeholder=""/>
+                    <input class="form-control" id="repeating_custom_tag_row-index0-tag-input-index-0" type="text" name="repeating_custom_tag-0-tag-input-index-0" value='{{ data.get("repeating_custom_tag-0-tag-input-index-0") }}' placeholder=""/>
             </div>
             <div class="metadata_tags_type_select">
                     <div><label for="tag_select" class="input-group-text">{{_('Input tag type')}}</label></div>
-                    <select id="tag_select" name="repeating_custom_tag_row-index0-select-input-index-0" required>
+                    <select id="tag_select" name="repeating_custom_tag-0-select_input_index-0">
                     {% for option in options %}
                         <option value="{{ option.value }}"{% if option.value == selected %} selected{% endif %}>{{ option.text or option.value }}</option>
                     {% endfor %}
@@ -39,5 +38,21 @@
         </div>
     </div>
 
+</div> -->
+<!-- <textarea id="{{ id or name }}" name="{{ name }}" cols="{{ cols }}" rows="{{ rows }}" placeholder="{{ placeholder }}">{{ value | empty_and_escape }}</textarea>
 </div>
+{% endcall %} -->
+{% set data = data["testing_field"]%}
+{% call
+
+    form.input_block(
+    field.fieldname ,
+    label = "Tags" ,
+    classes = ['control-medium']
+
+) %}
+<div>
+    <input name="testing_input" value="{{ data }}">
+</div>
+
 {% endcall %}
