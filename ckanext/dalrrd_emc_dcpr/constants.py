@@ -101,3 +101,15 @@ DATASET_MINIMAL_SET_OF_FIELDS = [
     "spatial_representation type",
     "spatial_reference_system",
 ]
+
+
+class DCPRRequestRequiredFields(enum.Enum):
+    SPATIAL_REFERENCE_SYSTEM = "EPSG:4326"
+    DATASET_LANGUAGE = "en"
+    DATASET_CHARACTER_SET = "ucs-2"
+    METADATA_LANGUAGE = "en"
+    ISO_TOPIC_CATEGORY = "location"
+    LINEAGE = "Formed from a DCPR request"
+    EQUIVALENT_SCALE = "10"
+    SPATIAL_REPRESENTATION_TYPE = "001"
+    NOTES = "Default notes"

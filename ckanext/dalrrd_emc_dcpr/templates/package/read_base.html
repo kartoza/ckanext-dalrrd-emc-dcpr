@@ -34,3 +34,9 @@
         {% endif %}
     {% endif %}
 {% endblock %}
+{% block secondary_content %}
+    {% if pkg.spatial %}
+        {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=pkg.spatial %}
+    {% endif %}
+    {{ super() }}
+{% endblock %}

@@ -43,8 +43,8 @@ def emc_bbox_converter(value: str) -> str:
         logger.exception(msg="something failed")
         raise toolkit.Invalid(error_msg)
 
-    except TypeError:
-        if value == "":
+    except (AttributeError, TypeError):
+        if value == "" or not isinstance(value, str):
             value = "-22.1265, 16.4699, -34.8212, 32.8931"
         values = value.split(",")
         bbox_coords = [float(i) for i in values]

@@ -78,3 +78,9 @@ xml-parser-js:
   contents:
     - js/xmlParser.js
   filter: rjsmin
+
+check-access-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_checkAccess.js
+  contents:
+    - js/checkAccess.js
+  filter: rjsmin
