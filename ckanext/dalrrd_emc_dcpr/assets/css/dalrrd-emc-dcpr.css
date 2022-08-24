@@ -815,3 +815,8 @@ footer {
 .publish-action .card{
   min-height: 180px;
 }
+
+/* Modal */
+.modal-dialog {
+  margin-top: 70px;
+}
