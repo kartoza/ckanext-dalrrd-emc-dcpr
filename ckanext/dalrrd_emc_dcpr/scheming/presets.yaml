@@ -40,7 +40,7 @@ presets:
 
   - preset_name: modified_repeating_subfields
     values:
-      # validators: extract_values_from_lineage_level_select
+      validators: convert_choices_select_to_int
       form_snippet: modified_repeating_subfields.html
       display_snippet: modified_repeating_subfields.html
 
@@ -48,4 +48,4 @@ presets:
     values:
       form_snippet: custom_tags.html
       display_snippet: modified_repeating_subfields.html
-      validators: ignore_missing expand_tags_composite
+      validators: ignore_missing

@@ -84,23 +84,38 @@ class DcprRequestModerationAction(enum.Enum):
 
 DATASET_MINIMAL_SET_OF_FIELDS = [
     "title",
+    "name",
+    "metadata_standard_name",
+    "metadata_standard_version",
     "notes",
     "purpose",
+    "status",
+    "metadata_point_of_contact-0-orgnizational_role",
     "reference_date",
-    "reference_system_info",
     "iso_topic_category",
     "organization",
     "private",
-    "status",
     "dataset_language",
-    "metadata_language" "dataset_character_set",
-    "lineage",
+    "metadata_language",
+    "dataset_character_set",
+    "lineage-0-lineage_statement",
+    "lineage-0-process_step_description",
+    "distribution-0-distributor_contact",
     "maintainer",
     "spatial",
     "equivalent_scale",
-    "spatial_representation type",
+    "spatial_representation_type",
     "spatial_reference_system",
+    "metadata_stamp",
 ]
+# choices fields
+# status
+# metadata_point_of_contact-0-orgnizational_role
+# dataset_character_set
+# dataset_character_set
+# spatial_representation_type
+
+# the equivalent_scale is teh spatial resolution field
 
 
 class DCPRRequestRequiredFields(enum.Enum):

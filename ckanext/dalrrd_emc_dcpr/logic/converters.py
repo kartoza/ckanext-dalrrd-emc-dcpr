@@ -80,13 +80,16 @@ def spatial_resolution_converter(value: str):
     return value
 
 
-def extract_values_from_lineage_level_select(data_dict, context):
+def convert_choices_select_to_int(data_dict, context):
     """
-    while submitting the dataset the level field,
-    return the values as strings, we need to
-    submit the values instead.
+    while submitting the select choices numerical
+    values, they are returned as strings,
+    they should be submitted as ints, otherwises
+    a value error would be raised.
     """
-    logger.debug("extract values from lineage level ", data_dict)
+    # TODO: adding the field name for proper loggin
+
+    logger.debug("convert select choices to int ", data_dict)
     try:
         return int(data_dict)
     except:
@@ -95,11 +98,12 @@ def extract_values_from_lineage_level_select(data_dict, context):
         )
 
 
-def expand_tags_composite(data_dict, context):
-    """
-    expanding tags composite field
-    to a dict
-    """
-    # fieldnames -= set(data_dict)
-    # return data_dict
-    return data_dict
+# def expand_tags_composite(data_dict, context):
+#     """
+#     expanding tags composite field
+#     to a dict
+#     """
+#     # fieldnames -= set(data_dict)
+#     # return data_dict
+#     raise RuntimeError(data_dict)
+#     return data_dict

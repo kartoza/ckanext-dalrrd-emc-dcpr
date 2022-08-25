@@ -208,14 +208,46 @@ dataset_fields:
   #   required: false
   #   form_snippet: custom_tags.html tag_select
 
-
   - field_name: tag_string
     label: Tags
-    #preset: emc_free_tags_tag_string_autocomplete
-    preset: custom_tag_field
+    preset: emc_free_tags_tag_string_autocomplete
+    form_snippet: tag_select.html
     help_text: >-
       Additional keywords useful for describing the dataset. In order to optimize searchability, it is
       recommended to add at least three keywords
+    form_placeholder: eg. economy, mental health, government
+
+  # - field_name: tag_string
+  #   label: Tags
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+  #     - field_name: tag_name
+  #       label: Tag name
+  #       preset: emc_free_tags_tag_string_autocomplete
+  #       required: false
+  #       form_placeholder: E.g. economy
+  #       validators: ignore_missing
+  #       help_text: >-
+  #         Additional keywords useful for describing the dataset. In order to optimize searchability, it is
+  #         recommended to add at least three keywords, press "Add" button below.
+
+  #     - field_name: tag_type
+  #       label: Tag type
+  #       required: false
+  #       preset: select
+  #       validators: ignore_missing convert_choices_select_to_int
+  #       choices:
+  #         - value: 001
+  #           label: Discipline
+  #         - value: 002
+  #           label: Place
+  #         - value: 003
+  #           label: Stratum
+  #         - value: 004
+  #           label: Temporal
+  #         - value: 005
+  #           label: Theme
+
 
   - field_name: license_id
     label: License
@@ -323,7 +355,7 @@ dataset_fields:
       - field_name: level
         label: Level
         preset: select
-        validators: extract_values_from_lineage_level_select
+        validators: convert_choices_select_to_int
         choices:
           - value: 001
             label: Attribute
@@ -407,10 +439,6 @@ dataset_fields:
         label: Processor Electronic mail address
         required: false
         help_text: Address of the electronic mailbox of the responsible processing organization or individual
-
-
-
-
 
 #  - field_name: author
 #    label: Author
