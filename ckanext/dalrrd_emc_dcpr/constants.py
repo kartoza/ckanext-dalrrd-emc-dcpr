@@ -93,7 +93,7 @@ DATASET_MINIMAL_SET_OF_FIELDS = [
     "metadata_point_of_contact-0-orgnizational_role",
     "reference_date",
     "iso_topic_category",
-    "organization",
+    "owner_org",
     "private",
     "dataset_language",
     "metadata_language",
@@ -106,7 +106,7 @@ DATASET_MINIMAL_SET_OF_FIELDS = [
     "equivalent_scale",
     "spatial_representation_type",
     "spatial_reference_system",
-    "metadata_stamp",
+    "metadata_date_stamp",
 ]
 # choices fields
 # status
@@ -179,7 +179,7 @@ DATASET_FULL_SET_OF_FIELDS = [
     "reference_system_additional_info-0-temporal_extent_period_duration_to",
     "minimum_vertical_extent",
     "maximum_vertical_extent",
-    "metadata_stamp",
+    "metadata_date_stamp",
 ]
 
 

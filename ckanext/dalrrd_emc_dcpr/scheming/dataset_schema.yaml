@@ -355,6 +355,7 @@ dataset_fields:
       - field_name: level
         label: Level
         preset: select
+        required: false
         validators: convert_choices_select_to_int
         choices:
           - value: 001

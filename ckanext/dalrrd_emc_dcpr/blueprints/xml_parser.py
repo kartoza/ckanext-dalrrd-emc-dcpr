@@ -1,17 +1,16 @@
-from pydoc import describe
-from flask import request, Response, abort, redirect, jsonify, Blueprint
+from flask import request, Response, jsonify, Blueprint
 from ckan.plugins import toolkit
 import xml.dom.minidom as dom
 import logging
-import json
 from datetime import datetime
-from ..constants import DATASET_MINIMAL_SET_OF_FIELDS as xml_minimal_set
-
+from ..constants import DATASET_MINIMAL_SET_OF_FIELDS as xml_minimum_set, DATASET_FULL_SET_OF_FIELDS as xml_full_set
+import os
 # About this Blueprint:
 # -------------
 # parsing xml file to extract info
 # necessary to create a dataset,
 # calls dataset create action.
+# use it as root_url/dataset/xml_parser/
 
 logger = logging.getLogger(__name__)
 
@@ -36,116 +35,135 @@ def extract_files():
     xml_files = request.files.getlist("xml_dataset_files")
     # loggin the request files.
     logger.debug("from xml parser blueprint, the xmlfiles object should be:", xml_files)
+    check_result = check_file_fields(xml_files)
+    if check_result is None:
+        return "something went wrong during dataset creation!"
+    if check_result["state"] == False:
+        return jsonify(check_result["msg"])
+    return Response(response="package created !", status=200)
 
-    for _file in xml_files:
-        check_results = parse_xml_dataset_upload(_file)
-        if check_results["state"] == False:
-            return jsonify(check_results["msg"])
-    return Response(status=200)
 
-
-def check_file_fields(xml_files) -> list:
+def check_file_fields(xml_files) -> dict:
     """
-    check if the each xml file holds
-    fields more than the maximum
-    set of fields, if so raises
-    an error.
+    performs different checks over
+    the xml files.
 
     returns:
     -----
-    a list of parsed dom root
-    elements.
+    object with status: False and a message
+    or status:True.
     """
-    roots = []
+    root = None
     for xml_file in xml_files:
-        dom_ob = dom.parse(xml_file)
-        root = dom_ob.firstChild
-        roots.append(root)
-        if root.hasChildNodes():
-            pass
-    return roots
+        # has data check
+        dataset = file_has_xml_dataset(xml_file)
+        if dataset["state"]:
+            root = dataset["root"]
+        else:
+            return dataset["msg"]
+        if root is not None:
+            # return and object of the root
+            root = return_object_root(root)
+            # has field more than maximum set
+            maximum_fields_check_ob = maximum_fields_check(root)
+            if maximum_fields_check_ob["state"] == False:
+                return {"state":False, "msg":maximum_fields_check_ob["msg"]}
+            # has field less than minimum set    
+            minimum_set_check_ob = minimum_set_check(root)
+            if minimum_set_check_ob["state"] == False:
+                return {"state":False, "msg":minimum_set_check_ob["msg"]}
+            root = handle_date_fields(root)
+            create_ckan_dataset(root)
+            # things went ok
+            return {"state":True}
+        else:
+            return {"state":False, "msg":"something went wrong during dataset creation"}
 
 
-def parse_xml_dataset_upload(xml_file):
+def file_has_xml_dataset(xml_file):
     """
-    parse xml file via dom lib,
+    parses the file, 
+    checks if file has a
+    dataset within it and 
+    returns it.
     """
-    logger.debug("from xml parser blueprint", xml_file)
     dom_ob = dom.parse(xml_file)
     root = dom_ob.firstChild
-    fields_ob = {}
     if root.hasChildNodes():
-        for field in root.childNodes:
-            # extract_tags(field)
-            # nodeType is end of line character,
-            # we need to skip it
-            if field.nodeType != 3 and field.tagName == "reference_date":
-                date_field = handle_date_field(field)
-                fields_ob.update(date_field)
-            elif field.nodeType != 3:
-                fields_ob.update({field.tagName: field.childNodes[0].data})
-    slug_url_field = fields_ob["title"].replace(" ", "-")
-    fields_ob.update({"name": slug_url_field})
-    # checks
-    # minimal set check
-    minimal_check = minimal_set_check(fields_ob, xml_minimal_set)
-    if minimal_check["state"] == False:
-        return minimal_check
-    create_action = toolkit.get_action("package_create")
-    create_action(data_dict=fields_ob)
+        return {"state":True,"root":root}
+    else:
+        return {"state":False, "msg":f"file {xml_file.filename} is empty!"}
 
+def return_object_root(root):
+    """
+    transform the xml dom
+    root into an object of
+    tag_name:tag_value
+    """
+    ob_root = {}
+    for field in root.childNodes:
+        if field.nodeType != 3:
+            ob_root[field.tagName] = field.childNodes[0].data
+    
+    return ob_root
+
+def maximum_fields_check(root_ob):
+    """
+    checking if the provided field
+    is more than the maximum set
+    of EMC datasets fields.
+    """
+    root_ob_keys = root_ob.keys()
+    for field in root_ob_keys:
+        if field not in xml_full_set:
+                return {"state":False, "msg":f"field \"{field}\" "+ 
+                "is not within the maximum set of allowed xml fields"} 
+    return {"state":True}
+
+def minimum_set_check(root_ob: dict):
+    """
+    checking if the xml file fields
+    has the minimum required set.
+    """
+    # adding field "name" later dynamically 
+    for tag in xml_minimum_set:
+        if tag not in root_ob:
+            if tag !="name":
+                msg = f"{tag} is a required missing field"
+                return {"state": False, "msg": msg}
+    return {"state": True}
+
+def handle_date_fields(root_ob):
+    """
+    date fields need to be 
+    iso compliant inorder
+    to create the package,
+    transform date strings
+    to dates. 
+    """
+    date_fields = ["reference_date"]
+    for field in date_fields:
+        iso_date_field = handle_date_field(root_ob[field])
+        root_ob.update(iso_date_field)
+    return root_ob
+
+
+def create_ckan_dataset(root_ob):
+    """
+    create package via ckan api's
+    package_create action.
+    """
+    logger.debug("from xml parser blueprint", root_ob)
+    slug_url_field = root_ob["title"].replace(" ", "-")
+    root_ob.update({"name": slug_url_field})
+    create_action = toolkit.get_action("package_create")
+    create_action(data_dict=root_ob)
+    return {"state":True}
 
 def handle_date_field(date_field):
     """
     returns a date from iso-string
     YY-MM-DDTHH:MM:SS
     """
-    date_ob = {}
-    date_string = date_field.childNodes[0].data
-    date_ob["iso_date"] = datetime.fromisoformat(date_string)
-
-    return {date_field.tagName: date_ob["iso_date"]}
-
-
-def minimal_set_check(field_ob: dict, minimal_set: list):
-    """
-    getting all the tag names
-    to check if the satisfy the
-    minimal set of required tags
-    """
-    available_tags = list(field_ob.keys())
-    for tag in minimal_set:
-        if tag not in available_tags:
-            # flash and abort
-            msg = f"{tag} is a required missing field"
-            return {"state": False, "msg": msg}
-    return {"state": True}
-
-
-def missing_values_check():
-    """
-    the tag is there, but the
-    value is not
-    """
-    pass
-
-
-def additional_fields_check(field_name):
-    """
-    checking if the provided field
-    is more than the
-    """
-
-
-# xml_tags = []
-# def extract_tags(root):
-#     """
-#         getting all the tag names
-#         to check if the satisfy the
-#         minimal set of required tags
-#     """
-#     if root.hasChildNodes():
-#         xml_tags.append(root.tagName)
-#         for field in root.childNodes:
-#             if field.nodeType != 3:
-#                 extract_tags(field)
+    iso_date = datetime.fromisoformat(date_field)
+    return {date_field: iso_date}
