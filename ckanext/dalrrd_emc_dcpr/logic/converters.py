@@ -93,9 +93,7 @@ def convert_choices_select_to_int(data_dict, context):
     try:
         return int(data_dict)
     except:
-        raise toolkit.Invalid(
-            "lineage level should have an integer value per SANS 1878 code"
-        )
+        raise toolkit.Invalid("select field should have a string value")
 
 
 # def expand_tags_composite(data_dict, context):

@@ -7,6 +7,12 @@ import json
 from datetime import datetime
 from ..constants import DATASET_MINIMAL_SET_OF_FIELDS as xml_minimal_set
 
+# About this Blueprint:
+# -------------
+# parsing xml file to extract info
+# necessary to create a dataset,
+# calls dataset create action.
+
 logger = logging.getLogger(__name__)
 
 xml_parser_blueprint = Blueprint(
@@ -20,13 +26,17 @@ xml_parser_blueprint = Blueprint(
 @xml_parser_blueprint.route("/", methods=["GET", "POST"])
 def extract_files():
     """
-    parsing xml file to extract info
-    necessary to create a dataset,
-    calls dataset create action
+    the blueprint allows for multiple
+    files to be sent at once, extract
+    each and call parse_xml_dataset.
+    retutn success after all files
+    parsed.
     """
     # files = request.files.to_dict()
     xml_files = request.files.getlist("xml_dataset_files")
+    # loggin the request files.
     logger.debug("from xml parser blueprint, the xmlfiles object should be:", xml_files)
+
     for _file in xml_files:
         check_results = parse_xml_dataset_upload(_file)
         if check_results["state"] == False:
@@ -34,8 +44,33 @@ def extract_files():
     return Response(status=200)
 
 
+def check_file_fields(xml_files) -> list:
+    """
+    check if the each xml file holds
+    fields more than the maximum
+    set of fields, if so raises
+    an error.
+
+    returns:
+    -----
+    a list of parsed dom root
+    elements.
+    """
+    roots = []
+    for xml_file in xml_files:
+        dom_ob = dom.parse(xml_file)
+        root = dom_ob.firstChild
+        roots.append(root)
+        if root.hasChildNodes():
+            pass
+    return roots
+
+
 def parse_xml_dataset_upload(xml_file):
-    logger.debug("from xml parser blueprint")
+    """
+    parse xml file via dom lib,
+    """
+    logger.debug("from xml parser blueprint", xml_file)
     dom_ob = dom.parse(xml_file)
     root = dom_ob.firstChild
     fields_ob = {}
@@ -93,6 +128,13 @@ def missing_values_check():
     value is not
     """
     pass
+
+
+def additional_fields_check(field_name):
+    """
+    checking if the provided field
+    is more than the
+    """
 
 
 # xml_tags = []
