@@ -1,10 +1,12 @@
 from flask import request, Response, jsonify, Blueprint
 from ckan.plugins import toolkit
+from ckan import model
+from ckan.logic import ValidationError
+from ckan.lib.mailer import mail_user, MailerException
 import xml.dom.minidom as dom
 import logging
 from datetime import datetime
 from ..constants import DATASET_MINIMAL_SET_OF_FIELDS as xml_minimum_set, DATASET_FULL_SET_OF_FIELDS as xml_full_set
-import os
 # About this Blueprint:
 # -------------
 # parsing xml file to extract info
@@ -13,6 +15,7 @@ import os
 # use it as root_url/dataset/xml_parser/
 
 logger = logging.getLogger(__name__)
+creator = ""
 
 xml_parser_blueprint = Blueprint(
     "xml_parser",
@@ -35,15 +38,30 @@ def extract_files():
     xml_files = request.files.getlist("xml_dataset_files")
     # loggin the request files.
     logger.debug("from xml parser blueprint, the xmlfiles object should be:", xml_files)
-    check_result = check_file_fields(xml_files)
-    if check_result is None:
-        return "something went wrong during dataset creation!"
-    if check_result["state"] == False:
-        return jsonify(check_result["msg"])
-    return Response(response="package created !", status=200)
+    err_msgs = []
+    info_msgs = [] 
+    for xml_file in xml_files:
+        check_result = check_file_fields(xml_file)
+        if check_result is None:
+            err_msgs.append(f"something went wrong during \"{xml_file.filename}\" dataset creation!")
+        if check_result["state"] == False:
+            err_msgs.append(check_result["msg"])
+        else:
+            info_msgs.append(check_result["msg"]) 
+    # aggregate messages
+    if len(err_msgs)>0:
+        res = {"info_msgs":info_msgs, "err_msgs":err_msgs}
+        send_email_to_creator(res)
+        return jsonify({"response":res})
+
+    else:
+    # only when all packages are created
+        res = {"info_msgs":info_msgs, "err_msgs":err_msgs}
+        send_email_to_creator(res)
+        return jsonify({"response":"all packages were created", "status":200})
 
 
-def check_file_fields(xml_files) -> dict:
+def check_file_fields(xml_file) -> dict:
     """
     performs different checks over
     the xml files.
@@ -54,30 +72,29 @@ def check_file_fields(xml_files) -> dict:
     or status:True.
     """
     root = None
-    for xml_file in xml_files:
-        # has data check
-        dataset = file_has_xml_dataset(xml_file)
-        if dataset["state"]:
-            root = dataset["root"]
-        else:
-            return dataset["msg"]
-        if root is not None:
-            # return and object of the root
-            root = return_object_root(root)
-            # has field more than maximum set
-            maximum_fields_check_ob = maximum_fields_check(root)
-            if maximum_fields_check_ob["state"] == False:
-                return {"state":False, "msg":maximum_fields_check_ob["msg"]}
-            # has field less than minimum set    
-            minimum_set_check_ob = minimum_set_check(root)
-            if minimum_set_check_ob["state"] == False:
-                return {"state":False, "msg":minimum_set_check_ob["msg"]}
-            root = handle_date_fields(root)
-            create_ckan_dataset(root)
-            # things went ok
-            return {"state":True}
-        else:
-            return {"state":False, "msg":"something went wrong during dataset creation"}
+    # has data check
+    dataset = file_has_xml_dataset(xml_file)
+    file_name_reference = xml_file.filename
+    if dataset["state"]:
+        root = dataset["root"]
+    else:
+        return dataset["msg"]
+    if root is not None:
+        # return and object of the root
+        root = return_object_root(root)
+        # has field more than maximum set
+        maximum_fields_check_ob = maximum_fields_check(root, file_name_reference)
+        if maximum_fields_check_ob["state"] == False:
+            return {"state":False, "msg":maximum_fields_check_ob["msg"]}
+        # has field less than minimum set    
+        minimum_set_check_ob = minimum_set_check(root, file_name_reference)
+        if minimum_set_check_ob["state"] == False:
+            return {"state":False, "msg":minimum_set_check_ob["msg"]}
+        root = handle_date_fields(root)
+        return create_ckan_dataset(root)
+        # things went ok
+    else:
+        return {"state":False, "msg":"something went wrong during dataset creation"}
 
 
 def file_has_xml_dataset(xml_file):
@@ -107,7 +124,7 @@ def return_object_root(root):
     
     return ob_root
 
-def maximum_fields_check(root_ob):
+def maximum_fields_check(root_ob, file_name_reference:str):
     """
     checking if the provided field
     is more than the maximum set
@@ -117,10 +134,11 @@ def maximum_fields_check(root_ob):
     for field in root_ob_keys:
         if field not in xml_full_set:
                 return {"state":False, "msg":f"field \"{field}\" "+ 
-                "is not within the maximum set of allowed xml fields"} 
+                f"in the file \"{file_name_reference}\" is not within the "+ 
+                "maximum set of allowed xml fields"} 
     return {"state":True}
 
-def minimum_set_check(root_ob: dict):
+def minimum_set_check(root_ob: dict, file_name_reference:str):
     """
     checking if the xml file fields
     has the minimum required set.
@@ -129,7 +147,7 @@ def minimum_set_check(root_ob: dict):
     for tag in xml_minimum_set:
         if tag not in root_ob:
             if tag !="name":
-                msg = f"{tag} is a required missing field"
+                msg = f"field \"{tag}\" is a required field, missed in file \"{file_name_reference}\""
                 return {"state": False, "msg": msg}
     return {"state": True}
 
@@ -154,11 +172,17 @@ def create_ckan_dataset(root_ob):
     package_create action.
     """
     logger.debug("from xml parser blueprint", root_ob)
-    slug_url_field = root_ob["title"].replace(" ", "-")
+    package_title = root_ob['title']
+    slug_url_field = package_title.replace(" ", "-")
     root_ob.update({"name": slug_url_field})
     create_action = toolkit.get_action("package_create")
-    create_action(data_dict=root_ob)
-    return {"state":True}
+    try:
+        created_package = create_action(data_dict=root_ob)
+        global creator 
+        creator = get_creator_id(created_package)
+    except ValidationError as e:
+        return {"state":False, "msg":f"error creating package \"{package_title}\": "+e.error_summary["Name"]}
+    return {"state":True, "msg":f"package \"{package_title}\" were created"}
 
 def handle_date_field(date_field):
     """
@@ -167,3 +191,43 @@ def handle_date_field(date_field):
     """
     iso_date = datetime.fromisoformat(date_field)
     return {date_field: iso_date}
+
+def get_creator_id(ckan_package_ob):
+    """
+    extract the user id from
+    the created package object 
+    """
+    user_id = ckan_package_ob["creator_user_id"]
+    user_ob = model.User.get(user_id)
+    #user_dict = model.User.get(user_id).as_dict()
+    #user_email = user_dict.get("email")
+    return user_ob
+
+def send_email_to_creator(res):
+    """
+    per issue #105 we need
+    to send emails to creator
+    for mail_user function
+    check https://github.com/ckan/ckan/blob/master/ckan/lib/mailer.py
+    """
+    #res = {"info_msgs":info_msgs, "err_msgs":err_msgs}
+    global creator
+    msg_body = "xml upload process completed, please navigate to the"+ \
+    "following messages: \n"
+    created_packages_msgs = res["info_msgs"]
+    error_packages_msgs = res["err_msgs"]
+    msg_body+="created packages: \n"
+    for msg in created_packages_msgs:
+        msg_body+=f"{msg} \n"
+    msg_body+="packages with errors upon creation \n"
+    for msg in error_packages_msgs:
+        msg_body+=f"{msg} \n"
+    try:
+        mail_user(
+        creator,
+        subject="creating dataset via xml upload",
+        body= msg_body
+    )
+    except MailerException as e:
+        return jsonify({"msg":e})
+    return jsonify({"msg":"mail should be sent to the creator"})
