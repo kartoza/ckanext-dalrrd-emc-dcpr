@@ -81,7 +81,7 @@ ckan.module("xml_parser",function($){
             }
 
             let flash_box = document.getElementsByClassName("flash-messages")[0]
-            
+
             let msg_box_creation = function(class_list, msg){
                 // DRY
                 let info_or_err = document.createElement("div")
@@ -92,7 +92,7 @@ ckan.module("xml_parser",function($){
                 info_or_err.classList.add(...class_list)
                 info_or_err.innerHTML = msg
                 info_or_err.append(close_btn)
-                flash_box.append(info_or_err)    
+                flash_box.append(info_or_err)
             }
 
             fetch(window.location.href.split('?')[0]+'xml_parser/',{method:"POST", body:formData}).
@@ -107,7 +107,7 @@ ckan.module("xml_parser",function($){
                     for(let info of info_msgs){
                         msg_box_creation(["alert","fade-in","alert-info"], info)
                     }
-                    
+
                     flash_box.style.display = "block"
                     // window.location.reload()
                 }

@@ -18,5 +18,3 @@ ckan.module("xml_parser",function($){
         }
     }
 })
-
-
