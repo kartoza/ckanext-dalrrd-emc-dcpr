@@ -11,6 +11,7 @@ from ..constants import (
     DATASET_MINIMAL_SET_OF_FIELDS as xml_minimum_set,
     DATASET_FULL_SET_OF_FIELDS as xml_full_set,
 )
+from xml.parsers.expat import ExpatError
 
 # About this Blueprint:
 # -------------
@@ -20,7 +21,6 @@ from ..constants import (
 # use it as root_url/dataset/xml_parser/
 
 logger = logging.getLogger(__name__)
-creator = c.user
 
 xml_parser_blueprint = Blueprint(
     "xml_parser",
@@ -28,6 +28,8 @@ xml_parser_blueprint = Blueprint(
     url_prefix="/dataset/xml_parser",
     template_folder="templates",
 )
+
+creator = ""
 
 
 @xml_parser_blueprint.route("/", methods=["GET", "POST"])
@@ -40,6 +42,8 @@ def extract_files():
     parsed.
     """
     # files = request.files.to_dict()
+    global creator
+    creator = c.userobj
     xml_files = request.files.getlist("xml_dataset_files")
     # loggin the request files.
     logger.debug("from xml parser blueprint, the xmlfiles object should be:", xml_files)
@@ -111,27 +115,23 @@ def file_has_xml_dataset(xml_file):
     dataset within it and
     returns it.
     """
-
-    contents = xml_file.read()
-    if contents.count(b"<") <= 1:
+    try:
+        dom_ob = dom.parse(xml_file)
+    except ExpatError:
         """
-        this causes a problem with
-        the creator as we want to send
-        email, and for the creator to
-        be set, a package must be created
-        to get the creator of it.
+        this happens when the file is
+        completely empty without any tags
         """
         return {"state": False, "msg": f"file {xml_file.filename} is empty!"}
+
+    root = dom_ob.firstChild
+    if root.hasChildNodes():
+        """
+        this will cause the same problem as above
+        """
+        return {"state": True, "root": root}
     else:
-        dom_ob = dom.parse(xml_file)
-        root = dom_ob.firstChild
-        if root.hasChildNodes():
-            """
-            this will cause the same problem as above
-            """
-            return {"state": True, "root": root}
-        else:
-            return {"state": False, "msg": f"file {xml_file.filename} is empty!"}
+        return {"state": False, "msg": f"file {xml_file.filename} is empty!"}
 
 
 def return_object_root(root):
@@ -206,9 +206,7 @@ def create_ckan_dataset(root_ob):
     root_ob.update({"name": slug_url_field})
     create_action = toolkit.get_action("package_create")
     try:
-        created_package = create_action(data_dict=root_ob)
-        global creator
-        creator = get_creator_id(created_package)
+        create_action(data_dict=root_ob)
     except ValidationError as e:
         return {
             "state": False,
@@ -227,16 +225,16 @@ def handle_date_field(date_field):
     return {date_field: iso_date}
 
 
-def get_creator_id(ckan_package_ob):
-    """
-    extract the user id from
-    the created package object
-    """
-    user_id = ckan_package_ob["creator_user_id"]
-    user_ob = model.User.get(user_id)
-    # user_dict = model.User.get(user_id).as_dict()
-    # user_email = user_dict.get("email")
-    return user_ob
+# def get_creator_id(ckan_package_ob):
+#     """
+#     extract the user id from
+#     the created package object
+#     """
+#     user_id = ckan_package_ob["creator_user_id"]
+#     user_ob = model.User.get(user_id)
+#     # user_dict = model.User.get(user_id).as_dict()
+#     # user_email = user_dict.get("email")
+#     return user_ob
 
 
 def send_email_to_creator(res):
@@ -246,7 +244,6 @@ def send_email_to_creator(res):
     for mail_user function
     check https://github.com/ckan/ckan/blob/master/ckan/lib/mailer.py
     """
-    # res = {"info_msgs":info_msgs, "err_msgs":err_msgs}
     global creator
     msg_body = (
         "xml upload process completed, please navigate to the"
