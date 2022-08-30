@@ -99,13 +99,34 @@ ckan.module("xml_parser",function($){
             then(res => this._handleError(res)).
             then(res=>res.json()).then(
                 (data)=>{
+                    console.log(data)
                     let err_msgs = data.response.err_msgs
                     let info_msgs = data.response.info_msgs
-                    for(let err of err_msgs){
-                        msg_box_creation(["warning-explanation","alert","alert-danger"], err)
+                    console.log("error messages:", err_msgs)
+                    if(err_msgs == undefined && info_msgs == undefined){
+                        if(data.response.includes("all packages were created")){
+                            // the cause where everything went right
+                            // sessionStorage.setItem("reloading", "true");
+                            // document.location.reload();
+                            // //window.location.reload()
+                            // window.addEventListener("load", function(){
+                            //     var reloading = sessionStorage.getItem("reloading");
+                            //     if (reloading) {
+                            //         sessionStorage.removeItem("reloading");
+                            //         msg_box_creation(["alert","fade-in","alert-info"], data.response)
+                            //     }
+
+                            // })
+                            msg_box_creation(["alert","fade-in","alert-info"], data.response)
+                        }
                     }
-                    for(let info of info_msgs){
-                        msg_box_creation(["alert","fade-in","alert-info"], info)
+                    else {
+                        for(let err of err_msgs){
+                            msg_box_creation(["warning-explanation","alert","alert-danger"], err)
+                        }
+                        for(let info of info_msgs){
+                            msg_box_creation(["alert","fade-in","alert-info"], info)
+                        }
                     }
 
                     flash_box.style.display = "block"

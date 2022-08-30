@@ -1,6 +1,7 @@
 from flask import request, Response, jsonify, Blueprint
 from ckan.plugins import toolkit
 from ckan import model
+from ckan.common import c
 from ckan.logic import ValidationError
 from ckan.lib.mailer import mail_user, MailerException
 import xml.dom.minidom as dom
@@ -19,7 +20,7 @@ from ..constants import (
 # use it as root_url/dataset/xml_parser/
 
 logger = logging.getLogger(__name__)
-creator = ""
+creator = c.user
 
 xml_parser_blueprint = Blueprint(
     "xml_parser",
@@ -84,7 +85,7 @@ def check_file_fields(xml_file) -> dict:
     if dataset["state"]:
         root = dataset["root"]
     else:
-        return dataset["msg"]
+        return dataset
     if root is not None:
         # return and object of the root
         root = return_object_root(root)
@@ -110,12 +111,27 @@ def file_has_xml_dataset(xml_file):
     dataset within it and
     returns it.
     """
-    dom_ob = dom.parse(xml_file)
-    root = dom_ob.firstChild
-    if root.hasChildNodes():
-        return {"state": True, "root": root}
-    else:
+
+    contents = xml_file.read()
+    if contents.count(b"<") <= 1:
+        """
+        this causes a problem with
+        the creator as we want to send
+        email, and for the creator to
+        be set, a package must be created
+        to get the creator of it.
+        """
         return {"state": False, "msg": f"file {xml_file.filename} is empty!"}
+    else:
+        dom_ob = dom.parse(xml_file)
+        root = dom_ob.firstChild
+        if root.hasChildNodes():
+            """
+            this will cause the same problem as above
+            """
+            return {"state": True, "root": root}
+        else:
+            return {"state": False, "msg": f"file {xml_file.filename} is empty!"}
 
 
 def return_object_root(root):
@@ -247,5 +263,4 @@ def send_email_to_creator(res):
     try:
         mail_user(creator, subject="creating dataset via xml upload", body=msg_body)
     except MailerException as e:
-        return jsonify({"msg": e})
-    return jsonify({"msg": "mail should be sent to the creator"})
+        return
