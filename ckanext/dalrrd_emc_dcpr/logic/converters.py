@@ -89,7 +89,7 @@ def convert_choices_select_to_int(data_dict, context):
     """
     # TODO: adding the field name for proper loggin
 
-    logger.debug("convert select choices to int ", data_dict)
+    logger.debug("convert select choices to int ")
     try:
         return int(data_dict)
     except:
