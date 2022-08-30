@@ -61,8 +61,8 @@ def test_create_package(name, private, org_role):
         "metadata_standard_version": "1.0",
         "notes": f"notes for {name}",
         "purpose": "purpose",
-        "status": "status",
-        "metadata_point_of_contact-0-orgnizational_role": "Surname, Name, title",
+        "status": "completed",
+        "metadata_point_of_contact-0-orgnizational_role": "resource_provider",
         "reference_date": "2020-01-01",
         "iso_topic_category": "biota",
         "owner_org": owner_organization["id"],
@@ -91,7 +91,7 @@ def test_create_package(name, private, org_role):
         "equivalent_scale": "500",
         "spatial_representation_type": "001",
         "spatial_reference_system": "EPSG:4326",
-        "metadata_stamp": "2020-01-01",
+        "metadata_date_stamp": "2020-01-01",
     }
 
     helpers.call_action(

@@ -111,7 +111,7 @@ dataset_fields:
       - field_name: position_name
         label: Role / Position of the responsible individual
         required: false
-        help_text: Role/ position of responsible individual in the orgnization
+        help_text: Role/ position of responsible individual in the organization
 
       - field_name: contact_point_address_city
         label: City
@@ -132,7 +132,7 @@ dataset_fields:
         help_text: Address of the electronic mailbox of the responsible organization or individual
 
       # this to be implemented as multiple choices.
-      - field_name: orgnizational_role
+      - field_name: organizational_role
         label: Organization role
         required: true
         preset: select
