@@ -69,6 +69,7 @@ def test_create_package(name, private, org_role):
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
+        "lineage-0-level": "001",
         "lineage-0-lineage_statement": f"lineage statement for {name}",
         "lineage-0-process_step_description": f"lineage description for {name}",
         "distribution-0-distributor_contact": "Surname, name, title",
