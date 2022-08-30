@@ -62,7 +62,7 @@ def test_create_package(name, private, org_role):
         "notes": f"notes for {name}",
         "purpose": "purpose",
         "status": "completed",
-        "metadata_point_of_contact-0-orgnizational_role": "resource_provider",
+        "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
         "iso_topic_category": "biota",
         "owner_org": owner_organization["id"],
