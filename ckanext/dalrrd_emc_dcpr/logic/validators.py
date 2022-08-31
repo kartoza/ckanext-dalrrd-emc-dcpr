@@ -1,10 +1,15 @@
 import logging
 import typing
+from datetime import datetime
 
 from ckan.plugins import toolkit
 from ckan.lib.navl.dictization_functions import (
     Missing,
 )  # note: imported for type hints only
+
+from ckantoolkit import get_validator
+
+ignore_missing = get_validator("ignore_missing")
 
 from ..constants import DcprRequestModerationAction
 
@@ -25,6 +30,28 @@ def dcpr_moderation_choices_validator(value: str):
 def dcpr_end_date_after_start_date_validator(key, flattened_data, errors, context):
     """Validator that checks that start and end dates are consistent"""
     logger.debug(f"{flattened_data=}")
+
+
+def emc_to_date_after_from_date_validator(key, flattened_data, errors, context):
+    """Validator that checks that start and end dates are consistent"""
+    logger.debug(f"{flattened_data=}")
+    # ('reference_system_additional_info', 0, 'temporal_extent_period_duration_from')
+    from_date = flattened_data[
+        ("reference_system_additional_info", 0, "temporal_extent_period_duration_from")
+    ]
+    to_date = flattened_data[
+        ("reference_system_additional_info", 0, "temporal_extent_period_duration_to")
+    ]
+    from_date = datetime.strptime(from_date, "%y-%m-%d")
+    to_date = datetime.strptime(to_date, "%y-%m-%d")
+    if to_date < from_date:
+        raise toolkit.Invalid(
+            toolkit._(
+                "Please provide correct temporal duration for temporal references (from - to)"
+            )
+        )
+    else:
+        return ignore_missing(key, flattened_data, errors, context)
 
 
 def emc_value_or_true_validator(value: typing.Union[str, Missing]):
