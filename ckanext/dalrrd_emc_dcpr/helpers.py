@@ -379,5 +379,14 @@ def mod_scheming_flatten_subfield(subfield, data):
             index=i,
         )
         for k in record:
-            flat[prefix + k] = record[k]
-    return {"flat": "flat"}
+            """
+            this is where the modification happens,
+            records can be just an empty string,
+            accessing it as a dict would cause a
+            type error
+            """
+            if record == "":
+                continue
+            else:
+                flat[prefix + k] = record[k]
+    return flat
