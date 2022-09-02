@@ -27,10 +27,12 @@
         {% endfor %}
       </div>
     </div>
+    {{ h.mod_scheming_flatten_subfield(field, errors) }}
   </div>
 {% endmacro %}
 
-{# {% set flat = h.scheming_flatten_subfield(field, data) %} #}
+{% set flat = h.scheming_flatten_subfield(field, data) %}
+{# add a new helping function similar to https://github.com/ckan/ckanext-scheming/blob/master/ckanext/scheming/helpers.py#L414 #}
 {% set flaterr = h.scheming_flatten_subfield(field, errors) %}
 
 {% call form.input_block(
