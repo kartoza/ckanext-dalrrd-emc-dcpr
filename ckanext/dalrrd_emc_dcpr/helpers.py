@@ -358,3 +358,35 @@ def get_dcpr_request_action(package):
         if extra.get("key") == "action" and extra.get("value") == "APPROVE":
             return "ACCEPT"
     return "REJECT"
+
+
+def mod_scheming_flatten_subfield(subfield, data):
+    """
+    this is specifically for testing site
+    and might not be useful after a while,
+    we are mimicking and modifying
+    https://github.com/ckan/ckanext-scheming/blob/master/ckanext/scheming/helpers.py#L414
+    to avoid few errors
+    """
+    flat = dict(data)
+
+    if subfield["field_name"] not in data:
+        return flat
+
+    for i, record in enumerate(data[subfield["field_name"]]):
+        prefix = "{field_name}-{index}-".format(
+            field_name=subfield["field_name"],
+            index=i,
+        )
+        for k in record:
+            """
+            this is where the modification happens,
+            records can be just an empty string,
+            accessing it as a dict would cause a
+            type error
+            """
+            if record == "":
+                continue
+            else:
+                flat[prefix + k] = record[k]
+    return flat

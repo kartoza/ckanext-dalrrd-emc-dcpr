@@ -340,6 +340,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_requests_approved_by_nsif": helpers.get_dcpr_requests_approved_by_nsif,
             "is_dcpr_request": helpers.is_dcpr_request,
             "get_dcpr_request_action": helpers.get_dcpr_request_action,
+            "mod_scheming_flatten_subfield": helpers.mod_scheming_flatten_subfield,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
