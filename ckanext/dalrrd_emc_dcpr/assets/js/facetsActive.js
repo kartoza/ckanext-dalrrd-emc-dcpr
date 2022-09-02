@@ -3,21 +3,6 @@
 
 ckan.module('emc-facets-active', function (jQuery, _) {
 
-    function getUrlParameter(param) {
-          let sPageURL = window.location.search.substring(1),
-                URLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
-
-            for (i = 0; i < URLVariables.length; i++) {
-                sParameterName = URLVariables[i].split('=');
-
-                if (sParameterName[0] === param) {
-                    return sParameterName[1];
-                }
-            }
-            return false;
-    }
 
     return {
         initialize: function () {
@@ -26,7 +11,7 @@ ckan.module('emc-facets-active', function (jQuery, _) {
                 'organization': 'Organizations',
                 '_organization_limit': 'Organizations',
                 'vocab_sasdi_themes': 'SASDIThemes',
-                '_vocab_sasdi_themes_limit': 'SASDITheme',
+                '_vocab_sasdi_themes_limit': 'SASDIThemes',
                 'vocab_iso_topic_categories': 'ISOTopicCategories',
                 '_vocab_iso_topic_categories_limit': 'ISOTopicCategories',
                 'tags': 'Tags',

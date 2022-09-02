@@ -8,6 +8,7 @@ Displays a date selector in order to let user choose the temporal range for a se
 {% set end_identifier = "ext_end_reference_date" %}
 {% set previous_start = request.args.get(start_identifier) %}
 {% set previous_end = request.args.get(end_identifier) %}
+{% set today = h.get_today_date() %}
 
 <section id="temporal-search" class="module module-narrow module-shallow">
     <div class="panel panel-default expanded">
@@ -25,11 +26,15 @@ Displays a date selector in order to let user choose the temporal range for a se
     <div class="container-fluid">
         <p>
             <div class="form-horizontal">
+                <form role="form" data-toggle="validator" id="fromTemporalQuery">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="{{ start_identifier }}">{{ _("Start") }}</label>
                     <div class="col-sm-10">
                         <input
                                 type="date"
+                                max="{{ today }}"
+                                maxlength="10"
+                                oninput="maxLengthCheck(this)"
                                 id="{{ start_identifier }}"
                                 name="{{ start_identifier }}"
                                 class="form-control"
@@ -44,6 +49,9 @@ Displays a date selector in order to let user choose the temporal range for a se
                     <div class="col-sm-10">
                         <input
                                 type="date"
+                                max="{{ today }}"
+                                maxlength="10"
+                                oninput="maxLengthCheck(this)"
                                 id="{{ end_identifier }}"
                                 name="{{ end_identifier }}"
                                 class="form-control"
@@ -53,6 +61,7 @@ Displays a date selector in order to let user choose the temporal range for a se
                         />
                     </div>
                 </div>
+                </form>
             </div>
         </p>
     </div>
