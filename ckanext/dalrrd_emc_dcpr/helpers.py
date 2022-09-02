@@ -386,9 +386,7 @@ def mod_scheming_flatten_subfield(subfield, data):
             accessing it as a dict would cause a
             type error
             """
-            if record == "":
-                continue
-            else:
+            if type(flat) is dict and type(record) is dict:
                 flat[prefix + k] = record[k]
     return flat
 
