@@ -305,6 +305,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_end_date_after_start_date_validator": validators.dcpr_end_date_after_start_date_validator,
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
             "spatial_resolution_converter": converters.spatial_resolution_converter,
+            "convert_choices_select_to_int": converters.convert_choices_select_to_int,
+            # "expand_tags_composite": converters.expand_tags_composite,
         }
 
     def is_fallback(self) -> bool:
@@ -334,9 +336,11 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
             "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
             "emc_org_memberships": helpers.get_org_memberships,
+            # added by mohab
             "dcpr_requests_approved_by_nsif": helpers.get_dcpr_requests_approved_by_nsif,
             "is_dcpr_request": helpers.is_dcpr_request,
             "get_dcpr_request_action": helpers.get_dcpr_request_action,
+            "mod_scheming_flatten_subfield": helpers.mod_scheming_flatten_subfield,
             "get_today_date": helpers.get_today_date,
         }
 

@@ -78,3 +78,30 @@ def spatial_resolution_converter(value: str):
     if value == "":
         return -1
     return value
+
+
+def convert_choices_select_to_int(data_dict, context):
+    """
+    while submitting the select choices numerical
+    values, they are returned as strings,
+    they should be submitted as ints, otherwises
+    a value error would be raised.
+    """
+    # TODO: adding the field name for proper loggin
+
+    logger.debug("convert select choices to int ")
+    try:
+        return int(data_dict)
+    except:
+        raise toolkit.Invalid("select field should have a string value")
+
+
+# def expand_tags_composite(data_dict, context):
+#     """
+#     expanding tags composite field
+#     to a dict
+#     """
+#     # fieldnames -= set(data_dict)
+#     # return data_dict
+#     raise RuntimeError(data_dict)
+#     return data_dict

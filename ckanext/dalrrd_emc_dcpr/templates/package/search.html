@@ -41,7 +41,12 @@
 {% endblock %}
 
 {% block secondary_content %}
-    {% snippet "spatial/snippets/spatial_query.html", default_extent=h.dalrrd_emc_dcpr_default_spatial_search_extent() %}
+    {% snippet "spatial/snippets/spatial_query.html", default_extent="{ \"type\":\"Polygon\",
+    \"coordinates\": [[[16.4699, -34.8212],
+    [32.8931, -34.8212],
+    [32.8931, -22.1265],
+    [16.4699, -22.1265],
+    [16.4699, -34.8212]]]}"%}
     {% snippet "snippets/temporal_query.html" %}
     <div class="filters">
     <div>

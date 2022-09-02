@@ -39,7 +39,6 @@ def user_update(original_action, context, data_dict):
     for the user.
 
     """
-
     original_result = original_action(context, data_dict)
     user_id = original_result["id"]
     model = context["model"]

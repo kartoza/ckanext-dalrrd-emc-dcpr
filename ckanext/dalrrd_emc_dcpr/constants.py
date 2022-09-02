@@ -82,6 +82,107 @@ class DcprRequestModerationAction(enum.Enum):
     RESIGN = "RESIGN"
 
 
+DATASET_MINIMAL_SET_OF_FIELDS = [
+    "title",
+    "name",
+    "metadata_standard_name",
+    "metadata_standard_version",
+    "notes",
+    "purpose",
+    "status",
+    "metadata_point_of_contact-0-organizational_role",
+    "reference_date",
+    "iso_topic_category",
+    "owner_org",
+    "private",
+    "dataset_language",
+    "metadata_language",
+    "dataset_character_set",
+    "lineage-0-lineage_statement",
+    "lineage-0-process_step_description",
+    "distribution-0-distributor_contact",
+    "maintainer",
+    "spatial",
+    "equivalent_scale",
+    "spatial_representation_type",
+    "spatial_reference_system",
+    "metadata_date_stamp",
+]
+# choices fields
+# status
+# metadata_point_of_contact-0-orgnizational_role
+# dataset_character_set
+# dataset_character_set
+# spatial_representation_type
+
+# the equivalent_scale is teh spatial resolution field
+
+DATASET_FULL_SET_OF_FIELDS = [
+    "title",
+    "name",
+    "featured",
+    "metadata_standard_name",
+    "metadata_standard_version",
+    "notes",
+    "purpose",
+    "acknowledgement",
+    "status",
+    "metadata_point_of_contact-0-individual_name",
+    "metadata_point_of_contact-0-position_name",
+    "metadata_point_of_contact-0-contact_point_address_city",
+    "metadata_point_of_contact-0-contact_point_address_administrative_area",
+    "metadata_point_of_contact-0-contact_point_postal_code",
+    "metadata_point_of_contact-0- contact_point_electronic_mail_address",
+    "metadata_point_of_contact-0-organizational_role",
+    "owner_org",
+    "private",
+    "reference_date",
+    "iso_topic_category",
+    "sasdi_theme",
+    "tag_string",
+    "license_id",
+    "url",
+    "version",
+    "dataset_language",
+    "metadata_language",
+    "dataset_character_set",
+    "lineage-0-level",
+    "lineage-0-lineage_statement",
+    "lineage-0-process_step_description",
+    "lineage-0-process_step_datetime_from",
+    "lineage-0-process_step_datetime_to",
+    "lineage-0-processor_individual_name",
+    "lineage-0-processing_owner_org",
+    "lineage-0-processor_position_name",
+    "lineage-0-processor_address_city",
+    "lineage-0-processor_address_administrative_area",
+    "lineage-0-processor_postal_code",
+    "lineage-0-processor_electronic_mail_address",
+    "distribution-0-distributor_contact",
+    "distribution-0-distribution_order_process",
+    "distribution-0-units_of_distribution",
+    "distribution-0-distribution_online_source",
+    "maintainer",
+    "maintainer_email",
+    "maintenance_information-0-maintenance_and_update_frequency",
+    "maintenance_information-0-maintenance_date_of_next_update",
+    "maintenance_information-0-user_defined_maintenance_frequency",
+    "maintenance_information-0-update_scope",
+    "maintenance_information-0-update_scope_description",
+    "maintenance_information-0-maintenance_notes",
+    "spatial",
+    "equivalent_scale",
+    "spatial_representation_type",
+    "spatial_reference_system",
+    "temporal_reference_system",
+    "reference_system_additional_info-0-temporal_extent_period_duration_from",
+    "reference_system_additional_info-0-temporal_extent_period_duration_to",
+    "minimum_vertical_extent",
+    "maximum_vertical_extent",
+    "metadata_date_stamp",
+]
+
+
 class DCPRRequestRequiredFields(enum.Enum):
     SPATIAL_REFERENCE_SYSTEM = "EPSG:4326"
     DATASET_LANGUAGE = "en"
