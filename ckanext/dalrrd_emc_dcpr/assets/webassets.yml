@@ -84,3 +84,9 @@ check-access-js:
   contents:
     - js/checkAccess.js
   filter: rjsmin
+
+utils-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_utils.js
+  contents:
+    - js/utils.js
+  filter: rjsmin
