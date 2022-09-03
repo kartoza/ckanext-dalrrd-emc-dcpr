@@ -58,7 +58,8 @@ ckan.module('emc-facets-active', function (jQuery, _) {
 ckan.module("xml_parser",function($){
     /*
         this isn't completed yet, the idea is to show
-        a flash message when the xml file is incorrect.
+        a flash message when the xml file is incorrect
+        after the page reloads.
 
     */
     return{

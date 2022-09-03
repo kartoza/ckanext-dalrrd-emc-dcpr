@@ -1,8 +1,9 @@
 "use strict";
 
-ckan.module("xml_parser",function($){
+ckan.module("xml_parser_sep",function($){
     return{
         initialize: function(){
+            console.log("xml parser is loaded !")
             $.proxyAll(this,/_on/);
             this.el.on("change", this._onChange)
         },

@@ -56,6 +56,27 @@ dataset_fields:
       Version(s) of metadata standard used, if multiple standards used, separate versions by comma
       - This is a SANS 1878 mandatory field
 
+  - field_name: citation
+    label: Citation
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: citation_title
+        label: Citation title
+        required: true
+        help_text: name by which the cited dataset is known
+      - field_name: citation_date
+        label: Citation date
+        preset: date
+        required: true
+        help_text: reference date for cited resource
+      # the citation identifier could be a choice field limited to identifiers we have and others choice field enabling the user to insert a unique one
+      - field_name: citation_identifier
+        label: Citation identifier
+        required: true
+
+
+
+
   - field_name: notes
     label: Abstract
     required: true
