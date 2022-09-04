@@ -2,7 +2,7 @@
 {# currently adding this js file isn't working
   it might have to do with droping volumes
 #}
-{% asset 'ckanext-dalrrdemcdcpr/xml-parser-js' %}
+
 {% block breadcrumb_content %}
     <div class="page-header">
     {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
@@ -23,7 +23,6 @@
           style="display: none;"
           multiple
           data-module="xml_parser"
-          data-module="xml_parser_sep"
           >
           <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add Dataset') }}</a>
         {% endif %}

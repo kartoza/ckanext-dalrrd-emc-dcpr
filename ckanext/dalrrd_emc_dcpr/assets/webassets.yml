@@ -67,16 +67,16 @@ temporal-query-js:
     - js/temporalQuery.js
   filter: rjsmin
 
-facets-active-js:
-  output: ckanext-dalrrdemcdcpr/%(version)s_facetsActive.js
-  contents:
-    - js/facetsActive.js
-  filter: rjsmin
-
 xml-parser-js:
   output: ckanext-dalrrdemcdcpr/%(version)s_xmlParser.js
   contents:
     - js/xmlParser.js
+  filter: rjsmin
+
+facets-active-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_facetsActive.js
+  contents:
+    - js/facetsActive.js
   filter: rjsmin
 
 check-access-js:
