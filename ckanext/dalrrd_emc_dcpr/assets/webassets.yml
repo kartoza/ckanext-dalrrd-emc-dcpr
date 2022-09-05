@@ -84,3 +84,9 @@ check-access-js:
   contents:
     - js/checkAccess.js
   filter: rjsmin
+
+custom-select-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_customSelect.js
+  contents:
+    - js/customSelect.js
+  filter: rjsmin

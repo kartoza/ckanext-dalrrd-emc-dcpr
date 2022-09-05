@@ -94,14 +94,3 @@ def convert_choices_select_to_int(data_dict, context):
         return int(data_dict)
     except:
         raise toolkit.Invalid("select field should have a string value")
-
-
-# def expand_tags_composite(data_dict, context):
-#     """
-#     expanding tags composite field
-#     to a dict
-#     """
-#     # fieldnames -= set(data_dict)
-#     # return data_dict
-#     raise RuntimeError(data_dict)
-#     return data_dict

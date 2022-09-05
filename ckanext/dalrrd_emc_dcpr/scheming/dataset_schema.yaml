@@ -548,7 +548,7 @@ dataset_fields:
       - field_name: maintenance_and_update_frequency
         label: Maintenance and update frequency
         required: false
-        preset: select
+        preset: custom_select_field
         choices:
           - value: monthly
             label: monthly
