@@ -556,7 +556,6 @@ dataset_fields:
             label: yearly
           - value: other
             label: other
-            preset: text
 
         help_text: frequency with which changes and additions are made to the dataset after it's submitted
 
