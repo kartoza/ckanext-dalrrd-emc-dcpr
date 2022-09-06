@@ -319,7 +319,14 @@ def create_package_from_dcpr_request(
             data_dict[
                 "iso_topic_category"
             ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
-            data_dict["lineage"] = DCPRRequestRequiredFields.LINEAGE.value
+            data_dict["lineage-0-level"] = DCPRRequestRequiredFields.LINEAGE_LEVEL.value
+            data_dict[
+                "lineage-0-lineage_statement"
+            ] = DCPRRequestRequiredFields.LINEAGE_STATEMENT.value
+            data_dict[
+                "lineage-0-process_step_description"
+            ] = DCPRRequestRequiredFields.LINEAGE_PROCESS_DESCRIPTION.value
+
             data_dict["maintainer"] = request_obj.owner_user
             data_dict[
                 "equivalent_scale"
@@ -328,6 +335,18 @@ def create_package_from_dcpr_request(
                 "spatial_representation_type"
             ] = DCPRRequestRequiredFields.SPATIAL_REPRESENTATION_TYPE.value
             data_dict["notes"] = DCPRRequestRequiredFields.NOTES.value
+            data_dict[
+                "metadata_standard_name"
+            ] = DCPRRequestRequiredFields.METADATA_STANDARD_NAME.value
+            data_dict[
+                "metadata_standard_version"
+            ] = DCPRRequestRequiredFields.METADATA_STANDARD_VERSION.value
+            data_dict["status"] = DCPRRequestRequiredFields.STATUS.value
+            data_dict[
+                "distribution-0-distributor_contact"
+            ] = DCPRRequestRequiredFields.DISTRIBUTOR_CONTACT.value
+            data_dict["metadata_date_stamp"] = dt.datetime.now(dt.timezone.utc)
+            data_dict["purpose"] = DCPRRequestRequiredFields.PURPOSE.value
 
             result = toolkit.get_action("package_create")(context, data_dict)
         except toolkit.NotAuthorized:
