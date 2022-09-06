@@ -8,6 +8,8 @@
 
 {% block scripts %}
     {{ super() }}
+    {% asset 'ckanext-dalrrdemcdcpr/xml-parser-js' %}
+    {% asset 'ckanext-dalrrdemcdcpr/custom-select-js' %}
     <script type="text/javascript">
         window.$crisp=[];window.CRISP_WEBSITE_ID="b725612e-5df8-4a32-b7a4-e13484d28435";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
     </script>

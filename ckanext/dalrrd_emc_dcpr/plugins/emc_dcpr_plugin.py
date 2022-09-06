@@ -43,6 +43,8 @@ from ..logic.auth import dcpr as dcpr_auth
 from ..logic.auth import emc as emc_auth
 from ..model.user_extra_fields import UserExtraFields
 
+import ckanext.dalrrd_emc_dcpr.plugins.utils as utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -184,6 +186,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             )
             filter_query = " ".join((search_params["fq"], temporal_query))
             search_params["fq"] = filter_query
+        search_params["fq"] = utils.handle_search(search_params)
         return search_params
 
     def before_view(self, pkg_dict: typing.Dict):
@@ -306,6 +309,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
             "spatial_resolution_converter": converters.spatial_resolution_converter,
             "convert_choices_select_to_int": converters.convert_choices_select_to_int,
+            "convert_select_custom_choice_to_extra": converters.convert_select_custom_choice_to_extra,
             # "expand_tags_composite": converters.expand_tags_composite,
         }
 

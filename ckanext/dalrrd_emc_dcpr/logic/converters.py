@@ -96,12 +96,11 @@ def convert_choices_select_to_int(data_dict, context):
         raise toolkit.Invalid("select field should have a string value")
 
 
-# def expand_tags_composite(data_dict, context):
-#     """
-#     expanding tags composite field
-#     to a dict
-#     """
-#     # fieldnames -= set(data_dict)
-#     # return data_dict
-#     raise RuntimeError(data_dict)
-#     return data_dict
+def convert_select_custom_choice_to_extra(data_dict):
+    """
+    adding custom field to select options,
+    currently appears as "__extras" in the
+    database,
+    """
+    # raise RuntimeError(data_dict)
+    return data_dict
