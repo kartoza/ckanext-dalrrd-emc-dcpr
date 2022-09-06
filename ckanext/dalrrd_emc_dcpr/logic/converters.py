@@ -94,3 +94,13 @@ def convert_choices_select_to_int(data_dict, context):
         return int(data_dict)
     except:
         raise toolkit.Invalid("select field should have a string value")
+
+
+def convert_select_custom_choice_to_extra(data_dict):
+    """
+    adding custom field to select options,
+    currently appears as "__extras" in the
+    database,
+    """
+    # raise RuntimeError(data_dict)
+    return data_dict

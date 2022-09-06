@@ -174,6 +174,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return pkg_dict
 
     def before_search(self, search_params: typing.Dict):
+        search_params
         start_date = search_params.get("extras", {}).get("ext_start_reference_date")
         end_date = search_params.get("extras", {}).get("ext_end_reference_date")
         if start_date is not None or end_date is not None:
@@ -306,6 +307,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
             "spatial_resolution_converter": converters.spatial_resolution_converter,
             "convert_choices_select_to_int": converters.convert_choices_select_to_int,
+            "convert_select_custom_choice_to_extra": converters.convert_select_custom_choice_to_extra,
             # "expand_tags_composite": converters.expand_tags_composite,
         }
 
