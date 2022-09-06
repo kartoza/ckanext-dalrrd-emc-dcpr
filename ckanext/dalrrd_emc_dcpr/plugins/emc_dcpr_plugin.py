@@ -43,6 +43,8 @@ from ..logic.auth import dcpr as dcpr_auth
 from ..logic.auth import emc as emc_auth
 from ..model.user_extra_fields import UserExtraFields
 
+import ckanext.dalrrd_emc_dcpr.plugins.utils as utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -174,7 +176,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return pkg_dict
 
     def before_search(self, search_params: typing.Dict):
-        search_params
         start_date = search_params.get("extras", {}).get("ext_start_reference_date")
         end_date = search_params.get("extras", {}).get("ext_end_reference_date")
         if start_date is not None or end_date is not None:
@@ -185,6 +186,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             )
             filter_query = " ".join((search_params["fq"], temporal_query))
             search_params["fq"] = filter_query
+        search_params["fq"] = utils.handle_search(search_params)
         return search_params
 
     def before_view(self, pkg_dict: typing.Dict):

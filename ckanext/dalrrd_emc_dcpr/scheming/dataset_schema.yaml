@@ -505,12 +505,12 @@ dataset_fields:
       #   form_placeholder: Name of subset, profile or product specification of format
 
       - field_name: distributor_contact
-        label: Distributior Contact
+        label: Distributor Contact
         required: true
         help_text:  Name of party from whom the dataset can be obtained - This is a SANS 1878 mandatory field
 
       - field_name: distribution_order_process
-        label: Distributior Order Process
+        label: Distributor Order Process
         required: false
         form_snippet: markdown.html
         help_text: information about how the dataset may be obtained, and related instructions and fee information
