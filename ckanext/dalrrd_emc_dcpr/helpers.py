@@ -1,6 +1,7 @@
 import json
 import logging
 import typing
+import datetime
 from urllib.parse import quote
 from html import escape as html_escape
 
@@ -388,3 +389,7 @@ def mod_scheming_flatten_subfield(subfield, data):
             if type(flat) is dict and type(record) is dict:
                 flat[prefix + k] = record[k]
     return flat
+
+
+def get_today_date() -> str:
+    return datetime.datetime.now().strftime("%Y-%m-%d")

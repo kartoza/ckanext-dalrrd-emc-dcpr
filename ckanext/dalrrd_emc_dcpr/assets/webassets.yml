@@ -90,3 +90,9 @@ custom-select-js:
   contents:
     - js/customSelect.js
   filter: rjsmin
+
+utils-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_utils.js
+  contents:
+    - js/utils.js
+  filter: rjsmin
