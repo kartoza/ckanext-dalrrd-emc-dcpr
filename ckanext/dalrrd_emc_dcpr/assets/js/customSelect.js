@@ -1,7 +1,6 @@
 ckan.module("custom_select", function($){
     return{
         initialize:function(){
-            console.log("custom select loaded !")
             $.proxyAll(this,/_on/);
             if(this.el.val() != "other"){
                 this.el.parent().children("#custom_other_choice_select").hide()

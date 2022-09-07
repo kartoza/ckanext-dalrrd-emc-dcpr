@@ -30,10 +30,10 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
             this.formInputElement = document.getElementById(this.options.formInputId)
 
 
-            console.log(
-                `Hi there, I'm running inside the emcDatasetSpatialExtentMap module. ` +
-                `Oh, and my bound element is ${this.el} and the Jinja template passed me this as the default extent: ${this.options.defaultExtent}`
-            )
+            // console.log(
+            //     `Hi there, I'm running inside the emcDatasetSpatialExtentMap module. ` +
+            //     `Oh, and my bound element is ${this.el} and the Jinja template passed me this as the default extent: ${this.options.defaultExtent}`
+            // )
 
             jQuery.proxyAll(this, /_on/);
             this.el.ready(this._onReady);

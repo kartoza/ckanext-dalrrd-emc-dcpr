@@ -96,3 +96,9 @@ utils-js:
   contents:
     - js/utils.js
   filter: rjsmin
+
+spatial-search-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_spatial_search.js
+  contents:
+    - js/spatial_search.js
+  filter: rjsmin
