@@ -14,5 +14,5 @@ def handle_search(search_params):
             fq_dict[key_value_pair[0]] = key_value_pair[1]
         else:
             fq_list[idx] = " OR " + fq_list[idx] + " "
-    search_params["fq"] = "".join(item for item in fq_list)
+    search_params["fq"] = " ".join(item for item in fq_list)
     return search_params["fq"]
