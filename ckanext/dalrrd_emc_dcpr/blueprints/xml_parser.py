@@ -208,10 +208,11 @@ def create_ckan_dataset(root_ob):
     try:
         create_action(data_dict=root_ob)
     except ValidationError as e:
+        error_summary = e.error_summary.get("Name")
+        error_summary = "" if error_summary is None else error_summary
         return {
             "state": False,
-            "msg": f'error creating package "{package_title}": '
-            + e.error_summary["Name"],
+            "msg": f'error creating package "{package_title}": ' + error_summary,
         }
     return {"state": True, "msg": f'package "{package_title}" were created'}
 

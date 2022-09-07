@@ -56,6 +56,27 @@ dataset_fields:
       Version(s) of metadata standard used, if multiple standards used, separate versions by comma
       - This is a SANS 1878 mandatory field
 
+  - field_name: citation
+    label: Citation
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: citation_title
+        label: Citation title
+        required: true
+        help_text: name by which the cited dataset is known
+      - field_name: citation_date
+        label: Citation date
+        preset: date
+        required: true
+        help_text: reference date for cited resource
+      # the citation identifier could be a choice field limited to identifiers we have and others choice field enabling the user to insert a unique one
+      - field_name: citation_identifier
+        label: Citation identifier
+        required: true
+
+
+
+
   - field_name: notes
     label: Abstract
     required: true
@@ -484,12 +505,12 @@ dataset_fields:
       #   form_placeholder: Name of subset, profile or product specification of format
 
       - field_name: distributor_contact
-        label: Distributior Contact
+        label: Distributor Contact
         required: true
         help_text:  Name of party from whom the dataset can be obtained - This is a SANS 1878 mandatory field
 
       - field_name: distribution_order_process
-        label: Distributior Order Process
+        label: Distributor Order Process
         required: false
         form_snippet: markdown.html
         help_text: information about how the dataset may be obtained, and related instructions and fee information
@@ -527,7 +548,7 @@ dataset_fields:
       - field_name: maintenance_and_update_frequency
         label: Maintenance and update frequency
         required: false
-        preset: select
+        preset: custom_select_field
         choices:
           - value: monthly
             label: monthly
@@ -535,7 +556,6 @@ dataset_fields:
             label: yearly
           - value: other
             label: other
-            preset: text
 
         help_text: frequency with which changes and additions are made to the dataset after it's submitted
 

@@ -67,16 +67,16 @@ temporal-query-js:
     - js/temporalQuery.js
   filter: rjsmin
 
-facets-active-js:
-  output: ckanext-dalrrdemcdcpr/%(version)s_facetsActive.js
-  contents:
-    - js/facetsActive.js
-  filter: rjsmin
-
 xml-parser-js:
   output: ckanext-dalrrdemcdcpr/%(version)s_xmlParser.js
   contents:
     - js/xmlParser.js
+  filter: rjsmin
+
+facets-active-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_facetsActive.js
+  contents:
+    - js/facetsActive.js
   filter: rjsmin
 
 check-access-js:
@@ -85,8 +85,20 @@ check-access-js:
     - js/checkAccess.js
   filter: rjsmin
 
+custom-select-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_customSelect.js
+  contents:
+    - js/customSelect.js
+  filter: rjsmin
+
 utils-js:
   output: ckanext-dalrrdemcdcpr/%(version)s_utils.js
   contents:
     - js/utils.js
+  filter: rjsmin
+
+spatial-search-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_spatial_search.js
+  contents:
+    - js/spatial_search.js
   filter: rjsmin
