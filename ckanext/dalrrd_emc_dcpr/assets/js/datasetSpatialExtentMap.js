@@ -94,7 +94,7 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
         },
 
         _onCreate: function (event) {
-            console.log("Created new")
+            // console.log("Created new")
             event.layer.on("pm:edit", this._onLayerEdit)
             event.layer.on("pm:dragend", this._onLayerDrag)
             this.formInputElement.setAttribute("value", this._getBboxString(event.layer.getBounds()))
@@ -102,7 +102,7 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
         },
 
         _onDrawStart: function (event) {
-            console.log("Started drawing")
+            // console.log("Started drawing")
             this.map.removeLayer(this.rectangleLayer)
         },
 

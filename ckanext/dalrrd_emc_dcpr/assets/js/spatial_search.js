@@ -50,7 +50,33 @@ ckan.module("spatial_search", function($){
                 })
                 let layerControl = L.control.layers(null,divisions_overlay)
                 layerControl.addTo(Lmap);
-            }
+                // adding circle to leaflet draw
+                $("a.leaflet-draw-draw-rectangle").parent().append(
+                    $("<a class='leaflet-draw-draw-circle'></a>")
+                )
+
+                $('a.leaflet-draw-draw-circle').hover(function(e){
+                    $(this).css({"cursor":"pointer"})
+                })
+
+                $('a.leaflet-draw-draw-circle').on('click', function(e){
+                    // if($('body').hasClass('dataset-map-expanded')){
+                    //     $('body').removeClass('dataset-map-expanded');
+                    // }
+                    // else{
+                    //     $('body').addClass('dataset-map-expanded');
+                    // }
+                    $('body').toggleClass('dataset-map-expanded');
+                    let drawer = new L.Draw.Circle(Lmap)
+                    drawer.enable()
+                  });
+
+                  Lmap.on('draw:created', function (e) {
+                    layer = e.layer;
+                    layer.addTo(Lmap);
+                    $('#ext_bbox').val(layer.getBounds().toBBoxString());
+                });
+                }
         },
     }
 })
