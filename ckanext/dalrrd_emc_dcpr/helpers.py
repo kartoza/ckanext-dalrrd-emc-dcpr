@@ -401,7 +401,7 @@ def get_maintenance_custom_other_field_data(data_dict):
     to grab it from the database, if other alternatives
     can be used (e.g. when using the pkg coming with
     /package/read.html, the whole data shows up)
-    it would be preferable.
+    it would be preferable
     """
     q = f""" select value from package_extra where package_id='{data_dict["id"]}' AND key = 'maintenance_information'  """
     result = model.Session.execute(q)
