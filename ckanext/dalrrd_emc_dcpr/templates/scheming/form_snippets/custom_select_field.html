@@ -27,16 +27,14 @@
 
 {%- set extra_html = caller() if caller -%}
 {% set custom_select_field_name = field.field_name+"-other_choice_input" %}
-{#
-{%- set custom_input_data = data["maintenance_information"]["maintenance_and_update_frequency-other_choice_input"] -%}
-#}
 {% call form.input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
 {{ data['__extras'] }}
 <select id="{{ id or name }}" name="{{ name }}" {{ form.attributes(attrs) }} data-module="custom_select">
     {% for option in options %}
         <option value="{{ option.value }}"{% if option.value == selected %} selected{% endif %}>{{ option.text or option.value }}</option>
     {% endfor %}
-    <input id='maintenance_information-0-custom_other_choice_select' class='form-control' name='maintenance_information-0-custom_other_choice_select' value= '{{ custom_input_data }}' placeholder='other' />
+    {% set maintenance_custom_other_input_field = h.get_maintenance_custom_other_field_data(data) %}
+    <input id='maintenance_information-0-custom_other_choice_select' class='form-control' name='maintenance_information-0-custom_other_choice_select' value= '{{ maintenance_custom_other_input_field }}' placeholder='other' />
 </select>
 {% endcall %}
 {% endmacro %}

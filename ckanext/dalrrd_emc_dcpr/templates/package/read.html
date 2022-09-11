@@ -1,6 +1,5 @@
 {% ckan_extends %}
 
-{% set maintenance_custom_other_input_field = h.get_maintenance_custom_other_field_data(pkg) %}
 
 {% block package_description  %}
     <section class="dataset-title-description">
@@ -17,7 +16,6 @@
     {% if free_tags|length > 0 %}
         {% snippet "package/snippets/tags.html", tags=free_tags %}
     {% endif %}
-    {{ maintenance_custom_other_input_field }}
     <section class="iso-topic-category">
         <h3> {{ _("ISO Topic Category") }}</h3>
         <div class="row">
