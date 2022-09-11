@@ -391,5 +391,17 @@ def mod_scheming_flatten_subfield(subfield, data):
     return flat
 
 
+def get_maintenance_custom_other_field_data(data_dict):
+    """
+    the custom field "other"
+    """
+    dictized_data = data_dict.as_dict()
+    maintenance_info = json.loads(dictized_data["extras"]["maintenance_information"])
+    custom_other_choice_select = maintenance_info[0]["__extras"][
+        "custom_other_choice_select"
+    ]
+    return custom_other_choice_select
+
+
 def get_today_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d")

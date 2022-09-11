@@ -36,7 +36,7 @@
     {% for option in options %}
         <option value="{{ option.value }}"{% if option.value == selected %} selected{% endif %}>{{ option.text or option.value }}</option>
     {% endfor %}
-    <!-- <input id='{{ field.field_name }}-custom_other_choice_select' class='form-control' name='{{ field.field_name }}-custom_other_choice_select' value= '{{ custom_input_data }}' placeholder='other' /> -->
+    <input id='maintenance_information-0-custom_other_choice_select' class='form-control' name='maintenance_information-0-custom_other_choice_select' value= '{{ custom_input_data }}' placeholder='other' />
 </select>
 {% endcall %}
 {% endmacro %}

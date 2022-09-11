@@ -1,3 +1,12 @@
+"""
+custom file, holds modules used directly
+by emc_dcpr plugin for different
+functionalities. different from
+helper functions as they aren't
+used by the UI.
+"""
+
+
 def handle_search(search_params):
     """
     we need to combine -AND operator-
