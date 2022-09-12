@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+
+{% block content_primary_nav %}
+  {{ h.build_nav_icon(group_type + '.edit', _('Edit'), id=group_dict.name, icon='pencil-square-o') }}
+  {{ h.build_nav_icon(group_type + '.bulk_process', _('Metadata Records'), id=group_dict.name, icon='sitemap') }}
+  {{ h.build_nav_icon(group_type + '.members', _('Members'), id=group_dict.name, icon='users') }}
+{% endblock %}

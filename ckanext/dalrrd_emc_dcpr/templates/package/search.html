@@ -7,14 +7,14 @@
     <div class="page-header">
     {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
         <h1>Electronic Metadata Catalogue (EMC)</h1>
-        <h5>Total number of datasets: {{ total }}</h5>
-        <h5>{{ page.item_count }} datasets found</h5>
-        {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + dataset_type + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
+        <h5>Total number of metadata record: {{ total }}</h5>
+        <h5>{{ page.item_count }} metadata record found</h5>
+        {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + 'metadata record' + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
         {% if h.check_access('package_create') %}
         <button class="btn btn-primary pull-right" onclick="document.getElementById('upload_input').click()"
           style="margin-left: 10px;"
           >
-          <i class="fa fa-cloud-upload"></i>{{ _("Add datasets from xml file") }}
+          <i class="fa fa-cloud-upload"></i>{{ _("Add metadata record from xml file") }}
         </button>
         <input type="file"
           id = "upload_input"
@@ -24,7 +24,7 @@
           multiple
           data-module="xml_parser"
           >
-          <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add Dataset') }}</a>
+          <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
         {% endif %}
     </div>
 {% endblock %}
