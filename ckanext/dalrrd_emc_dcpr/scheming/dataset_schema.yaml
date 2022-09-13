@@ -74,6 +74,14 @@ dataset_fields:
         label: Citation identifier
         required: true
 
+      - field_name: citation_identifier_type
+        label: Citation identifier type
+        required: false
+
+      - field_name: citation_responsible_party
+        label: Citation responsible party
+        required: true
+        preset: emc_dataset_organization
 
 
 
