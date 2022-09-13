@@ -9,14 +9,18 @@
 {% endblock %}
 
 {% block user_nums %}
-      <div class="nums">
+      <div class="nums" style="float: none">
         <dl>
-          <dt>{{ _('Followers') }}</dt>
-          <dd data-module="followers-counter" data-module-id="{{ user.id }}" data-module-num_followers="{{ user.num_followers }}">{{ h.SI_number_span(user.num_followers) }}</dd>
+          <p>
+          <span data-module="followers-counter" data-module-id="{{ user.id }}" data-module-num_followers="{{ user.num_followers }}">{{ h.SI_number_span(user.num_followers) }}</span>
+          {{ _('Followers') }}
+          </p>
         </dl>
         <dl>
-          <dt>{{ _('Metadata Records') }}</dt>
-          <dd>{{ h.SI_number_span(user.number_created_packages) }}</dd>
+          <p>
+          <span>{{ h.SI_number_span(user.number_created_packages) }}</span>
+              {{ _('Metadata Records') }}
+            </p>
         </dl>
       </div>
       {% endblock %}
