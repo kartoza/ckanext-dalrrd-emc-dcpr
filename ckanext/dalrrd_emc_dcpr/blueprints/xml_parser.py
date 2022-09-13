@@ -202,6 +202,7 @@ def create_ckan_dataset(root_ob):
     """
     logger.debug("from xml parser blueprint", root_ob)
     package_title = root_ob["title"]
+    package_title = change_name_special_chars_to_underscore(package_title)
     slug_url_field = package_title.replace(" ", "-")
     root_ob.update({"name": slug_url_field})
     create_action = toolkit.get_action("package_create")
@@ -262,3 +263,11 @@ def send_email_to_creator(res):
         mail_user(creator, subject="creating dataset via xml upload", body=msg_body)
     except MailerException as e:
         return
+
+
+def change_name_special_chars_to_underscore(title: str) -> str:
+    for i in title:
+        if i in "!”#$%&'()*+,-./:;<=>?@[\]^`{|}~.":
+            title = title.replace(i, "_")
+
+    return title

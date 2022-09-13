@@ -391,5 +391,40 @@ def mod_scheming_flatten_subfield(subfield, data):
     return flat
 
 
+def get_maintenance_custom_other_field_data(data_dict):
+    """
+    the custom field "maintenance" stores "other"
+    options in an __extra structure in the database,
+    in package_extra table, this structure
+    doesn't show up with regular ckan actions like
+    "package_show", "package_search" ..etc., we need
+    to grab it from the database, if other alternatives
+    can be used (e.g. when using the pkg coming with
+    /package/read.html, the whole data shows up)
+    it would be preferable
+    """
+    q = f""" select value from package_extra where package_id='{data_dict["id"]}' AND key = 'maintenance_information'  """
+    result = model.Session.execute(q)
+    for row in result.fetchall():
+        load_row = json.loads(dict(row)["value"])
+        try:
+            return load_row[0]["__extras"]["custom_other_choice_select"]
+        except:
+            pass
+
+    # if package object (i.e found with /package/read.html) is used
+    ##### keeping it for further solutions
+    # dictized_data = data_dict.as_dict()
+    # custom_other_choice_select= ""
+    # try:
+    #     maintenance_info = json.loads(dictized_data["extras"]["maintenance_information"])
+    #     custom_other_choice_select = maintenance_info[0]["__extras"][
+    #         "custom_other_choice_select"
+    #     ]
+    # except KeyError:
+    #     pass
+    # return custom_other_choice_select
+
+
 def get_today_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d")

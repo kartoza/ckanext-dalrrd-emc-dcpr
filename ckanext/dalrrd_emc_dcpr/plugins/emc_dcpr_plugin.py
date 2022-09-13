@@ -346,6 +346,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_dcpr_request_action": helpers.get_dcpr_request_action,
             "mod_scheming_flatten_subfield": helpers.mod_scheming_flatten_subfield,
             "get_today_date": helpers.get_today_date,
+            "get_maintenance_custom_other_field_data": helpers.get_maintenance_custom_other_field_data,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
