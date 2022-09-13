@@ -268,7 +268,6 @@ def send_email_to_creator(res):
 def change_name_special_chars_to_underscore(title: str) -> str:
     for i in title:
         if i in "!”#$%&'()*+,-./:;<=>?@[\]^`{|}~.":
-            print("spot!,", i)
             title = title.replace(i, "_")
 
     return title
