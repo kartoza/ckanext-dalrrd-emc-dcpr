@@ -55,7 +55,7 @@
     <h2 class="mb-5 section-title">Search for data</h2>
         <form {% if form_id %}id="{{ form_id }}" {% endif %}class="search-form{% if no_bottom_border %} no-bottom-border{% endif %}" method="get" data-module="select-switch" action="/dataset/">
             <div class="input-group search-input-group">
-                <input aria-label="{% block header_site_search_label %}{{ placeholder }}{% endblock %}" id="field-giant-search" type="text" class="form-control input-lg" name="q" value="{{ query }}" autocomplete="off" placeholder="Search datasets...">
+                <input aria-label="{% block header_site_search_label %}{{ placeholder }}{% endblock %}" id="field-giant-search" type="text" class="form-control input-lg" name="q" value="{{ query }}" autocomplete="off" placeholder="Search metadata records...">
                 <span class="input-group-btn">
                     <button class="btn btn-default btn-lg" type="submit" value="search" aria-label="{{_('Submit')}}">
                         <i class="fa fa-search"></i>
