@@ -5,9 +5,7 @@ from ckan.plugins import toolkit
 from .... import error_report_dictization
 from ...schema import create_error_report_schema
 from ....model import error_report
-from ....constants import (
-    ErrorReportStatus
-)
+from ....constants import ErrorReportStatus
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +29,7 @@ def error_report_create(context, data_dict):
     report = error_report.ErrorReport.get(csi_reference_id=csi_reference_id)
 
     if report:
-        raise toolkit.ValidationError(
-            {"message": "The error report already exists"}
-        )
+        raise toolkit.ValidationError({"message": "The error report already exists"})
 
     validated_data.update(
         {
@@ -42,7 +38,9 @@ def error_report_create(context, data_dict):
         }
     )
 
-    error_report_obj = error_report_dictization.error_report_dict_save(validated_data, context)
+    error_report_obj = error_report_dictization.error_report_dict_save(
+        validated_data, context
+    )
     model.Session.commit()
 
     return toolkit.get_action("error_report_show")(

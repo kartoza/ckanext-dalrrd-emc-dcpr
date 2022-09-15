@@ -93,8 +93,7 @@ class ErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
                 == ErrorReport.csi_reference_id,
             )
             .filter(
-                ErrorReportNotificationTarget.error_report_id
-                == str(self.csi_reference)
+                ErrorReportNotificationTarget.error_report_id == str(self.csi_reference)
             )
             .all()
         )

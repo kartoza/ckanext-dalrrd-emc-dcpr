@@ -31,9 +31,7 @@ def get_approved_error_reports():
 
 @error_report_blueprint.route("/all_error_reports")
 def get_error_reports():
-    return _get_error_reports_list(
-        "all_error_reports", should_show_create_action=True
-    )
+    return _get_error_reports_list("all_error_reports", should_show_create_action=True)
 
 
 @error_report_blueprint.route("/rejected_error_reports")
@@ -85,6 +83,7 @@ def _get_error_reports_list(ckan_action: str, should_show_create_action: bool = 
         }
         result = toolkit.render("error_report/list.html", extra_vars=extra_vars)
     return result
+
 
 class ErrorReportCreateView(MethodView):
     def get(self, data=None, errors=None, error_summary=None):
@@ -433,7 +432,8 @@ class DcprRequestSubmitView(MethodView):
                     "error_report": error_report,
                     "action": "submit",
                     "action_url": toolkit.h["url_for"](
-                        "error_report.error_report_submit", csi_reference_id=csi_reference_id
+                        "error_report.error_report_submit",
+                        csi_reference_id=csi_reference_id,
                     ),
                 },
             )
@@ -456,7 +456,8 @@ class DcprRequestSubmitView(MethodView):
                 toolkit.h["flash_notice"](toolkit._("Dataset has been submitted!"))
                 result = toolkit.redirect_to(
                     toolkit.h["url_for"](
-                        "error_report.error_report_show", csi_reference_id=csi_reference_id
+                        "error_report.error_report_show",
+                        csi_reference_id=csi_reference_id,
                     )
                 )
         else:
@@ -491,7 +492,8 @@ class DcprRequestDeleteView(MethodView):
                 "error_report": error_report,
                 "action": "delete",
                 "action_url": toolkit.h["url_for"](
-                    "error_report.error_report_delete", csi_reference_id=csi_reference_id
+                    "error_report.error_report_delete",
+                    csi_reference_id=csi_reference_id,
                 ),
             },
         )
@@ -588,7 +590,8 @@ class DcprRequestResignReviewerView(MethodView):
                 )
                 result = toolkit.redirect_to(
                     toolkit.h["url_for"](
-                        "error_report.error_report_show", csi_reference_id=csi_reference_id
+                        "error_report.error_report_show",
+                        csi_reference_id=csi_reference_id,
                     )
                 )
         else:
@@ -664,7 +667,8 @@ class DcprRequestBecomeReviewerView(MethodView):
                 )
                 result = toolkit.redirect_to(
                     toolkit.h["url_for"](
-                        "error_report.error_report_show", csi_reference_id=csi_reference_id
+                        "error_report.error_report_show",
+                        csi_reference_id=csi_reference_id,
                     )
                 )
         else:

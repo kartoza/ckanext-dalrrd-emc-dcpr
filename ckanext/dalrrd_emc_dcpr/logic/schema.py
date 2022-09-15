@@ -48,11 +48,7 @@ def create_error_report_schema(
     unicode_safe,
 ):
     return {
-        "metadata_record": [
-            not_missing,
-            not_empty,
-            unicode_safe
-        ],
+        "metadata_record": [not_missing, not_empty, unicode_safe],
         "error_application": [ignore_missing, unicode_safe],
         "error_description": [not_missing, not_empty],
         "solution_description": [ignore_missing, unicode_safe],
@@ -71,11 +67,7 @@ def update_error_report_by_owner_schema(
     unicode_safe,
 ):
     return {
-        "metadata_record": [
-            not_missing,
-            not_empty,
-            unicode_safe
-        ],
+        "metadata_record": [not_missing, not_empty, unicode_safe],
         "error_application": [ignore_missing, unicode_safe],
         "error_description": [not_missing, not_empty],
         "solution_description": [ignore_missing, unicode_safe],
@@ -84,6 +76,16 @@ def update_error_report_by_owner_schema(
         "nsif_review_additional_documents": [ignore_missing, unicode_safe],
         "nsif_moderation_date": [ignore_missing, unicode_safe],
     }
+
+
+@validator_args
+def show_error_report_schema(not_missing, not_empty, unicode_safe):
+    return {"csi_reference_id": [not_missing, not_empty, unicode_safe]}
+
+
+@validator_args
+def delete_error_report_schema():
+    return show_error_report_schema()
 
 
 @validator_args

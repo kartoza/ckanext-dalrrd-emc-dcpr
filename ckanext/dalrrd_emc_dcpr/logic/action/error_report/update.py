@@ -5,10 +5,7 @@ import typing
 from ckan.plugins import toolkit
 
 from .... import jobs
-from ....constants import (
-    ErrorReportStatus,
-    ErrorReportModerationAction
-)
+from ....constants import ErrorReportStatus, ErrorReportModerationAction
 from ... import schema as error_schema
 from ....model import error_report
 from .... import error_report_dictization
@@ -25,7 +22,9 @@ def error_report_update_by_owner(context, data_dict):
     toolkit.check_access("error_report_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id
     context["updated_by"] = "owner"
-    error_report_obj = error_report_dictization.error_report_dict_save(validated_data, context)
+    error_report_obj = error_report_dictization.error_report_dict_save(
+        validated_data, context
+    )
     context["model"].Session.commit()
 
     return error_report_dictization.error_report_dictize(error_report_obj, context)
@@ -44,7 +43,9 @@ def error_report_update_by_nsif(context, data_dict):
             "nsif_moderation_date": dt.datetime.now(dt.timezone.utc),
         }
     )
-    error_report_obj = error_report_dictization.error_report_dict_save(validated_data, context)
+    error_report_obj = error_report_dictization.error_report_dict_save(
+        validated_data, context
+    )
     context["model"].Session.commit()
 
     return error_report_dictization.error_report_dictize(error_report_obj, context)
