@@ -4,10 +4,7 @@ import typing
 
 from ckan.plugins import toolkit
 
-from .... import jobs
-from ....constants import ErrorReportStatus, ErrorReportModerationAction
 from ... import schema as error_schema
-from ....model import error_report
 from .... import error_report_dictization
 
 logger = logging.getLogger(__name__)

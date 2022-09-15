@@ -57,7 +57,7 @@ def submitted_error_report_list_(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List[typing.Dict]:
 
-    toolkit.check_access("error_report_list_submitted_auth", context, data_dict or {})
+    toolkit.check_access("error_report_submitted_auth", context, data_dict or {})
     return _get_error_report_list(
         context,
         data_dict,
