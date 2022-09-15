@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def error_report_create_auth(
-        context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     db_user = context["auth_user_obj"]
     result = {"success": False}
@@ -21,7 +21,7 @@ def error_report_create_auth(
 
 
 def error_report_update_by_owner_auth(
-        context: typing.Dict, data_dict: typing.Dict
+    context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     request_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
 
@@ -29,24 +29,27 @@ def error_report_update_by_owner_auth(
     return result
 
 
-
 def error_report_update_by_nsif_auth(
-        context: typing.Dict, data_dict: typing.Dict
+    context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     request_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
 
-    is_nsif_reviewer = toolkit.h["emc_user_is_org_member"] \
-        ("nsif", context["auth_user_obj"], role="editor")
+    is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+        "nsif", context["auth_user_obj"], role="editor"
+    )
 
-    result = {"success": (is_nsif_reviewer and
-                          request_obj.status == ErrorReportStatus.SUBMITTED.value)}
+    result = {
+        "success": (
+            is_nsif_reviewer and request_obj.status == ErrorReportStatus.SUBMITTED.value
+        )
+    }
     return result
 
 
 def error_report_nsif_moderate_auth(
-        context: typing.Dict, data_dict: typing.Dict
+    context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    """ Moderation authentication for error report"""
+    """Moderation authentication for error report"""
     request_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
     result = {"success": False}
     user = context["auth_user_obj"]
@@ -75,33 +78,45 @@ def error_report_nsif_moderate_auth(
 
 
 def my_error_reports_auth(
-        context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ):
     result = {"success": False}
     if context["auth_user_obj"].sysadmin:
         result["success"] = True
     else:
         result["success"] = toolkit.h["emc_user_is_org_member"](
-            'nsif', context["auth_user_obj"]
+            "nsif", context["auth_user_obj"]
         )
     return result
 
 
 def error_report_submitted_auth(
-        context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ):
     result = {"success": False}
     if context["auth_user_obj"].sysadmin:
         result["success"] = True
     else:
         result["success"] = toolkit.h["emc_user_is_org_member"](
-            'nsif', context["auth_user_obj"]
+            "nsif", context["auth_user_obj"]
         )
     return result
 
 
+def error_report_list_public_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    return {"success": True}
+
+
+def my_error_report_list_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    return {"success": True}
+
+
 def error_report_delete_auth(
-        context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     """
     Error reports can be deleted by NSIF representative

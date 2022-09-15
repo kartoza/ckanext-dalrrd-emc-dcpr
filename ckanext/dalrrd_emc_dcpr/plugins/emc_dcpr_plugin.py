@@ -41,6 +41,7 @@ from ..logic.auth import ckan as ckan_auth
 from ..logic.auth import pages as ckanext_pages_auth
 from ..logic.auth import dcpr as dcpr_auth
 from ..logic.auth import emc as emc_auth
+from ..logic.auth import error_report as error_report_auth
 from ..model.user_extra_fields import UserExtraFields
 
 import ckanext.dalrrd_emc_dcpr.plugins.utils as utils
@@ -258,6 +259,15 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_request_dataset_publication": (
                 emc_auth.authorize_request_dataset_publication
             ),
+            "error_report_create_auth": error_report_auth.error_report_create_auth,
+            "error_report_update_by_owner_auth": error_report_auth.error_report_update_by_owner_auth,
+            "error_report_update_by_nsif_auth": error_report_auth.error_report_update_by_nsif_auth,
+            "error_report_nsif_moderate_auth": error_report_auth.error_report_nsif_moderate_auth,
+            "my_error_reports_auth": error_report_auth.my_error_reports_auth,
+            "error_report_submitted_auth": error_report_auth.error_report_submitted_auth,
+            "error_report_list_public_auth": error_report_auth.error_report_list_public_auth,
+            "my_error_report_list_auth": error_report_auth.my_error_report_list_auth,
+            "error_report_delete_auth": error_report_auth.error_report_delete_auth,
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
