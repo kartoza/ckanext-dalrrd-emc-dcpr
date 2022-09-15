@@ -29,10 +29,10 @@
                     {% set logged = True %}
                 {% endif %}
                 <div class="row gx-5 justify-content-center" data-module="check-access" data-access="{{ h.check_access('package_create') }}"
-                data-logged="{{ logged }}">
+                data-logged="{{ logged }}" style="margin-left: -15px">
                      <!-- Manual publication -->
                     <a href="#" data-link="{{ h.url_for('dataset.new') }}" class="new-dataset">
-                    <div class="col-xs-6 col-md-4 publish-action">
+                    <div class="col-sm-4 publish-action">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-primary">
@@ -58,7 +58,7 @@
                           multiple
                           data-module="xml_parser"
                         >
-                    <div class="col-xs-6 col-md-4 publish-action">
+                    <div class="col-sm-4 publish-action">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-muted text-primary">XML upload</div>
@@ -73,7 +73,7 @@
                     </a>
                      <!-- Harvesting -->
                     <a href="#" class="harvesting" data-link="{{ h.url_for('harvest.search') }}">
-                    <div class="col-xs-6 col-md-4 publish-action">
+                    <div class="col-sm-4 publish-action">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-muted text-primary">Harvesting</div>
