@@ -2,10 +2,8 @@ import logging
 
 from ckan.plugins import toolkit
 
-from ....constants import DcprManagementActivityType
 from ....model import error_report
 from ...schema import delete_error_report_schema
-from .. import create_dcpr_management_activity
 
 logger = logging.getLogger(__name__)
 

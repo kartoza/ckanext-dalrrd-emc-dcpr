@@ -23,7 +23,7 @@ def error_report_create(context, data_dict):
         model.Session.rollback()
         raise toolkit.ValidationError(errors)
 
-    toolkit.check_access("error_create_auth", context, validated_data)
+    toolkit.check_access("error_report_create_auth", context, validated_data)
 
     csi_reference_id = str(validated_data["csi_reference_id"])
     report = error_report.ErrorReport.get(csi_reference_id=csi_reference_id)
