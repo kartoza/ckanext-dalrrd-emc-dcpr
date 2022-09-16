@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 def user_show(original_action, context, data_dict):
     """
     Intercepts the core `user_show` action to add any extra_fields that may exist for
-    the user.
-
+    the user
     """
 
     original_result = original_action(context, data_dict)
