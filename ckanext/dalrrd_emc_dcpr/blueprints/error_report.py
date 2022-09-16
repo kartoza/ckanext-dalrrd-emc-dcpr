@@ -13,9 +13,7 @@ from ckan.views.dataset import url_with_params
 from ckan.plugins import toolkit
 from ckan.logic import clean_dict, parse_params, tuplize_dict
 
-from .. import constants
 from ..helpers import get_status_labels
-from ..model.dcpr_request import DCPRRequestUrgency
 
 logger = logging.getLogger(__name__)
 
@@ -116,33 +114,23 @@ class ErrorReportCreateView(MethodView):
             # if we have an org id in request.args then there is no need to show the orgs select
             relevant_orgs = None
 
-        serialized_errors = json.dumps(errors or {})
-        serialized_error_summary = json.dumps(error_summary or {})
         extra_vars = {
             "form_snippet": "error_report/snippets/request_form.html",
             "enable_owner_fieldset": True,
             "enable_nsif_fieldset": False,
-            "enable_csi_fieldset": False,
             "csi_reference_id": None,
             "data": data_to_show,
             "errors": errors or {},
             "error_summary": error_summary or {},
             "relevant_organizations": relevant_orgs,
-            "data_urgency_options": [
-                {"value": level.value, "text": level.value}
-                for level in DCPRRequestUrgency
-            ],
-            # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be different according with the user role
         }
         return toolkit.render("error_report/edit.html", extra_vars=extra_vars)
 
     def post(self):
         try:
-            flat_data_dict = clean_dict(
+            data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
-            # these the submitted requests form fields with the data
-            data_dict = _unflatten_error_report_datasets(flat_data_dict)
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
         else:
@@ -157,7 +145,7 @@ class ErrorReportCreateView(MethodView):
                     data_dict=data_dict,
                 )
             except toolkit.ObjectNotFound:
-                result = toolkit.abort(404, toolkit._("DCPR request not found"))
+                result = toolkit.abort(404, toolkit._("Error report not found"))
             except toolkit.ValidationError as exc:
                 errors = exc.error_dict
                 error_summary = exc.error_summary
@@ -174,16 +162,18 @@ class ErrorReportCreateView(MethodView):
 
 
 new_error_report_view = ErrorReportCreateView.as_view("new_error_report")
-error_report_blueprint.add_url_rule("/request/new/", view_func=new_error_report_view)
+error_report_blueprint.add_url_rule(
+    "/error_report/new/", view_func=new_error_report_view
+)
 
 
-class _DcprUpdateView(MethodView):
+class ErrorReportUpdateView(MethodView):
     show_action = "error_report_show"
     success_redirect_to_view = "error_report.error_report_show"
     update_auth: typing.Optional[str] = None
     update_action: typing.Optional[str] = None
     template_path = "error_report/edit.html"
-    form_snippet = "error_report/snippets/request_form.html"
+    form_snippet = "error_report/snippets/error_report_form.html"
     enable_owner_fieldset = True
     enable_nsif_fieldset = False
     enable_csi_fieldset = False
@@ -200,13 +190,11 @@ class _DcprUpdateView(MethodView):
             old_data = toolkit.get_action(self.show_action)(
                 context, data_dict={"csi_reference_id": csi_reference_id}
             )
-            # old data is from the database and data is passed from the
-            # user. if there is a validation error. Use user's data, if there.
             if data is not None:
                 old_data.update(data)
             data = old_data
         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
-            result = toolkit.abort(404, toolkit._("Dataset not found"))
+            result = toolkit.abort(404, toolkit._("Error report not found"))
         else:
             try:
                 toolkit.check_access(
@@ -227,25 +215,19 @@ class _DcprUpdateView(MethodView):
                         "form_snippet": self.form_snippet,
                         "enable_owner_fieldset": self.enable_owner_fieldset,
                         "enable_nsif_fieldset": self.enable_nsif_fieldset,
-                        "enable_csi_fieldset": self.enable_csi_fieldset,
                         "data": data,
                         "csi_reference_id": csi_reference_id,
                         "errors": errors or {},
                         "error_summary": error_summary or {},
-                        "data_urgency_options": [
-                            {"value": level.value, "text": level.value}
-                            for level in DCPRRequestUrgency
-                        ],
                     },
                 )
         return result
 
     def post(self, csi_reference_id: str):
         try:
-            flat_data_dict = clean_dict(
+            data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
-            data_dict = _unflatten_error_report_datasets(flat_data_dict)
             data_dict["csi_reference_id"] = csi_reference_id
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
@@ -256,10 +238,10 @@ class _DcprUpdateView(MethodView):
             except toolkit.NotAuthorized as exc:
                 result = toolkit.base.abort(
                     403,
-                    toolkit._("Unauthorized to update DCPR request, %s") % exc,
+                    toolkit._("Unauthorized to update error report, %s") % exc,
                 )
             except toolkit.ObjectNotFound:
-                result = toolkit.base.abort(404, toolkit._("DCPR request not found"))
+                result = toolkit.base.abort(404, toolkit._("Error report not found"))
             except toolkit.ValidationError as exc:
                 errors = exc.error_dict
                 error_summary = exc.error_summary
@@ -277,7 +259,7 @@ class _DcprUpdateView(MethodView):
         return result
 
 
-class DcprRequestOwnerUpdateView(_DcprUpdateView):
+class ErrorReportOwnerUpdateView(ErrorReportUpdateView):
     update_auth = "error_report_update_by_owner_auth"
     update_action = "error_report_update_by_owner"
     enable_owner_fieldset = True
@@ -286,7 +268,7 @@ class DcprRequestOwnerUpdateView(_DcprUpdateView):
 
 
 # came back here to feature data in the EMC
-class DcprRequestNsifUpdateView(_DcprUpdateView):
+class ErrorReportNsifUpdateView(ErrorReportUpdateView):
     update_auth = "error_report_update_by_nsif_auth"
     update_action = "error_report_update_by_nsif"
     enable_owner_fieldset = False
@@ -294,35 +276,24 @@ class DcprRequestNsifUpdateView(_DcprUpdateView):
     enable_csi_fieldset = False
 
 
-class DcprRequestCsifUpdateView(_DcprUpdateView):
-    update_auth = "error_report_update_by_csi_auth"
-    update_action = "error_report_update_by_csi"
-    enable_owner_fieldset = False
-    enable_nsif_fieldset = False
-    enable_csi_fieldset = True
-
-
-owner_edit_error_report_view = DcprRequestOwnerUpdateView.as_view(
+owner_edit_error_report_view = ErrorReportOwnerUpdateView.as_view(
     "owner_edit_error_report"
 )
 error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/owner_edit/", view_func=owner_edit_error_report_view
+    "/error_report/<csi_reference_id>/owner_edit/",
+    view_func=owner_edit_error_report_view,
 )
 
-nsif_edit_error_report_view = DcprRequestNsifUpdateView.as_view(
+nsif_edit_error_report_view = ErrorReportNsifUpdateView.as_view(
     "nsif_edit_error_report"
 )
 error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/nsif_edit/", view_func=nsif_edit_error_report_view
+    "/error_report/<csi_reference_id>/nsif_edit/", view_func=nsif_edit_error_report_view
 )
 
-csi_edit_error_report_view = DcprRequestCsifUpdateView.as_view("csi_edit_error_report")
-error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/csi_edit/", view_func=csi_edit_error_report_view
-)
 
-# request show page
-@error_report_blueprint.route("/request/<csi_reference_id>")
+# error_report show page
+@error_report_blueprint.route("/error_report/<csi_reference_id>")
 def error_report_show(csi_reference_id):
     try:
         error_report = toolkit.get_action("error_report_show")(
@@ -330,7 +301,7 @@ def error_report_show(csi_reference_id):
             data_dict={"csi_reference_id": csi_reference_id},
         )
     except toolkit.ObjectNotFound:
-        result = toolkit.abort(404, toolkit._("DCPR request not found"))
+        result = toolkit.abort(404, toolkit._("Error report not found"))
     except toolkit.NotAuthorized:
         result = toolkit.base.abort(401, toolkit._("Not authorized"))
     else:
@@ -341,17 +312,13 @@ def error_report_show(csi_reference_id):
     return result
 
 
-class DcprRequestModerateView(MethodView):
+class ErrorReportModerateView(MethodView):
     template_name = "error_report/moderate.html"
     actions = {
         "nsif": {
-            "message": "Moderate DCPR request on behalf of NSIF",
+            "message": "Moderate Error report on behalf of NSIF",
             "ckan_action": "error_report_nsif_moderate",
-        },
-        "csi": {
-            "message": "Moderate DCPR request on behalf of CSI",
-            "ckan_action": "error_report_csi_moderate",
-        },
+        }
     }
 
     def get(self, csi_reference_id: str, organization: str):
@@ -361,10 +328,10 @@ class DcprRequestModerateView(MethodView):
                 context, data_dict={"csi_reference_id": csi_reference_id}
             )
         except toolkit.ObjectNotFound:
-            result = toolkit.abort(404, toolkit._("DCPR request not found"))
+            result = toolkit.abort(404, toolkit._("Error report not found"))
         except toolkit.NotAuthorized:
             result = toolkit.abort(
-                403, toolkit._("Unauthorized to moderate DCPR request")
+                403, toolkit._("Unauthorized to moderate error report")
             )
         else:
             result = toolkit.render(
@@ -384,16 +351,16 @@ class DcprRequestModerateView(MethodView):
     def post(self, csi_reference_id: str, organization: str):
         data_dict = {
             "csi_reference_id": csi_reference_id,
-            "action": list(request.form.keys())[0],
+            "action": list(error_report.form.keys())[0],
         }
         try:
             ckan_action = self.actions.get(organization, {}).get("ckan_action")
             toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
         except toolkit.ObjectNotFound:
-            result = toolkit.abort(404, toolkit._("Dataset not found"))
+            result = toolkit.abort(404, toolkit._("Report not found"))
         except toolkit.NotAuthorized:
             result = toolkit.abort(
-                403, toolkit._("Unauthorized to submit moderation for DCPR request")
+                403, toolkit._("Unauthorized to submit moderation for error report")
             )
         else:
             toolkit.h["flash_notice"](toolkit._("Moderation submitted"))
@@ -405,14 +372,14 @@ class DcprRequestModerateView(MethodView):
         return result
 
 
-moderate_error_report_view = DcprRequestModerateView.as_view("error_report_moderate")
+moderate_error_report_view = ErrorReportModerateView.as_view("error_report_moderate")
 error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/moderate/<organization>",
+    "/error_report/<csi_reference_id>/moderate/<organization>",
     view_func=moderate_error_report_view,
 )
 
 
-class DcprRequestSubmitView(MethodView):
+class ErrorReportSubmitView(MethodView):
     def get(self, csi_reference_id: str):
         context = _prepare_context()
         try:
@@ -420,10 +387,10 @@ class DcprRequestSubmitView(MethodView):
                 context, data_dict={"csi_reference_id": csi_reference_id}
             )
         except toolkit.ObjectNotFound:
-            result = toolkit.abort(404, toolkit._("DCPR request not found"))
+            result = toolkit.abort(404, toolkit._("Error report not found"))
         except toolkit.NotAuthorized:
             result = toolkit.abort(
-                403, toolkit._("Unauthorized to submit DCPR request")
+                403, toolkit._("Unauthorized to submit error report")
             )
         else:
             result = toolkit.render(
@@ -469,13 +436,13 @@ class DcprRequestSubmitView(MethodView):
         return result
 
 
-submit_error_report_view = DcprRequestSubmitView.as_view("error_report_submit")
+submit_error_report_view = ErrorReportSubmitView.as_view("error_report_submit")
 error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/submit/", view_func=submit_error_report_view
+    "/error_report/<csi_reference_id>/submit/", view_func=submit_error_report_view
 )
 
 
-class DcprRequestDeleteView(MethodView):
+class ErrorReportDeleteView(MethodView):
     def get(self, csi_reference_id: str):
         context = _prepare_context()
         try:
@@ -483,9 +450,9 @@ class DcprRequestDeleteView(MethodView):
                 context, data_dict={"csi_reference_id": csi_reference_id}
             )
         except toolkit.ObjectNotFound:
-            return toolkit.abort(404, toolkit._("DCPR request not found"))
+            return toolkit.abort(404, toolkit._("Error report not found"))
         except toolkit.NotAuthorized:
-            return toolkit.abort(403, toolkit._("Unauthorized to delete DCPR request"))
+            return toolkit.abort(403, toolkit._("Unauthorized to delete error report"))
         return toolkit.render(
             "error_report/ask_for_confirmation.html",
             extra_vars={
@@ -506,13 +473,13 @@ class DcprRequestDeleteView(MethodView):
                     context, data_dict={"csi_reference_id": csi_reference_id}
                 )
             except toolkit.ObjectNotFound:
-                result = toolkit.abort(404, toolkit._("DCPR request not found"))
+                result = toolkit.abort(404, toolkit._("Error report not found"))
             except toolkit.NotAuthorized:
                 result = toolkit.abort(
-                    403, toolkit._("Unauthorized to delete DCPR request %s") % ""
+                    403, toolkit._("Unauthorized to delete error report %s") % ""
                 )
             else:
-                toolkit.h["flash_notice"](toolkit._("DCPR request has been deleted."))
+                toolkit.h["flash_notice"](toolkit._("Error report has been deleted."))
                 result = toolkit.redirect_to(
                     toolkit.h["url_for"]("error_report.get_my_error_reports")
                 )
@@ -525,167 +492,9 @@ class DcprRequestDeleteView(MethodView):
         return result
 
 
-delete_error_report_view = DcprRequestDeleteView.as_view("error_report_delete")
+delete_error_report_view = ErrorReportDeleteView.as_view("error_report_delete")
 error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/delete/", view_func=delete_error_report_view
-)
-
-
-class DcprRequestResignReviewerView(MethodView):
-    def get(self, csi_reference_id: str, organization: str):
-        context = _prepare_context()
-        try:
-            error_report = toolkit.get_action("error_report_show")(
-                context, data_dict={"csi_reference_id": csi_reference_id}
-            )
-        except toolkit.ObjectNotFound:
-            return toolkit.abort(404, toolkit._("DCPR request not found"))
-        except toolkit.NotAuthorized:
-            return toolkit.abort(
-                403,
-                toolkit._(
-                    "Unauthorized to resign from the role of reviewer of DCPR request"
-                ),
-            )
-        action = {
-            "nsif": "Resign from being the NSIF reviewer",
-            "csi": "Resign from being the CSI reviewer",
-        }.get(organization)
-        return toolkit.render(
-            "error_report/ask_for_confirmation.html",
-            extra_vars={
-                "error_report": error_report,
-                "action": action,
-                "action_url": toolkit.h["url_for"](
-                    "error_report.error_report_resign_reviewer",
-                    csi_reference_id=csi_reference_id,
-                    organization=organization,
-                ),
-            },
-        )
-
-    def post(self, csi_reference_id: str, organization: str):
-        if "cancel" not in request.form.keys():
-            context = _prepare_context()
-            action_name = {
-                "nsif": "resign_error_report_nsif_reviewer",
-                "csi": "resign_error_report_csi_reviewer",
-            }.get(organization)
-            try:
-                toolkit.get_action(action_name)(
-                    context, data_dict={"csi_reference_id": csi_reference_id}
-                )
-            except toolkit.ObjectNotFound:
-                result = toolkit.abort(404, toolkit._("Dataset not found"))
-            except toolkit.NotAuthorized:
-                result = toolkit.abort(
-                    403,
-                    toolkit._(
-                        "Unauthorized to resign from the role of DCPR request reviewer"
-                    ),
-                )
-            else:
-                toolkit.h["flash_notice"](
-                    toolkit._("You are no longer the reviewer for the DCPR request.")
-                )
-                result = toolkit.redirect_to(
-                    toolkit.h["url_for"](
-                        "error_report.error_report_show",
-                        csi_reference_id=csi_reference_id,
-                    )
-                )
-        else:
-            result = toolkit.h.redirect_to(
-                toolkit.h["url_for"](
-                    "error_report.error_report_show", csi_reference_id=csi_reference_id
-                )
-            )
-        return result
-
-
-resign_error_report_view = DcprRequestResignReviewerView.as_view(
-    "error_report_resign_reviewer"
-)
-error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/resign/<organization>",
-    view_func=resign_error_report_view,
-)
-
-
-class DcprRequestBecomeReviewerView(MethodView):
-    def get(self, csi_reference_id: str, organization: str):
-        context = _prepare_context()
-        try:
-            error_report = toolkit.get_action("error_report_show")(
-                context, data_dict={"csi_reference_id": csi_reference_id}
-            )
-        except toolkit.ObjectNotFound:
-            result = toolkit.abort(404, toolkit._("DCPR request not found"))
-        except toolkit.NotAuthorized:
-            result = toolkit.abort(
-                403, toolkit._("Unauthorized to become the reviewer for DCPR request")
-            )
-        else:
-            action = {
-                constants.NSIF_ORG_NAME: "become NSIF reviewer",
-                constants.CSI_ORG_NAME: "become CSI reviewer",
-            }.get(organization)
-            result = toolkit.render(
-                "error_report/ask_for_confirmation.html",
-                extra_vars={
-                    "error_report": error_report,
-                    "action": action,
-                    "action_url": toolkit.h["url_for"](
-                        "error_report.error_report_become_reviewer",
-                        csi_reference_id=csi_reference_id,
-                        organization=organization,
-                    ),
-                },
-            )
-        return result
-
-    def post(self, csi_reference_id: str, organization: str):
-        if "cancel" not in request.form.keys():
-            context = _prepare_context()
-            action_name = {
-                "nsif": "claim_error_report_nsif_reviewer",
-                "csi": "claim_error_report_csi_reviewer",
-            }.get(organization)
-            try:
-                toolkit.get_action(action_name)(
-                    context, data_dict={"csi_reference_id": csi_reference_id}
-                )
-            except toolkit.ObjectNotFound:
-                result = toolkit.abort(404, toolkit._("Dataset not found"))
-            except toolkit.NotAuthorized:
-                result = toolkit.abort(
-                    403, toolkit._("Unauthorized to claim DCPR request")
-                )
-            else:
-                toolkit.h["flash_notice"](
-                    toolkit._("You are now the reviewer for the DCPR request.")
-                )
-                result = toolkit.redirect_to(
-                    toolkit.h["url_for"](
-                        "error_report.error_report_show",
-                        csi_reference_id=csi_reference_id,
-                    )
-                )
-        else:
-            result = toolkit.h.redirect_to(
-                toolkit.h["url_for"](
-                    "error_report.error_report_show", csi_reference_id=csi_reference_id
-                )
-            )
-        return result
-
-
-claim_error_report_view = DcprRequestBecomeReviewerView.as_view(
-    "error_report_become_reviewer"
-)
-error_report_blueprint.add_url_rule(
-    "/request/<csi_reference_id>/review/<organization>",
-    view_func=claim_error_report_view,
+    "/error_report/<csi_reference_id>/delete/", view_func=delete_error_report_view
 )
 
 
@@ -697,54 +506,3 @@ def _prepare_context() -> typing.Dict:
         "auth_user_obj": toolkit.g.userobj,
     }
     return context
-
-
-def _unflatten_error_report_datasets(flat_data_dict: typing.Dict) -> typing.Dict:
-    dataset_fields = [
-        "proposed_dataset_title",
-        "dataset_purpose",
-        "dataset_custodian",
-        "data_type",
-        "proposed_abstract",
-        "lineage_statement",
-        "associated_attributes",
-        "data_usage_restrictions",
-        "capture_method",
-    ]
-    # how many datasets have been submitted?
-    first_ds_field_value = flat_data_dict.get(dataset_fields[0])
-    num_datasets = (
-        len(first_ds_field_value) if isinstance(first_ds_field_value, list) else 1
-    )
-    logger.debug(f"{num_datasets=}")
-
-    data_dict = {}
-    datasets: typing.List[typing.Dict] = [{} for i in range(num_datasets)]
-    for name, value in flat_data_dict.items():
-        if name in dataset_fields:
-            logger.debug(f"Processing {name=} {value=}...")
-            if name == "dataset_custodian":
-                # the `dataset_custodian` form field is problematic - it is represented
-                # by a checkbox and is only submitted if the HTML element has the
-                # `checked` property. This means that if this `dataset_custodian` field
-                # is not checked, then parsing the form response when there are multiple
-                # datasets becomes trickier - the below code is just an attempt to deal
-                # with this in a less complex way.
-                if isinstance(value, list):
-                    for i in range(num_datasets):
-                        target_value = f"ds-{i + 1}"
-                        datasets[i][name] = target_value in value
-                else:
-                    for i in range(num_datasets):
-                        target_value = f"ds-{i + 1}"
-                        datasets[i][name] = value == target_value
-            elif num_datasets == 1:
-                datasets[0][name] = value
-            else:
-                for ds_index, ds_value in enumerate(value):
-                    logger.debug(f"Processing {ds_index=} {ds_value=}...")
-                    datasets[ds_index][name] = ds_value
-        else:
-            data_dict[name] = value
-    data_dict["datasets"] = datasets
-    return data_dict
