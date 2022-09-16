@@ -2,9 +2,12 @@
 
 import logging
 import typing
+import string
+import random
 
 import ckan.plugins.toolkit as toolkit
 from ckan.model.domain_object import DomainObject
+from ckan.lib.helpers import flash_success
 
 from ...model.user_extra_fields import UserExtraFields
 
@@ -15,8 +18,7 @@ logger = logging.getLogger(__name__)
 def user_show(original_action, context, data_dict):
     """
     Intercepts the core `user_show` action to add any extra_fields that may exist for
-    the user.
-
+    the user
     """
 
     original_result = original_action(context, data_dict)
@@ -97,6 +99,7 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
+    handle_versioning(context, data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
@@ -147,3 +150,24 @@ def _act_depending_on_package_visibility(
         access = toolkit.check_access("package_publish", context, data)
         result = action(context, data) if access else None
     return result
+
+
+def handle_versioning(context, data_dict):
+    old_dataset = toolkit.get_action("package_show")(data_dict={"id": data_dict["id"]})
+    old_version = old_dataset.get("version")
+    new_version = data_dict.get("version")
+    if old_version != new_version:
+        generated_id = "".join(
+            random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+            for _ in range(6)
+        )
+        new_id = data_dict.get("id") + "_" + new_version + "_" + generated_id
+        new_title = data_dict.get("title") + "_" + new_version
+        new_url = data_dict.get("name") + "_" + new_version
+        for i in new_url:
+            if i in "!”#$%&'()*+,-./:;<=>?@[\]^`{|}~.":
+                new_url = new_url.replace(i, "_")
+        data_dict.update({"id": new_id, "title": new_title, "name": new_url})
+        result = toolkit.get_action("package_create")(context, data_dict)
+        flash_success("new version is created !")
+        return result
