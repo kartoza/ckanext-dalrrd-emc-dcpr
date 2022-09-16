@@ -403,14 +403,17 @@ def get_maintenance_custom_other_field_data(data_dict):
     /package/read.html, the whole data shows up)
     it would be preferable
     """
-    q = f""" select value from package_extra where package_id='{data_dict["id"]}' AND key = 'maintenance_information'  """
-    result = model.Session.execute(q)
-    for row in result.fetchall():
-        load_row = json.loads(dict(row)["value"])
-        try:
-            return load_row[0]["__extras"]["custom_other_choice_select"]
-        except:
-            pass
+    dataset_id = data_dict.get("id")
+    # will be none if we are creating new package
+    if dataset_id is not None:
+        q = f""" select value from package_extra where package_id='{data_dict["id"]}' AND key = 'maintenance_information'  """
+        result = model.Session.execute(q)
+        for row in result.fetchall():
+            load_row = json.loads(dict(row)["value"])
+            try:
+                return load_row[0]["__extras"]["custom_other_choice_select"]
+            except:
+                pass
 
     # if package object (i.e found with /package/read.html) is used
     ##### keeping it for further solutions

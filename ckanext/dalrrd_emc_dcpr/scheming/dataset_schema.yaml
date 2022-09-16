@@ -81,8 +81,6 @@ dataset_fields:
       - field_name: citation_responsible_party
         label: Citation responsible party
         required: true
-        preset: emc_dataset_organization
-
 
 
   - field_name: notes
