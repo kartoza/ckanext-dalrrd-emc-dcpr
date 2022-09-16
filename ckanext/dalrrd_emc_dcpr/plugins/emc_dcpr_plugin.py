@@ -33,6 +33,11 @@ from ..logic.action.dcpr import delete as dcpr_delete_actions
 from ..logic.action.dcpr import get as dcpr_get_actions
 from ..logic.action.dcpr import update as dcpr_update_actions
 from ..logic.action import emc as emc_actions
+from ..logic.action.error_report import create as report_create_actions
+from ..logic.action.error_report import update as report_update_actions
+from ..logic.action.error_report import get as report_get_actions
+from ..logic.action.error_report import delete as report_delete_actions
+
 from ..logic import (
     converters,
     validators,
@@ -308,6 +313,14 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "user_update": ckan_actions.user_update,
             "user_create": ckan_actions.user_create,
             "user_show": ckan_actions.user_show,
+            "error_report_create": report_create_actions.error_report_create,
+            "error_report_update_by_owner": report_update_actions.error_report_update_by_owner,
+            "error_report_update_by_nsif": report_update_actions.error_report_update_by_nsif,
+            "error_report_show": report_get_actions.error_report_show,
+            "error_report_list_public": report_get_actions.error_report_list_public,
+            "my_error_report_list": report_get_actions.my_error_report_list,
+            "submitted_error_report_list_": report_get_actions.submitted_error_report_list,
+            "error_report_delete": report_delete_actions.error_report_delete,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:

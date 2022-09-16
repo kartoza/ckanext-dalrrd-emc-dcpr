@@ -53,7 +53,7 @@ def my_error_report_list(
 
 
 @toolkit.side_effect_free
-def submitted_error_report_list_(
+def submitted_error_report_list(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List[typing.Dict]:
 
