@@ -1,0 +1,103 @@
+{% import 'macros/form.html' as form %}
+
+{% if error_report.request_date %}
+  {% set request_date = h.date_str_to_datetime(error_report.request_date).strftime("%Y-%m-%d") %}
+{% else %}
+    {% set request_date = None %}
+{% endif %}
+
+{% if error_report.nsif_moderation_date %}
+  {% set nsif_moderation_date = h.date_str_to_datetime(error_report.nsif_moderation_date).strftime("%Y-%m-%d") %}
+{% else %}
+    {% set nsif_moderation_date = None %}
+{% endif %}
+
+{% block fields %}
+
+  {%- snippet 'error_report/snippets/inputs/select.html',
+   field = {'field_name': 'error_application', id: 'field-error_application',
+           'label': _('Organization Name'),  'options': organizations,
+           'selected': error_report.organization_name,
+           'help_text': 'Name of the organization that is requesting data capture.',
+           'classes': ['control-full'], 'attrs':
+           {'error_report-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {%- snippet 'error_report/snippets/inputs/select.html',
+   field = {'field_name': 'metadata_record', id: 'field-metadata_record',
+           'label': _('Organization Level'),  'options': metadata_records,
+           'selected': error_report.metadata_record,
+           'help_text': 'Dataset name',
+           'classes': ['control-full'], 'attrs':
+           {'error_report-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+
+   {%- snippet 'error_report/snippets/inputs/input.html',
+   field = {'field_name': 'error_description', id: 'field-error_description',
+           'label': _('Error description'),
+           'value': error_report.error_description,
+           'help_text': 'Error description',
+           'is_required': True,
+           'placeholder': _('eg. Error description'),
+           'classes': ['control-full'], 'attrs':
+           {'error_report-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'error_report/snippets/inputs/markdown.html',
+   field = {'field_name': 'solution_description', id: 'field-solution_description',
+           'label': _('Solution description'),
+           'value': error_report.solution_description,
+           'help_text': 'Information about the solution to the error',
+           'placeholder': _(''),
+   },
+   errors = errors or {}
+  -%}
+
+  {% if nsif_review_ready %}
+     {%- snippet 'error_report/snippets/inputs/input.html',
+     field = {'field_name': 'nsif_recommendation', id: 'field-nsif_recommendation',
+             'label': _('NSIF recommendation'),
+             'value': error_report.nsif_recommendation,
+             'help_text': 'Whether the NSIF recommends the DCPR request be accepted by CSI
+                           or not. This is the result of the NSIF review process.',
+             'placeholder': _(''),
+             'classes': ['control-full'], 'attrs':
+             {'error_report-module': 'slug-preview-target', 'class': 'form-control'}
+     },
+     errors = errors or {}
+    -%}
+
+    {%- snippet 'error_report/snippets/inputs/markdown.html',
+     field = {'field_name': 'nsif_moderation_notes', id: 'field-nsif_moderation_notes',
+             'label': _('NSIF moderation notes'),
+             'value': error_report.nsif_moderation_notes,
+             'help_text': 'Notes about the moderation process acted out by the NSIF representative.',
+             'placeholder': _('eg. NSIF moderation notes'),
+     },
+     errors = errors or {}
+    -%}
+
+     {%- snippet 'error_report/snippets/inputs/input.html',
+     field = {'field_name': 'nsif_review_additional_documents', id: 'field-nsif_review_additional_documents',
+             'label': _('NSIF review additional documents'),
+             'value': error_report.nsif_review_additional_documents,
+             'help_text': 'Additional documents that may be attached to the error report',
+             'placeholder': _(''),
+             'classes': ['control-full'], 'attrs':
+             {'error_report-module': 'slug-preview-target', 'class': 'form-control'}
+     },
+     errors = errors or {}
+    -%}
+
+  {% endif %}
+
+{% endblock %}
+
+{% block package_basic_fields_custom %}{% endblock %}

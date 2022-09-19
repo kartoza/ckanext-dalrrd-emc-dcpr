@@ -115,7 +115,7 @@ class ErrorReportCreateView(MethodView):
             relevant_orgs = None
 
         extra_vars = {
-            "form_snippet": "error_report/snippets/request_form.html",
+            "form_snippet": "error_report/snippets/report_form.html",
             "enable_owner_fieldset": True,
             "enable_nsif_fieldset": False,
             "csi_reference_id": None,
