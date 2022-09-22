@@ -23,6 +23,7 @@ from .. import (
 )
 from ..blueprints.dcpr import dcpr_blueprint
 from ..blueprints.emc import emc_blueprint
+from ..blueprints.error_report import error_report_blueprint
 from ..blueprints.xml_parser import xml_parser_blueprint
 from ..blueprints.publish import publish_blueprint
 from ..cli import commands
@@ -319,7 +320,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "error_report_show": report_get_actions.error_report_show,
             "error_report_list_public": report_get_actions.error_report_list_public,
             "my_error_report_list": report_get_actions.my_error_report_list,
-            "submitted_error_report_list_": report_get_actions.submitted_error_report_list,
+            "submitted_error_report_list": report_get_actions.submitted_error_report_list,
             "error_report_delete": report_delete_actions.error_report_delete,
         }
 
@@ -376,6 +377,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return [
             dcpr_blueprint,
             emc_blueprint,
+            error_report_blueprint,
             xml_parser_blueprint,
             publish_blueprint,
         ]

@@ -2,7 +2,18 @@
 
 <form class="dataset-form" method="post" data-module="basic-form" novalidate>
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
-    <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
+    <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="error-report-owner-fields">
+
+        {% call form.select(
+                "metadata_record",
+                id="field-metadata_record",
+                label=_("Metadata record"),
+                options=metadata_records,
+                selected=selected_record or metadata_records[0].text,
+                is_required=true
+            ) %}
+                {{ form.info(_('Metadata record that has fault or deficiency')) }}
+            {% endcall %}
 
         {% call form.input(
             'error_application',
@@ -18,20 +29,16 @@
                             the metadata record or with the underlying dataset itself')) }}
         {% endcall %}
 
-        {% call form.input(
+        {% call form.markdown(
             'error_description',
             label=_('Error description'),
-            id='field-error-description',
-            placeholder=_(''),
-            value=data.error-description,
-            error=errors.error-description,
-            classes=['control-medium'],
-            is_required=False
+            id='field-error_description',
+            value=data.error_description,
+            error=errors.error_description,
+            placeholder=_('e.g. Error description')
         ) %}
-            {{ form.info(_('Report purpose, whether it is about a deficiency with
-                            the metadata record or with the underlying dataset itself')) }}
+            {{ form.info(_('Description of possible solutions to the error being reported')) }}
         {% endcall %}
-
 
         {% call form.markdown(
             'solution_description',
@@ -46,8 +53,9 @@
         </div>
 
     </fieldset>
+    {% if is_nsif_reviewer or is_admin %}
     <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
-        <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
+        <legend>NSIF reviewer fields (only enabled for NSI reviewer)</legend>
         {% call form.markdown(
             'nsif_moderation_notes',
             label=_('NSIF moderation notes'),
@@ -70,8 +78,8 @@
             {{ form.info(_('Provided by the NSIF reviewers')) }}
         {% endcall %}
 
-
     </fieldset>
+    {% endif %}
 
     {% block form_actions %}
         {{ form.required_message() }}

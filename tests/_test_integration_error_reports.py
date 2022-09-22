@@ -66,15 +66,15 @@ def test_create_dcpr_report(name, user_available, user_logged):
             "error_description": report.error_description,
             "solution_description": report.solution_description,
             "request_date": report.request_date,
-            "csi_moderation_notes": report.csi_moderation_notes,
-            "csi_review_additional_documents": report.csi_review_additional_documents,
-            "csi_moderation_date": report.csi_moderation_date,
+            "nsif_moderation_notes": report.csi_moderation_notes,
+            "nsif_review_additional_documents": report.csi_review_additional_documents,
+            "nsif_moderation_date": report.csi_moderation_date,
         }
 
         context = {"ignore_auth": not user_logged, "user": user["name"]}
 
         helpers.call_action(
-            "dcpr_error_report_create",
+            "error_report_create",
             context=context,
             **data_dict,
         )

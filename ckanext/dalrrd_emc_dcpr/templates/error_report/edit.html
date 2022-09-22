@@ -1,10 +1,9 @@
 {% extends 'page.html' %}
-
-{% block subtitle %}
+{% block content_primary_nav %}
     {% if csi_reference_id %}
-        {{ _('Edit Error report') }}
+        <h1>{{ _('Edit error report') }}</h1>
     {% else %}
-        {{ _('Create Error report') }}
+        <h1>{{ _('Create new error report') }}{% if data.organization_id %} for organization {{ data.organization_id }}{% endif %}</h1>
     {% endif %}
 {% endblock %}
 
@@ -15,21 +14,19 @@
 {% endblock %}
 
 {% block primary_content_inner %}
-    {% if csi_reference_id %}
-        <h1>{{ _('Edit error report') }}</h1>
-    {% else %}
-        <h1>{{ _('Create new error report') }}{% if data.organization_id %} for organization {{ data.organization_id }}{% endif %}</h1>
-    {% endif %}
+
     {% block form %}
         {{- h.snippet(
             form_snippet,
             csi_reference_id=csi_reference_id,
             data=data,
-            relevant_organizations=relevant_organizations,
+            metadata_records=metadata_records,
+            selected_record=selected_record,
             enable_owner_fieldset=enable_owner_fieldset,
             enable_nsif_fieldset=enable_nsif_fieldset,
             errors=errors,
-            error_summary=error_summary,)
+            error_summary=error_summary,
+            data_urgency_options=data_urgency_options)
         -}}
 
     {% endblock %}

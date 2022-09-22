@@ -14,8 +14,8 @@ from ckan.model import core, domain_object, meta, types as _types
 
 
 # revision identifiers, used by Alembic.
-revision = 'e4f399857598'
-down_revision = 'e996e739c44c'
+revision = "e4f399857598"
+down_revision = "e996e739c44c"
 branch_labels = None
 depends_on = None
 

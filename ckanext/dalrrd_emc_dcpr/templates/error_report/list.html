@@ -13,19 +13,19 @@
 
 {% block content_primary_nav %}
     {% if has_multiple_request_types or is_sysadmin %}
-        {{ h.build_nav("error_report.get_public_error_report", _("Approved error reports")) }}
+        {{ h.build_nav("error_report.get_error_reports", _("Approved error reports")) }}
         {% if able_to_create_request %}
-            {{ h.build_nav("error_reprot.get_my_error_reports", _("My error reports")) }}
+            {{ h.build_nav("error_report.get_error_reports", _("My error reports")) }}
         {% endif %}
         {%  if is_nsif_member or is_sysadmin %}
-            {{ h.build_nav("error_report.get_awaiting_nsif_moderation_error_reports", _("Error reports awaiting NSIF moderation")) }}
+            {{ h.build_nav("error_report.get_error_reports", _("Error reports awaiting NSIF moderation")) }}
         {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block page_primary_action %}
-    {% if able_to_create_request and show_create_button %}
-        {% link_for _('Open an error report'), named_route="error_report.new_error_report", class_='btn btn-primary', icon='plus-square' %}
+    {% if able_to_create_error_report and show_create_button %}
+        {% link_for _('New error report'), named_route="error_report.new_error_report", class_='btn btn-success', icon='plus-square' %}
     {% endif %}
 {% endblock %}
 

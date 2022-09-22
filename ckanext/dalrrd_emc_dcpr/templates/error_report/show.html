@@ -10,7 +10,7 @@
 {% endblock -%}
 
 {% block secondary_content %}
-    {% snippet 'dcpr/snippets/info.html', error_reports=error_reports %}
+    {% snippet 'error_report/snippets/info.html', error_reports=error_reports %}
 {% endblock %}
 
 {% block content_action %}
@@ -61,11 +61,11 @@
             </tr>
             <tr>
                 <th scope="row">{{ _("Capture start date") }}</th>
-                <td>{% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=error_report.capture_start_date %}</td>
+                <td>{% snippet 'error_report/snippets/datetime_without_hours.html', datetime_obj=error_report.capture_start_date %}</td>
             </tr>
             <tr>
                 <th scope="row">{{ _("Capture end date") }}</th>
-                <td>{% snippet 'dcpr/snippets/datetime_without_hours.html', datetime_obj=error_report.capture_end_date %}</td>
+                <td>{% snippet 'error_report/snippets/datetime_without_hours.html', datetime_obj=error_report.capture_end_date %}</td>
             </tr>
             <tr>
                 <th scope="row" class="dataset-label">{{ _("Request date") }}</th>
@@ -75,9 +75,9 @@
                 </td>
             </tr>
             <tr>
-                <th scope="row" class="dataset-label">{{ _("NSIF review date") }}</th>
+                <th scope="row" class="dataset-label">{{ _("NSIF moderation date") }}</th>
                 <td class="dataset-details">
-                    {% snippet 'error_report/snippets/datetime_without_hours.html', datetime_obj=error_report.nsif_review_date %}
+                    {% snippet 'error_report/snippets/datetime_without_hours.html', datetime_obj=error_report.nsif_moderation_date %}
                 </td>
             </tr>
 
