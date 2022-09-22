@@ -6,14 +6,14 @@
           <dl>
             <p>
                 <span data-module="followers-counter" data-module-id="{{ organization.id }}" data-module-num_followers="{{ organization.num_followers }}">{{ h.SI_number_span(organization.num_followers) }}</span>
-              {{ _('Followers') }}
+              {{ ungettext('Follower', 'Followers', organization.num_followers) }}
             </p>
           </dl>
 
           <dl>
             <p>
             <span data-module="followers-counter">{{ h.SI_number_span(organization.package_count) }}</span>
-                {{ _('Metadata Records') }}
+                {{ ungettext('Metadata Record', 'Metadata Records', organization.package_count) }}
               </p>
           </dl>
         </div>
