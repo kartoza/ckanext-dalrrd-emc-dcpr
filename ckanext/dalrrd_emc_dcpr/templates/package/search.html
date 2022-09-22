@@ -7,8 +7,8 @@
     <div class="page-header">
     {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
         <h1>Electronic Metadata Catalogue (EMC)</h1>
-        <h5>Total number of metadata record: {{ total }}</h5>
-        <h5>{{ page.item_count }} metadata record found</h5>
+        <h5>Total number of metadata {{ ungettext('record', 'records', total) }}: {{ total }}</h5>
+        <h5>{{ page.item_count }} metadata {{ ungettext('record', 'records', page.item_count) }} found</h5>
         {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + 'metadata record' + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
         {% if h.check_access('package_create') %}
         <button class="btn btn-primary pull-right" onclick="document.getElementById('upload_input').click()"
