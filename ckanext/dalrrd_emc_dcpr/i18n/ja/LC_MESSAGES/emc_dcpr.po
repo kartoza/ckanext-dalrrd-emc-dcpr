@@ -585,3 +585,63 @@ msgstr "{actor} メタデータ レコードを作成しました {dataset}"
 #: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/requested_dataset_maintenance.html:6
 msgid "{actor} requested maintenance of dataset {dataset}"
 msgstr "{actor} データセットのメンテナンスを要求 {dataset}"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:6
+msgid "Welcome DALRRD"
+msgstr "ようこそDALRRD"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:19
+msgid "Electronic Metadata Catalogue (EMC)"
+msgstr "電子メタデータ カタログ (EMC)"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:20
+msgid "View All Datasets"
+msgstr "すべてのデータセットを表示"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:33
+msgid "Data Capture Project Register (DCPR)"
+msgstr "データ キャプチャ プロジェクト レジスタ (DCPR)"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:45
+msgid "Previous"
+msgstr "前"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:49
+msgid "Next"
+msgstr "次"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:55
+msgid "Search for data"
+msgstr "データを検索する"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:164
+msgid "Featured Datasets"
+msgstr "注目のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:164
+msgid "Featured Datasets"
+msgstr "注目のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:169
+msgid "Recent Datasets"
+msgstr "最近のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:20
+msgid "Metadata Records"
+msgstr "メタデータ レコード"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:21
+msgid "Organisations"
+msgstr "組織"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:22
+msgid "Publish"
+msgstr "公開"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:24
+msgid "Groups"
+msgstr "グループ"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:25
+msgid "About"
+msgstr "約"

@@ -17,7 +17,7 @@
                    <div class="col-xl-6">
                     <div class="text-center text-white">
                         <h1 class="header-title">_(Electronic Metadata Catalogue (EMC))</h1>
-                        <div class="mb-5 col-auto"><a href="/dataset/"><button class="btn btn-warning btn-lg"  type="submit">View All Datasets</button></a></div>
+                        <div class="mb-5 col-auto"><a href="/dataset/"><button class="btn btn-warning btn-lg"  type="submit">_("View All Datasets")</button></a></div>
                     </div>
                    </div>
                   </div>
@@ -30,7 +30,7 @@
                   <div class="row justify-content-center">
                   <div class="col-xl-6">
                     <div class="text-center text-white">
-                     <h1 class="header-title">_(Data Capture Project Register (DCPR))</h1>
+                     <h1 class="header-title">_("Data Capture Project Register (DCPR)")</h1>
                      <div class="mb-5 col-auto"><a href="/dcpr/"><button class="btn btn-warning btn-lg"  type="submit">DCPR</button></a></div>
                     </div>
                   </div>
@@ -42,17 +42,17 @@
         <!-- Left and right controls -->
           <a class="left carousel-control" href="#emcCarousel" data-slide="prev">
             <span class="glyphicon glyphicon-chevron-left"></span>
-            <span class="sr-only">_(Previous)</span>
+            <span class="sr-only">_("Previous")</span>
           </a>
           <a class="right carousel-control" href="#emcCarousel" data-slide="next">
             <span class="glyphicon glyphicon-chevron-right"></span>
-            <span class="sr-only">_(Next)</span>
+            <span class="sr-only">_("Next")</span>
           </a>
     </div>
 </header>
 <main class="index-search">
     <div class="container">
-    <h2 class="mb-5 section-title">_(Search for data)</h2>
+    <h2 class="mb-5 section-title">_("Search for data")</h2>
         <form {% if form_id %}id="{{ form_id }}" {% endif %}class="search-form{% if no_bottom_border %} no-bottom-border{% endif %}" method="get" data-module="select-switch" action="/dataset/">
             <div class="input-group search-input-group">
                 <input aria-label="{% block header_site_search_label %}{{ placeholder }}{% endblock %}" id="field-giant-search" type="text" class="form-control input-lg" name="q" value="{{ query }}" autocomplete="off" placeholder="Search metadata records...">
@@ -68,7 +68,7 @@
 </main>
  <section class="index-sasdi-theme">
     <div class="text-center container">
-    <h2 class="mb-5 section-title">SASDI Themes</h2>
+    <h2 class="mb-5 section-title">_("SASDI Themes")</h2>
         <div class="row mb-5">
             <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
                 <div data-toggle="tooltip" data-placement="top" title="Hydrology">
@@ -161,12 +161,12 @@
 <div class="container">
     <div class="row mb-5">
         <div class="col-lg-6 index-datasets">
-            <h2 class="mb-5 section-title">Featured Datasets</h2>
+            <h2 class="mb-5 section-title">_("Featured Datasets")</h2>
             {% set featured_datasets = h.emc_get_featured_datasets() %}
             {{ h.snippet('snippets/package_list.html', packages=featured_datasets) }}
         </div>
         <div class="col-lg-6 index-datasets">
-            <h2 class="mb-5 section-title">Recent Datasets</h2>
+            <h2 class="mb-5 section-title">_("Recent Datasets")</h2>
             {% set recent_datasets = h.emc_get_recently_modified_datasets() %}
             {{ h.snippet('snippets/package_list.html', packages=recent_datasets) }}
         </div>
