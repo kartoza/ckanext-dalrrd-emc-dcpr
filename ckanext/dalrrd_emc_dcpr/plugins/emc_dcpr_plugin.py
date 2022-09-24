@@ -60,6 +60,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPluginObserver)
+    plugins.implements(plugins.ITranslation)
 
     def before_load(self, plugin_class):
         """IPluginObserver interface requires reimplementation of this method."""
@@ -383,6 +384,20 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """
 
         return facets_dict
+
+    # ITranslate
+
+    def i18n_directory(self):
+        """Change the directory of the .mo translation files"""
+        return "../i18n"
+
+    def i18n_locales(self):
+        """returns a list of locals this plugin handles"""
+        return ["en", "ja"]
+
+    def i18n_domain(self):
+        """returns a list of locals this plugin handles"""
+        return "EMC"
 
 
 def _parse_date(raw_date: str) -> typing.Optional[str]:
