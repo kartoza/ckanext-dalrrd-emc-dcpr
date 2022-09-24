@@ -389,7 +389,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def i18n_directory(self):
         """Change the directory of the .mo translation files"""
-        return "../i18n"
+        return "/home/appuser/app/ckanext/dalrrd_emc_dcpr/i18n"
 
     def i18n_locales(self):
         """returns a list of locals this plugin handles"""
@@ -397,7 +397,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def i18n_domain(self):
         """returns a list of locals this plugin handles"""
-        return "EMC"
+        return "ckanext-dalrrd_emc_dcpr"
 
 
 def _parse_date(raw_date: str) -> typing.Optional[str]:
