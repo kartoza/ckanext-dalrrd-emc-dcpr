@@ -1,0 +1,647 @@
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-09-24 12:08+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: ckanext/dalrrd_emc_dcpr/email_notifications.py:130
+msgid "{n} new activity from {site_title}"
+msgid_plural "{n} new activities from {site_title}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ckanext/dalrrd_emc_dcpr/helpers.py:265
+msgid "Under preparation"
+msgstr "準備中"
+
+#: ckanext/dalrrd_emc_dcpr/helpers.py:269
+msgid "Waiting for NSIF review"
+msgstr "NSIF審査待ち"
+
+#: ckanext/dalrrd_emc_dcpr/helpers.py:273
+msgid "Waiting for CSI review"
+msgstr "CSI審査待ち"
+
+#: ckanext/dalrrd_emc_dcpr/helpers.py:276
+msgid "Accepted"
+msgstr "受け入れた"
+
+#: ckanext/dalrrd_emc_dcpr/helpers.py:277
+msgid "Rejected"
+msgstr "拒否されました"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:81
+msgid "has been submitted for moderation"
+msgstr "モデレートのために送信されました"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:93
+msgid "has been accepted by NSIF"
+msgstr "NSIFに受理されました"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:105
+msgid "has been rejected by NSIF"
+msgstr "NSIFによって拒否されました"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:115 ckanext/dalrrd_emc_dcpr/jobs.py:156
+msgid "needs clarification"
+msgstr "明確化が必要"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:128
+msgid "has had its NSIF reviewer step down"
+msgstr "NSIFのレビュアーが辞任"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:137
+msgid "has been accepted by CSI"
+msgstr "CSIに受理されました"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:146
+msgid "has been rejected by CSI"
+msgstr "CSIによって拒否されました"
+
+#: ckanext/dalrrd_emc_dcpr/jobs.py:169
+msgid "has had its CSI reviewer step down"
+msgstr "CSIFのレビュアーが辞任"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:74
+msgid "Not authorized to list DCPR requests"
+msgstr "DCPR リクエストを一覧表示する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:159
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:263
+msgid "Integrity Error"
+msgstr "完全性エラー"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:172
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:274
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:345
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:376
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:435
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:496
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:518
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:551
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:631
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:218
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:253
+msgid "DCPR request not found"
+msgstr "DCPR リクエストが見つかりません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:221
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:405
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:461
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:588
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:667
+msgid "Dataset not found"
+msgstr "データセット リクエストが見つかりません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:232
+#, python-format
+msgid "User %r not authorized to edit %s"
+msgstr "ユーザー %r は %s を編集する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:271
+#, python-format
+msgid "Unauthorized to update DCPR request, %s"
+msgstr "DCPR リクエスト %s を更新する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:347
+msgid "Not authorized"
+msgstr "許可されていません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:379
+msgid "Unauthorized to moderate DCPR request"
+msgstr "DCPR リクエストを管理する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:408
+msgid "Unauthorized to submit moderation for DCPR request"
+msgstr "DCPR リクエストのモデレートを送信する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:411
+msgid "Moderation submitted"
+msgstr "モデレートが送信されました"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:438
+msgid "Unauthorized to submit DCPR request"
+msgstr "DCPR リクエストを送信する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:464
+#, python-format
+msgid "Unauthorized to submit package %s"
+msgstr "パッケージ %s を送信する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:467
+msgid "Dataset has been submitted!"
+msgstr "データセットが送信されました!"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:498
+msgid "Unauthorized to delete DCPR request"
+msgstr "DCPR リクエストを削除する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:521
+#, python-format
+msgid "Unauthorized to delete DCPR request %s"
+msgstr "DCPR リクエスト %s を削除する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:524
+msgid "DCPR request has been deleted."
+msgstr "DCPR リクエストは削除されました。"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:555
+msgid "Unauthorized to resign from the role of reviewer of DCPR request"
+msgstr "DCPRリクエストのレビュアーの役割を辞任する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:592
+msgid "Unauthorized to resign from the role of DCPR request reviewer"
+msgstr "DCPRリクエストのレビュアーの役割を辞任する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:598
+msgid "You are no longer the reviewer for the DCPR request."
+msgstr "あなたは DCPR リクエストのレビュー担当者ではなくなりました。"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:634
+msgid "Unauthorized to become the reviewer for DCPR request"
+msgstr "DCPRリクエストのレビュー担当者になる権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:670
+msgid "Unauthorized to claim DCPR request"
+msgstr "DCPR 要求を請求する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/dcpr.py:674
+msgid "You are now the reviewer for the DCPR request."
+msgstr "あなたは DCPR リクエストのレビュー担当者になりました"
+
+#: ckanext/dalrrd_emc_dcpr/blueprints/emc.py:19
+#: ckanext/dalrrd_emc_dcpr/blueprints/emc.py:37
+msgid ""
+"Organization publishers have been notified of your request. You are now "
+"following the dataset and will be notified when it has been modified."
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/converters.py:20
+msgid ""
+"Invalid bounding box. Please provide a comma-separated list of values with "
+"upper left lat, upper left lon, lower right lat, lower right lon."
+msgstr "境界ボックスが無効です。 左上の緯度、左上の経度、右下の緯度、右下の経度の値をコンマで区切ったリストを提供してください。"
+
+#: ckanext/dalrrd_emc_dcpr/logic/validators.py:49
+msgid "Please provide correct temporal duration for temporal references (from - to)"
+msgstr "一時参照の正しい継続時間を指定してください (から - まで)"
+
+#: ckanext/dalrrd_emc_dcpr/logic/validators.py:77
+msgid "Please provide a colon-separated value, e.g. EPSG:4326"
+msgstr "値をコロンで区切って入力してください。 EPSG:4326"
+
+#: ckanext/dalrrd_emc_dcpr/logic/validators.py:86
+msgid ""
+"Could not extract Spatial Reference System's authority and code. Please "
+"provide them as a colon-separated value, e.g. EPSG:4326"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:119
+msgid "You are not authorized to view this request"
+msgstr "このリクエストを表示する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:179
+msgid "Current user is not authorized to update this DCPR request"
+msgstr "現在のユーザーには、この DCPR 要求を更新する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:183
+msgid "DCPR request cannot currently be updated"
+msgstr "DCPR リクエストは現在更新できません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:185
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:291
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:322
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:346
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:381
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:416
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:447
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:478
+msgid "Request not found"
+msgstr "リクエストが見つかりません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:210
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:245
+msgid "You are not authorized to update this request"
+msgstr "このリクエストを更新する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:214
+msgid "DCPR request cannot be currently updated by NSIF members"
+msgstr "現在、NSIF メンバーは DCPR リクエストを更新できません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:249
+msgid "DCPR request cannot be currently updated by CSI members"
+msgstr "現在、NSIF メンバーは CSI リクエストを更新できません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:276
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:307
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:361
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:396
+msgid "The DCPR request owner cannot be involved in the moderation stage"
+msgstr "DCPR リクエスト所有者はモデレーション段階に関与できません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:282
+msgid ""
+"Current user is not authorized to moderate this DCPR request on behalf of the"
+" NSIF"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:287
+msgid "DCPR request cannot currently be moderated on behalf of the NSIF"
+msgstr "現在、NSIF に代わって DCPR リクエストをモデレートすることはできません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:313
+msgid ""
+"Current user is not authorized to moderate this DCPR request on behalf of the"
+" CSI"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:318
+msgid "DCPR request cannot currently be moderated on behalf of the CSI"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:372
+msgid "DCPR request cannot currently be claimed for NSIF review"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:376
+msgid ""
+"Current user is not authorized to claim the role of NSIF reviewer for this "
+"DCPR request"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:407
+msgid "DCPR request cannot currently be claimed for CSI review"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:411
+msgid ""
+"Current user is not authorized to claim the role of CSI moderator for this "
+"DCPR request"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:440
+msgid ""
+"Current user is not authorized to resign from the role of NSIF moderator for "
+"this DCPR request"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:445
+msgid "DCPR request is not currently under NSIF review"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:471
+msgid ""
+"Current user is not authorized to resign from the role of CSI moderator for "
+"this DCPR request"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/dcpr.py:476
+msgid "DCPR request is not currently under CSI review"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/pages.py:40
+msgid "You are not authorized to edit pages"
+msgstr "ページを編集する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/pages.py:67
+msgid "You are not authorized to delete pages"
+msgstr "ページを削除する権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/pages.py:105
+#, python-format
+msgid "You are not authorized to access page %s"
+msgstr "ページ %s にアクセスする権限がありません"
+
+#: ckanext/dalrrd_emc_dcpr/logic/auth/pages.py:111
+#, python-format
+msgid "Page %s not found"
+msgstr "ページ %s が見つかりません"
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:106
+msgid "Groups"
+msgstr "グループ"
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:107
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:30
+msgid "Tags"
+msgstr "タグ"
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:365
+msgid "SASDI Themes"
+msgstr "SASDI テーマ"
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:370
+msgid "ISO Topic Categories"
+msgstr "ISOトピックカテゴリー"
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:371
+msgid "Reference Date"
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:372
+msgid "Harvest source"
+msgstr "収穫元"
+
+#: ckanext/dalrrd_emc_dcpr/plugins/emc_dcpr_plugin.py:373
+msgid "DCPR Request"
+msgstr "DCPR リクエスト"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:23
+msgid "Dataset title"
+msgstr "データセットのタイトル"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:30
+msgid "Proposed title for the dataset being collected."
+msgstr "収集されるデータセットの提案されたタイトル"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:34
+msgid "Organization is custodian?"
+msgstr "組織はカストディアンですか？"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:40
+msgid ""
+"Whether the request is being made by an organization that is the dataset "
+"custodian."
+msgstr ""
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:44
+msgid "Dataset purpose"
+msgstr "データセットの目的"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:51
+msgid ""
+"Purpose that justifies the existence of the dataset being collected in the "
+"context of the project."
+msgstr "データセットの目的"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:55
+msgid "Dataset abstract"
+msgstr "データセットの要約"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:61
+msgid "Proposed abstract for the dataset being collected."
+msgstr "収集されるデータセットの提案された要約"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:65
+msgid "Dataset lineage statement"
+msgstr "データセット系列ステートメント"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:71
+msgid ""
+"Information about the lineage of the dataset being collected (if it is based "
+"on previous data, etc.)"
+msgstr "血統に関する情報"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:75
+msgid "Data type"
+msgstr "データ・タイプ"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:77
+msgid "e.g. Vector line"
+msgstr "例えば ベクター線"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:82
+msgid ""
+"Data type of the dataset being collected (vector point, vector line, raster, "
+"RADAR, etc."
+msgstr "収集されるデータセットのデータ型"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:86
+msgid "Dataset associated attributes"
+msgstr "データセットに関連付けられた属性"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:93
+msgid ""
+"Additional alphanumeric attributes that shall be collected, in addition to "
+"the geospatial information.\n"
+"                If possible, provide a detailed description of each attribute."
+msgstr "収集される追加の英数字属性"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:99
+msgid "Dataset usage restrictions"
+msgstr "データセットの使用制限"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:105
+msgid "Description of dataset usage restrictions"
+msgstr "データセットの使用制限の説明"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:109
+msgid "Dataset capture method"
+msgstr "データセットのキャプチャ方法"
+
+#: ckanext/dalrrd_emc_dcpr/templates/ajax_snippets/dcpr_request_dataset_form_fieldset.html:115
+msgid ""
+"Method to be employed for collecting the raw data (Aerial photography, "
+"cadastral survey, etc.)"
+msgstr "生データの収集方法"
+
+#: ckanext/dalrrd_emc_dcpr/templates/dcpr/ask_for_confirmation.html:13
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: ckanext/dalrrd_emc_dcpr/templates/dcpr/moderate.html:11
+msgid "What action should be taken?"
+msgstr "どのような行動を取るべきですか？"
+
+#: ckanext/dalrrd_emc_dcpr/templates/dcpr/moderate.html:14
+msgid "Move back to draft"
+msgstr "下書きに戻る"
+
+#: ckanext/dalrrd_emc_dcpr/templates/dcpr/moderate.html:15
+msgid "Approve DCPR request"
+msgstr "DCPR リクエストの承認"
+
+#: ckanext/dalrrd_emc_dcpr/templates/dcpr/moderate.html:16
+msgid "Reject DCPR Request"
+msgstr "DCPR リクエストを拒否"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:10
+msgid "Title"
+msgstr "題名"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:10
+msgid "eg. A descriptive title"
+msgstr "例えば。 わかりやすいタイトル"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:19
+msgid "URL"
+msgstr "URL"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:19
+msgid "eg. my-dataset"
+msgstr "例えば。 私のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:25
+msgid "Description"
+msgstr "説明"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:25
+msgid "eg. Some useful notes about the data"
+msgstr "例えば。 データに関するいくつかの役立つメモ"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:30
+msgid "eg. economy, mental health, government"
+msgstr "例えば。 経済、メンタルヘルス、政府"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:36
+msgid "License"
+msgstr "ライセンス"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:42
+msgid "Please select the license"
+msgstr "ライセンスを選択してください"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:53
+msgid ""
+"\n"
+"            License definitions and additional information can be found\n"
+"            at <a "
+"href=\"http://opendefinition.org/licenses/\">opendefinition.org</a>\n"
+"            "
+msgstr "http://opendefinition.org/licenses/"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:88
+msgid "Organization"
+msgstr "組織"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:92
+msgid "No organization"
+msgstr "組織なし"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:107
+msgid "Visibility"
+msgstr "視認性"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:110
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/dcpr_request_item.html:16
+msgid "Private"
+msgstr "プライベート"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:110
+msgid "Public"
+msgstr "公衆"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:128
+msgid "State"
+msgstr "状態"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:131
+msgid "Active"
+msgstr "アクティブ"
+
+#: ckanext/dalrrd_emc_dcpr/templates/package/snippets/package_basic_fields.html:132
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/dcpr_request_item.html:24
+msgid "Deleted"
+msgstr "削除しました"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/dcpr_request_item.html:22
+msgid "Draft"
+msgstr "下書き"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/dcpr_request_item.html:32
+msgid "Popular"
+msgstr "人気"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/dcpr_request_item.html:39
+msgid "This dataset has no description"
+msgstr "このデータセットには説明がありません"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/changed_package.html:6
+msgid "{actor} updated the metadata record {dataset}"
+msgstr "{actor} メタデータ レコードを更新しました {dataset}"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/changed_package.html:16
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/new_package.html:15
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/requested_dataset_maintenance.html:16
+msgid "View this version"
+msgstr "このバージョンを表示"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/changed_package.html:20
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/requested_dataset_maintenance.html:20
+msgid "Changes"
+msgstr "変化"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/deleted_package.html:4
+msgid "{actor} deleted the metadata record {dataset}"
+msgstr "{actor} メタデータ レコードを削除しました {dataset}"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/new_package.html:5
+msgid "{actor} created the metadata record {dataset}"
+msgstr "{actor} メタデータ レコードを作成しました {dataset}"
+
+#: ckanext/dalrrd_emc_dcpr/templates/snippets/activities/requested_dataset_maintenance.html:6
+msgid "{actor} requested maintenance of dataset {dataset}"
+msgstr "{actor} データセットのメンテナンスを要求 {dataset}"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:6
+msgid "Welcome DALRRD"
+msgstr "ようこそDALRRD"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:19
+msgid "Electronic Metadata Catalogue (EMC)"
+msgstr "電子メタデータ カタログ (EMC)"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:20
+msgid "View All Datasets"
+msgstr "すべてのデータセットを表示"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:33
+msgid "Data Capture Project Register (DCPR)"
+msgstr "データ キャプチャ プロジェクト レジスタ (DCPR)"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:45
+msgid "Previous"
+msgstr "前"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:49
+msgid "Next"
+msgstr "次"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:55
+msgid "Search for data"
+msgstr "データを検索する"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:164
+msgid "Featured Datasets"
+msgstr "注目のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:164
+msgid "Featured Datasets"
+msgstr "注目のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/home/index.html:169
+msgid "Recent Datasets"
+msgstr "最近のデータセット"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:20
+msgid "Metadata Records"
+msgstr "メタデータ レコード"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:21
+msgid "Organisations"
+msgstr "組織"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:22
+msgid "Publish"
+msgstr "公開"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:24
+msgid "Groups"
+msgstr "グループ"
+
+#: ckanext/dalrrd_emc_dcpr/templates/header.html:25
+msgid "About"
+msgstr "約"
