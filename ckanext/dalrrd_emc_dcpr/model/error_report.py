@@ -126,20 +126,20 @@ meta.mapper(
     error_report_table,
     properties={
         "owner": orm.relationship(
-                    User,
-                    backref="error_reports",
-                    foreign_keys=error_report_table.c.owner_user,
-                ),
+            User,
+            backref="error_reports",
+            foreign_keys=error_report_table.c.owner_user,
+        ),
         "record": orm.relationship(
-                    Package,
-                    backref="error_reports",
-                    foreign_keys=error_report_table.c.metadata_record,
-                ),
+            Package,
+            backref="error_reports",
+            foreign_keys=error_report_table.c.metadata_record,
+        ),
         "nsif_reviewer_user": orm.relationship(
-                    User,
-                    backref="nsif_reviewer_error_reports",
-                    foreign_keys=error_report_table.c.nsif_reviewer,
-                ),
-    }
+            User,
+            backref="nsif_reviewer_error_reports",
+            foreign_keys=error_report_table.c.nsif_reviewer,
+        ),
+    },
 )
 meta.mapper(ErrorReportNotificationTarget, error_report_notification_table)
