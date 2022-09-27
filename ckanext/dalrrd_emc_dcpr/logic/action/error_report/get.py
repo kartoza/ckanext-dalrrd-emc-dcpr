@@ -4,7 +4,7 @@ import typing
 from ckan.plugins import toolkit
 
 from ....model import error_report
-from .... import dcpr_dictization
+from .... import error_report_dictization
 from ....constants import ErrorReportStatus
 from ...schema import show_error_report_schema
 
@@ -19,11 +19,11 @@ def error_report_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Di
         raise toolkit.ValidationError(errors)
     toolkit.check_access("error_report_show_auth", context, validated_data)
     error_report_object = error_report.ErrorReport.get(
-        validated_data["csi_reference_id"]
+        csi_reference_id=validated_data["csi_reference_id"]
     )
     if not error_report_object:
         raise toolkit.ObjectNotFound
-    return dcpr_dictization.error_report_dictize(error_report_object, context)
+    return error_report_dictization.error_report_dictize(error_report_object, context)
 
 
 @toolkit.side_effect_free
@@ -82,4 +82,6 @@ def _get_error_report_list(
         .limit(data_.get("limit", 10))
         .offset(data_.get("offset", 0))
     )
-    return [dcpr_dictization.error_report_dictize(i, context) for i in query.all()]
+    return [
+        error_report_dictization.error_report_dictize(i, context) for i in query.all()
+    ]

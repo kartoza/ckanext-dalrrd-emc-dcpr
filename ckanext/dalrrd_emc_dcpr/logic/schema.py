@@ -41,6 +41,7 @@ def create_dcpr_request_schema(
     }
 
 
+@validator_args
 def create_error_report_schema(
     ignore_missing,
     not_missing,

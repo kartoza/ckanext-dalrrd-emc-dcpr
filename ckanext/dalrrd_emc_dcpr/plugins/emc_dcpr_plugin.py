@@ -266,6 +266,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 emc_auth.authorize_request_dataset_publication
             ),
             "error_report_create_auth": error_report_auth.error_report_create_auth,
+            "error_report_show_auth": error_report_auth.error_report_show_auth,
             "error_report_update_by_owner_auth": error_report_auth.error_report_update_by_owner_auth,
             "error_report_update_by_nsif_auth": error_report_auth.error_report_update_by_nsif_auth,
             "error_report_nsif_moderate_auth": error_report_auth.error_report_nsif_moderate_auth,

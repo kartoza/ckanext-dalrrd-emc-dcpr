@@ -20,19 +20,43 @@ def error_report_create_auth(
     return result
 
 
+def error_report_show_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    db_user = context["auth_user_obj"]
+    error_report_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
+    is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+        "nsif", context["auth_user_obj"], role="editor"
+    )
+    result = {"success": False}
+    if db_user.sysadmin:
+        result["success"] = True
+    else:
+        if error_report.status == ErrorReportStatus.SUBMITTED:
+            allowed_to_view = (
+                db_user.id == error_report.owner_user
+            ) or is_nsif_reviewer
+            result = {"success": allowed_to_view}
+        elif error_report.status == ErrorReportStatus.APPROVED:
+            result = {"success": True}
+        else:
+            result = {"success": False}
+    return result
+
+
 def error_report_update_by_owner_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    request_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
+    error_report_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
 
-    result = {"success": request_obj.owner_user == context["auth_user_obj"].id}
+    result = {"success": error_report_obj.owner_user == context["auth_user_obj"].id}
     return result
 
 
 def error_report_update_by_nsif_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
-    request_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
+    error_report_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
 
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
         "nsif", context["auth_user_obj"], role="editor"
@@ -40,7 +64,8 @@ def error_report_update_by_nsif_auth(
 
     result = {
         "success": (
-            is_nsif_reviewer and request_obj.status == ErrorReportStatus.SUBMITTED.value
+            is_nsif_reviewer
+            and error_report_obj.status == ErrorReportStatus.SUBMITTED.value
         )
     }
     return result
@@ -50,15 +75,15 @@ def error_report_nsif_moderate_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     """Moderation authentication for error report"""
-    request_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
+    error_report_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
     result = {"success": False}
     user = context["auth_user_obj"]
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
-    if request_obj is not None:
-        if request_obj.status == ErrorReportStatus.SUBMITTED.value:
+    if error_report_obj is not None:
+        if error_report_obj.status == ErrorReportStatus.SUBMITTED.value:
             if context["auth_user_obj"].sysadmin:
                 result["success"] = True
-            elif context["auth_user_obj"].id == request_obj.owner_user:
+            elif context["auth_user_obj"].id == error_report_obj.owner_user:
                 result["msg"] = toolkit._(
                     "The report owner cannot be involved in the moderation stage"
                 )
