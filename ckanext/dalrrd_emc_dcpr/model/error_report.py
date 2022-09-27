@@ -7,7 +7,15 @@ log = getLogger(__name__)
 
 from sqlalchemy import orm, types, Column, Table, ForeignKey
 
-from ckan.model import core, domain_object, meta, types as _types, Session, Package
+from ckan.model import (
+    core,
+    domain_object,
+    meta,
+    types as _types,
+    Package,
+    Session,
+    User,
+)
 
 error_report_table = Table(
     "error_report",
@@ -28,13 +36,13 @@ error_report_table = Table(
         "nsif_reviewer",
         types.UnicodeText,
         ForeignKey("user.id"),
-        nullable=False,
+        nullable=True,
     ),
     Column(
         "metadata_record",
         types.UnicodeText,
         ForeignKey("package.id"),
-        nullable=True,
+        nullable=False,
     ),
     Column("status", types.UnicodeText),
     Column("error_application", types.UnicodeText),
@@ -43,7 +51,7 @@ error_report_table = Table(
     Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
     Column("nsif_moderation_notes", types.UnicodeText),
     Column("nsif_review_additional_documents", types.UnicodeText),
-    Column("nsif_moderation_date", types.DateTime, default=datetime.datetime.utcnow),
+    Column("nsif_moderation_date", types.DateTime),
 )
 
 error_report_notification_table = Table(
@@ -113,5 +121,25 @@ class ErrorReport(core.StatefulObjectMixin, domain_object.DomainObject):
         return record
 
 
-meta.mapper(ErrorReport, error_report_table)
+meta.mapper(
+    ErrorReport,
+    error_report_table,
+    properties={
+        "owner": orm.relationship(
+                    User,
+                    backref="error_reports",
+                    foreign_keys=error_report_table.c.owner_user,
+                ),
+        "record": orm.relationship(
+                    Package,
+                    backref="error_reports",
+                    foreign_keys=error_report_table.c.metadata_record,
+                ),
+        "nsif_reviewer_user": orm.relationship(
+                    User,
+                    backref="nsif_reviewer_error_reports",
+                    foreign_keys=error_report_table.c.nsif_reviewer,
+                ),
+    }
+)
 meta.mapper(ErrorReportNotificationTarget, error_report_notification_table)
