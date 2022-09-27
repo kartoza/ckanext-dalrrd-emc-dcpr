@@ -40,13 +40,13 @@ def upgrade():
             "nsif_reviewer",
             types.UnicodeText,
             ForeignKey("user.id"),
-            nullable=False,
+            nullable=True,
         ),
         sa.Column(
             "metadata_record",
             types.UnicodeText,
             ForeignKey("package.id"),
-            nullable=True,
+            nullable=False,
         ),
         sa.Column("status", types.UnicodeText),
         sa.Column("error_application", types.UnicodeText),
@@ -55,7 +55,7 @@ def upgrade():
         sa.Column("request_date", types.DateTime, default=dt.datetime.utcnow),
         sa.Column("nsif_moderation_notes", types.UnicodeText),
         sa.Column("nsif_review_additional_documents", types.UnicodeText),
-        sa.Column("nsif_moderation_date", types.DateTime, default=dt.datetime.utcnow),
+        sa.Column("nsif_moderation_date", types.DateTime),
     )
 
     op.create_table(
@@ -72,10 +72,10 @@ def upgrade():
         sa.Column("user_id", types.UnicodeText, ForeignKey("user.id"), nullable=True),
         sa.Column("group_id", types.UnicodeText, ForeignKey("group.id"), nullable=True),
     )
-
-    # remove the old error reports tables
-    op.drop_table("dcpr_error_report_notification")
-    op.drop_table("dcpr_error_report")
+    #
+    # # remove the old error reports tables
+    # op.drop_table("dcpr_error_report_notification")
+    # op.drop_table("dcpr_error_report")
 
 
 def downgrade():
