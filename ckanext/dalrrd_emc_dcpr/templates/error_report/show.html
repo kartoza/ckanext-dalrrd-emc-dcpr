@@ -17,7 +17,7 @@
 
     {% if error_report.status == "SUBMITTED" %}
         {% if h.check_access("error_report_nsif_moderate_auth", {"csi_reference_id": error_report.csi_reference_id}) %}
-            {% link_for _('Submit NSIF review'), named_route="error_report.error_report_moderate", csi_reference_id=error_report.csi_reference_id, organization="nsif", class_='btn btn-warning', icon='envelope-o' %}
+            {% link_for _('Review this error report'), named_route="error_report.error_report_moderate", csi_reference_id=error_report.csi_reference_id, organization="nsif", class_='btn btn-warning', icon='envelope-o' %}
         {% endif %}
     {% endif %}
 
@@ -59,14 +59,7 @@
                     {{ error_report.error_description }}
                 </td>
             </tr>
-            <tr>
-                <th scope="row">{{ _("Capture start date") }}</th>
-                <td>{% snippet 'error_report/snippets/datetime_without_hours.html', datetime_obj=error_report.capture_start_date %}</td>
-            </tr>
-            <tr>
-                <th scope="row">{{ _("Capture end date") }}</th>
-                <td>{% snippet 'error_report/snippets/datetime_without_hours.html', datetime_obj=error_report.capture_end_date %}</td>
-            </tr>
+
             <tr>
                 <th scope="row" class="dataset-label">{{ _("Request date") }}</th>
                 <td class="dataset-details">

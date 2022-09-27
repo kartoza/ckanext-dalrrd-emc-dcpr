@@ -18,7 +18,7 @@
             {{ h.build_nav("error_report.get_error_reports", _("My error reports")) }}
         {% endif %}
         {%  if is_nsif_member or is_sysadmin %}
-            {{ h.build_nav("error_report.get_error_reports", _("Error reports awaiting NSIF moderation")) }}
+            {{ h.build_nav("error_report.get_submitted_error_reports", _("Error reports awaiting NSIF moderation")) }}
         {% endif %}
     {% endif %}
 {% endblock %}
