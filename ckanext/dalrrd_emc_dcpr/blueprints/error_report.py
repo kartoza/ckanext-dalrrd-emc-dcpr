@@ -31,12 +31,9 @@ def get_error_reports_list():
     return _get_error_reports_list("error_report_list_public")
 
 
-#
-#
-# @error_report_blueprint.route("/submitted_error_reports")
-# def get_error_reports_list():
-#     return _get_error_reports_list("submitted_error_report_list")
-#
+@error_report_blueprint.route("/submitted_error_reports")
+def get_submitted_error_reports():
+    return _get_error_reports_list("submitted_error_report_list", True)
 
 
 def _request_url_(params_nopage, requests_type, q=None, page=None):
@@ -70,7 +67,7 @@ def _get_error_reports_list(ckan_action: str, should_show_create_action: bool = 
         pager_url = partial(_request_url_, params_nosort, None)
         page = h.get_page_number(request.args)
         extra_vars = {
-            "error_requests": error_reports,
+            "error_reports": error_reports,
             "statuses": get_status_labels(),
             "show_create_button": should_show_create_action,
             "page": h.Page(
@@ -93,15 +90,10 @@ class ErrorReportCreateView(MethodView):
                 tuplize_dict(parse_params(request.args, ignore_keys=CACHE_PARAMETERS))
             )
         )
-        metadata_records = toolkit.get_action("package_list")(
-            context={
-                "user": toolkit.g.user,
-                "dictize_for_ui": True,
-            },
-            data_dict={},
-        )
+        packages = ckan.model.Session.query(ckan.model.Package).all()
+
         metadata_records = [
-            {"value": record, "text": record} for record in metadata_records
+            {"value": record.id, "text": record.title} for record in packages
         ]
 
         selected_metadata_record = request.args.get("metadata_record", None)
@@ -127,8 +119,8 @@ class ErrorReportCreateView(MethodView):
         except dict_fns.DataError:
             result = toolkit.abort(400, toolkit._("Integrity Error"))
         else:
-            if data_dict.get("organization_id") is None:
-                data_dict["organization_id"] = request.args.get("organization_id")
+            if data_dict.get("metadata_record") is None:
+                data_dict["metadata_record"] = request.args.get("metadata_record")
             try:
                 error_report = toolkit.get_action("error_report_create")(
                     context={
@@ -155,9 +147,7 @@ class ErrorReportCreateView(MethodView):
 
 
 new_error_report_view = ErrorReportCreateView.as_view("new_error_report")
-error_report_blueprint.add_url_rule(
-    "/error_report/new/", view_func=new_error_report_view
-)
+error_report_blueprint.add_url_rule("/new/", view_func=new_error_report_view)
 #
 #
 # class ErrorReportUpdateView(MethodView):
@@ -285,91 +275,92 @@ error_report_blueprint.add_url_rule(
 # )
 #
 #
-# # error_report show page
-# @error_report_blueprint.route("/error_report/<csi_reference_id>")
-# def error_report_show(csi_reference_id):
-#     try:
-#         error_report = toolkit.get_action("error_report_show")(
-#             context={"dictize_for_ui": True},
-#             data_dict={"csi_reference_id": csi_reference_id},
-#         )
-#     except toolkit.ObjectNotFound:
-#         result = toolkit.abort(404, toolkit._("Error report not found"))
-#     except toolkit.NotAuthorized:
-#         result = toolkit.base.abort(401, toolkit._("Not authorized"))
-#     else:
-#         extra_vars = {
-#             "error_report": error_report,
-#         }
-#         result = toolkit.render("error_report/show.html", extra_vars=extra_vars)
-#     return result
-#
-#
-# class ErrorReportModerateView(MethodView):
-#     template_name = "error_report/moderate.html"
-#     actions = {
-#         "nsif": {
-#             "message": "Moderate Error report on behalf of NSIF",
-#             "ckan_action": "error_report_nsif_moderate",
-#         }
-#     }
-#
-#     def get(self, csi_reference_id: str, organization: str):
-#         context = _prepare_context()
-#         try:
-#             error_report = toolkit.get_action("error_report_show")(
-#                 context, data_dict={"csi_reference_id": csi_reference_id}
-#             )
-#         except toolkit.ObjectNotFound:
-#             result = toolkit.abort(404, toolkit._("Error report not found"))
-#         except toolkit.NotAuthorized:
-#             result = toolkit.abort(
-#                 403, toolkit._("Unauthorized to moderate error report")
-#             )
-#         else:
-#             result = toolkit.render(
-#                 self.template_name,
-#                 extra_vars={
-#                     "error_report": error_report,
-#                     "action": self.actions.get(organization, {}).get("message"),
-#                     "action_url": toolkit.h["url_for"](
-#                         "error_report.error_report_moderate",
-#                         csi_reference_id=csi_reference_id,
-#                         organization=organization,
-#                     ),
-#                 },
-#             )
-#         return result
-#
-#     def post(self, csi_reference_id: str, organization: str):
-#         data_dict = {
-#             "csi_reference_id": csi_reference_id,
-#             "action": list(error_report.form.keys())[0],
-#         }
-#         try:
-#             ckan_action = self.actions.get(organization, {}).get("ckan_action")
-#             toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
-#         except toolkit.ObjectNotFound:
-#             result = toolkit.abort(404, toolkit._("Report not found"))
-#         except toolkit.NotAuthorized:
-#             result = toolkit.abort(
-#                 403, toolkit._("Unauthorized to submit moderation for error report")
-#             )
-#         else:
-#             toolkit.h["flash_notice"](toolkit._("Moderation submitted"))
-#             result = toolkit.redirect_to(
-#                 toolkit.h["url_for"](
-#                     "error_report.error_report_show", csi_reference_id=csi_reference_id
-#                 )
-#             )
-#         return result
-#
-#
-# moderate_error_report_view = ErrorReportModerateView.as_view("error_report_moderate")
-# error_report_blueprint.add_url_rule(
-#     "/error_report/<csi_reference_id>/moderate/<organization>",
-#     view_func=moderate_error_report_view,
-# )
+# error_report show page
+
+
+@error_report_blueprint.route("/show/<csi_reference_id>")
+def error_report_show(csi_reference_id):
+    try:
+        error_report = toolkit.get_action("error_report_show")(
+            context={"dictize_for_ui": True},
+            data_dict={"csi_reference_id": csi_reference_id},
+        )
+    except toolkit.ObjectNotFound:
+        result = toolkit.abort(404, toolkit._("Error report not found"))
+    except toolkit.NotAuthorized:
+        result = toolkit.base.abort(401, toolkit._("Not authorized"))
+    else:
+        extra_vars = {
+            "error_report": error_report,
+        }
+        result = toolkit.render("error_report/show.html", extra_vars=extra_vars)
+    return result
+
+
+class ErrorReportModerateView(MethodView):
+    template_name = "error_report/moderate.html"
+    actions = {
+        "nsif": {
+            "message": "Moderate error report on behalf of NSIF",
+            "ckan_action": "error_report_update_by_nsif",
+        }
+    }
+
+    def get(self, csi_reference_id: str):
+        context = _prepare_context()
+        try:
+            error_report = toolkit.get_action("error_report_show")(
+                context, data_dict={"csi_reference_id": csi_reference_id}
+            )
+        except toolkit.ObjectNotFound:
+            result = toolkit.abort(404, toolkit._("Error report not found"))
+        except toolkit.NotAuthorized:
+            result = toolkit.abort(
+                403, toolkit._("Unauthorized to moderate error report")
+            )
+        else:
+            result = toolkit.render(
+                self.template_name,
+                extra_vars={
+                    "error_report": error_report,
+                    "action": self.actions.get("nsif", {}).get("message"),
+                    "action_url": toolkit.h["url_for"](
+                        "error_report.error_report_moderate",
+                        csi_reference_id=csi_reference_id,
+                    ),
+                },
+            )
+        return result
+
+    def post(self, csi_reference_id: str):
+        data_dict = {
+            "csi_reference_id": csi_reference_id,
+            "action": list(request.form.keys())[0],
+        }
+        try:
+            ckan_action = self.actions.get("nsif", {}).get("ckan_action")
+            toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
+        except toolkit.ObjectNotFound:
+            result = toolkit.abort(404, toolkit._("Report not found"))
+        except toolkit.NotAuthorized:
+            result = toolkit.abort(
+                403, toolkit._("Unauthorized to submit moderation for error report")
+            )
+        else:
+            toolkit.h["flash_notice"](toolkit._("Moderation submitted"))
+            result = toolkit.redirect_to(
+                toolkit.h["url_for"](
+                    "error_report.error_report_show", csi_reference_id=csi_reference_id
+                )
+            )
+        return result
+
+
+moderate_error_report_view = ErrorReportModerateView.as_view("error_report_moderate")
+error_report_blueprint.add_url_rule(
+    "/<csi_reference_id>/moderate/",
+    view_func=moderate_error_report_view,
+)
 #
 #
 # class ErrorReportSubmitView(MethodView):

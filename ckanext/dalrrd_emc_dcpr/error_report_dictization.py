@@ -33,4 +33,11 @@ def error_report_dictize(
 ) -> typing.Dict:
     result_dict = ckan_dictization.table_dictize(error_report, context)
 
+    if context.get("dictize_for_ui", False):
+        result_dict.update(
+            {
+                "owner": error_report.owner.name,
+            }
+        )
+
     return result_dict
