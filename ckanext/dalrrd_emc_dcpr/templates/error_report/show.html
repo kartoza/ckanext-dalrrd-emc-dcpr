@@ -15,9 +15,15 @@
 
 {% block content_action %}
 
-    {% if error_report.status == "SUBMITTED" %}
+    {% if error_report.status not in ["APPROVED", "REJECTED"] %}
         {% if h.check_access("error_report_nsif_moderate_auth", {"csi_reference_id": error_report.csi_reference_id}) %}
             {% link_for _('Review this error report'), named_route="error_report.error_report_moderate", csi_reference_id=error_report.csi_reference_id, organization="nsif", class_='btn btn-warning', icon='envelope-o' %}
+        {% endif %}
+        {% if h.check_access("error_report_update_by_owner_auth", {"csi_reference_id": error_report.csi_reference_id}) %}
+            {% link_for _('Update error report'), named_route="error_report.owner_edit_error_report", csi_reference_id=error_report.csi_reference_id, class_='btn btn-default', icon='wrench' %}
+
+        {% elif h.check_access("error_report_update_by_nsif_auth", {"csi_reference_id": error_report.csi_reference_id}) %}
+            {% link_for _('Update error report'), named_route="error_report.nsif_edit_error_report", csi_reference_id=error_report.csi_reference_id, class_='btn btn-default', icon='wrench' %}
         {% endif %}
     {% endif %}
 
@@ -45,8 +51,10 @@
                 <td>{{ error_report.csi_reference_id }}</td>
             </tr>
             <tr>
-                <th scope="row" class="dataset-label">{{ _('Metadata') }} </th>
-                <td>{{ error_report.metadata_record }}</td>
+                <th scope="row" class="dataset-label">{{ _('Metadata record') }} </th>
+                <td>
+                    {{ error_report.record.title }}
+                </td>
             </tr>
             {# TODO: Add the dataset custodian info #}
             <tr>
@@ -57,6 +65,12 @@
                 <th scope="row" class="dataset-label">{{ _("Error description") }}</th>
                 <td class="dataset-details">
                     {{ error_report.error_description }}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row" class="dataset-label">{{ _("Solution description") }}</th>
+                <td class="dataset-details">
+                    {{ error_report.solution_description }}
                 </td>
             </tr>
 

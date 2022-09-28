@@ -150,130 +150,138 @@ new_error_report_view = ErrorReportCreateView.as_view("new_error_report")
 error_report_blueprint.add_url_rule("/new/", view_func=new_error_report_view)
 #
 #
-# class ErrorReportUpdateView(MethodView):
-#     show_action = "error_report_show"
-#     success_redirect_to_view = "error_report.error_report_show"
-#     update_auth: typing.Optional[str] = None
-#     update_action: typing.Optional[str] = None
-#     template_path = "error_report/edit.html"
-#     form_snippet = "error_report/snippets/error_report_form.html"
-#     enable_owner_fieldset = True
-#     enable_nsif_fieldset = False
-#     enable_csi_fieldset = False
-#
-#     def get(
-#         self,
-#         csi_reference_id: str,
-#         data: typing.Optional[typing.Dict] = None,
-#         errors: typing.Optional[typing.Dict] = None,
-#         error_summary=None,
-#     ):
-#         context = _prepare_context()
-#         try:
-#             old_data = toolkit.get_action(self.show_action)(
-#                 context, data_dict={"csi_reference_id": csi_reference_id}
-#             )
-#             if data is not None:
-#                 old_data.update(data)
-#             data = old_data
-#         except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
-#             result = toolkit.abort(404, toolkit._("Error report not found"))
-#         else:
-#             try:
-#                 toolkit.check_access(
-#                     self.update_auth,
-#                     context,
-#                     data_dict={"csi_reference_id": csi_reference_id},
-#                 )
-#             except toolkit.NotAuthorized:
-#                 result = toolkit.abort(
-#                     403,
-#                     toolkit._("User %r not authorized to edit %s")
-#                     % (toolkit.g.user, csi_reference_id),
-#                 )
-#             else:
-#                 result = toolkit.render(
-#                     self.template_path,
-#                     extra_vars={
-#                         "form_snippet": self.form_snippet,
-#                         "enable_owner_fieldset": self.enable_owner_fieldset,
-#                         "enable_nsif_fieldset": self.enable_nsif_fieldset,
-#                         "data": data,
-#                         "csi_reference_id": csi_reference_id,
-#                         "errors": errors or {},
-#                         "error_summary": error_summary or {},
-#                     },
-#                 )
-#         return result
-#
-#     def post(self, csi_reference_id: str):
-#         try:
-#             data_dict = clean_dict(
-#                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
-#             )
-#             data_dict["csi_reference_id"] = csi_reference_id
-#         except dict_fns.DataError:
-#             result = toolkit.abort(400, toolkit._("Integrity Error"))
-#         else:
-#             context = _prepare_context()
-#             try:
-#                 toolkit.get_action(self.update_action)(context, data_dict)
-#             except toolkit.NotAuthorized as exc:
-#                 result = toolkit.base.abort(
-#                     403,
-#                     toolkit._("Unauthorized to update error report, %s") % exc,
-#                 )
-#             except toolkit.ObjectNotFound:
-#                 result = toolkit.base.abort(404, toolkit._("Error report not found"))
-#             except toolkit.ValidationError as exc:
-#                 errors = exc.error_dict
-#                 error_summary = exc.error_summary
-#                 result = self.get(
-#                     csi_reference_id,
-#                     data=data_dict,
-#                     errors=errors,
-#                     error_summary=error_summary,
-#                 )
-#             else:
-#                 url = toolkit.h.url_for(
-#                     self.success_redirect_to_view, csi_reference_id=csi_reference_id
-#                 )
-#                 result = toolkit.h.redirect_to(url)
-#         return result
-#
-#
-# class ErrorReportOwnerUpdateView(ErrorReportUpdateView):
-#     update_auth = "error_report_update_by_owner_auth"
-#     update_action = "error_report_update_by_owner"
-#     enable_owner_fieldset = True
-#     enable_nsif_fieldset = False
-#     enable_csi_fieldset = False
-#
-#
-# # came back here to feature data in the EMC
-# class ErrorReportNsifUpdateView(ErrorReportUpdateView):
-#     update_auth = "error_report_update_by_nsif_auth"
-#     update_action = "error_report_update_by_nsif"
-#     enable_owner_fieldset = False
-#     enable_nsif_fieldset = True
-#     enable_csi_fieldset = False
-#
-#
-# owner_edit_error_report_view = ErrorReportOwnerUpdateView.as_view(
-#     "owner_edit_error_report"
-# )
-# error_report_blueprint.add_url_rule(
-#     "/error_report/<csi_reference_id>/owner_edit/",
-#     view_func=owner_edit_error_report_view,
-# )
-#
-# nsif_edit_error_report_view = ErrorReportNsifUpdateView.as_view(
-#     "nsif_edit_error_report"
-# )
-# error_report_blueprint.add_url_rule(
-#     "/error_report/<csi_reference_id>/nsif_edit/", view_func=nsif_edit_error_report_view
-# )
-#
+
+
+class ErrorReportUpdateView(MethodView):
+    show_action = "error_report_show"
+    success_redirect_to_view = "error_report.error_report_show"
+    update_auth: typing.Optional[str] = None
+    update_action: typing.Optional[str] = None
+    template_path = "error_report/edit.html"
+    form_snippet = "error_report/snippets/report_form.html"
+    enable_owner_fieldset = True
+    enable_nsif_fieldset = False
+
+    def get(
+        self,
+        csi_reference_id: str,
+        data: typing.Optional[typing.Dict] = None,
+        errors: typing.Optional[typing.Dict] = None,
+        error_summary=None,
+    ):
+        context = _prepare_context()
+        try:
+            old_data = toolkit.get_action(self.show_action)(
+                context, data_dict={"csi_reference_id": csi_reference_id}
+            )
+            if data is not None:
+                old_data.update(data)
+            data = old_data
+
+            packages = ckan.model.Session.query(ckan.model.Package).all()
+
+            metadata_records = [
+                {"value": record.id, "text": record.title} for record in packages
+            ]
+            selected_metadata_record = request.args.get("metadata_record", None)
+        except (toolkit.ObjectNotFound, toolkit.NotAuthorized):
+            result = toolkit.abort(404, toolkit._("Error report not found"))
+        else:
+            try:
+                toolkit.check_access(
+                    self.update_auth,
+                    context,
+                    data_dict={"csi_reference_id": csi_reference_id},
+                )
+            except toolkit.NotAuthorized:
+                result = toolkit.abort(
+                    403,
+                    toolkit._("User %r not authorized to edit %s")
+                    % (toolkit.g.user, csi_reference_id),
+                )
+            else:
+                result = toolkit.render(
+                    self.template_path,
+                    extra_vars={
+                        "form_snippet": self.form_snippet,
+                        "enable_owner_fieldset": self.enable_owner_fieldset,
+                        "enable_nsif_fieldset": self.enable_nsif_fieldset,
+                        "data": data,
+                        "metadata_records": metadata_records,
+                        "selected_record": selected_metadata_record,
+                        "csi_reference_id": csi_reference_id,
+                        "errors": errors or {},
+                        "error_summary": error_summary or {},
+                    },
+                )
+        return result
+
+    def post(self, csi_reference_id: str):
+        try:
+            data_dict = clean_dict(
+                dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
+            )
+            data_dict["csi_reference_id"] = csi_reference_id
+        except dict_fns.DataError:
+            result = toolkit.abort(400, toolkit._("Integrity Error"))
+        else:
+            context = _prepare_context()
+            try:
+                toolkit.get_action(self.update_action)(context, data_dict)
+            except toolkit.NotAuthorized as exc:
+                result = toolkit.base.abort(
+                    403,
+                    toolkit._("Unauthorized to update error report, %s") % exc,
+                )
+            except toolkit.ObjectNotFound:
+                result = toolkit.base.abort(404, toolkit._("Error report not found"))
+            except toolkit.ValidationError as exc:
+                errors = exc.error_dict
+                error_summary = exc.error_summary
+                result = self.get(
+                    csi_reference_id,
+                    data=data_dict,
+                    errors=errors,
+                    error_summary=error_summary,
+                )
+            else:
+                url = toolkit.h.url_for(
+                    self.success_redirect_to_view, csi_reference_id=csi_reference_id
+                )
+                result = toolkit.h.redirect_to(url)
+        return result
+
+
+class ErrorReportOwnerUpdateView(ErrorReportUpdateView):
+    update_auth = "error_report_update_by_owner_auth"
+    update_action = "error_report_update_by_owner"
+    enable_owner_fieldset = True
+    enable_nsif_fieldset = False
+
+
+# came back here to feature data in the EMC
+class ErrorReportNsifUpdateView(ErrorReportUpdateView):
+    update_auth = "error_report_update_by_nsif_auth"
+    update_action = "error_report_update_by_nsif"
+    enable_owner_fieldset = False
+    enable_nsif_fieldset = True
+
+
+owner_edit_error_report_view = ErrorReportOwnerUpdateView.as_view(
+    "owner_edit_error_report"
+)
+error_report_blueprint.add_url_rule(
+    "/<csi_reference_id>/owner_edit/",
+    view_func=owner_edit_error_report_view,
+)
+
+nsif_edit_error_report_view = ErrorReportNsifUpdateView.as_view(
+    "nsif_edit_error_report"
+)
+error_report_blueprint.add_url_rule(
+    "/<csi_reference_id>/nsif_edit/", view_func=nsif_edit_error_report_view
+)
+
 #
 # error_report show page
 
@@ -302,7 +310,7 @@ class ErrorReportModerateView(MethodView):
     actions = {
         "nsif": {
             "message": "Moderate error report on behalf of NSIF",
-            "ckan_action": "error_report_update_by_nsif",
+            "ckan_action": "error_report_nsif_moderate",
         }
     }
 
@@ -426,60 +434,62 @@ error_report_blueprint.add_url_rule(
 # )
 #
 #
-# class ErrorReportDeleteView(MethodView):
-#     def get(self, csi_reference_id: str):
-#         context = _prepare_context()
-#         try:
-#             error_report = toolkit.get_action("error_report_show")(
-#                 context, data_dict={"csi_reference_id": csi_reference_id}
-#             )
-#         except toolkit.ObjectNotFound:
-#             return toolkit.abort(404, toolkit._("Error report not found"))
-#         except toolkit.NotAuthorized:
-#             return toolkit.abort(403, toolkit._("Unauthorized to delete error report"))
-#         return toolkit.render(
-#             "error_report/ask_for_confirmation.html",
-#             extra_vars={
-#                 "error_report": error_report,
-#                 "action": "delete",
-#                 "action_url": toolkit.h["url_for"](
-#                     "error_report.error_report_delete",
-#                     csi_reference_id=csi_reference_id,
-#                 ),
-#             },
-#         )
-#
-#     def post(self, csi_reference_id: str):
-#         if "cancel" not in request.form.keys():
-#             context = _prepare_context()
-#             try:
-#                 toolkit.get_action("error_report_delete")(
-#                     context, data_dict={"csi_reference_id": csi_reference_id}
-#                 )
-#             except toolkit.ObjectNotFound:
-#                 result = toolkit.abort(404, toolkit._("Error report not found"))
-#             except toolkit.NotAuthorized:
-#                 result = toolkit.abort(
-#                     403, toolkit._("Unauthorized to delete error report %s") % ""
-#                 )
-#             else:
-#                 toolkit.h["flash_notice"](toolkit._("Error report has been deleted."))
-#                 result = toolkit.redirect_to(
-#                     toolkit.h["url_for"]("error_report.get_my_error_reports")
-#                 )
-#         else:
-#             result = toolkit.h.redirect_to(
-#                 toolkit.h["url_for"](
-#                     "error_report.error_report_show", csi_reference_id=csi_reference_id
-#                 )
-#             )
-#         return result
-#
-#
-# delete_error_report_view = ErrorReportDeleteView.as_view("error_report_delete")
-# error_report_blueprint.add_url_rule(
-#     "/error_report/<csi_reference_id>/delete/", view_func=delete_error_report_view
-# )
+
+
+class ErrorReportDeleteView(MethodView):
+    def get(self, csi_reference_id: str):
+        context = _prepare_context()
+        try:
+            error_report = toolkit.get_action("error_report_show")(
+                context, data_dict={"csi_reference_id": csi_reference_id}
+            )
+        except toolkit.ObjectNotFound:
+            return toolkit.abort(404, toolkit._("Error report not found"))
+        except toolkit.NotAuthorized:
+            return toolkit.abort(403, toolkit._("Unauthorized to delete error report"))
+        return toolkit.render(
+            "error_report/ask_for_confirmation.html",
+            extra_vars={
+                "error_report": error_report,
+                "action": "delete",
+                "action_url": toolkit.h["url_for"](
+                    "error_report.error_report_delete",
+                    csi_reference_id=csi_reference_id,
+                ),
+            },
+        )
+
+    def post(self, csi_reference_id: str):
+        if "cancel" not in request.form.keys():
+            context = _prepare_context()
+            try:
+                toolkit.get_action("error_report_delete")(
+                    context, data_dict={"csi_reference_id": csi_reference_id}
+                )
+            except toolkit.ObjectNotFound:
+                result = toolkit.abort(404, toolkit._("Error report not found"))
+            except toolkit.NotAuthorized:
+                result = toolkit.abort(
+                    403, toolkit._("Unauthorized to delete error report %s") % ""
+                )
+            else:
+                toolkit.h["flash_notice"](toolkit._("Error report has been deleted."))
+                result = toolkit.redirect_to(
+                    toolkit.h["url_for"]("error_report.get_error_reports")
+                )
+        else:
+            result = toolkit.h.redirect_to(
+                toolkit.h["url_for"](
+                    "error_report.error_report_show", csi_reference_id=csi_reference_id
+                )
+            )
+        return result
+
+
+delete_error_report_view = ErrorReportDeleteView.as_view("error_report_delete")
+error_report_blueprint.add_url_rule(
+    "/<csi_reference_id>/delete/", view_func=delete_error_report_view
+)
 
 
 def _prepare_context() -> typing.Dict:

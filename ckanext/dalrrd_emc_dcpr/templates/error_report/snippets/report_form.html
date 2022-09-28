@@ -53,8 +53,8 @@
         </div>
 
     </fieldset>
-    {% if is_nsif_reviewer or is_admin %}
-    <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
+    {% if enable_nsif_fieldset %}
+    <fieldset>
         <legend>NSIF reviewer fields (only enabled for NSI reviewer)</legend>
         {% call form.markdown(
             'nsif_moderation_notes',

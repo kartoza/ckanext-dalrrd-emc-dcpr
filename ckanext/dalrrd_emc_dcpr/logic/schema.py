@@ -90,6 +90,11 @@ def delete_error_report_schema():
 
 
 @validator_args
+def moderate_error_report_schema():
+    return show_error_report_schema()
+
+
+@validator_args
 def update_dcpr_request_by_owner_schema(
     convert_group_name_or_id_to_id,
     ignore_missing,

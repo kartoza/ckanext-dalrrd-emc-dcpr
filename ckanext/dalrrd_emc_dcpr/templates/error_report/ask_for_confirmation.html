@@ -7,7 +7,7 @@
 {% block main_content %}
     <section class="module col-md-6 col-md-offset-3">
         <div class="module-content">
-            <p>{{ _('Are you sure you want to %s the error report for - %s?' % (action, error_report.metadata_record)) }}</p>
+            <p>{{ _('Are you sure you want to %s the error report for - %s?' % (action, error_report.csi_reference_id)) }}</p>
             <p class="form-actions">
                 <form id='dcpr-request-confirmation-form' action="{{ action_url }}" method="post">
                     <button class="btn btn-default" type="submit" name="cancel" >{{ _('Cancel') }}</button>

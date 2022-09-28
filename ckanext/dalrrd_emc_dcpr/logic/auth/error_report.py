@@ -20,27 +20,37 @@ def error_report_create_auth(
     return result
 
 
+@toolkit.auth_allow_anonymous_access
 def error_report_show_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     db_user = context["auth_user_obj"]
-    error_report_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
+    error_report_obj = error_report.ErrorReport.get(
+        csi_reference_id=data_dict["csi_reference_id"]
+    )
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
         "nsif", context["auth_user_obj"], role="editor"
     )
     result = {"success": False}
-    if db_user.sysadmin:
-        result["success"] = True
-    else:
-        if error_report.status == ErrorReportStatus.SUBMITTED:
-            allowed_to_view = (
-                db_user.id == error_report.owner_user
-            ) or is_nsif_reviewer
-            result = {"success": allowed_to_view}
-        elif error_report.status == ErrorReportStatus.APPROVED:
+    if not db_user:
+        if error_report_obj.status in [
+            ErrorReportStatus.APPROVED.value,
+            ErrorReportStatus.REJECTED.value,
+        ]:
             result = {"success": True}
+    else:
+        if db_user.sysadmin:
+            result["success"] = True
         else:
-            result = {"success": False}
+            if error_report.status == ErrorReportStatus.SUBMITTED:
+                allowed_to_view = (
+                    db_user.id == error_report.owner_user
+                ) or is_nsif_reviewer
+                result = {"success": allowed_to_view}
+            elif error_report.status == ErrorReportStatus.APPROVED:
+                result = {"success": True}
+            else:
+                result = {"success": False}
     return result
 
 
@@ -57,6 +67,9 @@ def error_report_update_by_nsif_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     error_report_obj = error_report.ErrorReport.get(data_dict["csi_reference_id"])
+    result = {"success": False}
+    if context["auth_user_obj"].sysadmin:
+        result["success"] = True
 
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
         "nsif", context["auth_user_obj"], role="editor"
@@ -128,6 +141,7 @@ def error_report_submitted_auth(
     return result
 
 
+@toolkit.auth_allow_anonymous_access
 def error_report_list_public_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:

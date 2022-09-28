@@ -14,7 +14,7 @@
 {% block content_primary_nav %}
     {% if has_multiple_request_types or is_sysadmin %}
         {{ h.build_nav("error_report.get_error_reports", _("Approved error reports")) }}
-        {% if able_to_create_request %}
+        {% if able_to_create_error_report %}
             {{ h.build_nav("error_report.get_error_reports", _("My error reports")) }}
         {% endif %}
         {%  if is_nsif_member or is_sysadmin %}
@@ -40,7 +40,7 @@
                                 <div class="col-md-12">
                                     <div>
                                         <h2 class="dataset-heading">
-                                            {{ h.link_to(h.truncate("error", 80), h.url_for('error_report.error_report_show', csi_reference_id=error_report.csi_reference_id)) }}
+                                            {{ h.link_to(h.truncate(error_report.description or "Error report", 80), h.url_for('error_report.error_report_show', csi_reference_id=error_report.csi_reference_id)) }}
                                             <small>{{ error_report.csi_reference_id }}</small>
                                         </h2>
                                         <div><span {% if error_report.status == "REJECTED" %}class="text-danger"{% endif %}>{{ error_report.status }}</span></div>

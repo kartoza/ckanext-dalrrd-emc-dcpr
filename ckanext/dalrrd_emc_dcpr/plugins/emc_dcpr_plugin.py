@@ -318,6 +318,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "error_report_create": report_create_actions.error_report_create,
             "error_report_update_by_owner": report_update_actions.error_report_update_by_owner,
             "error_report_update_by_nsif": report_update_actions.error_report_update_by_nsif,
+            "error_report_nsif_moderate": report_update_actions.error_report_nsif_moderate,
             "error_report_show": report_get_actions.error_report_show,
             "error_report_list_public": report_get_actions.error_report_list_public,
             "my_error_report_list": report_get_actions.my_error_report_list,

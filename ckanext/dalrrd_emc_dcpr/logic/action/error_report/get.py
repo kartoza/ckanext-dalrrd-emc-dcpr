@@ -30,7 +30,7 @@ def error_report_show(context: typing.Dict, data_dict: typing.Dict) -> typing.Di
 def error_report_list_public(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.List:
-    """Return a list of public DCPR requests."""
+    """Return a list of public error reports."""
     toolkit.check_access("error_report_list_public_auth", context, data_dict or {})
     relevant_statuses = (ErrorReportStatus.APPROVED.value,)
     return _get_error_report_list(
