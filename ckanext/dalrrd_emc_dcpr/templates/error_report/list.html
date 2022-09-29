@@ -15,7 +15,7 @@
     {% if has_multiple_request_types or is_sysadmin %}
         {{ h.build_nav("error_report.get_error_reports", _("Approved error reports")) }}
         {% if able_to_create_error_report %}
-            {{ h.build_nav("error_report.get_error_reports", _("My error reports")) }}
+            {{ h.build_nav("error_report.get_my_error_reports", _("My error reports")) }}
         {% endif %}
         {%  if is_nsif_member or is_sysadmin %}
             {{ h.build_nav("error_report.get_submitted_error_reports", _("Error reports awaiting NSIF moderation")) }}

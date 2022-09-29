@@ -31,6 +31,11 @@ def get_error_reports_list():
     return _get_error_reports_list("error_report_list_public")
 
 
+@error_report_blueprint.route("/my_error_reports")
+def get_my_error_reports():
+    return _get_error_reports_list("my_error_report_list", True)
+
+
 @error_report_blueprint.route("/submitted_error_reports")
 def get_submitted_error_reports():
     return _get_error_reports_list("submitted_error_report_list", True)

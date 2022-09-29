@@ -42,12 +42,12 @@ def error_report_show_auth(
         if db_user.sysadmin:
             result["success"] = True
         else:
-            if error_report.status == ErrorReportStatus.SUBMITTED:
+            if error_report.status == ErrorReportStatus.SUBMITTED.value:
                 allowed_to_view = (
                     db_user.id == error_report.owner_user
                 ) or is_nsif_reviewer
                 result = {"success": allowed_to_view}
-            elif error_report.status == ErrorReportStatus.APPROVED:
+            elif error_report.status == ErrorReportStatus.APPROVED.value:
                 result = {"success": True}
             else:
                 result = {"success": False}
