@@ -161,12 +161,12 @@
 <div class="container">
     <div class="row mb-5">
         <div class="col-lg-6 index-datasets">
-            <h2 class="mb-5 section-title">Featured Datasets</h2>
+            <h2 class="mb-5 section-title">Featured Metadata Records</h2>
             {% set featured_datasets = h.emc_get_featured_datasets() %}
             {{ h.snippet('snippets/package_list.html', packages=featured_datasets) }}
         </div>
         <div class="col-lg-6 index-datasets">
-            <h2 class="mb-5 section-title">Recent Datasets</h2>
+            <h2 class="mb-5 section-title">Recent Metadata Records</h2>
             {% set recent_datasets = h.emc_get_recently_modified_datasets() %}
             {{ h.snippet('snippets/package_list.html', packages=recent_datasets) }}
         </div>
