@@ -18,15 +18,11 @@ def error_report_update_by_owner(context, data_dict):
     if errors:
         raise toolkit.ValidationError(errors)
 
-    toolkit.check_access("error_report_update_by_owner_auth", context, validated_data)
-    validated_data["owner_user"] = context["auth_user_obj"].id
     validated_data["csi_reference_id"] = data_dict["csi_reference_id"]
 
-    if ErrorReportStatus(validated_data["status"]) in [
-        ErrorReportStatus.APPROVED,
-        ErrorReportStatus.REJECTED,
-    ]:
-        raise toolkit.NotAuthorized
+    toolkit.check_access("error_report_update_by_owner_auth", context, validated_data)
+    validated_data["owner_user"] = context["auth_user_obj"].id
+
     context["updated_by"] = "owner"
     error_report_obj = error_report_dictization.error_report_dict_save(
         validated_data, context
@@ -42,6 +38,8 @@ def error_report_update_by_nsif(context, data_dict):
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     if errors:
         raise toolkit.ValidationError(errors)
+
+    validated_data["csi_reference_id"] = data_dict["csi_reference_id"]
     toolkit.check_access("error_report_update_by_nsif_auth", context, validated_data)
 
     if ErrorReportStatus(validated_data["status"]) in [
@@ -49,9 +47,6 @@ def error_report_update_by_nsif(context, data_dict):
         ErrorReportStatus.REJECTED,
     ]:
         raise toolkit.NotAuthorized
-
-    # make sure csi_reference_id is always present
-    validated_data["csi_reference_id"] = data_dict["csi_reference_id"]
 
     validated_data.update(
         {

@@ -61,7 +61,13 @@ def error_report_update_by_owner_auth(
         csi_reference_id=data_dict["csi_reference_id"]
     )
 
-    result = {"success": error_report_obj.owner_user == context["auth_user_obj"].id}
+    if error_report_obj.status in [
+        ErrorReportStatus.APPROVED,
+        ErrorReportStatus.REJECTED,
+    ]:
+        result = {"success": False}
+    else:
+        result = {"success": error_report_obj.owner_user == context["auth_user_obj"].id}
     return result
 
 
@@ -170,7 +176,7 @@ def error_report_delete_auth(
     """
 
     report_id = toolkit.get_or_bust(data_dict, "csi_reference_id")
-    report_obj = error_report.ErrorReport.get(report_id)
+    report_obj = error_report.ErrorReport.get(csi_reference_id=report_id)
     result = {"success": False}
     if report_obj is not None:
         is_nsif_reviewer = context["auth_user_obj"].id == report_obj.nsif_reviewer

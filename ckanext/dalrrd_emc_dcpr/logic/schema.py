@@ -68,7 +68,9 @@ def update_error_report_by_owner_schema(
     unicode_safe,
 ):
     return {
+        "csi_reference_id": [not_missing, not_empty, unicode_safe],
         "metadata_record": [not_missing, not_empty, unicode_safe],
+        "status": [ignore_missing, unicode_safe],
         "error_application": [ignore_missing, unicode_safe],
         "error_description": [not_missing, not_empty],
         "solution_description": [ignore_missing, unicode_safe],
