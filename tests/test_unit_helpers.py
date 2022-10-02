@@ -15,6 +15,7 @@ pytestmark = pytest.mark.unit
                     [[0.0, 0.0], [10.0, 0.0], [10.0, 10.0], [0.0, 10.0], [0.0, 0.0]]
                 ],
             },
+            # this is the expected value
             [10.0, 0.0, 0.0, 10.0],
         ),
     ],
