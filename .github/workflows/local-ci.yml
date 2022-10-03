@@ -2,7 +2,7 @@ name: Local CI
 on:
   push:
     branches:
-      - development
+      - 'development/**'
 jobs:
   ci:
     name: Continuous Integration
