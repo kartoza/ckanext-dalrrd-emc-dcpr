@@ -29,7 +29,7 @@ def error_report_show_auth(
         csi_reference_id=data_dict["csi_reference_id"]
     )
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
-        "nsif", context["auth_user_obj"], role="editor"
+        "nsif", context["auth_user_obj"]
     )
     result = {"success": False}
     if not db_user:
@@ -43,11 +43,11 @@ def error_report_show_auth(
             result["success"] = True
         else:
             if error_report_obj.status == ErrorReportStatus.SUBMITTED.value:
-                allowed_to_view = (
-                    db_user.id == error_report_obj.owner_user
-                ) or is_nsif_reviewer
-                result = {"success": allowed_to_view}
-            elif error_report_obj.status == ErrorReportStatus.APPROVED.value:
+                result = {"success": is_nsif_reviewer}
+            elif error_report_obj.status in [
+                ErrorReportStatus.APPROVED.value,
+                ErrorReportStatus.REJECTED.value,
+            ]:
                 result = {"success": True}
             else:
                 result = {"success": False}
