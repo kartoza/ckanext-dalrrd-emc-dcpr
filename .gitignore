@@ -135,3 +135,4 @@ dmypy.json
 .vscode/
 
 node_modules
+/cypress

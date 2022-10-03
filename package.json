@@ -10,13 +10,14 @@
     "gulp-sourcemaps": "^2.6.5"
   },
   "devDependencies": {
-    "cypress": "^4.8.0",
+    "cypress": "^4.12.1",
     "cypress-axe": "^0.8.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docker-watch": "gulp --gulpfile gulpfile-docker.js watch",
-    "docker-build": "gulp --gulpfile gulpfile-docker.js build"
+    "docker-build": "gulp --gulpfile gulpfile-docker.js build",
+    "cypress:open": "cypress open"
   },
   "repository": {
     "type": "git",
