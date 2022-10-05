@@ -6,15 +6,10 @@
 #}
 {% block footer_content %}
     <div class="content">
-        <div class="row">
-        <div class="col-lg-6 footer-text">Copyright &copy; - 2022 SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE</div>
-        <div class="col-lg-6 pull-right">
-            <div class="language">
+        <div class="footer-text">Copyright &copy; - 2022 SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE</div>
+        <div class="language">
             {% block footer_lang %}
-                {% snippet "snippets/language_selector.html" %}
             {% endblock %}
-            </div>
-        </div>
         </div>
     </div>
 {% endblock %}
