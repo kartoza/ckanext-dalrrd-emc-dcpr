@@ -649,9 +649,11 @@ footer {
   margin-bottom: initial;
   color: #3A744E;
   background: #3A744E url("../../../base/images/bg.png");
+  padding: 23px 0;
 }
 
 .footer-text {
+  text-align: center;
   color: #fff;
   font-size: 14px;
   margin-top:3px
@@ -872,4 +874,12 @@ footer {
 
 #s2id_field-lang-select{
   width: 0;
+}
+
+.select-group{
+  margin-top: 20px;
+}
+
+.group-content{
+  padding-top: 60px;
 }

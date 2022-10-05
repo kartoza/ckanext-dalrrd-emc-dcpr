@@ -5,11 +5,13 @@
     CKAN and of the EMC
 #}
 {% block footer_content %}
-        <span class="footer-text">Copyright &copy; - 2022 SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE</span>
-        <div class="language pull-right">
+    <div class="content">
+        <div class="footer-text">Copyright &copy; - 2022 SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE</div>
+        <div class="language">
             {% block footer_lang %}
-                {% snippet "snippets/language_selector.html" %}
             {% endblock %}
+        </div>
+    </div>
 {% endblock %}
 {% set emc_version = h.emc_show_version() %}
 
