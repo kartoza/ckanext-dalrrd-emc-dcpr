@@ -92,3 +92,14 @@ def emc_srs_validator(value: str) -> str:
         )
 
     return value
+
+
+def emc_version_validator(value):
+    """
+    check if the version is number or not
+    """
+    try:
+        value = float(value)
+    except:
+        raise toolkit.Invalid("the dataset version should be a number")
+    return value

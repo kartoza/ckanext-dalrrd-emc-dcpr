@@ -8,3 +8,8 @@
     height: 300px;
     width: 100%;
 }
+
+.leaflet-control-layers-overlays > label::after{
+    /* removing the colons ":" from lealfet layers names */
+    content: "" !important;
+}

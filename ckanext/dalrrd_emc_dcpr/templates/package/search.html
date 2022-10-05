@@ -6,9 +6,9 @@
 {% block breadcrumb_content %}
     <div class="page-header">
     {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
-        <h1>Electronic Metadata Catalogue (EMC)</h1>
-        <h5>Total number of metadata records: {{ total }}</h5>
-        <h5>{{ page.item_count }} metadata records found</h5>
+        <h1>{{ _("Electronic Metadata Catalogue (EMC)") }}</h1>
+        <h5>{{ _("Total number of metadata") }} {{ ungettext('record', 'records', total) }}: {{ total }}</h5>
+        <h5>{{ page.item_count }} {{ _("metadata") }} {{ ungettext('record', 'records', page.item_count) }} {{ _("found") }}</h5>
         {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + 'metadata record' + 's') + '...', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
         {% if h.check_access('package_create') %}
         <button class="btn btn-primary pull-right" onclick="document.getElementById('upload_input').click()"
@@ -25,7 +25,7 @@
           multiple
           data-module="xml_parser"
           >
-          <a class="btn btn-primary pull-right new-dataset" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
+          <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
         {% endif %}
     </div>
 {% endblock %}

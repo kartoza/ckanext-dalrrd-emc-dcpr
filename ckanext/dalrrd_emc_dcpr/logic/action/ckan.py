@@ -7,6 +7,7 @@ import ckan.plugins.toolkit as toolkit
 from ckan.model.domain_object import DomainObject
 
 from ...model.user_extra_fields import UserExtraFields
+from .dataset_versioning_control import handle_versioning
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,7 @@ logger = logging.getLogger(__name__)
 def user_show(original_action, context, data_dict):
     """
     Intercepts the core `user_show` action to add any extra_fields that may exist for
-    the user.
-
+    the user
     """
 
     original_result = original_action(context, data_dict)
@@ -97,6 +97,7 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
+    handle_versioning(context, data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
