@@ -352,6 +352,7 @@ class ErrorReportModerateView(MethodView):
         }
         try:
             ckan_action = self.actions.get("nsif", {}).get("ckan_action")
+            logger.info(f" ckan action {ckan_action}")
             toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
         except toolkit.ObjectNotFound:
             result = toolkit.abort(404, toolkit._("Report not found"))

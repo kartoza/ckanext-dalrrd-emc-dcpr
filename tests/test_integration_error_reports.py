@@ -12,6 +12,7 @@ from sqlalchemy import exc
 
 from ckanext.dalrrd_emc_dcpr.cli._sample_dcpr_error_reports import SAMPLE_ERROR_REPORTS
 
+
 pytestmark = pytest.mark.integration
 
 
@@ -22,7 +23,7 @@ pytestmark = pytest.mark.integration
             "report_1",
             True,
             True,
-            id="request-added-successfully",
+            id="report-added-successfully",
         ),
         pytest.param(
             "report_2",
@@ -39,7 +40,7 @@ pytestmark = pytest.mark.integration
         ),
     ],
 )
-def test_create_dcpr_report(name, user_available, user_logged):
+def test_create_error_report(name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
 
     package = model.Session.query(model.Package).first()
@@ -58,17 +59,11 @@ def test_create_dcpr_report(name, user_available, user_logged):
         data_dict = {
             "csi_reference_id": uuid.uuid4(),
             "owner_user": user_id,
-            "csi_reviewer": user_id,
             "metadata_record": package_id,
-            "notification_targets": [{"user_id": user_id, "group_id": None}],
             "status": report.status,
             "error_application": report.error_application,
             "error_description": report.error_description,
             "solution_description": report.solution_description,
-            "request_date": report.request_date,
-            "nsif_moderation_notes": report.csi_moderation_notes,
-            "nsif_review_additional_documents": report.csi_review_additional_documents,
-            "nsif_moderation_date": report.csi_moderation_date,
         }
 
         context = {"ignore_auth": not user_logged, "user": user["name"]}

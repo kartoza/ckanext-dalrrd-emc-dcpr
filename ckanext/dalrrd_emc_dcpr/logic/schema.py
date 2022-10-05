@@ -50,6 +50,7 @@ def create_error_report_schema(
 ):
     return {
         "metadata_record": [not_missing, not_empty, unicode_safe],
+        "owner_user": [not_missing, not_empty, unicode_safe],
         "error_application": [ignore_missing, unicode_safe],
         "error_description": [not_missing, not_empty],
         "solution_description": [ignore_missing, unicode_safe],

@@ -19,6 +19,7 @@ def error_report_update_by_owner(context, data_dict):
         raise toolkit.ValidationError(errors)
 
     validated_data["csi_reference_id"] = data_dict["csi_reference_id"]
+    validated_data["status"] = ErrorReportStatus.SUBMITTED.value
 
     toolkit.check_access("error_report_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id

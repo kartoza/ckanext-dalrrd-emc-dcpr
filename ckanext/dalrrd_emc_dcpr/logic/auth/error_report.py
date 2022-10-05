@@ -42,8 +42,14 @@ def error_report_show_auth(
         if db_user.sysadmin:
             result["success"] = True
         else:
-            if error_report_obj.status == ErrorReportStatus.SUBMITTED.value:
-                result = {"success": is_nsif_reviewer}
+            if error_report_obj.status in [
+                ErrorReportStatus.SUBMITTED.value,
+                ErrorReportStatus.MODIFICATION_REQUESTED.value,
+            ]:
+                result = {
+                    "success": is_nsif_reviewer
+                    or error_report_obj.owner_user == db_user.id
+                }
             elif error_report_obj.status in [
                 ErrorReportStatus.APPROVED.value,
                 ErrorReportStatus.REJECTED.value,
@@ -62,12 +68,16 @@ def error_report_update_by_owner_auth(
     )
 
     if error_report_obj.status in [
-        ErrorReportStatus.APPROVED,
-        ErrorReportStatus.REJECTED,
+        ErrorReportStatus.APPROVED.value,
+        ErrorReportStatus.REJECTED.value,
     ]:
         result = {"success": False}
     else:
-        result = {"success": error_report_obj.owner_user == context["auth_user_obj"].id}
+        result = {
+            "success": error_report_obj.owner_user == context["auth_user_obj"].id
+            and error_report_obj.status
+            == ErrorReportStatus.MODIFICATION_REQUESTED.value
+        }
     return result
 
 
@@ -106,9 +116,9 @@ def error_report_nsif_moderate_auth(
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"]("nsif", user, role="editor")
     if error_report_obj is not None:
         if error_report_obj.status == ErrorReportStatus.SUBMITTED.value:
-            if context["auth_user_obj"].sysadmin:
+            if user.sysadmin:
                 result["success"] = True
-            elif context["auth_user_obj"].id == error_report_obj.owner_user:
+            elif user.id == error_report_obj.owner_user:
                 result["msg"] = toolkit._(
                     "The report owner cannot be involved in the moderation stage"
                 )
@@ -126,6 +136,7 @@ def error_report_nsif_moderate_auth(
             )
     else:
         result["msg"] = toolkit._("Request not found")
+
     return result
 
 
@@ -179,9 +190,12 @@ def error_report_delete_auth(
     report_obj = error_report.ErrorReport.get(csi_reference_id=report_id)
     result = {"success": False}
     if report_obj is not None:
-        is_nsif_reviewer = context["auth_user_obj"].id == report_obj.nsif_reviewer
-        report_submitted = report_obj.status == ErrorReportStatus.SUBMITTED.value
-        if (is_nsif_reviewer or context["auth_user_obj"].sysadmin) and report_submitted:
+        owner_user = context["auth_user_obj"].id == report_obj.owner_user
+        report_submitted = report_obj.status in [
+            ErrorReportStatus.SUBMITTED.value,
+            ErrorReportStatus.MODIFICATION_REQUESTED.value,
+        ]
+        if (owner_user or context["auth_user_obj"].sysadmin) and report_submitted:
             result["success"] = True
     else:
         result["msg"] = toolkit._("Error report not found")
