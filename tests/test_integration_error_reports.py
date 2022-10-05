@@ -29,7 +29,7 @@ pytestmark = pytest.mark.integration
             "report_2",
             False,
             True,
-            marks=pytest.mark.raises(exception=exc.IntegrityError),
+            marks=pytest.mark.raises(exception=logic.ValidationError),
             id="report-can-not-be-added-integrity-error",
         ),
         pytest.param(
@@ -59,14 +59,17 @@ def test_create_error_report(name, user_available, user_logged):
         data_dict = {
             "csi_reference_id": uuid.uuid4(),
             "owner_user": user_id,
-            "metadata_record": package_id,
+            "metadata_record": package_id if user_available else None,
             "status": report.status,
             "error_application": report.error_application,
             "error_description": report.error_description,
             "solution_description": report.solution_description,
         }
 
-        context = {"ignore_auth": not user_logged, "user": user["name"]}
+        context = {
+            "ignore_auth": not user_logged,
+            "user": user["name"] if user else None,
+        }
 
         helpers.call_action(
             "error_report_create",
