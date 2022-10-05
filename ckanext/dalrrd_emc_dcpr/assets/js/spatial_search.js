@@ -7,6 +7,7 @@ ckan.module("spatial_search", function($){
             $.proxyAll(this,/_on/);
         },
         mapper: function(){
+            var _this = this
             let Lmap = window.map
             if(Lmap == undefined){
                 setTimeout(this.mapper,1500)
@@ -17,10 +18,12 @@ ckan.module("spatial_search", function($){
                    one of them is rejected keeps me of using it.
                    at the same time we don't want to sequence these */
 
-                 let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
+                let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
                 divisions.forEach(division =>{
-                    divisions_overlay[division] = L.layerGroup()
+                    let _caps = division.charAt(0).toUpperCase() + division.slice(1);
+                    var division_caps = _caps.replace("_", " ")
+                    divisions_overlay[division_caps] = L.layerGroup()
                     let division_json = L.geoJson(null,{
                         onEachFeature:function(feature, layer){
 
@@ -46,7 +49,7 @@ ckan.module("spatial_search", function($){
                     data.features.forEach(item=>{
                         division_json.addData(item)
                     })
-                }).then(divisions_overlay[division].addLayer(division_json))
+                }).then(divisions_overlay[division_caps].addLayer(division_json))
                 })
                 let layerControl = L.control.layers(null,divisions_overlay)
                 layerControl.addTo(Lmap);
@@ -76,7 +79,11 @@ ckan.module("spatial_search", function($){
                     layer.addTo(Lmap);
                     $('#ext_bbox').val(layer.getBounds().toBBoxString());
                 });
-                }
+            }
         },
+        captializeFirstLetter: function(name){
+            return
+        },
+
     }
 })
