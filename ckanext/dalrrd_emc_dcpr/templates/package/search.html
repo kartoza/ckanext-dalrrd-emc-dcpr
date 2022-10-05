@@ -3,6 +3,8 @@
   it might have to do with droping volumes
 #}
 
+{% block subtitle %}Metadata record{% endblock %}
+
 {% block breadcrumb_content %}
     <div class="page-header">
     {% set total =  h.emc_get_all_datasets_count(g.userobj) %}

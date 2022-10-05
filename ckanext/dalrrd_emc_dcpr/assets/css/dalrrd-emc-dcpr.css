@@ -92,12 +92,7 @@ a {
  }
 
 .navbar-nav {
-  margin: 7.5px 25px;
-}
-
-.navbar-right {
-  float: right !important;
-  margin-right: 0;
+  margin: 7.5px 0;
 }
 
 .navbar-default {
@@ -598,6 +593,7 @@ fieldset[disabled] .btn-default.focus {
   position: relative;
   color: #FFFFFF;
   background-color: #3A744E;
+  padding-bottom: 3rem;
 }
 
 .sasdi {
@@ -663,9 +659,9 @@ footer {
   margin-top:3px
 }
 
-.language {
-  float: right;
-  width: 20%;
+.language form {
+  margin: auto;
+  width: 50%;
 }
 
 /* End Footer */
@@ -819,4 +815,71 @@ footer {
 /* Modal */
 .modal-dialog {
   margin-top: 70px;
+}
+
+@media screen and (max-width: 1050px) {
+
+  .search-form {
+    width: 80%;
+    margin: auto;
+  }
+  .header-title{
+    font-size: 28px;
+  }
+
+  .carousel-inner-img{
+    width: auto;
+  }
+  .carousel-inner > .item > img, .carousel-inner > .item > a > img{
+    max-width: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .js .main .secondary .filters {
+    display: block;
+    position: relative;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    padding: 0;
+  }
+  .secondary{
+    margin: 15px;
+  }
+
+  .toolbar .breadcrumb {
+    color: #333333;
+    text-shadow: none;
+  }
+
+  .publish-action {
+    margin-bottom: 15px;
+    min-height: auto;
+  }
+  .publish-action .card {
+    min-height: 100px;
+  }
+
+}
+
+@media (max-width: 477px) {
+  .new-dataset{
+    margin-top: 15px;
+  }
+}
+
+#s2id_field-lang-select{
+  width: 0;
+}
+
+.select-group{
+  margin-top: 20px;
+}
+
+.group-content{
+  padding-top: 60px;
 }
