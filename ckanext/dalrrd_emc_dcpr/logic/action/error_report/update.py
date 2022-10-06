@@ -79,12 +79,13 @@ def error_report_nsif_moderate(
         .Session.query(error_report.ErrorReport)
         .get(validated_data["csi_reference_id"])
     )
-    if ErrorReportStatus(report_obj.status) in [
-        ErrorReportStatus.APPROVED,
-        ErrorReportStatus.REJECTED,
-    ]:
-        raise toolkit.NotAuthorized
+
     if report_obj is not None:
+        if ErrorReportStatus(report_obj.status) in [
+            ErrorReportStatus.APPROVED,
+            ErrorReportStatus.REJECTED,
+        ]:
+            raise toolkit.NotAuthorized
         try:
 
             action_status = {
@@ -93,7 +94,7 @@ def error_report_nsif_moderate(
                 "REQUEST_MODIFICATION": "MODIFICATION_REQUESTED",
             }
             report_obj.status = ErrorReportStatus(
-                action_status[data_dict.get("action")]
+                action_status[str(data_dict.get("action"))]
             ).value
             report_obj.nsif_moderation_date = dt.datetime.now(dt.timezone.utc)
 
@@ -103,3 +104,10 @@ def error_report_nsif_moderate(
             if context["auth_user_obj"].sysadmin:
                 report_obj.nsif_reviewer = context["auth_user_obj"].id
             context["model"].Session.commit()
+
+            result = toolkit.get_action("error_report_show")(context, validated_data)
+
+    else:
+        raise toolkit.NotAuthorized
+
+    return result
