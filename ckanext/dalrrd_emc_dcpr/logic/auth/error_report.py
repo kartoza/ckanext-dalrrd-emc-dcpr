@@ -33,7 +33,7 @@ def error_report_show_auth(
     )
     result = {"success": False}
     if not db_user:
-        if error_report_obj.status in [
+        if error_report_obj and error_report_obj.status in [
             ErrorReportStatus.APPROVED.value,
             ErrorReportStatus.REJECTED.value,
         ]:
@@ -42,21 +42,22 @@ def error_report_show_auth(
         if db_user.sysadmin:
             result["success"] = True
         else:
-            if error_report_obj.status in [
-                ErrorReportStatus.SUBMITTED.value,
-                ErrorReportStatus.MODIFICATION_REQUESTED.value,
-            ]:
-                result = {
-                    "success": is_nsif_reviewer
-                    or error_report_obj.owner_user == db_user.id
-                }
-            elif error_report_obj.status in [
-                ErrorReportStatus.APPROVED.value,
-                ErrorReportStatus.REJECTED.value,
-            ]:
-                result = {"success": True}
-            else:
-                result = {"success": False}
+            if error_report_obj is not None:
+                if error_report_obj.status in [
+                    ErrorReportStatus.SUBMITTED.value,
+                    ErrorReportStatus.MODIFICATION_REQUESTED.value,
+                ]:
+                    result = {
+                        "success": is_nsif_reviewer
+                        or error_report_obj.owner_user == db_user.id
+                    }
+                elif error_report_obj.status in [
+                    ErrorReportStatus.APPROVED.value,
+                    ErrorReportStatus.REJECTED.value,
+                ]:
+                    result = {"success": True}
+                else:
+                    result = {"success": False}
     return result
 
 
@@ -66,18 +67,19 @@ def error_report_update_by_owner_auth(
     error_report_obj = error_report.ErrorReport.get(
         csi_reference_id=data_dict["csi_reference_id"]
     )
-
-    if error_report_obj.status in [
-        ErrorReportStatus.APPROVED.value,
-        ErrorReportStatus.REJECTED.value,
-    ]:
-        result = {"success": False}
-    else:
-        result = {
-            "success": error_report_obj.owner_user == context["auth_user_obj"].id
-            and error_report_obj.status
-            == ErrorReportStatus.MODIFICATION_REQUESTED.value
-        }
+    result = {"success": False}
+    if error_report_obj is not None:
+        if error_report_obj.status in [
+            ErrorReportStatus.APPROVED.value,
+            ErrorReportStatus.REJECTED.value,
+        ]:
+            result = {"success": False}
+        else:
+            result = {
+                "success": error_report_obj.owner_user == context["auth_user_obj"].id
+                and error_report_obj.status
+                == ErrorReportStatus.MODIFICATION_REQUESTED.value
+            }
     return result
 
 
@@ -88,19 +90,20 @@ def error_report_update_by_nsif_auth(
         csi_reference_id=data_dict["csi_reference_id"]
     )
     result = {"success": False}
-    if context["auth_user_obj"].sysadmin:
-        result["success"] = True
+    if error_report_obj is not None:
+        if context["auth_user_obj"].sysadmin:
+            result["success"] = True
 
-    is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
-        "nsif", context["auth_user_obj"], role="editor"
-    )
-
-    result = {
-        "success": (
-            is_nsif_reviewer
-            and error_report_obj.status == ErrorReportStatus.SUBMITTED.value
+        is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
+            "nsif", context["auth_user_obj"], role="editor"
         )
-    }
+
+        result = {
+            "success": (
+                is_nsif_reviewer
+                and error_report_obj.status == ErrorReportStatus.SUBMITTED.value
+            )
+        }
     return result
 
 
