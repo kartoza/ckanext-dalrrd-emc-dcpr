@@ -26,7 +26,7 @@ def error_report_show_auth(
 ) -> typing.Dict:
     db_user = context["auth_user_obj"]
     error_report_obj = error_report.ErrorReport.get(
-        csi_reference_id=data_dict["csi_reference_id"]
+        csi_reference_id=data_dict.get("csi_reference_id")
     )
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
         "nsif", context["auth_user_obj"]
@@ -65,7 +65,7 @@ def error_report_update_by_owner_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     error_report_obj = error_report.ErrorReport.get(
-        csi_reference_id=data_dict["csi_reference_id"]
+        csi_reference_id=data_dict.get("csi_reference_id")
     )
     result = {"success": False}
     if error_report_obj is not None:
@@ -87,7 +87,7 @@ def error_report_update_by_nsif_auth(
     context: typing.Dict, data_dict: typing.Dict
 ) -> typing.Dict:
     error_report_obj = error_report.ErrorReport.get(
-        csi_reference_id=data_dict["csi_reference_id"]
+        csi_reference_id=data_dict.get("csi_reference_id")
     )
     result = {"success": False}
     if error_report_obj is not None:
@@ -112,7 +112,7 @@ def error_report_nsif_moderate_auth(
 ) -> typing.Dict:
     """Moderation authentication for error report"""
     error_report_obj = error_report.ErrorReport.get(
-        csi_reference_id=data_dict["csi_reference_id"]
+        csi_reference_id=data_dict.get("csi_reference_id")
     )
     result = {"success": False}
     user = context["auth_user_obj"]
