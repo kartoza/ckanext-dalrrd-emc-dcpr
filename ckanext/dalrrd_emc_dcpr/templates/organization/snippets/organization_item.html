@@ -1,7 +1,7 @@
 {% ckan_extends %}
 
 {% block item %}
-<li class="media-item col-sm-3">
+<div class="media-organization-item col-sm-3 ">
 {% block item_inner %}
   {% block image %}
     <img src="{{ organization.image_display_url or h.url_for_static('/base/images/placeholder-organization.png') }}" alt="{{ organization.name }}" class="img-responsive media-image">
@@ -32,6 +32,6 @@
   </a>
   {% endblock %}
   {% endblock %}
-</li>
+</div>
 
 {% endblock %}

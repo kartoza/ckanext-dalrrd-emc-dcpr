@@ -894,6 +894,21 @@ footer {
   padding: 0;
 }
 
-.media-item {
-  width: 20%;
+.media-organization-grid{
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.media-organization-item {
+  position: relative;
+  float: left;
+  padding: 15px;
+  margin: 0 15px 15px 15px;
+  background-color: white;
+  border-radius: 3px;
+}
+
+.media-organization-item img{
+  width: 100%;
 }
