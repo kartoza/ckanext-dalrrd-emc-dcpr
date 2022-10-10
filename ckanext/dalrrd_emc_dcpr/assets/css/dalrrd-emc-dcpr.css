@@ -92,12 +92,7 @@ a {
  }
 
 .navbar-nav {
-  margin: 7.5px 25px;
-}
-
-.navbar-right {
-  float: right !important;
-  margin-right: 0;
+  margin: 7.5px 0;
 }
 
 .navbar-default {
@@ -337,6 +332,7 @@ fieldset[disabled] .btn-default.focus {
   position: relative;
   min-height: 300px;
   background-color: transparent;
+  margin-right: 0;
 }
 
 .main .secondary {
@@ -598,6 +594,7 @@ fieldset[disabled] .btn-default.focus {
   position: relative;
   color: #FFFFFF;
   background-color: #3A744E;
+  padding-bottom: 3rem;
 }
 
 .sasdi {
@@ -613,6 +610,7 @@ fieldset[disabled] .btn-default.focus {
   position: relative;
   background-color: #FFFFFF;
   color: #3A744E;
+  margin-bottom: 20px;
 }
 
 .index-datasets {
@@ -663,9 +661,9 @@ footer {
   margin-top:3px
 }
 
-.language {
-  float: right;
-  width: 20%;
+.language form {
+  margin: auto;
+  width: 50%;
 }
 
 /* End Footer */
@@ -726,8 +724,12 @@ footer {
   text-transform: uppercase;
 }
 
+.module > .page-header {
+  margin-top: 0;
+}
+
 .page-header.module-content {
-  padding-top: 15px;
+  padding-top: 0;
   padding-bottom: 30px;
 }
 
@@ -821,10 +823,92 @@ footer {
   margin-top: 70px;
 }
 
+@media screen and (max-width: 1050px) {
+
+  .search-form {
+    width: 80%;
+    margin: auto;
+  }
+  .header-title{
+    font-size: 28px;
+  }
+
+  .carousel-inner-img{
+    width: auto;
+  }
+  .carousel-inner > .item > img, .carousel-inner > .item > a > img{
+    max-width: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .js .main .secondary .filters {
+    display: block;
+    position: relative;
+    overflow: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    padding: 0;
+  }
+  .secondary{
+    margin: 15px;
+  }
+
+  .toolbar .breadcrumb {
+    color: #333333;
+    text-shadow: none;
+  }
+
+  .publish-action {
+    margin-bottom: 15px;
+    min-height: auto;
+  }
+  .publish-action .card {
+    min-height: 100px;
+  }
+
+}
+
+@media (max-width: 477px) {
+  .new-dataset{
+    margin-top: 15px;
+  }
+}
+
+#s2id_field-lang-select{
+  width: 0;
+}
+
 .select-group{
   margin-top: 20px;
 }
 
 .group-content{
   padding-top: 60px;
+}
+
+.module-content {
+  padding: 0;
+}
+
+.media-organization-grid{
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.media-organization-item {
+  position: relative;
+  float: left;
+  padding: 15px;
+  margin: 0 15px 15px 15px;
+  background-color: white;
+  border-radius: 3px;
+}
+
+.media-organization-item img{
+  width: 100%;
 }
