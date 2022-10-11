@@ -310,6 +310,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "spatial_resolution_converter": converters.spatial_resolution_converter,
             "convert_choices_select_to_int": converters.convert_choices_select_to_int,
             "convert_select_custom_choice_to_extra": converters.convert_select_custom_choice_to_extra,
+            "doi_validator": validators.doi_validator,
             # "expand_tags_composite": converters.expand_tags_composite,
         }
 
