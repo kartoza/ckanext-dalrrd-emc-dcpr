@@ -15,7 +15,6 @@ from .logic.action.emc import show_version
 from .constants import DCPRRequestStatus
 from .model.dcpr_request import DCPRRequest
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -346,7 +345,6 @@ def get_dcpr_requests_approved_by_nsif(request_origin):
 
 
 def is_dcpr_request(package):
-
     for extra in package.get("extras") or []:
         if extra.get("key") == "origin" and extra.get("value") == "DCPR":
             return True
@@ -354,7 +352,6 @@ def is_dcpr_request(package):
 
 
 def get_dcpr_request_action(package):
-
     for extra in package.get("extras") or []:
         if extra.get("key") == "action" and extra.get("value") == "APPROVE":
             return "ACCEPT"
