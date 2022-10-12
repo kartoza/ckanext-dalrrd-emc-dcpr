@@ -112,6 +112,9 @@ def doi_validator(value: str):
     check if the doi follows
     certain pattern.
     """
+    if value == "" or value is None:
+        return ""
+
     pattern = "^10\\.\\d{4,}(\\.\\d+)*/[-._;()/:a-zA-Z0-9]+$"
     if re.match(pattern, value) is None:
         raise toolkit.Invalid(

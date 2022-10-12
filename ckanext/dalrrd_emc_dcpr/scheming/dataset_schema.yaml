@@ -31,6 +31,7 @@ dataset_fields:
 
   - field_name: doi
     label: DOI
+    required: false
     help_text: Digital Object Identifier of the data (if any)
     validators: doi_validator
 

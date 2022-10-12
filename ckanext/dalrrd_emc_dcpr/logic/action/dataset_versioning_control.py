@@ -14,13 +14,18 @@ def handle_versioning(context, data_dict):
     extising dataset.
     """
     # handling the version number
-    package_state = data_dict.get("state")
-    if package_state is None:
-        return data_dict
-    if package_state is not "active":
-        return data_dict
 
     old_dataset = toolkit.get_action("package_show")(data_dict={"id": data_dict["id"]})
+    shared_items = {
+        k: data_dict[k]
+        for k in data_dict
+        if k in old_dataset and data_dict[k] == old_dataset[k]
+    }
+    for k in data_dict:
+        if k not in shared_items.keys():
+            if k == "state":
+                if old_dataset[k] == "draft":
+                    return data_dict
     old_version = old_dataset.get("version")
     new_version = data_dict.get("version")
     url = data_dict.get("name")
