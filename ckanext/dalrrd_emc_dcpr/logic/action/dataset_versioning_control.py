@@ -61,6 +61,11 @@ def numbering_version(url):
 
 def get_previous_versions(url, context):
     """
+    TODO: i need to get the highest
+    number of previous versions in case
+    the user updated the version from the
+    original dataset, which results in creating
+    a new version with the number 2.
     get the pervious
     versions of the dataset
     """
