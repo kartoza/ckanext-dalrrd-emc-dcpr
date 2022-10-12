@@ -71,6 +71,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS otherconstraints,
            NULL AS classification,
            NULL AS conditionapplyingtoaccessanduse,
+	   NULL AS edition,
            c.extras->>'lineage' AS lineage,
            NULL AS responsiblepartyrole,
            NULL AS specificationtitle,

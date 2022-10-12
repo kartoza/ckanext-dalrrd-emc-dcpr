@@ -912,3 +912,7 @@ footer {
 .media-organization-item img{
   width: 100%;
 }
+
+#flDebug{
+  display: none !important;
+}

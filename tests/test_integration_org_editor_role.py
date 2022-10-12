@@ -57,6 +57,7 @@ def test_create_package(name, private, org_role):
         "name": name,
         "private": private,
         "title": name,
+        "doi": "",
         "metadata_standard_name": "standard name",
         "metadata_standard_version": "1.0",
         "notes": f"notes for {name}",

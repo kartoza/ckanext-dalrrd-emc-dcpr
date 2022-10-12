@@ -97,8 +97,12 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
-    handle_versioning(context, data_dict)
-    return _act_depending_on_package_visibility(original_action, context, data_dict)
+    package_state = data_dict.get("state")
+    if package_state == "draft":
+        return _act_depending_on_package_visibility(original_action, context, data_dict)
+    else:
+        handle_versioning(context, data_dict)
+        return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
 @toolkit.chained_action
