@@ -29,7 +29,7 @@ def handle_versioning(context, data_dict):
     old_version = old_dataset.get("version")
     new_version = data_dict.get("version")
     url = data_dict.get("name")
-    new_version = numbering_version(url, old_version, new_version)
+    new_version = numbering_version(url)
     # create new dataset if the status is completed
     if old_dataset.get("status") == "completed":
         generated_id = "".join(
@@ -42,16 +42,30 @@ def handle_versioning(context, data_dict):
         return result
 
 
-def numbering_version(url, old_version, new_version):
+def numbering_version(url):
     """
     handle the numbering
-    logic of the new version
+    logic of the new
+    version, incrementing
+    the last one by one
     """
     match = re.search(r"[\d+]$", url)
+    version_number = "0"
     if match is None:
-        return "2"
+        version_number = "2"
     else:
-        return str(int(match.group()) + 1)
+        version_number = str(int(match.group()) + 1)
+
+    return version_number
+
+
+def get_previous_versions(url):
+    """
+    get the pervious
+    versions of the dataset
+    """
+    url_name, version = url.split("_v_")
+    packages = toolkit.get_action("package_list")()
 
 
 def update_dataset_title_and_url(
