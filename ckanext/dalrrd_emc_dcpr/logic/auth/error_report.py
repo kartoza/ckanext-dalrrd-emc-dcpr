@@ -12,11 +12,9 @@ def error_report_create_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:
     db_user = context["auth_user_obj"]
-    result = {"success": False}
-    if db_user.sysadmin:
-        result["success"] = True
-    else:
-        result = {"success": len(db_user.get_groups()) > 0}
+    result = {
+        "success": db_user is not None
+    }
     return result
 
 
@@ -27,7 +25,8 @@ def error_report_show_auth(
     db_user = context["auth_user_obj"]
     error_report_obj = error_report.ErrorReport.get(
         csi_reference_id=data_dict.get("csi_reference_id")
-    )
+    ) if data_dict else None
+
     is_nsif_reviewer = toolkit.h["emc_user_is_org_member"](
         "nsif", context["auth_user_obj"]
     )

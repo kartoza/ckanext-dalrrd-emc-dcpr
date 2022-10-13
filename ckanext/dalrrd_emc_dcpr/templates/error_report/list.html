@@ -3,7 +3,7 @@
 {% set able_to_create_error_report = h.check_access('error_report_create_auth') %}
 {% set is_nsif_member = h.emc_user_is_org_member('nsif', g.userobj) %}
 {% set is_sysadmin = g.userobj.sysadmin %}
-{% set has_multiple_request_types = able_to_create_error_report or is_nsif_member %}
+{% set has_multiple_report_types = able_to_create_error_report or is_nsif_member %}
 
 {% block subtitle %}{{ _('Error Reports') }} - {{ super() }}{% endblock %}
 
@@ -12,7 +12,7 @@
 {% endblock%}
 
 {% block content_primary_nav %}
-    {% if has_multiple_request_types or is_sysadmin %}
+    {% if has_multiple_report_types or is_sysadmin %}
         {{ h.build_nav("error_report.get_error_reports", _("Approved error reports")) }}
         {% if able_to_create_error_report %}
             {{ h.build_nav("error_report.get_my_error_reports", _("My error reports")) }}

@@ -14,6 +14,8 @@ def error_report_create(context, data_dict):
     toolkit.check_access("error_report_create_auth", context, data_dict)
     logger.debug("Inside the error_report_create action")
 
+    logger.info(f"Metadata record {data_dict.get('metadata_record')}")
+
     model = context["model"]
     schema = context.get("schema", create_error_report_schema())
 
