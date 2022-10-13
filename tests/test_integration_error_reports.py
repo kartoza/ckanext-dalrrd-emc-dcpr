@@ -32,7 +32,7 @@ SAMPLE_ERROR_REPORTS = [
         "nsif_moderation_notes": "NSIF moderation notes",
         "nsif_review_additional_documents": "NSIF review additional documents",
         "nsif_moderation_date": "2022-01-01",
-    }
+    },
 ]
 
 pytestmark = pytest.mark.integration
@@ -76,7 +76,7 @@ def test_create_error_report(name, user_available, user_logged):
         "status": "completed",
         "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
-        "owner_org": 'test_org_00',
+        "owner_org": "test_org_00",
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
@@ -110,7 +110,7 @@ def test_create_error_report(name, user_available, user_logged):
         context={"ignore_auth": False, "user": user["name"]},
         **package_data_dict,
     )
-    package_id = package['id'] if package else None
+    package_id = package["id"] if package else None
 
     convert_user_name_or_id_to_id = toolkit.get_converter(
         "convert_user_name_or_id_to_id"
@@ -137,7 +137,7 @@ def test_create_error_report(name, user_available, user_logged):
         )
 
     # Remove the test package
-    package_data_dict['id'] = package_id
+    package_data_dict["id"] = package_id
     helpers.call_action(
         "package_delete",
         context={"ignore_auth": False, "user": user["name"]},
@@ -177,7 +177,7 @@ def test_update_error_report(name, user_available, user_logged):
         "status": "completed",
         "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
-        "owner_org": 'test_org_00',
+        "owner_org": "test_org_00",
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
@@ -211,7 +211,7 @@ def test_update_error_report(name, user_available, user_logged):
         context={"ignore_auth": False, "user": user["name"]},
         **package_data_dict,
     )
-    package_id = package['id'] if package else None
+    package_id = package["id"] if package else None
 
     convert_user_name_or_id_to_id = toolkit.get_converter(
         "convert_user_name_or_id_to_id"
@@ -237,9 +237,9 @@ def test_update_error_report(name, user_available, user_logged):
             **data_dict,
         )
 
-        data_dict['csi_reference_id'] = created_error_report.get('csi_reference_id')
-        updated_description = 'Updated error report description'
-        data_dict['error_description'] = updated_description
+        data_dict["csi_reference_id"] = created_error_report.get("csi_reference_id")
+        updated_description = "Updated error report description"
+        data_dict["error_description"] = updated_description
 
         error_report = helpers.call_action(
             "error_report_update_by_owner",
@@ -247,15 +247,16 @@ def test_update_error_report(name, user_available, user_logged):
             **data_dict,
         )
 
-        assert error_report.get('error_description') == updated_description
+        assert error_report.get("error_description") == updated_description
 
     # Remove the test package
-    package_data_dict['id'] = package_id
+    package_data_dict["id"] = package_id
     helpers.call_action(
         "package_delete",
         context={"ignore_auth": False, "user": user["name"]},
         **package_data_dict,
     )
+
 
 @pytest.mark.parametrize(
     "name, user_available, user_logged",
@@ -289,7 +290,7 @@ def test_delete_error_report(name, user_available, user_logged):
         "status": "completed",
         "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
-        "owner_org": 'test_org_00',
+        "owner_org": "test_org_00",
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
@@ -323,7 +324,7 @@ def test_delete_error_report(name, user_available, user_logged):
         context={"ignore_auth": False, "user": user["name"]},
         **package_data_dict,
     )
-    package_id = package['id'] if package else None
+    package_id = package["id"] if package else None
 
     convert_user_name_or_id_to_id = toolkit.get_converter(
         "convert_user_name_or_id_to_id"
@@ -349,7 +350,7 @@ def test_delete_error_report(name, user_available, user_logged):
             **data_dict,
         )
 
-        data_dict['csi_reference_id'] = created_error_report.get('csi_reference_id')
+        data_dict["csi_reference_id"] = created_error_report.get("csi_reference_id")
 
         helpers.call_action(
             "error_report_delete",
@@ -358,7 +359,7 @@ def test_delete_error_report(name, user_available, user_logged):
         )
 
     # Remove the test package
-    package_data_dict['id'] = package_id
+    package_data_dict["id"] = package_id
     helpers.call_action(
         "package_delete",
         context={"ignore_auth": False, "user": user["name"]},

@@ -35,10 +35,7 @@ def error_report_dictize(
 
     if context.get("dictize_for_ui", False):
         result_dict.update(
-            {
-                "owner": error_report.owner.name,
-                "record": error_report.record
-            }
+            {"owner": error_report.owner.name, "record": error_report.record}
         )
 
     return result_dict
