@@ -62,8 +62,12 @@ pytestmark = pytest.mark.integration
         ),
     ],
 )
+@pytest.mark.usefixtures(
+    "emc_clean_db", "with_plugins", "with_request_context", "emc_create_sasdi_themes"
+)
 def test_create_error_report(name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    owner_organization = factories.Organization()
 
     package_data_dict = {
         "name": name,
@@ -76,7 +80,7 @@ def test_create_error_report(name, user_available, user_logged):
         "status": "completed",
         "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
-        "owner_org": "test_org_00",
+        "owner_org": owner_organization.get("id"),
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
@@ -163,8 +167,12 @@ def test_create_error_report(name, user_available, user_logged):
         ),
     ],
 )
+@pytest.mark.usefixtures(
+    "emc_clean_db", "with_plugins", "with_request_context", "emc_create_sasdi_themes"
+)
 def test_update_error_report(name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    owner_organization = factories.Organization()
 
     package_data_dict = {
         "name": name,
@@ -177,7 +185,7 @@ def test_update_error_report(name, user_available, user_logged):
         "status": "completed",
         "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
-        "owner_org": "test_org_00",
+        "owner_org": owner_organization.get("id"),
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
@@ -249,7 +257,7 @@ def test_update_error_report(name, user_available, user_logged):
 
         assert error_report.get("error_description") == updated_description
 
-    # Remove the test package
+    # Remove the test package and the org
     package_data_dict["id"] = package_id
     helpers.call_action(
         "package_delete",
@@ -276,8 +284,12 @@ def test_update_error_report(name, user_available, user_logged):
         ),
     ],
 )
+@pytest.mark.usefixtures(
+    "emc_clean_db", "with_plugins", "with_request_context", "emc_create_sasdi_themes"
+)
 def test_delete_error_report(name, user_available, user_logged):
     user = toolkit.get_action("get_site_user")({"ignore_auth": True}, {})
+    owner_organization = factories.Organization()
 
     package_data_dict = {
         "name": name,
@@ -290,7 +302,7 @@ def test_delete_error_report(name, user_available, user_logged):
         "status": "completed",
         "metadata_point_of_contact-0-organizational_role": "resource_provider",
         "reference_date": "2020-01-01",
-        "owner_org": "test_org_00",
+        "owner_org": owner_organization.get("id"),
         "dataset_language": "en",
         "metadata_language": "en",
         "dataset_character_set": "utf-8",
