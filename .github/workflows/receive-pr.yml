@@ -40,7 +40,6 @@ jobs:
         run: |
           mkdir -p ./pr
           echo ${{ github.event.number }} > ./pr/NR
-
       - name: Get current git commit hash
         uses: priyesh2609/sha-trim-action@v1.1.1
 
@@ -56,7 +55,6 @@ jobs:
           IMAGE_NAME: ${{ github.repository }}
         run: |
           docker save "$IMAGE_NAME:$SLUGGED_GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
-
       - name: Persist artifacts
         uses: actions/upload-artifact@v2
         with:

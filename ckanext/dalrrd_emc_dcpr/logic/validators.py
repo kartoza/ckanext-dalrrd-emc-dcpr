@@ -1,6 +1,8 @@
 import logging
 import typing
 from datetime import datetime
+import re
+from ckan.lib.navl.dictization_functions import Missing
 
 from ckan.plugins import toolkit
 from ckan.lib.navl.dictization_functions import (
@@ -103,3 +105,26 @@ def emc_version_validator(value):
     except:
         raise toolkit.Invalid("the dataset version should be a number")
     return value
+
+
+def doi_validator(value: str):
+    """
+    check if the doi follows
+    certain pattern.
+    """
+    if value == "" or value is None:
+        return ""
+
+    if type(value) is Missing:
+        return ""
+
+    pattern = "^10\\.\\d{4,}(\\.\\d+)*/[-._;()/:a-zA-Z0-9]+$"
+    if re.match(pattern, value) is None:
+        raise toolkit.Invalid(
+            """
+        doi is not in the correct form,
+        please refer to https://www.doi.org/
+        """
+        )
+    else:
+        return value

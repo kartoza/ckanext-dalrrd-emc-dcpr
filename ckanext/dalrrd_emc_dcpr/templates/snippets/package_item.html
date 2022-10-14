@@ -19,6 +19,7 @@
           {% block heading %}
             <h2 class="dataset-heading">
             {% block heading_title %}
+                <div data-testid="search_item_anchor"></div>
                 {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
               {% endblock %}
               {% block heading_private %}

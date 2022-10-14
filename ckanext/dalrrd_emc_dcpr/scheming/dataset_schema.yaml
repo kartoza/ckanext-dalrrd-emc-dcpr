@@ -28,6 +28,13 @@ dataset_fields:
     validators: boolean_validator
     preset: emc_checkbox
 
+
+  - field_name: doi
+    label: DOI
+    required: false
+    help_text: Digital Object Identifier of the data (if any)
+    validators: doi_validator
+
   # this multiple checkbox is better to be implemented than these two fields,
   # but multiple checkbox has an issue
   # - field_name: metadata_standard_name

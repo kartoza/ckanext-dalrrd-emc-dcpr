@@ -1,8 +1,6 @@
 """Mappings from CKAN to pycsw
-
 This file is used by the EMC's pycsw instance in order to expose existing catalog
 records via pycsw.
-
 """
 
 from sqlalchemy.schema import PrimaryKeyConstraint
@@ -32,6 +30,7 @@ MD_CORE_MODEL = {
         "pycsw:Language": "language",
         "pycsw:Title": "title",
         "pycsw:Abstract": "abstract",
+        "pycsw:Edition": "edition",
         "pycsw:Keywords": "keywords",
         "pycsw:KeywordType": "keywordstype",
         "pycsw:Format": "format",
@@ -49,7 +48,7 @@ MD_CORE_MODEL = {
         "pycsw:OrganizationName": "organization",
         "pycsw:SecurityConstraints": "securityconstraints",
         "pycsw:ParentIdentifier": "parentidentifier",
-        "pycsw:TopicCategory": "topicategory",
+        "pycsw:TopicCategory": "topiccategory",
         "pycsw:ResourceLanguage": "resourcelanguage",
         "pycsw:GeographicDescriptionCode": "geodescode",
         "pycsw:Denominator": "denominator",

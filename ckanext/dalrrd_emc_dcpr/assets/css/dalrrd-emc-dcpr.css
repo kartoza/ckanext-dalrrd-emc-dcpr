@@ -332,6 +332,7 @@ fieldset[disabled] .btn-default.focus {
   position: relative;
   min-height: 300px;
   background-color: transparent;
+  margin-right: 0;
 }
 
 .main .secondary {
@@ -609,6 +610,7 @@ fieldset[disabled] .btn-default.focus {
   position: relative;
   background-color: #FFFFFF;
   color: #3A744E;
+  margin-bottom: 20px;
 }
 
 .index-datasets {
@@ -722,8 +724,12 @@ footer {
   text-transform: uppercase;
 }
 
+.module > .page-header {
+  margin-top: 0;
+}
+
 .page-header.module-content {
-  padding-top: 15px;
+  padding-top: 0;
   padding-bottom: 30px;
 }
 
@@ -882,4 +888,31 @@ footer {
 
 .group-content{
   padding-top: 60px;
+}
+
+.module-content {
+  padding: 0;
+}
+
+.media-organization-grid{
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.media-organization-item {
+  position: relative;
+  float: left;
+  padding: 15px;
+  margin: 0 15px 15px 15px;
+  background-color: white;
+  border-radius: 3px;
+}
+
+.media-organization-item img{
+  width: 100%;
+}
+
+#flDebug{
+  display: none !important;
 }

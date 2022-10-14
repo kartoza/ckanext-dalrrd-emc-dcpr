@@ -18,7 +18,8 @@ ckan.module("spatial_search", function($){
                    one of them is rejected keeps me of using it.
                    at the same time we don't want to sequence these */
 
-                let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
+                //let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
+                let divisions = ["district_municipalities"]
                 let divisions_overlay = {}
                 divisions.forEach(division =>{
                     let _caps = division.charAt(0).toUpperCase() + division.slice(1);
@@ -41,15 +42,31 @@ ckan.module("spatial_search", function($){
                                     var form = $(".search-form");
                                     form.submit();
                                   }, 200);
-                            }})
-                        }
-                    })
-                    url = `${location.origin}/sa_boundaries/sa_${division}.geojson`
-                    fetch(url).then(res=>res.json()).then((data)=>{
-                    data.features.forEach(item=>{
-                        division_json.addData(item)
-                    })
-                }).then(divisions_overlay[division_caps].addLayer(division_json))
+                                }})
+                            }
+                        })
+                        // url = `${location.origin}/sa_boundaries/sa_${division}.geojson`
+                        // fetch(url).then(res=>res.json()).then((data)=>{
+                        // data.features.forEach(item=>{
+                        //     division_json.addData(item)
+                        // })
+                        // }).then(divisions_overlay[division_caps].addLayer(division_json))
+
+                        let urls_list = []
+                        for(let i=1;i<9;i++){
+                                url = `${location.origin}/sa_boundaries/sa_district_municipalities/district_municipalities${i}.geojson`
+                                urls_list.push(url)
+                            }
+                        Promise.all(urls_list.map(url=>{
+                            fetch(url).then(res=> res.json()).then(data=>{
+                                data.features.forEach(item=>{
+                                    division_json.addData(item)
+                                })
+                            })
+                            })).then(divisions_overlay[division_caps].addLayer(division_json))
+
+
+
                 })
                 let layerControl = L.control.layers(null,divisions_overlay)
                 layerControl.addTo(Lmap);
@@ -83,6 +100,17 @@ ckan.module("spatial_search", function($){
         },
         captializeFirstLetter: function(name){
             return
+        },
+
+        getMunicipalBoundaries:function(){
+            for(let i=1;i<9;i++){
+                url = `${location.origin}/sa_boundaries/sa_district_municipalities/district_municipalities${i}.geojson`
+                fetch(url).then(res=> res.json()).then(data=>{
+                    data.features.forEach(item=>{
+                        division_json.addData(item)
+                    })
+                })
+            }
         },
 
     }
