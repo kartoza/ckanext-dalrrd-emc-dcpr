@@ -870,11 +870,21 @@ footer {
     min-height: 100px;
   }
 
+  .flash-messages{
+    margin: 15px;
+  }
+
 }
 
 @media (max-width: 477px) {
   .new-dataset{
     margin-top: 15px;
+  }
+}
+
+@media (max-width: 264px) {
+  .footer-text{
+    margin-top: -15px;
   }
 }
 
