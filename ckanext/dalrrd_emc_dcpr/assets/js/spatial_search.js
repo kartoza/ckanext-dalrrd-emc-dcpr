@@ -16,7 +16,8 @@ ckan.module("spatial_search", function($){
                 /* although promise.all can be used with mulitple fetch
                    requests, the fact it rejects all of fetch requests if
                    one of them is rejected keeps me of using it.
-                   at the same time we don't want to sequence these */
+                   at the same time we don't want to sequence these
+                */
 
                 //let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions = ["district_municipalities"]
