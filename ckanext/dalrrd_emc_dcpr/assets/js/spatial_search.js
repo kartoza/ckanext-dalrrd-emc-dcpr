@@ -1,4 +1,17 @@
 ckan.module("spatial_search", function($){
+    let divisions_unit = [
+        {"unit_name":"sa_national", "number_of_files":1},
+        {"unit_name":"sa_provinces", "number_of_files":5},
+        {"unit_name":"sa_district_municipalities", "number_of_files":26},
+        {"unit_name":"sa_local_municipalities", "number_of_files":107},
+    ]
+    var division_caps
+    var divisionCapsOb = {
+        "sa_national":"National", "sa_provinces":"Provinces", "sa_district_municipalities":"District municipalities",
+         "sa_local_municipalities":"Local municipalities"
+    }
+    var divisions_json = {}
+
     return{
         initialize:function(){
             let _this = this
@@ -9,22 +22,19 @@ ckan.module("spatial_search", function($){
         mapper: function(){
             var _this = this
             let Lmap = window.map
+            let getDivisionCaps = function(division){
+                let _caps = division.charAt(0).toUpperCase() + division.slice(1);
+                division_caps = _caps.replace("_", " ")
+                return division_caps
+            }
             if(Lmap == undefined){
                 setTimeout(this.mapper,1500)
             }
             else{
-                /* although promise.all can be used with mulitple fetch
-                   requests, the fact it rejects all of fetch requests if
-                   one of them is rejected keeps me of using it.
-                   at the same time we don't want to sequence these
-                */
-
-                //let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
-                let divisions = ["district_municipalities"]
+                let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
                 divisions.forEach(division =>{
-                    let _caps = division.charAt(0).toUpperCase() + division.slice(1);
-                    var division_caps = _caps.replace("_", " ")
+                    division_caps = getDivisionCaps(division)
                     divisions_overlay[division_caps] = L.layerGroup()
                     let division_json = L.geoJson(null,{
                         onEachFeature:function(feature, layer){
@@ -46,29 +56,28 @@ ckan.module("spatial_search", function($){
                                 }})
                             }
                         })
-                        // url = `${location.origin}/sa_boundaries/sa_${division}.geojson`
-                        // fetch(url).then(res=>res.json()).then((data)=>{
-                        // data.features.forEach(item=>{
-                        //     division_json.addData(item)
-                        // })
-                        // }).then(divisions_overlay[division_caps].addLayer(division_json))
 
-                        let urls_list = []
-                        for(let i=1;i<9;i++){
-                                url = `${location.origin}/sa_boundaries/sa_district_municipalities/district_municipalities${i}.geojson`
-                                urls_list.push(url)
-                            }
-                        Promise.all(urls_list.map(url=>{
-                            fetch(url).then(res=> res.json()).then(data=>{
-                                data.features.forEach(item=>{
-                                    division_json.addData(item)
-                                })
-                            })
-                            })).then(divisions_overlay[division_caps].addLayer(division_json))
-
-
-
+                    let prefixed_json = "sa_" + division
+                    divisions_json[prefixed_json] = division_json
                 })
+
+                for(let unit of divisions_unit){
+                    let urls_list = []
+                    let unit_name = unit["unit_name"]
+                    let files_number = unit["number_of_files"]
+                    for(let i=1;i<=files_number;i++){
+                        url = `${location.origin}/sa_boundaries/${unit_name}/${unit_name}${i}.geojson`
+                        urls_list.push(url)
+                    }
+                    Promise.all(urls_list.map(url=>{
+                      fetch(url).then(res=> res.json()).then(data=>{
+                        data.features.forEach(item=>{
+                            divisions_json[unit_name].addData(item)
+                        })
+                    })
+                    })).then(()=>{divisions_overlay[divisionCapsOb[unit_name]].addLayer(divisions_json[unit_name])})
+                }
+
                 let layerControl = L.control.layers(null,divisions_overlay)
                 layerControl.addTo(Lmap);
                 // adding circle to leaflet draw
@@ -81,12 +90,6 @@ ckan.module("spatial_search", function($){
                 })
 
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
-                    // if($('body').hasClass('dataset-map-expanded')){
-                    //     $('body').removeClass('dataset-map-expanded');
-                    // }
-                    // else{
-                    //     $('body').addClass('dataset-map-expanded');
-                    // }
                     $('body').toggleClass('dataset-map-expanded');
                     let drawer = new L.Draw.Circle(Lmap)
                     drawer.enable()
@@ -97,20 +100,6 @@ ckan.module("spatial_search", function($){
                     layer.addTo(Lmap);
                     $('#ext_bbox').val(layer.getBounds().toBBoxString());
                 });
-            }
-        },
-        captializeFirstLetter: function(name){
-            return
-        },
-
-        getMunicipalBoundaries:function(){
-            for(let i=1;i<9;i++){
-                url = `${location.origin}/sa_boundaries/sa_district_municipalities/district_municipalities${i}.geojson`
-                fetch(url).then(res=> res.json()).then(data=>{
-                    data.features.forEach(item=>{
-                        division_json.addData(item)
-                    })
-                })
             }
         },
 
