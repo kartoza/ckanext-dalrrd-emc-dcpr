@@ -9,7 +9,7 @@ used by the UI.
 
 def handle_search(search_params):
     """
-    we need to combine -AND operator-
+    we use combine -AND operator-
     search params when they are from
     the same category "e.g. 2 different
     organizations", and use OR opertaor
