@@ -122,7 +122,9 @@ class ErrorReportCreateView(MethodView):
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
             )
         except dict_fns.DataError:
-            result = toolkit.abort(400, toolkit._("Integrity Error"))
+            result = toolkit.abort(
+                400, toolkit._("Integrity Error, problem in parsing form parameters")
+            )
         else:
             if data_dict.get("metadata_record") is None:
                 data_dict["metadata_record"] = request.args.get("metadata_record")
