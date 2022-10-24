@@ -204,5 +204,5 @@ def error_report_delete_auth(
         if (owner_user or context["auth_user_obj"].sysadmin) and report_submitted:
             result["success"] = True
     else:
-        result["msg"] = toolkit._("Error report not found")
+        result["success"] = False
     return result
