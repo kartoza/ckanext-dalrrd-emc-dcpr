@@ -145,13 +145,10 @@ def error_report_nsif_moderate_auth(
 def my_error_reports_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ):
-    result = {"success": False}
-    if context["auth_user_obj"].sysadmin:
-        result["success"] = True
-    else:
-        result["success"] = toolkit.h["emc_user_is_org_member"](
-            "nsif", context["auth_user_obj"]
-        )
+
+    user = context["auth_user_obj"]
+    result = {"success": user is not None}
+
     return result
 
 
