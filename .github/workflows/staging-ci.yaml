@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run common CI
-        uses: ../.github/actions/action-common-ci
+        uses: ./.github/actions/action-common-ci
         with:
           image-name: kartoza/ckanext-dalrrd-emc-dcpr
 
