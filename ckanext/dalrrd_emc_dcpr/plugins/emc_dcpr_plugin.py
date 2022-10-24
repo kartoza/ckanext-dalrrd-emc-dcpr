@@ -274,6 +274,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "error_report_submitted_auth": error_report_auth.error_report_submitted_auth,
             "error_report_list_public_auth": error_report_auth.error_report_list_public_auth,
             "my_error_report_list_auth": error_report_auth.my_error_report_list_auth,
+            "rejected_error_reports_auth": error_report_auth.rejected_error_reports_auth,
             "error_report_delete_auth": error_report_auth.error_report_delete_auth,
         }
 
@@ -322,6 +323,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "error_report_show": report_get_actions.error_report_show,
             "error_report_list_public": report_get_actions.error_report_list_public,
             "my_error_report_list": report_get_actions.my_error_report_list,
+            "rejected_error_reports": report_get_actions.rejected_error_reports,
             "submitted_error_report_list": report_get_actions.submitted_error_report_list,
             "error_report_delete": report_delete_actions.error_report_delete,
         }

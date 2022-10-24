@@ -175,6 +175,13 @@ def error_report_list_public_auth(
     return {"success": True}
 
 
+@toolkit.auth_allow_anonymous_access
+def rejected_error_reports_auth(
+    context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
+) -> typing.Dict:
+    return {"success": True}
+
+
 def my_error_report_list_auth(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.Dict:

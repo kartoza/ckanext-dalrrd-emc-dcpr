@@ -41,6 +41,18 @@ def error_report_list_public(
 
 
 @toolkit.side_effect_free
+def rejected_error_reports(context: typing.Dict, data_dict: typing.Dict) -> typing.List:
+    """Return a list of rejected error reports."""
+    toolkit.check_access("rejected_error_reports_auth", context, data_dict or {})
+    relevant_statuses = (ErrorReportStatus.REJECTED.value,)
+    return _get_error_report_list(
+        context,
+        data_dict,
+        filter_=error_report.ErrorReport.status.in_(relevant_statuses),
+    )
+
+
+@toolkit.side_effect_free
 def my_error_report_list(
     context: typing.Dict, data_dict: typing.Optional[typing.Dict] = None
 ) -> typing.List[typing.Dict]:
