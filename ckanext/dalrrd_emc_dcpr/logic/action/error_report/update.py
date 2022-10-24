@@ -108,6 +108,6 @@ def error_report_nsif_moderate(
             result = toolkit.get_action("error_report_show")(context, validated_data)
 
     else:
-        raise toolkit.NotAuthorized
+        raise toolkit.ObjectNotFound
 
     return result
