@@ -50,7 +50,7 @@ def upgrade():
         ),
         sa.Column("status", types.UnicodeText),
         sa.Column("error_application", types.UnicodeText),
-        sa.Column("error_description", types.UnicodeText),
+        sa.Column("error_description", types.UnicodeText, nullable=False),
         sa.Column("solution_description", types.UnicodeText),
         sa.Column("request_date", types.DateTime, default=dt.datetime.utcnow),
         sa.Column("nsif_moderation_notes", types.UnicodeText),

@@ -46,7 +46,7 @@ error_report_table = Table(
     ),
     Column("status", types.UnicodeText),
     Column("error_application", types.UnicodeText),
-    Column("error_description", types.UnicodeText),
+    Column("error_description", types.UnicodeText, nullable=False),
     Column("solution_description", types.UnicodeText),
     Column("request_date", types.DateTime, default=datetime.datetime.utcnow),
     Column("nsif_moderation_notes", types.UnicodeText),
