@@ -63,3 +63,13 @@ ckan.module("emc-filter-expand", function ($){
 
 
 })
+
+ckan.module("emc-facets-pagination", function ($){
+
+    return{
+        initialize: function(){
+            console.log('testts pagination')
+        }
+    }
+
+})
