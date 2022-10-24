@@ -22,7 +22,6 @@ def error_report_delete(context, data_dict):
 
     toolkit.check_access("error_report_delete_auth", context, validated_data)
 
-    model = context["model"]
     error_report_obj = model.Session.query(error_report.ErrorReport).get(
         validated_data["csi_reference_id"]
     )
