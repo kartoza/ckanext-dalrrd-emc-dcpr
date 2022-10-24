@@ -104,6 +104,7 @@ def create_dcpr_management_activity(
         DcprManagementActivityType.REJECT_DCPR_REQUEST_CSI: dcpr_request_obj.csi_moderator,
         DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_CSI: dcpr_request_obj.csi_moderator,
     }.get(activity_type)
+
     return toolkit.get_action("activity_create")(
         context=action_context,
         data_dict={

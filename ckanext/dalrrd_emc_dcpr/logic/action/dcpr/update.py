@@ -14,7 +14,10 @@ from ....constants import (
 from ... import schema as dcpr_schema
 from ....model import dcpr_request
 from .... import dcpr_dictization
-from .. import create_dcpr_management_activity
+from .. import (
+    create_dataset_management_activity,
+    create_dcpr_management_activity,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -264,22 +267,29 @@ def dcpr_request_csi_moderate(
                 DcprRequestModerationAction.REJECT: DcprManagementActivityType.REJECT_DCPR_REQUEST_CSI,
                 DcprRequestModerationAction.REQUEST_CLARIFICATION: DcprManagementActivityType.REQUEST_CLARIFICATION_DCPR_REQUEST_CSI,
             }[moderation_action]
-            activity = create_dcpr_management_activity(
-                request_obj, activity_type=activity_type, context=context
-            )
-            toolkit.enqueue_job(
-                jobs.notify_dcpr_actors_of_relevant_status_change,
-                args=[activity["id"]],
-            )
+
             result = toolkit.get_action("dcpr_request_show")(context, validated_data)
 
             if moderation_action in [
                 DcprRequestModerationAction.APPROVE,
                 DcprRequestModerationAction.REJECT,
             ]:
-                create_package_from_dcpr_request(
+
+                package = create_package_from_dcpr_request(
                     context, request_obj, moderation_action
                 )
+                activity = create_dataset_management_activity(
+                    package.get("id"), activity_type=activity_type
+                )
+            else:
+                activity = create_dcpr_management_activity(
+                    request_obj, activity_type=activity_type, context=context
+                )
+
+            toolkit.enqueue_job(
+                jobs.notify_dcpr_actors_of_relevant_status_change,
+                args=[activity["id"]],
+            )
     else:
         raise toolkit.ObjectNotFound
     return result
