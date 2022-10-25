@@ -309,7 +309,7 @@ def create_package_from_dcpr_request(
                 data_dict["extras"] = [
                     {"key": "origin", "value": "DCPR"},
                     {"key": "action", "value": action.value},
-                    {"key": "status", "value": "completed"},
+                    {"key": "dcpr_status", "value": "completed"},
                 ]
                 data_dict["private"] = False
                 data_dict["owner_org"] = request_obj.organization_id
