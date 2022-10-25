@@ -34,6 +34,7 @@ CSI_ORG_NAME = "csi"
 class DatasetManagementActivityType(enum.Enum):
     REQUEST_MAINTENANCE = "requested dataset maintenance"
     REQUEST_PUBLICATION = "requested dataset publication"
+    CREATED_FROM_DCPR_REQUEST = "created from dcpr request"
 
 
 class DcprManagementActivityType(enum.Enum):

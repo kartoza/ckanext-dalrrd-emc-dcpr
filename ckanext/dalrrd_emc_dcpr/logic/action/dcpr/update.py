@@ -6,6 +6,7 @@ from ckan.plugins import toolkit
 
 from .... import jobs
 from ....constants import (
+    DatasetManagementActivityType,
     DcprRequestModerationAction,
     DcprManagementActivityType,
     DCPRRequestRequiredFields,
@@ -278,8 +279,16 @@ def dcpr_request_csi_moderate(
                 package = create_package_from_dcpr_request(
                     context, request_obj, moderation_action
                 )
-                activity = create_dataset_management_activity(
-                    package.get("id"), activity_type=activity_type
+                dataset_activity_type = {
+                    DcprManagementActivityType.ACCEPT_DCPR_REQUEST_CSI: DatasetManagementActivityType.CREATED_FROM_DCPR_REQUEST,
+                    DcprManagementActivityType.REJECT_DCPR_REQUEST_CSI: DatasetManagementActivityType.CREATED_FROM_DCPR_REQUEST,
+                }[activity_type]
+                activity = (
+                    create_dataset_management_activity(
+                        package.get("id"), activity_type=dataset_activity_type
+                    )
+                    if package is not None
+                    else None
                 )
             else:
                 activity = create_dcpr_management_activity(
