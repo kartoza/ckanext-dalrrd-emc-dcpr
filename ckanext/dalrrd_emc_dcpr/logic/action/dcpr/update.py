@@ -298,7 +298,7 @@ def dcpr_request_csi_moderate(
             toolkit.enqueue_job(
                 jobs.notify_dcpr_actors_of_relevant_status_change,
                 args=[activity["id"]],
-            )
+            ) if activity is not None else None
     else:
         raise toolkit.ObjectNotFound
     return result
