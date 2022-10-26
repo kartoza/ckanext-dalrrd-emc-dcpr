@@ -44,6 +44,7 @@ from ..logic.auth import emc as emc_auth
 from ..model.user_extra_fields import UserExtraFields
 
 import ckanext.dalrrd_emc_dcpr.plugins.utils as utils
+from ckanext.pages.interfaces import IPagesSchema
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IFacets)
     plugins.implements(plugins.IPluginObserver)
+    plugins.implements(IPagesSchema)
 
     def before_load(self, plugin_class):
         """IPluginObserver interface requires reimplementation of this method."""
@@ -384,6 +386,13 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         """
 
         return facets_dict
+
+    def update_pages_schema(self, schema):
+        """
+        This function allows update the pages schema and add custom fields.
+        """
+        schema.update({"parent_menu": [toolkit.get_validator("ignore_missing")]})
+        return schema
 
 
 def _parse_date(raw_date: str) -> typing.Optional[str]:
