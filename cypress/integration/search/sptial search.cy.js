@@ -29,8 +29,12 @@ describe("search dataset by spatial bounding boxes and boundaries", ()=>{
         cy.get(".leaflet-control-layers-toggle")
         .click()
         cy.get("#dataset-map-container")
-        .trigger('mousedown',   200, 50, {which:1})
-        .get(".apply").click()
+        .trigger('mousedown', 200, 50, {which:1})
+        .trigger("click",{ clientX: 300, clientY: 300 }) // this to remove the label
+        .wait(3000)
+        .click(150, 20)
+        .url().should("ccontain", "ext_bbox=")
+
     })
 
 })

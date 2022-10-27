@@ -17,14 +17,18 @@ def handle_search(search_params):
     """
     fq_list = search_params["fq"].split()  # the default is space
     fq_dict = {}
+    if len(fq_list) <= 0:
+        return search_params["fq"]
+
     for idx, item in enumerate(fq_list):
-        key_value_pair = item.split(":")
-        if key_value_pair[0] not in fq_dict:
-            try:
+        try:
+            key_value_pair = item.split(":")
+            if key_value_pair[0] not in fq_dict:
                 fq_dict[key_value_pair[0]] = key_value_pair[1]
-            except IndexError:
-                return search_params["fq"]
-        else:
-            fq_list[idx] = " OR " + fq_list[idx] + " "
+        except:
+            return search_params["fq"]
+
+        fq_list[idx] = " OR " + fq_list[idx] + " "
+
     search_params["fq"] = " ".join(item for item in fq_list)
     return search_params["fq"]
