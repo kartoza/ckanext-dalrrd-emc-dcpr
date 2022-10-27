@@ -428,3 +428,10 @@ def get_maintenance_custom_other_field_data(data_dict):
 
 def get_today_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d")
+
+
+def get_pages():
+
+    return toolkit.get_action("ckanext_pages_list")(
+        None, {"order": True, "private": False}
+    )

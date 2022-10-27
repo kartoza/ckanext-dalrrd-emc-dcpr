@@ -1,6 +1,10 @@
 {% ckan_extends %}
 
-{% set options = [{'value': True, 'text': _('Yes')}, {'value': False, 'text': _('No')}]%}
+{% set options = [{'value':None, 'text':'---------'}] %}
+{% for page in h.get_pages() %}
+{% set options = options.append({'value': page.title, 'text':page.title}) %}
+{% endfor %}
+
 {% block extra_pages_form %}
     {{ form.select('parent_menu', id = 'parent_menu', label = 'Parent menu', options=options, selected=data.testing) }}
 {% endblock extra_pages_form %}
