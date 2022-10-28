@@ -1,9 +1,9 @@
 """
-custom file, holds modules used directly
+this file holds modules used
 by emc_dcpr plugin for different
-functionalities. different from
-helper functions as they aren't
-used by the UI.
+functionalities. these modules are
+different from helper functions as
+they aren't used by the UI.
 """
 
 
@@ -15,11 +15,14 @@ def handle_search(search_params):
     organizations", and use OR opertaor
     for different categories.
     """
+    # lstrip removes leading spaces
     fq_list = search_params["fq"].split()  # the default is space
     fq_dict = {}
-    if len(fq_list) <= 0:
+    if len(fq_list) <= 1:
         return search_params["fq"]
-
+    debugger = ""
+    for item in fq_list:
+        debugger = debugger + "|" + item
     for idx, item in enumerate(fq_list):
         try:
             key_value_pair = item.split(":")
@@ -30,6 +33,7 @@ def handle_search(search_params):
 
         try:
             fq_list[idx] = " OR " + fq_list[idx] + " "
+
         except:
             continue
 
