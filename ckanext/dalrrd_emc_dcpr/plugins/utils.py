@@ -45,9 +45,13 @@
 
 #     return search_params["fq"]
 
-# import re
+import re
 
-# string = "-dataset_type:harvest reference_date:[2022-10-27T00:00:00Z TO *]"
-# match = re.split(r"[^\[\.*\]]", string)
+string = "-dataset_type:harvest reference_date:[2022-10-27T00:00:00Z TO *]"
+# match = re.search(r"[\[.*\]]", string)
+for match in re.finditer(r"\[.*?\]", string):
+    print(match.group(), match.start())
+
+
 # if match:
-#     print(match.group())
+#     print(match)
