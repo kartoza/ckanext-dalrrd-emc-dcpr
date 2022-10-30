@@ -3,5 +3,6 @@
     "testFiles":[
         "integration/**/*.cy.js"
     ],
-    "baseUrl": "http://localhost:5000"
+    "baseUrl": "http://localhost:5000",
+    "numTestsKeptInMemory": 5
 }

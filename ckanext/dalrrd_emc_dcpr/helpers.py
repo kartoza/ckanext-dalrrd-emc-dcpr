@@ -15,6 +15,9 @@ from .logic.action.emc import show_version
 from .constants import DCPRRequestStatus
 from .model.dcpr_request import DCPRRequest
 
+from ckan.common import c
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -233,20 +236,15 @@ def get_all_datasets_count(user_obj):
     solr active search
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/116
     """
-    search_action = toolkit.get_action("package_list")
+    # context = {"user":c.user, "auth_user_obj":c.userobj}
+    # data_dict = {"userobj":c.userobj}
+    # packages = toolkit.get_action("package_list")(context=context, data_dict=data_dict)
+    # return len(packages)
     # 32000 rows is the maximum of what can be retrieved
     # by ckan at once.
-    q = """ select count(distinct(id)) from package where state='active' """
+    q = """ select count(distinct(id)) from package where state='active' and type='dataset' """
     result = model.Session.execute(q)
     return result.fetchone()[0]
-    # if user_obj is not None:
-    #     result = search_action(context={"user": user_obj.id}, data_dict={})
-    #     package_count = len(result)
-    #     return package_count
-    # else:
-    #     result = search_action(data_dict={})
-    #     package_count = len(result)
-    #     return package_count
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
