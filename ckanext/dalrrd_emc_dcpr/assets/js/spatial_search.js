@@ -31,6 +31,11 @@ ckan.module("spatial_search", function($){
                 setTimeout(this.mapper,1500)
             }
             else{
+            Lmap.eachLayer(lyr=>{
+                if( lyr instanceof L.TileLayer ) {
+                    lyr.options.noWrap = true
+                }
+            })
                 let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
                 divisions.forEach(division =>{
