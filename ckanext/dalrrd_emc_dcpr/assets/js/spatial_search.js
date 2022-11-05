@@ -39,8 +39,6 @@ ckan.module("spatial_search", function($){
 
                 Lmap.options.minZoom = 4;
 
-
-
             Lmap.eachLayer(lyr=>{
                 if( lyr instanceof L.TileLayer ) {
                     lyr.options.noWrap = true
