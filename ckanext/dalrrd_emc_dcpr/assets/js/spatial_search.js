@@ -84,6 +84,7 @@ ckan.module("spatial_search", function($){
                         urls_list.push(url)
                     }
                     Promise.all(urls_list.map(url=>{
+                      console.log(url)
                       fetch(url).then(res=> res.json()).then(data=>{
                         data.features.forEach(item=>{
                             divisions_json[unit_name].addData(item)
