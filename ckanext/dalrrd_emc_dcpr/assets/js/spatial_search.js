@@ -28,9 +28,24 @@ ckan.module("spatial_search", function($){
                 return division_caps
             }
             if(Lmap == undefined){
-                setTimeout(this.mapper,1500)
+                setTimeout(this.mapper,1500);
             }
             else{
+                bound1 = L.latLng(-34.921971, 9.580078)
+                bound2 = L.latLng(-21.002471, 37.001953)
+                Lmap.setMaxBounds([
+                    bound1, bound2
+                    ])
+
+                Lmap.options.minZoom = 4;
+
+
+
+            Lmap.eachLayer(lyr=>{
+                if( lyr instanceof L.TileLayer ) {
+                    lyr.options.noWrap = true
+                }
+            })
                 let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
                 divisions.forEach(division =>{

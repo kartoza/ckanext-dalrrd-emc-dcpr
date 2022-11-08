@@ -29,17 +29,31 @@ describe("search for datasets via title", ()=>{
         should("have.text","dataset no 1_v.4")
     })
 
-    // it("finds a dataset from the search page by text",()=>{
-    //     setTimeout(()=>{},2000)
-    //     cy.visit("/dataset/")
-    //     cy.get("#field-giant-search")
-    //     .type("test dataset no.1")
-    //     .next().click()
-    //     .url().should("include","/dataset/?q=test+dataset+no.1")
-    //     .get("[data-testid='search_item_anchor']").next().eq(0).
-    //     should("have.text","dataset no 1")
-    // })
+})
 
 
+describe("search dataset by temporal range", ()=>{
+    beforeEach(()=>{
+        cy.visit("/dataset/")
+    })
+    it("finds datasets by start data",()=>{
+        cy.get("[data-testid='temporal_search-start']")
+        .type("2022-10-24{enter}")
+    })
+
+    it("finds datasets by end date", ()=>{
+        cy.get("[data-testid='temporal_search-end']")
+        .type("2022-10-25{enter}")
+
+    })
+
+    it("finds datasets temporal range (start-end)", ()=>{
+        cy.get("[data-testid='temporal_search-start']")
+        .type("2022-10-24{enter}")
+        .get*("[data-testid='temporal_search-end']")
+        .type("2022-10-24{enter}")
+
+
+    })
 
 })
