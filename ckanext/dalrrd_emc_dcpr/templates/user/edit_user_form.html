@@ -1,8 +1,9 @@
 {% import 'macros/form.html' as form %}
 
+{% set extra_fields = data.get("extra_fields") %}
+
 <form id="user-edit-form" class="dataset-form" method="post" action="{{ action }}" enctype="multipart/form-data">
   {{ form.errors(error_summary) }}
-
   <fieldset>
     <legend>{{ _('Change details') }}</legend>
     {{ form.input('name', label=_('Username'), id='field-username', value=data.name, error=errors.name, classes=['control-medium'], attrs={'readonly': '', 'class': 'form-control'}) }}
@@ -28,14 +29,14 @@
   </fieldset>
     <fieldset>
         <legend>{{ _('Extra details') }}</legend>
-        {{ form.input('extra_fields_affiliation', label=_('Affiliation'), id='field-extra-details-affiliation', value=data.extra_fields.affiliation, error=errors.affiliation, classes=['control-medium']) }}
-
-        {{ form.input('extra_fields_professional_occupation', label=_('Professional Occupation'), id='field-extra-details-professional-occupation', value=data.extra_fields.professional_occupation, error=errors.professional_occupation, placeholder=_('eg. Department Head'), classes=['control-medium']) }}
+        {% if extra_fields %}
+          {{ form.input('extra_fields_affiliation', label=_('Affiliation'), id='field-extra-details-affiliation', value=data.extra_fields.affiliation, error=errors.affiliation, classes=['control-medium']) }}
+          {{ form.input('extra_fields_professional_occupation', label=_('Professional Occupation'), id='field-extra-details-professional-occupation', value=data.extra_fields.professional_occupation, error=errors.professional_occupation, placeholder=_('eg. Department Head'), classes=['control-medium']) }}
+        {% endif %}
     </fieldset>
-
   <fieldset>
     <legend>{{ _('Change password') }}</legend>
-    {{ form.input('old_password',
+      {{ form.input('old_password',
                   type='password',
                   label=_('Sysadmin Password') if is_sysadmin else _('Old Password'),
                   id='field-password-old',
