@@ -2,7 +2,7 @@
 {% block page_primary_action %}
     {% if h.check_access('package_create') %}
           <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
-        {% endif %}
+    {% endif %}
 {% endblock %}
 {% block groups_search_form %}
       {% snippet 'snippets/search_form.html', form_id='organization-datasets-search-form', type='dataset', query=q, sorting=sorting, sorting_selected=sort_by_selected, count=page.item_count, facets=facets, placeholder=_('Search metadata records...'), show_empty=request.params, fields=fields %}
