@@ -44,7 +44,7 @@
 		    {% block facet_list_items %}
                 {% set item_id = title.replace(' ', '') %}
                 <div id="{{ item_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ item_id }}">
-                <div class="panel-body" style="padding: 0px">
+                <div class="panel-body" style="padding: 0px" data-module="emc-facets-pagination">
 			{% with items = items or c.search_facets[name]['items'] %}
 				{% if item_id == 'DCPRRequest' %}
 					{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth"},
@@ -56,7 +56,7 @@
 				{% endif %}
 			{% if items %}
 				<nav aria-label="{{ title }}">
-				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }}">
+				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }} facet-outer-{{ item_id }} facet-outer">
 						{% for item in items %}
 							{% if item_id == 'DCPRRequest' %}
 							{# apply the check here #}
@@ -94,13 +94,9 @@
 					{% endfor %}
 				    </ul>
 				</nav>
-				<p class="module-footer" data-module="emc-facets-pagination" data-all-list="{{ c.search_facets[name] }}">
-					{% if h.has_more_facets(name, search_facets or c.search_facets) %}
-					    <a href="#" class="read-more" id="showMore">{{ _('Show More {facet_type}').format(facet_type=title) }}</a>
-				    {% else %}
-					<a href="#" class="read-more" id="showLess">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }}</a>
-				{% endif %}
-                        </p>
+				<p class="module-footer show-more-button" data-all-list="{{ c.search_facets[name] }}">
+					<button class="read-more" id="showMore{{ item_id }}" style="text-decoration: none">{{ _('Show More {facet_type}').format(facet_type=title) }}</button>
+                </p>
 			    {% else %}
 				<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
 			    {% endif %}
