@@ -204,6 +204,7 @@ def create_ckan_dataset(root_ob):
     package_title = root_ob["title"]
     package_title = change_name_special_chars_to_underscore(package_title)
     slug_url_field = package_title.replace(" ", "-")
+    slug_url_field = slug_url_field.lower()
     root_ob.update({"name": slug_url_field})
     create_action = toolkit.get_action("package_create")
     try:
