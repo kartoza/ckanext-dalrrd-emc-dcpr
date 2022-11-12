@@ -435,7 +435,9 @@ def get_current_release():
     if it's staging it uses v*.*.*-rc, rather
     if it's production v.*.*.*
     """
-    with open("releases.txt") as f:
+    current_file_path = Path(__file__)
+    releases_file_path = current_file_path.parent.joinpath("releases.txt")
+    with open(releases_file_path) as f:
         releases = json.loads(f.read())
         current_branch = _get_git_branch()
         # this might change so main is release candidate
