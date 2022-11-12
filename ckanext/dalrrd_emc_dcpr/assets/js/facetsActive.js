@@ -69,35 +69,11 @@ ckan.module("emc-facets-pagination", function ($){
     return{
 
         initialize: function(){
-            let itemsTags, itemsOrganizations, itemsSASDIThemes, itemsISOTopicCategories, itemsDCPRRequest, itemsHarvestsource;
-            itemsTags = itemsOrganizations = itemsSASDIThemes = itemsISOTopicCategories =
-                itemsDCPRRequest = itemsHarvestsource= 10;
-            let allOrganizations = $('.facet-outer-Organizations li').length;
-            let allSASDIThemes = $('.facet-outer-SASDIThemes li').length;
-            let allISOTopicCategories = $('.facet-outer-ISOTopicCategories li').length;
-            let allTags = $('.facet-outer-Tags li').length;
-            let allDCPRRequest = $('.facet-outer-DCPRRequest li').length;
-            let allHarvestsource = $('.facet-outer-Harvestsource li').length;
-            const pagination = 10;
-            if (itemsSASDIThemes > allSASDIThemes) {
-                     $('#showMoreSASDIThemes').hide();
-                 }
-            if (itemsISOTopicCategories > allISOTopicCategories) {
-                     $('#showMoreISOTopicCategories').hide();
-                 }
-            if (itemsOrganizations > allOrganizations) {
-                     $('#showMoreOrganizations').hide();
-                 }
-            if (itemsTags > allTags) {
-                     $('#showMoreTags').hide();
-                 }
-            if (itemsDCPRRequest > allDCPRRequest) {
-                     $('#showMoreDCPRRequest').hide();
-                 }
-            if (itemsHarvestsource > allHarvestsource) {
-                $('#showMoreHarvestsource').hide();
-            }
-            for(let i = 0; i<pagination; i++){
+
+            $.proxyAll(this,/_on/);
+            this.el.on('click', this._showMoreFacets);
+
+            for(let i = 0; i<10; i++){
                 $('.facet-outer-Organizations li:eq(' + i + ')').show();
                 $('.facet-outer-SASDIThemes li:eq(' + i + ')').show();
                 $('.facet-outer-ISOTopicCategories li:eq(' + i + ')').show();
@@ -106,74 +82,29 @@ ckan.module("emc-facets-pagination", function ($){
                 $('.facet-outer-Harvestsource li:eq(' + i + ')').show();
             }
 
-            $('#showMoreSASDIThemes').on('click', function () {
-                console.log(itemsSASDIThemes)
-                for (let i = itemsSASDIThemes; i < (itemsSASDIThemes + pagination); i++) {
-                    $('.facet-outer-SASDIThemes li:eq(' + i + ')').show();
-                }
-                itemsSASDIThemes += pagination;
-                 if (itemsSASDIThemes > allSASDIThemes) {
-                     $('#showMoreSASDIThemes').hide();
-                 }
-            }
-            );
-
-            $('#showMoreISOTopicCategories').on('click', function () {
-
-                for (let i = itemsISOTopicCategories; i < (itemsISOTopicCategories + pagination); i++) {
-                    $('.facet-outer-ISOTopicCategories li:eq(' + i + ')').show();
-                }
-                itemsISOTopicCategories += pagination;
-                 if (itemsISOTopicCategories > allISOTopicCategories) {
-                     $('#showMoreISOTopicCategories').hide();
-                 }
-            }
-            );
-
-            $('#showMoreOrganizations').on('click', function () {
-
-                for (let i = itemsOrganizations; i < (itemsOrganizations + pagination); i++) {
-                    $('.facet-outer-Organizations li:eq(' + i + ')').show();
-                }
-                itemsOrganizations += pagination;
-                 if (itemsOrganizations > allOrganizations) {
-                     $('#showMoreOrganizations').hide();
-                 }
-            }
-            );
-
-            $('#showMoreTags').on('click', function () {
-                for (let i = itemsTags; i < (itemsTags + pagination); i++) {
-                    $('.facet-outer-Tags li:eq(' + i + ')').show();
-                }
-                itemsTags += pagination;
-                 if (itemsTags > allTags) {
-                     $('#showMoreTags').hide();
-                 }
-            }
-            );
-            $('#showMoreDCPRRequest').on('click', function () {
-                for (let i = itemsDCPRRequest; i < (itemsDCPRRequest + pagination); i++) {
-                    $('.facet-outer-DCPRRequest li:eq(' + i + ')').show();
-                }
-                itemsDCPRRequest += pagination;
-                 if (itemsDCPRRequest > allDCPRRequest) {
-                     $('#showMoreDCPRRequest').hide();
-                 }
-            }
-            );
-            $('#showMoreHarvestsource').on('click', function () {
-                for (let i = itemsHarvestsource; i < (itemsHarvestsource + pagination); i++) {
-                    $('.facet-outer-Harvestsource li:eq(' + i + ')').show();
-                }
-                itemsHarvestsource += pagination;
-                 if (itemsHarvestsource > allHarvestsource) {
-                     $('#showMoreHarvestsource').hide();
-                 }
-            }
-            );
-
         },
+
+        _showMoreFacets: function (e){
+            let self = this
+            let pagination = 10;
+            let ulClassname = '.'+self.dataset['classname']
+            let allItems = document.querySelectorAll(ulClassname)
+            let itemsNotShow = []
+            for(let i=0; i<allItems.length;i++){
+                if( allItems[i].style.display===''){
+                    itemsNotShow.push(allItems[i])
+                }
+            }
+            for (let i = 0; i < (pagination); i++) {
+                if(i<itemsNotShow.length){
+                    itemsNotShow[i].style.display= 'block';
+                }
+                else{
+                    self.style.display = 'none'
+                }
+            }
+
+        }
 
 
 
