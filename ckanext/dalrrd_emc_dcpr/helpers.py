@@ -4,7 +4,7 @@ import typing
 import datetime
 from urllib.parse import quote
 from html import escape as html_escape
-
+from pathlib import Path
 from shapely import geometry
 from ckan import model
 from ckan.plugins import toolkit
@@ -426,3 +426,37 @@ def get_maintenance_custom_other_field_data(data_dict):
 
 def get_today_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d")
+
+
+def get_current_release():
+    """
+    get releases to website footer,
+    the release depends on the environment,
+    if it's staging it uses v*.*.*-rc, rather
+    if it's production v.*.*.*
+    """
+    with open("releases.txt") as f:
+        releases = json.loads(f.read())
+        current_branch = _get_git_branch()
+        # this might change so main is release candidate
+        # and release branch is the latest release
+        if current_branch == "development":
+            return releases.get("latest_release_candidate")
+        elif current_branch == "main":
+            return releases.get("latest_release")
+        else:
+            return ""
+
+
+def _get_git_branch():
+    """
+    getting the current
+    branch name
+    """
+    head_dir = Path(__file__).parents[2] / ".git" / "HEAD"
+    with head_dir.open("r") as f:
+        content = f.read().splitlines()
+
+    for line in content:
+        if line[0:4] == "ref:":
+            return line.partition("refs/heads/")[2]
