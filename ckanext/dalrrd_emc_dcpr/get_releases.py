@@ -1,8 +1,9 @@
 import requests
 import json
+from pathlib import Path
 
 username = "Mohab25"
-token = "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"
+token = ""
 
 res = requests.get(
     "https://api.github.com/repos/kartoza/ckanext-dalrrd-emc-dcpr/tags",
@@ -18,5 +19,7 @@ for rel in releases:
         if "latest_release" not in latest_releases_ob:
             latest_releases_ob["latest_release"] = rel.get("name")
 
-with open("releases.txt", "w") as f:
+current_file_path = Path(__file__)
+releases_file_path = current_file_path.parent.joinpath("releases.txt")
+with open(releases_file_path, "w") as f:
     f.write(json.dumps(latest_releases_ob))
