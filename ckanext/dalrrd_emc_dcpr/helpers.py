@@ -455,10 +455,14 @@ def _get_git_branch():
     getting the current
     branch name
     """
-    head_dir = Path(__file__).parents[2] / ".git" / "HEAD"
-    with head_dir.open("r") as f:
-        content = f.read().splitlines()
+    return "development"
 
-    for line in content:
-        if line[0:4] == "ref:":
-            return line.partition("refs/heads/")[2]
+
+#    head_dir = Path(__file__).parents[2] / ".git" / "HEAD"
+
+#    with open(head_dir,"r") as f:
+#        content = f.read().splitlines()
+
+#    for line in content:
+#        if line[0:4] == "ref:":
+#            return line.partition("refs/heads/")[2]
