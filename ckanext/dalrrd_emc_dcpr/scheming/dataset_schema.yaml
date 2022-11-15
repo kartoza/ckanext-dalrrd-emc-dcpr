@@ -6,7 +6,6 @@ scheming_version: 2
 dataset_type: dataset
 about: CKAN schema for the SASDI EMC. This schema holds SANS1878-related fields
 
-
 dataset_fields:
 
   - field_name: title
