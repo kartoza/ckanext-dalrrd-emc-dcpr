@@ -62,31 +62,31 @@ dataset_fields:
       Version(s) of metadata standard used, if multiple standards used, separate versions by comma
       - This is a SANS 1878 mandatory field
 
-  - field_name: citation
-    label: Citation
-    preset: modified_repeating_subfields
-    repeating_subfields:
-      - field_name: citation_title
-        label: Citation title
-        required: true
-        help_text: name by which the cited dataset is known
-      - field_name: citation_date
-        label: Citation date
-        preset: date
-        required: true
-        help_text: reference date for cited resource
-      # the citation identifier could be a choice field limited to identifiers we have and others choice field enabling the user to insert a unique one
-      - field_name: citation_identifier
-        label: Citation identifier
-        required: true
+  # - field_name: citation
+  #   label: Citation
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+  #     - field_name: citation_title
+  #       label: Citation title
+  #       required: true
+  #       help_text: name by which the cited dataset is known
+  #     - field_name: citation_date
+  #       label: Citation date
+  #       preset: date
+  #       required: true
+  #       help_text: reference date for cited resource
+  #     # the citation identifier could be a choice field limited to identifiers we have and others choice field enabling the user to insert a unique one
+  #     - field_name: citation_identifier
+  #       label: Citation identifier
+  #       required: true
 
-      - field_name: citation_identifier_type
-        label: Citation identifier type
-        required: false
+  #     - field_name: citation_identifier_type
+  #       label: Citation identifier type
+  #       required: false
 
-      - field_name: citation_responsible_party
-        label: Citation responsible party
-        required: true
+  #     - field_name: citation_responsible_party
+  #       label: Citation responsible party
+  #      required: true
 
 
   - field_name: notes
@@ -131,8 +131,14 @@ dataset_fields:
       Status of the dataset- This is a SANS 1878 mandatory field
 
 # owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
-  # vanilla ckanext-scheming too
-  - field_name: metadata_point_of_contact
+# vanilla ckanext-scheming too
+  - field_name: owner_org
+    label: Organization Name
+    required: true
+    preset: emc_dataset_organization
+    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
+
+  - field_name: contact
     label: Metadata point of contact
     preset: modified_repeating_subfields
     repeating_subfields:
@@ -191,18 +197,11 @@ dataset_fields:
           - value: publisher
             label: publisher
 
-  - field_name: owner_org
-    label: Organization
-    required: true
-    preset: emc_dataset_organization
-    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
-
   - field_name: reference_date
     label: Reference date
     required: true
     preset: date
     help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
-
 
   - field_name: iso_topic_category
     label: Topic Category
