@@ -90,6 +90,8 @@ def convert_choices_select_to_int(data_dict, context):
     # TODO: adding the field name for proper loggin
 
     logger.debug("convert select choices to int ")
+    if data_dict == "":
+        return ""
     try:
         return int(data_dict)
     except:
@@ -102,5 +104,4 @@ def convert_select_custom_choice_to_extra(data_dict):
     currently appears as "__extras" in the
     database,
     """
-    # raise RuntimeError(data_dict)
     return data_dict

@@ -10,7 +10,7 @@ dataset_fields:
 
   - field_name: title
     label: Title
-    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifer for the dataset - This is a SANS 1878 mandatory field
+    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifier for the dataset - This is a SANS 1878 mandatory field
     preset: title
     required: true
     form_placeholder: eg. A descriptive title
@@ -152,6 +152,10 @@ dataset_fields:
         required: false
         help_text: Role/ position of responsible individual in the organization
 
+      - field_name: contact_point_delivery_point
+        label: Delivery Point
+        required: false
+
       - field_name: contact_point_address_city
         label: City
         required: false
@@ -170,9 +174,19 @@ dataset_fields:
         required: false
         help_text: Address of the electronic mailbox of the responsible organization or individual
 
+      - field_name: contact_point_voice
+        label: Contact point phone
+        required: false
+        help_text: Telephone number to contact the responsible organization or individual
+
+      - field_name: contact_point_facsimile
+        label: Contact point facsimile
+        required: false
+        help_text: Facsimile machine number to contact responsible organization or individual
+
       # this to be implemented as multiple choices.
-      - field_name: organizational_role
-        label: Organization role
+      - field_name: organisational_role
+        label: Organisation role
         required: true
         preset: select
         choices:
@@ -380,6 +394,71 @@ dataset_fields:
       Full name of the character coding standard used for the dataset -
       This is a SANS 1878 mandatory field
 
+  - field_name: metadata_character_set
+    label: Metadata character set
+    required: true
+    choices:
+      - value: ucs-2
+        label: UCS-2
+      - value: ucs-4
+        label: UCS-4
+      - value: utf-7
+        label: UTF-7
+      - value: utf-8
+        label: UTF-8
+      - value: utf-16
+        label: UTF-16
+      - value: 8859part1
+        label: 8859-1
+      - value: 8859part2
+        label: 8859-2
+      - value: 8859part3
+        label: 8859-3
+      - value: 8859part4
+        label: 8859-4
+      - value: 8859part5
+        label: 8859-5
+      - value: 8859part6
+        label: 8859-6
+      - value: 8859part7
+        label: 8859-7
+      - value: 8859part8
+        label: 8859-8
+      - value: 8859part9
+        label: 8859-9
+      - value: 8859part10
+        label: 8859-10
+      - value: 8859part11
+        label: 8859-11
+      - value: 8859part13
+        label: 8859-13
+      - value: 8859part14
+        label: 8859-14
+      - value: 8859part15
+        label: 8859-15
+      - value: 8859part16
+        label: 8859-16
+      - value: jis
+        label: jis
+      - value: shiftJIS
+        label: shiftJIS
+      - value: eucJP
+        label: eucJP
+      - value: usAscii
+        label: ASCII
+      - value: ebcdic
+        label: ebcdic
+      - value: eucKR
+        label: eucKR
+      - value: big5
+        label: big5
+      - value: GB2312
+        label: GB2312
+    preset: select
+    help_text: >-
+      Full name of the character coding standard used for the dataset -
+      This is a SANS 1878 mandatory field
+
   - field_name: lineage
     label: Lineage
     preset: modified_repeating_subfields
@@ -388,7 +467,7 @@ dataset_fields:
         label: Level
         preset: select
         required: false
-        validators: convert_choices_select_to_int
+        validators:  ignore_missing convert_choices_select_to_int
         choices:
           - value: 001
             label: Attribute
@@ -418,14 +497,17 @@ dataset_fields:
             label: Service
           - value: 014
             label: Model
-      - field_name: lineage_statement
+
+      - field_name: statement
         label: Statement
         required: true
         help_text: general explaination of the data producer's knowledge about the lineage of a dataset - - This is a SANS 1878 mandatory field
+
       - field_name: process_step_description
         label: Process step description
         required: true
         help_text: description of the event, including related parameters of tolerances
+
       - field_name: process_step_rationale
         label: Process step rationale
         help_text: requirement purpose of the process setp
@@ -437,7 +519,6 @@ dataset_fields:
       - field_name: process_step_datetime_to
         label: Process step date time (to)
         preset: date
-
 
       - field_name: processor_individual_name
         label: Processor Individual name
@@ -473,54 +554,30 @@ dataset_fields:
         required: false
         help_text: Address of the electronic mailbox of the responsible processing organization or individual
 
-#  - field_name: author
-#    label: Author
-#    form_placeholder: Joe Bloggs
-#    display_property: dc:creator
-#
-#  - field_name: author_email
-#    label: Author Email
-#    form_placeholder: joe@example.com
-#    display_property: dc:creator
-#    display_snippet: email.html
-#    display_email_name_field: author
+      - field_name: source_description
+        label: Source description
+        required: false
+        help_text: description about the level of the source data
+
+      - field_name: source_scale_denominator
+        label: Source scale denominator
+        required: false
+        help_text: denominator of the representative fraction on a source map
+
+      - field_name: source_reference_system
+        label: Source reference system
+        required: false
+        validators: emc_srs_validator
+        help_text: spatial reference system used by the source
+      # maybe the source citation to be added?
 
   - field_name: distribution
     label: Distribution information
     preset: modified_repeating_subfields
     repeating_label: Distribution information
     repeating_subfields:
-      # - field_name: distribution_format_name
-      #   label: Distribution format name
-      #   required: true
-      #   form_placeholder: Distribution format(s) name - This is a SANS 1878 mandatory field
 
-      # - field_name: distribution_format_version
-      #   label: Distribution format version
-      #   required: true
-      #   form_placeholder: Distribution format version (date, number ..etc.)- This is a SANS 1878 mandatory field
-
-      # - field_name: distribution_format_amendment_number
-      #   label: Distribution format amendment number
-      #   required: false
-      #   form_placeholder: Amendment number of the format version
-
-      # - field_name: distribution_format_specification
-      #   label: Distribution format specification
-      #   required: false
-      #   form_placeholder: Name of subset, profile or product specification of format
-
-      # - field_name: distribution_format_specification
-      #   label: Distribution format specification
-      #   required: false
-      #   form_placeholder: Name of subset, profile or product specification of format
-
-      - field_name: distributor_contact
-        label: Distributor Contact
-        required: true
-        help_text:  Name of party from whom the dataset can be obtained - This is a SANS 1878 mandatory field
-
-      - field_name: distribution_order_process
+      - field_name: order_process
         label: Distributor Order Process
         required: false
         form_snippet: markdown.html
@@ -531,10 +588,21 @@ dataset_fields:
         required: false
         help_text: tiles, layers, geographic areas ..etc., in which data is available
 
-      - field_name: distribution_online_source
+      - field_name: transfer_size
+        label: Transfer size
+        required: false
+        help_text: estimated size of a unit the specified transfer format, expressed in megabytes
+
+      - field_name: online_source
         label: Distribution online source
         required: false
         help_text: information about online source from which the resource can be obtained
+
+      - field_name: distribution_offline_source
+        label: Distribution offline source
+        required: false
+        help_text: information about offline source from which the resource can be obtained
+
 
   - field_name: maintainer
     label: Maintainer
@@ -665,6 +733,12 @@ dataset_fields:
     label: Additional information about Reference Systems
     preset: modified_repeating_subfields
     repeating_subfields:
+
+      - field_name: description
+        label: Temporal and spatial extents description
+        form_snippet: markdown.html
+        required: false
+
       - field_name: temporal_extent_period_duration_from
         label: Temporal extent duration (from)
         preset: date
@@ -673,6 +747,10 @@ dataset_fields:
       - field_name: temporal_extent_period_duration_to
         label: Temporal extent duration (to)
         preset: date
+        required: false
+
+      - field_name: spatial_temporal_extent
+        label: Spatio-Temporal extent identifier
         required: false
 
       - field_name: minimum_vertical_extent
@@ -717,3 +795,18 @@ resource_fields:
     label: Format Version
     required: true
     help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
+
+  - field_name: amendment_number
+    label: Amendment number
+    required: false
+    help_text: Amendment number of the format version
+
+  - field_name: specification
+    label: Specification
+    required: false
+    help_text: Name of a subset, profile or product specification of format
+
+  - field_name: file_decompression_technique
+    label: File decompression technique
+    required: false
+    help_text: Recommendations of algorithms or processes that can be applied to read or expand resources to which compression techniques have be applied
