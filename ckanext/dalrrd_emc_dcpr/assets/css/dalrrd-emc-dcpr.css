@@ -795,6 +795,12 @@ footer {
 .module .read-more {
   font-weight: bold;
   color: #F3881C;
+  pointer-events: auto;
+}
+
+.show-more-button button{
+  border: none;
+  background-color: transparent;
 }
 
 .module .read-more a{
@@ -925,4 +931,8 @@ footer {
 
 #flDebug{
   display: none !important;
+}
+
+.facet-outer li{
+  display: none;
 }
