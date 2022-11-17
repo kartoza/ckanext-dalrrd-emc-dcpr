@@ -40,7 +40,6 @@ ckan.module("spatial_search", function($){
                 Lmap.options.minZoom = 4;
 
 
-
             Lmap.eachLayer(lyr=>{
                 if( lyr instanceof L.TileLayer ) {
                     lyr.options.noWrap = true
@@ -85,6 +84,7 @@ ckan.module("spatial_search", function($){
                         urls_list.push(url)
                     }
                     Promise.all(urls_list.map(url=>{
+                      console.log(url)
                       fetch(url).then(res=> res.json()).then(data=>{
                         data.features.forEach(item=>{
                             divisions_json[unit_name].addData(item)
