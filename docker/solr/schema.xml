@@ -183,12 +183,80 @@ schema. In this case the version should be set to the next CKAN version number.
     <field name="minx" type="float" indexed="true" stored="true" />
     <field name="miny" type="float" indexed="true" stored="true" />
 
+
+    <!--
+
+        SANS1878 additional fields
+        index and stored values are true by default
+        https://solr.apache.org/guide/6_6/defining-fields.html
+    -->
+    <field name="reference_date" type="date"/>
+    <field name="doi" type="string"/>
+    <field name="metadata_standard_name" type="string" default="sans1878"/>
+    <field name="metadata_standard_version" type="string" default="1.1"/>
+    <field name="purpose" type="string"/>
+    <field name="acknowledgement" type="string" indexed="false" stored="false"/>
+    <field name="status" type="string" multiValued="true"/>
+    <field name="contact_individual_name" type="string"/>
+    <field name="contact_position_name" type="string" indexed="false" stored="false"/>
+    <field name="contact_delivery_point" type="string" indexed="false" stored="false"/>
+    <field name="contact_address_city" type="string" indexed="false" stored="false"/>
+    <field name="contact_address_administrative_area" type="string" indexed="false" stored="false"/>
+    <field name="contact_postal_code" type="string" indexed="false" stored="false"/>
+    <field name="contact_electronic_mail_address" type="string" indexed="false" stored="false"/>
+    <field name="contact_voice" type="string" indexed="false" stored="false"/>
+    <field name="contact_facsimile" type="string" indexed="false" stored="false"/>
+    <field name="contact_organisational_role" multiValued="true"/>
+    <field name="iso_topic_category" type="string"/>
+    <field name="sasdi_theme" type="string"/>
+    <field name="tag_string" type="string"/>
+    <field name="license_id" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_statement" type="string" indexed="false" stored="false" />
+    <field name="dataset_lineage_level" type="string" indexed="false" stored="false" multiValued="true"/>
+    <field name="dataset_lineage_process_step_description" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_process_step_rationale" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_process_step_datetime_from" type="date" indexed="false" stored="false"/>
+    <field name="dataset_lineage_process_step_datetime_to" type="date" indexed="false" stored="false"/>
+    <field name="dataset_lineage_processor_individual_name" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_processing_owner_org" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_processor_position_name" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_processor_address_city" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_processor_address_administrative_area" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_processor_electronic_mail_address" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_source_description" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_source_scale_denominator" type="string" indexed="false" stored="false"/>
+    <field name="dataset_lineage_source_reference_system" type="string" indexed="false" stored="false"/>
+    <field name="distribution_order_process" type="string" indexed="false" stored="false"/>
+    <field name="distribution_units_of_distribution" type="string" indexed="false" stored="false"/>
+    <field name="distribution_transfer_size" type="string" indexed="false" stored="false"/>
+    <field name="distribution_online_source" type="string" indexed="false" stored="false"/>
+    <field name="distribution_offline_source" type="string" indexed="false" stored="false"/>
+    <field name="maintenance_information_maintenance_and_update_frequency" type="string" indexed="false" stored="false" multiValued="true"/>
+    <field name="maintenance_information_maintenance_date_of_next_update" type="date" indexed="false" stored="false"/>
+    <field name="maintenance_information_user_defined_maintenance_frequency" type="string" indexed="false" stored="false"/>
+    <field name="maintenance_information_update_scope" type="string" indexed="false" stored="false"/>
+    <field name="maintenance_information_update_scope_description" type="string" indexed="false" stored="false"/>
+    <field name="maintenance_information_maintenance_notes" type="string" indexed="false" stored="false"/>
+    <field name="temporal_reference_system" type="string"/>
+    <field name="reference_system_additional_info_description" type="string" indexed="false" stored="false"/>
+    <field name="reference_system_additional_info_temporal_extent_period_duration_from" type="date" indexed="false" stored="false"/>
+    <field name="reference_system_additional_info_temporal_extent_period_duration_to" type="date" indexed="false" stored="false"/>
+    <field name="reference_system_additional_info_spatial_temporal_extent" type="string" indexed="false" stored="false"/>
+    <field name="reference_system_additional_info_minimum_vertical_extent" type="string" indexed="false" stored="false"/>
+    <field name="reference_system_additional_info_maximum_vertical_extent" type="string" indexed="false" stored="false"/>
+    <field name="metadata_date_stamp" type="date"/>
+
+
+
 </fields>
 
 <uniqueKey>index_id</uniqueKey>
 <defaultSearchField>text</defaultSearchField>
 <solrQueryParser defaultOperator="AND"/>
+<!--
+see https://solr.apache.org/guide/6_6/copying-fields.html for copyField
 
+-->
 <copyField source="url" dest="urls"/>
 <copyField source="title" dest="title_ngram"/>
 <copyField source="name" dest="name_ngram"/>

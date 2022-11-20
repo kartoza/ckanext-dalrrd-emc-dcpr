@@ -484,7 +484,7 @@ dataset_fields:
 
       - field_name: process_step_description
         label: Process step description
-        required: true
+        required: false
         help_text: description of the event, including related parameters of tolerances
 
       - field_name: process_step_rationale
@@ -546,7 +546,7 @@ dataset_fields:
       - field_name: source_reference_system
         label: Source reference system
         required: false
-        validators: emc_srs_validator
+        validators: lineage_source_srs_validator
         help_text: spatial reference system used by the source
       # maybe the source citation to be added?
 
