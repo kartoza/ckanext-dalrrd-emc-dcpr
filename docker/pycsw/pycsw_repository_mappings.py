@@ -29,7 +29,7 @@ MD_CORE_MODEL = {
         "pycsw:AnyText": "anytext",
         "pycsw:Language": "language",
         "pycsw:Title": "title",
-        "pycsw:Abstract": "abstract",
+        "pycsw:Abstract": "notes",
         "pycsw:Edition": "edition",
         "pycsw:Keywords": "keywords",
         "pycsw:KeywordType": "keywordstype",
