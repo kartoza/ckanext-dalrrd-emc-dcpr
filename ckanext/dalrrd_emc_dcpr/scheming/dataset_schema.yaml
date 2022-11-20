@@ -606,7 +606,7 @@ dataset_fields:
 
   - field_name: maintainer
     label: Maintainer
-    required: true
+    required: false
     form_placeholder: Joe Bloggs
     display_property: dc:contributor
     help_text: >-
@@ -767,8 +767,6 @@ dataset_fields:
     preset: date
     help_text: >-
       date that the metadata was created
-
-
 
 resource_fields:
 
