@@ -67,33 +67,6 @@ dataset_fields:
       blank if the metadata standard version is 1.1
       - This is a SANS 1878 mandatory field
 
-  # - field_name: citation
-  #   label: Citation
-  #   preset: modified_repeating_subfields
-  #   repeating_subfields:
-  #     - field_name: citation_title
-  #       label: Citation title
-  #       required: true
-  #       help_text: name by which the cited dataset is known
-  #     - field_name: citation_date
-  #       label: Citation date
-  #       preset: date
-  #       required: true
-  #       help_text: reference date for cited resource
-  #     # the citation identifier could be a choice field limited to identifiers we have and others choice field enabling the user to insert a unique one
-  #     - field_name: citation_identifier
-  #       label: Citation identifier
-  #       required: true
-
-  #     - field_name: citation_identifier_type
-  #       label: Citation identifier type
-  #       required: false
-
-  #     - field_name: citation_responsible_party
-  #       label: Citation responsible party
-  #      required: true
-
-
   - field_name: notes
     label: Abstract
     required: true
@@ -464,9 +437,10 @@ dataset_fields:
       Full name of the character coding standard used for the dataset -
       This is a SANS 1878 mandatory field
 
-  - field_name: lineage
+  - field_name: dataset_lineage
     label: Lineage
     preset: modified_repeating_subfields
+    repeating_label: Lineage
     repeating_subfields:
       - field_name: level
         label: Level
@@ -603,7 +577,7 @@ dataset_fields:
         required: false
         help_text: information about online source from which the resource can be obtained
 
-      - field_name: distribution_offline_source
+      - field_name: offline_source
         label: Distribution offline source
         required: false
         help_text: information about offline source from which the resource can be obtained
