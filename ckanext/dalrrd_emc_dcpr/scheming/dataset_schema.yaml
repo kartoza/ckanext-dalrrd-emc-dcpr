@@ -48,18 +48,23 @@ dataset_fields:
   #   help_text: Name of metadata standard used - This is a SANS 1878 mandatory field
 
   # these two fields are better to be implemented as above
+  # after several discussions, this is always SANS1878
   - field_name: metadata_standard_name
     label: Metadata standard name
+    validators: metadata_default_standard_name
     required: true
     help_text: >-
-      Name(s) of metadata standard used, if multiple standards used, separate them by comma
+      Name(s) of metadata standard used, if multiple standards used, separate them by comma, leave
+      blank if the metadata standard used is SANS1878
       - This is a SANS 1878 mandatory field
 
   - field_name: metadata_standard_version
     label: Metadata standard version
+    validators: metadata_default_standard_version
     required: true
     help_text: >-
-      Version(s) of metadata standard used, if multiple standards used, separate versions by comma
+      Version(s) of metadata standard used, if multiple standards used, separate versions by comma, leave
+      blank if the metadata standard version is 1.1
       - This is a SANS 1878 mandatory field
 
   # - field_name: citation
@@ -152,34 +157,34 @@ dataset_fields:
         required: false
         help_text: Role/ position of responsible individual in the organization
 
-      - field_name: contact_point_delivery_point
+      - field_name: delivery_point
         label: Delivery Point
         required: false
 
-      - field_name: contact_point_address_city
+      - field_name: address_city
         label: City
         required: false
 
-      - field_name: contact_point_address_administrative_area
+      - field_name: address_administrative_area
         label: Administrative area
         required: false
         help_text: province of the contact location
 
-      - field_name: contact_point_postal_code
+      - field_name: postal_code
         label: Postal Code
         required: false
 
-      - field_name: contact_point_electronic_mail_address
+      - field_name: electronic_mail_address
         label: Electronic mail address
         required: false
         help_text: Address of the electronic mailbox of the responsible organization or individual
 
-      - field_name: contact_point_voice
+      - field_name: voice
         label: Contact point phone
         required: false
         help_text: Telephone number to contact the responsible organization or individual
 
-      - field_name: contact_point_facsimile
+      - field_name: facsimile
         label: Contact point facsimile
         required: false
         help_text: Facsimile machine number to contact responsible organization or individual

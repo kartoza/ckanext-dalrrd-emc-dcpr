@@ -105,3 +105,21 @@ def convert_select_custom_choice_to_extra(data_dict):
     database,
     """
     return data_dict
+
+
+def default_metadata_standard_name(value):
+    """
+    returns SANS1878 as the default
+    metadata standard name.
+    """
+    if value == "":
+        return "sans1878"
+
+
+def default_metadata_standard_version(value):
+    """
+    returns SANS1878 as the default
+    metadata standard name.
+    """
+    if value == "":
+        return "1.1"
