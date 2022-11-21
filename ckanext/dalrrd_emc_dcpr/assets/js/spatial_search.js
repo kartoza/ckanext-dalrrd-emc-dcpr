@@ -1,9 +1,9 @@
 ckan.module("spatial_search", function($){
     let divisions_unit = [
         {"unit_name":"sa_national", "number_of_files":1},
-        {"unit_name":"sa_provinces", "number_of_files":5},
-        {"unit_name":"sa_district_municipalities", "number_of_files":26},
-        {"unit_name":"sa_local_municipalities", "number_of_files":107},
+        {"unit_name":"sa_provinces", "number_of_files":1},
+        {"unit_name":"sa_district_municipalities", "number_of_files":1},
+        {"unit_name":"sa_local_municipalities", "number_of_files":1},
     ]
     var division_caps
     var divisionCapsOb = {
