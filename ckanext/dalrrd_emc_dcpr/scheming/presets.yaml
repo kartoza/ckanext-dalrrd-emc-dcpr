@@ -46,4 +46,4 @@ presets:
   - preset_name: custom_select_field
     values:
       form_snippet: custom_select_field.html
-      validators: convert_select_custom_choice_to_extra
+      validators: ignore_missing convert_select_custom_choice_to_extra

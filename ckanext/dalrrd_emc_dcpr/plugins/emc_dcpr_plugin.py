@@ -311,7 +311,9 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "convert_choices_select_to_int": converters.convert_choices_select_to_int,
             "convert_select_custom_choice_to_extra": converters.convert_select_custom_choice_to_extra,
             "doi_validator": validators.doi_validator,
-            # "expand_tags_composite": converters.expand_tags_composite,
+            "metadata_default_standard_name": converters.default_metadata_standard_name,
+            "metadata_default_standard_version": converters.default_metadata_standard_version,
+            "lineage_source_srs_validator": validators.lineage_source_srs_validator,
         }
 
     def is_fallback(self) -> bool:
