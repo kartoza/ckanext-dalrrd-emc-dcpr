@@ -15,8 +15,10 @@ ckan.module("spatial_search", function($){
     return{
         initialize:function(){
             let _this = this
-            if(document.readyState == "complete"){_this.mapper()}
-            else{window.addEventListener( "load", (e)=>setTimeout(_this.mapper(),1500))}
+            if(document.readyState == "complete"){_this.mapper(); }
+            else{window.addEventListener("load", (e)=>{
+                setTimeout(_this.mapper(),1500);
+            })}
             $.proxyAll(this,/_on/);
         },
         mapper: function(){
@@ -84,7 +86,6 @@ ckan.module("spatial_search", function($){
                         urls_list.push(url)
                     }
                     Promise.all(urls_list.map(url=>{
-                      console.log(url)
                       fetch(url).then(res=> res.json()).then(data=>{
                         data.features.forEach(item=>{
                             divisions_json[unit_name].addData(item)
@@ -93,12 +94,17 @@ ckan.module("spatial_search", function($){
                     })).then(()=>{divisions_overlay[divisionCapsOb[unit_name]].addLayer(divisions_json[unit_name])})
                 }
 
-                let layerControl = L.control.layers(null,divisions_overlay)
+                let layerControl = L.control.layers(divisions_overlay)
                 layerControl.addTo(Lmap);
                 // adding circle to leaflet draw
+
+                $("a.leaflet-draw-draw-rectangle").attr("title", "search with rectangle bounds")
+
                 $("a.leaflet-draw-draw-rectangle").parent().append(
                     $("<a class='leaflet-draw-draw-circle'></a>")
                 )
+
+                $("a.leaflet-draw-draw-circle").attr("title", "search with circular buffer")
 
                 $('a.leaflet-draw-draw-circle').hover(function(e){
                     $(this).css({"cursor":"pointer"})
@@ -116,7 +122,6 @@ ckan.module("spatial_search", function($){
                     $('#ext_bbox').val(layer.getBounds().toBBoxString());
                 });
             }
-        },
-
+        }
     }
 })
