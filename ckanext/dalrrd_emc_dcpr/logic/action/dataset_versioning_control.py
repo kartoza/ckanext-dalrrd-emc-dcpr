@@ -43,6 +43,7 @@ def handle_versioning(context, data_dict):
             for _ in range(6)
         )
         update_dataset_title_and_url(new_version, generated_id, data_dict)
+        context["ignore_auth"] = True
         result = toolkit.get_action("package_create")(context, data_dict)
         flash_success("new version is created, updating the existing one !")
         return result
