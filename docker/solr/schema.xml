@@ -190,7 +190,7 @@ schema. In this case the version should be set to the next CKAN version number.
         index and stored values are true by default
         https://solr.apache.org/guide/6_6/defining-fields.html
     -->
-    <!-- <field name="reference_date" type="date"/>
+    <field name="reference_date" type="date"/>
     <field name="doi" type="string"/>
     <field name="metadata_standard_name" type="string" default="sans1878"/>
     <field name="metadata_standard_version" type="string" default="1.1"/>
@@ -244,7 +244,7 @@ schema. In this case the version should be set to the next CKAN version number.
     <field name="reference_system_additional_info_spatial_temporal_extent" type="string" indexed="false" stored="false"/>
     <field name="reference_system_additional_info_minimum_vertical_extent" type="string" indexed="false" stored="false"/>
     <field name="reference_system_additional_info_maximum_vertical_extent" type="string" indexed="false" stored="false"/>
-    <field name="metadata_date_stamp" type="date"/> -->
+    <field name="metadata_date_stamp" type="date"/>
 
 
 
