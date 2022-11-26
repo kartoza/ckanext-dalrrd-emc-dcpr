@@ -12,6 +12,8 @@ ckan.module("spatial_search", function($){
     }
     var divisions_json = {}
     var drawer
+    var drawerEnabled = false
+
     return{
         initialize:function(){
             let _this = this
@@ -96,9 +98,13 @@ ckan.module("spatial_search", function($){
 
                 let layerControl = L.control.layers(divisions_overlay)
                 layerControl.addTo(Lmap);
-                // adding circle to leaflet draw
+                // handle drawer
 
                 $("a.leaflet-draw-draw-rectangle").attr("title", "search with rectangle bounds")
+                // $("a.leaflet-draw-draw-rectangle").on("click", function(e){
+                // })
+
+
 
                 $("a.leaflet-draw-draw-rectangle").parent().append(
                     $("<a class='leaflet-draw-draw-circle'></a>")
@@ -113,23 +119,28 @@ ckan.module("spatial_search", function($){
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
                     $('body').toggleClass('dataset-map-expanded');
                     Lmap.invalidateSize();
-                    if(drawer != undefined){
+                    if(drawerEnabled == true){
                         drawer.disable()
+                        drawerEnabled = false
                     }
                     else{
+                        console.log("drawer is enabled now!")
                         drawer = new L.Draw.Circle(Lmap)
                         drawer.enable()
+                        drawerEnabled = true
                     }
                 });
 
                   $(".cancel").on("click",function(e){
-                      if(drawer){
+                      if(drawerEnabled == true){
                         drawer.disable()
+                        drawerEnabled = false
                       }
                   })
 
 
                   Lmap.on('draw:created', function (e) {
+                    console.log(e)
                     layer = e.layer;
                     layer.addTo(Lmap);
                     $('#ext_bbox').val(layer.getBounds().toBBoxString());
