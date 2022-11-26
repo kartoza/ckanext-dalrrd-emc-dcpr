@@ -42,10 +42,10 @@ ckan.module("spatial_search", function($){
                 Lmap.options.minZoom = 4;
 
 
-            Lmap.eachLayer(lyr=>{
-                if( lyr instanceof L.TileLayer ) {
-                    lyr.options.noWrap = true
-                }
+                Lmap.eachLayer(lyr=>{
+                    if( lyr instanceof L.TileLayer ) {
+                        lyr.options.noWrap = true
+                    }
             })
                 let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
@@ -112,6 +112,7 @@ ckan.module("spatial_search", function($){
 
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
                     $('body').toggleClass('dataset-map-expanded');
+                    Lmap.invalidateSize();
                     let drawer = new L.Draw.Circle(Lmap)
                     drawer.enable()
                   });
