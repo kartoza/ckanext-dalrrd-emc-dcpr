@@ -113,9 +113,15 @@ ckan.module("spatial_search", function($){
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
                     $('body').toggleClass('dataset-map-expanded');
                     Lmap.invalidateSize();
-                    drawer = new L.Draw.Circle(Lmap)
-                    drawer.enable()
-                  });
+                    if(drawer != undefined){
+                        drawer.disable()
+                    }
+                    else{
+                        drawer = new L.Draw.Circle(Lmap)
+                        drawer.enable()
+                    }
+                });
+
                   $(".cancel").on("click",function(e){
                       if(drawer){
                         drawer.disable()
