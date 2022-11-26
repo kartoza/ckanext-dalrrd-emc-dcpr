@@ -11,7 +11,7 @@ ckan.module("spatial_search", function($){
          "sa_local_municipalities":"Local municipalities"
     }
     var divisions_json = {}
-
+    var drawer
     return{
         initialize:function(){
             let _this = this
@@ -113,9 +113,15 @@ ckan.module("spatial_search", function($){
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
                     $('body').toggleClass('dataset-map-expanded');
                     Lmap.invalidateSize();
-                    let drawer = new L.Draw.Circle(Lmap)
+                    drawer = new L.Draw.Circle(Lmap)
                     drawer.enable()
                   });
+                  $(".cancel").on("click",function(e){
+                      if(drawer){
+                        drawer.disable()
+                      }
+                  })
+
 
                   Lmap.on('draw:created', function (e) {
                     layer = e.layer;
