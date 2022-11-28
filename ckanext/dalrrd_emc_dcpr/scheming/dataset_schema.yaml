@@ -78,7 +78,7 @@ dataset_fields:
     label: Purpose
     required: true
     help_text: >-
-      Breif description why this dataset is created - This is a SANS 1878 mandatory field
+      Brief description why this dataset is created - This is a SANS 1878 mandatory field
 
   - field_name: acknowledgement
     label: Acknowledgement
