@@ -55,6 +55,13 @@ ckan.module("spatial_search", function($){
                     division_caps = getDivisionCaps(division)
                     divisions_overlay[division_caps] = L.layerGroup()
                     let division_json = L.geoJson(null,{
+                        style:{
+
+                            "color": "#008000",
+                            "weight": 5,
+                            "opacity": 0.65
+
+                        },
                         onEachFeature:function(feature, layer){
 
                             /* for reasons related to browser cache
@@ -73,7 +80,7 @@ ckan.module("spatial_search", function($){
                                   }, 200);
                                 }})
                             }
-                        })
+                        },)
 
                     let prefixed_json = "sa_" + division
                     divisions_json[prefixed_json] = division_json
