@@ -19,11 +19,11 @@
                          button.setAttribute("target", "_blank")
                       </script>
                     <i class="fa fa-external-link"></i> {{ _('Go to resource') }}
-                  {% else %}
-                    <i class="fa fa-arrow-circle-o-down"></i> {{ _('Download') }}
+                  {# {% else %}
+                    <i class="fa fa-arrow-circle-o-down"></i> {{ _('Download') }} #}
                   {% endif %}
                 </a>
-                {% block download_resource_button %}
+                {# {% block download_resource_button %}
                   {% if res.datastore_active %}
                 <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
@@ -41,7 +41,7 @@
                   </li>
                 </ul>
                   {% endif %}
-                {% endblock %}
+                {% endblock %} #}
                 </div>
          </li>
          <li>
