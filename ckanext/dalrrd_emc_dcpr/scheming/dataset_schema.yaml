@@ -84,7 +84,7 @@ dataset_fields:
     label: Acknowledgement
     required: false
     help_text: >-
-      Recognition of those who contributed to the dataset - This is a SANS 1878 mandatory field
+      Recognition of those who contributed to the dataset
 
   - field_name: status
     label: Status
@@ -107,6 +107,28 @@ dataset_fields:
         label: under development
     help_text: >-
       Status of the dataset- This is a SANS 1878 mandatory field
+
+
+  - field_name: usage
+    label: Resource Specific usage
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: specific_usage
+        label: Specific usage
+        required: false
+        help_text: brief description of the resource or resource series usage (or both)
+
+      - field_name: usage_datetime_from
+        label: Usage date time (from)
+        preset: date
+        required: false
+        help_text: date and time of the first use of the resource or resource series (or both)
+
+      - field_name: usage_datetime_to
+        label: Usage date time (to)
+        preset: date
+        required: false
+        help_text: date and time of the last use of the resource or resource series (or both) that complete a range, leave empty if not specified.
 
 # owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
 # vanilla ckanext-scheming too
