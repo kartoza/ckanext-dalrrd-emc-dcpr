@@ -1,8 +1,11 @@
 import string
 import random
 import re
+import json
 import ckan.plugins.toolkit as toolkit
 from ckan.lib.helpers import flash_success
+from ckan import model
+
 import sqlalchemy
 
 _select = sqlalchemy.sql.select
@@ -34,7 +37,7 @@ def handle_versioning(context, data_dict):
                     return data_dict
             if k == "resources":
                 return data_dict
-
+    resources = _get_package_resource(context, data_dict)
     new_version = data_dict.get("version")
     url = data_dict.get("name")
     new_version = numbering_version(url, context, data_dict)
@@ -46,6 +49,7 @@ def handle_versioning(context, data_dict):
         )
         update_dataset_title_and_url(new_version, generated_id, data_dict)
         context["ignore_auth"] = True
+        data_dict["resources"] = resources
         result = toolkit.get_action("package_create")(context, data_dict)
         flash_success("new version is created, updating the existing one !")
         return result
@@ -162,6 +166,43 @@ def search_and_update(title_or_url, new_version):
         # first time to change the versions
         str_to_substitute += f"_v{delimeter}" + new_version
     return str_to_substitute
+
+
+def _get_package_resource(context, data_dict: dict):
+    """
+    getting the package resources
+    """
+    model = context["model"]
+    package_id = data_dict.get("pkg_name")
+    q = f""" select url, name, description, format, extras from resource where package_id='{package_id}'"""
+    result = model.Session.execute(q)
+    resources_results = result.fetchall()
+    resources = []
+    if len(resources_results) > 0:
+        for res in resources_results:
+            flattend_resource = _flatten_resource_extras(
+                {
+                    "url": res[0],
+                    "name": res[1],
+                    "description": res[2],
+                    "format": res[3],
+                    "extras": res[4],
+                }
+            )
+            resources.append(flattend_resource)
+        return resources
+
+
+def _flatten_resource_extras(resource: dict):
+    """
+    returns the fields and values
+    contained in resource_extra
+    """
+    if resource.get("extras") is not None:
+        extras = json.loads(resource["extras"])
+        for key, value in extras.items():
+            resource[key] = value
+        return resource
 
 
 # def remove_special_characters_from_package_url(url:str):
