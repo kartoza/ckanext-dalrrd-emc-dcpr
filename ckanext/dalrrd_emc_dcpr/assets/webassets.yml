@@ -102,3 +102,9 @@ spatial-search-js:
   contents:
     - js/spatial_search.js
   filter: rjsmin
+
+change-dataset-word-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_rename_dataset_to_metadata_record.js
+  contents:
+    - js/rename_dataset_to_metadata_record.js
+  filter: rjsmin

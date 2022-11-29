@@ -10,12 +10,10 @@ ckan.module("custom_select", function($){
     return{
         initialize:function(){
             $.proxyAll(this,/_on/);
-            console.log(this.el.val())
             if(this.el.val() != "other"){
                 this.el.parent().children(`#${other_input_id}`).hide()
             }
             this.el.on("change", this._onHandleSelectChange)
-
         },
         _onHandleSelectChange:function(e){
             let custom_input = this.el.parent().children(`#${other_input_id}`)
