@@ -17,28 +17,28 @@
 		    {% block facet_list_heading %}
                 {% set item_id = title.replace(' ', '') %}
                 {% if title not in ["Reference Date", "Licenses", "Groups", "Formats"] %}
-                    {% set filters = {
-                        'Organizations': 'fa fa-users',
-                        'Tags': 'fa fa-tags',
-                        'SASDI Themes': 'fa fa-bars',
-                        'ISO Topic Categories': 'fa fa-filter',
-                        'Harvest source': 'fa fa-cloud',
-						'DCPR Request': 'fa fa-file',
-                    } %}
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="head{{ item_id }}">
-                  <h2 class="panel-title">
-                    <a class="panel-title-link" role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="false"
-                       aria-controls="{{ item_id }}" data-module="emc-filter-expand">
-                      <i class="{{ filters[title] }}"></i>
-                        {% set title = title or h.get_facet_title(name) %}
-                        {% if title == 'Organizations' %}
-                            {% set title = 'Organisations' %}
-                        {% endif %}
-                        {{ title }}
-                    </a>
-                  </h2>
-                </div>
+						{% set filters = {
+							'Organizations': 'fa fa-users',
+							'Tags': 'fa fa-tags',
+							'SASDI Themes': 'fa fa-bars',
+							'ISO Topic Categories': 'fa fa-filter',
+							'Harvest source': 'fa fa-cloud',
+							'DCPR Request': 'fa fa-file',
+						} %}
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="head{{ item_id }}">
+						<h2 class="panel-title">
+							<a class="panel-title-link" role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ item_id }}" aria-expanded="false"
+							aria-controls="{{ item_id }}" data-module="emc-filter-expand">
+							<i class="{{ filters[title] }}"></i>
+								{% set title = title or h.get_facet_title(name) %}
+								{% if title == 'Organizations' %}
+									{% set title = 'Organisations' %}
+								{% endif %}
+								{{ title }}
+							</a>
+						</h2>
+					</div>
                 {% endif %}
 		    {% endblock %}
 		    {% block facet_list_items %}
@@ -46,53 +46,53 @@
                 <div id="{{ item_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ item_id }}">
                 <div class="panel-body" style="padding: 0px">
 			{# {% with items = items or c.search_facets[name]['items'] %} #}
-			{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
-				{% if item_id == 'DCPRRequest' %}
-					{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth"},
-					'My requests':{"link":"my-dcpr-requests", "access":"my_dcpr_request_list_auth"},
-					'Requests awaiting NSIF moderation':{"link":"awaiting-nsif-moderation-dcpr-requests", "access":"dcpr_request_list_pending_nsif_auth"},
-					'Requests awaiting CSI moderation':{"link":"awaiting-csi-moderation-dcpr-requests", "access":"dcpr_request_list_pending_csi_auth"},
-					'Requests under preparation':{"link":"under-preparation-dcpr-requests", "access":"dcpr_request_list_under_preparation_auth"}}
-					 %}
-				{% endif %}
+				{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
+					{% if item_id == 'DCPRRequest' %}
+						{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth"},
+						'My requests':{"link":"my-dcpr-requests", "access":"my_dcpr_request_list_auth"},
+						'Requests awaiting NSIF moderation':{"link":"awaiting-nsif-moderation-dcpr-requests", "access":"dcpr_request_list_pending_nsif_auth"},
+						'Requests awaiting CSI moderation':{"link":"awaiting-csi-moderation-dcpr-requests", "access":"dcpr_request_list_pending_csi_auth"},
+						'Requests under preparation':{"link":"under-preparation-dcpr-requests", "access":"dcpr_request_list_under_preparation_auth"}}
+						%}
+					{% endif %}
 			{% if items %}
 				<nav aria-label="{{ title }}">
 				    <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }} facet-outer-{{ item_id }} facet-outer">
 						{% for item in items %}
 							{% if item_id == 'DCPRRequest' %}
-							{# apply the check here #}
-							{% set href = request.url_root + "dcpr/" + items[item]["link"]%}
-							{% set label = item %}
-							{% set label_truncated = h.truncate(label, 22) %}
-							{% set count = '' %}
-							{% if not h.check_access(items[item]['access']) %}
+								{# apply the check here #}
+								{% set href = request.url_root + "dcpr/" + items[item]["link"]%}
+								{% set label = item %}
+								{% set label_truncated = h.truncate(label, 22) %}
+								{% set count = '' %}
+								{% if not h.check_access(items[item]['access']) %}
 
+								{% else %}
+									<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}">
+										<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+											<span class="item-label">{{ label_truncated }}</span>
+											<span class="hidden separator"> - </span>
+											<span class="item-count badge pull-righ">{{ count }}</span>
+										</a>
+									</li>
+								{% endif %}
 							{% else %}
-							<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}">
-							<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
-								<span class="item-label">{{ label_truncated }}</span>
-								<span class="hidden separator"> - </span>
-								<span class="item-count badge pull-righ">{{ count }}</span>
-							</a>
-							</li>
-							{% endif %}
-						{% else %}
-					    	{% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
-					    	{% set label = label_function(item) if label_function else item.display_name %}
-					    	{% set label_truncated = h.truncate(label, 22) if not label_function else label %}
-					    	{% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
+								{% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
+								{% set label = label_function(item) if label_function else item.display_name %}
+								{% set label_truncated = h.truncate(label, 22) if not label_function else label %}
+								{% set count = count_label(item['count']) if count_label else ('%d' % item['count']) %}
 
-						<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}">
-						<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" data-module="emc-facets-active">
-                            {% set sasdi = label if label != label_truncated else label_truncated %}
-                            {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
-						    <span class="item-label">{% if title == "SASDI Themes" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px" style="margin-bottom: 2px">{% endif %} {{ label_truncated }}</span>
-						    <span class="hidden separator"> - </span>
-						    <span class="item-count badge pull-right">{{ count }}</span>
-						</a>
-					    </li>
-						{% endif %}
-					{% endfor %}
+								<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}">
+									<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}" data-module="emc-facets-active">
+										{% set sasdi = label if label != label_truncated else label_truncated %}
+										{% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
+										<span class="item-label">{% if title == "SASDI Themes" %}<img src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="Conservation" width="30px" style="margin-bottom: 2px">{% endif %} {{ label_truncated }}</span>
+										<span class="hidden separator"> - </span>
+										<span class="item-count badge pull-right">{{ count }}</span>
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
 				    </ul>
 				</nav>
                 {% if items|length > 10%}
@@ -101,7 +101,7 @@
                     </p>
                 {% endif %}
 			    {% else %}
-				<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
+					<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
 			    {% endif %}
 			{% endwith %}
 		    {% endblock %}
