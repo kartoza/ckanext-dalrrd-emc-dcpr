@@ -2,11 +2,13 @@
 
 
 ckan.module('emc-facets-active', function (jQuery, _) {
-
+    var searchInput = document.querySelector("#field-giant-search")
 
     return {
-        initialize: function () {
 
+        initialize: function () {
+            $.proxyAll(this,/_on/);
+            searchInput.addEventListener("change", this._onSearchInputValueChange)
             const filters = {
                 'organization': 'Organizations',
                 '_organization_limit': 'Organizations',
@@ -34,6 +36,12 @@ ckan.module('emc-facets-active', function (jQuery, _) {
                     alert(head);
                 }
        }
+        },
+        _onSearchInputValueChange:function(e){
+            let searchUrl = this.el.get(0).href
+            let searchUrlSplit = searchUrl.split("&",2)[0]
+            let inputSearchTerm = searchUrlSplit.split("?q=",2)[1]
+            this.el.get(0).href = searchUrl.replace(inputSearchTerm, e.target.value)
         }
     }
 
