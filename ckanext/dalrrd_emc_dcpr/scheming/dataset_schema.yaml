@@ -118,13 +118,13 @@ dataset_fields:
         required: false
         help_text: brief description of the resource or resource series usage (or both)
 
-      - field_name: usage_datetime_from
+      - field_name: datetime_from
         label: Usage date time (from)
         preset: date
         required: false
         help_text: date and time of the first use of the resource or resource series (or both)
 
-      - field_name: usage_datetime_to
+      - field_name: datetime_to
         label: Usage date time (to)
         preset: date
         required: false

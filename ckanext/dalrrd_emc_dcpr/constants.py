@@ -100,23 +100,12 @@ DATASET_MINIMAL_SET_OF_FIELDS = [
     "dataset_character_set",
     "metadata_character_set",
     "dataset_lineage-0-statement",
-    "dataset_lineage-0-process_step_description",
-    "distribution-0-distributor_contact",
-    "maintainer",
     "spatial",
     "equivalent_scale",
     "spatial_representation_type",
     "spatial_reference_system",
     "metadata_date_stamp",
 ]
-# choices fields
-# status
-# metadata_point_of_contact-0-orgnizational_role
-# dataset_character_set
-# dataset_character_set
-# spatial_representation_type
-
-# the equivalent_scale is teh spatial resolution field
 
 DATASET_FULL_SET_OF_FIELDS = [
     "title",
@@ -126,14 +115,21 @@ DATASET_FULL_SET_OF_FIELDS = [
     "metadata_standard_version",
     "notes",
     "purpose",
+    "doi",
     "acknowledgement",
     "status",
+    "usage-0-specific_usage",
+    "usage-0-datetime_from",
+    "usage-0-datetime_to",
     "contact-0-individual_name",
     "contact-0-position_name",
+    "contact-0-delivery_point",
     "contact-0-address_city",
     "contact-0-address_administrative_area",
     "contact-0-postal_code",
-    "contact-0- electronic_mail_address",
+    "contact-0-electronic_mail_address",
+    "contact-0-voice",
+    "contact-0-facsimile",
     "contact-0-organisational_role",
     "owner_org",
     "private",
@@ -147,9 +143,11 @@ DATASET_FULL_SET_OF_FIELDS = [
     "dataset_language",
     "metadata_language",
     "dataset_character_set",
+    "metadata_character_set",
     "dataset_lineage-0-level",
-    "dataset_lineage-0-dataset_lineage_statement",
+    "dataset_lineage-0-statement",
     "dataset_lineage-0-process_step_description",
+    "dataset_lineage-0-process_step_rationale",
     "dataset_lineage-0-process_step_datetime_from",
     "dataset_lineage-0-process_step_datetime_to",
     "dataset_lineage-0-processor_individual_name",
@@ -159,10 +157,14 @@ DATASET_FULL_SET_OF_FIELDS = [
     "dataset_lineage-0-processor_address_administrative_area",
     "dataset_lineage-0-processor_postal_code",
     "dataset_lineage-0-processor_electronic_mail_address",
-    "distribution-0-distributor_contact",
-    "distribution-0-distribution_order_process",
+    "dataset_lineage-0-source_description",
+    "dataset_lineage-0-source_scale_denominator",
+    "dataset_lineage-0-source_reference_system",
+    "distribution-0-transfer_size",
+    "distribution-0-order_process",
     "distribution-0-units_of_distribution",
-    "distribution-0-distribution_online_source",
+    "distribution-0-online_source",
+    "distribution-0-offline_source",
     "maintainer",
     "maintainer_email",
     "maintenance_information-0-maintenance_and_update_frequency",
@@ -178,8 +180,10 @@ DATASET_FULL_SET_OF_FIELDS = [
     "temporal_reference_system",
     "reference_system_additional_info-0-temporal_extent_period_duration_from",
     "reference_system_additional_info-0-temporal_extent_period_duration_to",
-    "minimum_vertical_extent",
-    "maximum_vertical_extent",
+    "reference_system_additional_info-0-description",
+    "reference_system_additional_info-0-spatial_temporal_extent",
+    "reference_system_additional_info-0-minimum_vertical_extent",
+    "reference_system_additional_info-0-maximum_vertical_extent",
     "metadata_date_stamp",
 ]
 
