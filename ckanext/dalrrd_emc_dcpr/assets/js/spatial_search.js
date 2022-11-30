@@ -58,7 +58,7 @@ ckan.module("spatial_search", function($){
                         style:{
 
                             "color": "#008000",
-                            "weight": 5,
+                            "weight": 2,
                             "opacity": 0.65
 
                         },
