@@ -191,6 +191,7 @@ DATASET_FULL_SET_OF_FIELDS = [
 class DCPRRequestRequiredFields(enum.Enum):
     DATASET_LANGUAGE = "en"
     DATASET_CHARACTER_SET = "ucs-2"
+    METADATA_CHARACTER_SET = "ucs-2"
     DISTRIBUTOR_CONTACT = "contact"
     EQUIVALENT_SCALE = "10"
     ISO_TOPIC_CATEGORY = "location"

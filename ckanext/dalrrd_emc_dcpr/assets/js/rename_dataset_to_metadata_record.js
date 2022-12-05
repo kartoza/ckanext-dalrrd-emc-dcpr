@@ -19,7 +19,6 @@ ckan.module("change_dataset_to_metadata_record", function($){
             // error page
             let error_text = document.querySelector(".module-content").innerHTML
             let modified_error = error_text.replace(/dataset/ig, "Metadata record")
-            console.log(modified_error)
             document.querySelector(".module-content").innerHTML = modified_error
         }
     }
