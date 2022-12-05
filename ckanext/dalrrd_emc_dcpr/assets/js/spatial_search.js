@@ -11,6 +11,8 @@ ckan.module("spatial_search", function($){
          "sa_local_municipalities":"Local municipalities"
     }
     var divisions_json = {}
+    var drawer
+    var drawerEnabled = false
 
     return{
         initialize:function(){
@@ -42,10 +44,10 @@ ckan.module("spatial_search", function($){
                 Lmap.options.minZoom = 4;
 
 
-            Lmap.eachLayer(lyr=>{
-                if( lyr instanceof L.TileLayer ) {
-                    lyr.options.noWrap = true
-                }
+                Lmap.eachLayer(lyr=>{
+                    if( lyr instanceof L.TileLayer ) {
+                        lyr.options.noWrap = true
+                    }
             })
                 let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
@@ -53,6 +55,13 @@ ckan.module("spatial_search", function($){
                     division_caps = getDivisionCaps(division)
                     divisions_overlay[division_caps] = L.layerGroup()
                     let division_json = L.geoJson(null,{
+                        style:{
+
+                            "color": "#008000",
+                            "weight": 1,
+                            "opacity": 0.65
+
+                        },
                         onEachFeature:function(feature, layer){
 
                             /* for reasons related to browser cache
@@ -71,7 +80,7 @@ ckan.module("spatial_search", function($){
                                   }, 200);
                                 }})
                             }
-                        })
+                        },)
 
                     let prefixed_json = "sa_" + division
                     divisions_json[prefixed_json] = division_json
@@ -96,9 +105,13 @@ ckan.module("spatial_search", function($){
 
                 let layerControl = L.control.layers(divisions_overlay)
                 layerControl.addTo(Lmap);
-                // adding circle to leaflet draw
+                // handle drawer
 
                 $("a.leaflet-draw-draw-rectangle").attr("title", "search with rectangle bounds")
+                // $("a.leaflet-draw-draw-rectangle").on("click", function(e){
+                // })
+
+
 
                 $("a.leaflet-draw-draw-rectangle").parent().append(
                     $("<a class='leaflet-draw-draw-circle'></a>")
@@ -112,11 +125,29 @@ ckan.module("spatial_search", function($){
 
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
                     $('body').toggleClass('dataset-map-expanded');
-                    let drawer = new L.Draw.Circle(Lmap)
-                    drawer.enable()
-                  });
+                    Lmap.invalidateSize();
+                    if(drawerEnabled == true){
+                        drawer.disable()
+                        drawerEnabled = false
+                    }
+                    else{
+                        console.log("drawer is enabled now!")
+                        drawer = new L.Draw.Circle(Lmap)
+                        drawer.enable()
+                        drawerEnabled = true
+                    }
+                });
+
+                  $(".cancel").on("click",function(e){
+                      if(drawerEnabled == true){
+                        drawer.disable()
+                        drawerEnabled = false
+                      }
+                  })
+
 
                   Lmap.on('draw:created', function (e) {
+                    console.log(e)
                     layer = e.layer;
                     layer.addTo(Lmap);
                     $('#ext_bbox').val(layer.getBounds().toBBoxString());

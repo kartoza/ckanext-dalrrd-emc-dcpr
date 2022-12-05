@@ -78,13 +78,13 @@ dataset_fields:
     label: Purpose
     required: true
     help_text: >-
-      Breif description why this dataset is created - This is a SANS 1878 mandatory field
+      Brief description why this dataset is created - This is a SANS 1878 mandatory field
 
   - field_name: acknowledgement
     label: Acknowledgement
     required: false
     help_text: >-
-      Recognition of those who contributed to the dataset - This is a SANS 1878 mandatory field
+      Recognition of those who contributed to the dataset
 
   - field_name: status
     label: Status
@@ -107,6 +107,28 @@ dataset_fields:
         label: under development
     help_text: >-
       Status of the dataset- This is a SANS 1878 mandatory field
+
+
+  - field_name: usage
+    label: Resource Specific usage
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: specific_usage
+        label: Specific usage
+        required: false
+        help_text: brief description of the resource or resource series usage (or both)
+
+      - field_name: datetime_from
+        label: Usage date time (from)
+        preset: date
+        required: false
+        help_text: date and time of the first use of the resource or resource series (or both)
+
+      - field_name: datetime_to
+        label: Usage date time (to)
+        preset: date
+        required: false
+        help_text: date and time of the last use of the resource or resource series (or both) that complete a range, leave empty if not specified.
 
 # owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
 # vanilla ckanext-scheming too
@@ -167,6 +189,7 @@ dataset_fields:
         label: Organisation role
         required: true
         preset: select
+        help_text: function performed by responsible party, This is a SANS 1878 mandatory field
         choices:
           - value: resource_provider
             label: resource provider
@@ -480,7 +503,7 @@ dataset_fields:
       - field_name: statement
         label: Statement
         required: true
-        help_text: general explaination of the data producer's knowledge about the lineage of a dataset - - This is a SANS 1878 mandatory field
+        help_text: general explaination of the data producer's knowledge about the lineage of a dataset - This is a SANS 1878 mandatory field
 
       - field_name: process_step_description
         label: Process step description
@@ -489,7 +512,7 @@ dataset_fields:
 
       - field_name: process_step_rationale
         label: Process step rationale
-        help_text: requirement purpose of the process setp
+        help_text: requirement purpose of the process step
 
       - field_name: process_step_datetime_from
         label: Process step date time (from)
@@ -516,7 +539,7 @@ dataset_fields:
         help_text: Role/ position of the responsible individual in the orgnization
 
       - field_name: processor_address_city
-        label: Processor adderss - City
+        label: Processor address - City
         required: false
 
       - field_name: processor_address_administrative_area
@@ -565,7 +588,7 @@ dataset_fields:
       - field_name: units_of_distribution
         label: Units of distribution
         required: false
-        help_text: tiles, layers, geographic areas ..etc., in which data is available
+        help_text: tiles, layers, geographic areas ...etc., in which data is available
 
       - field_name: transfer_size
         label: Transfer size
@@ -590,7 +613,7 @@ dataset_fields:
     display_property: dc:contributor
     help_text: >-
         "Name of the individual responsible for the dataset. Provide it in the following
-        format: surname, given name, title separated by a delimiter - This is a SANS 1878 mandatory field"
+        format: surname, given name, title separated by a delimiter"
 
   - field_name: maintainer_email
     label: Maintainer Email
@@ -706,7 +729,7 @@ dataset_fields:
     label: Temporal Reference System Information
     required: false
     help_text: >-
-      Description about the temporal reference system used (if any) - This is partly a SANS 1878 mandatory field"
+      Description about the temporal reference system used (if any) - This is an optional SANS 1878 field"
 
   - field_name: reference_system_additional_info
     label: Additional information about Reference Systems

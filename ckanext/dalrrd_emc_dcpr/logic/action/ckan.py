@@ -100,11 +100,11 @@ def package_update(original_action, context, data_dict):
     """
     logger.debug(f"inside package_update action: {data_dict=}")
     package_state = data_dict.get("state")
-    if package_state == "draft":
-        return _act_depending_on_package_visibility(original_action, context, data_dict)
-    else:
-        handle_versioning(context, data_dict)
-        return _act_depending_on_package_visibility(original_action, context, data_dict)
+    # if package_state == "draft":
+    #     return _act_depending_on_package_visibility(original_action, context, data_dict)
+    # else:
+    #     handle_versioning(context, data_dict)
+    return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
 @toolkit.chained_action
