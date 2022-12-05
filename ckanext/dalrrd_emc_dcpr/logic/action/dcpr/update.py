@@ -309,7 +309,7 @@ def create_package_from_dcpr_request(
                 data_dict["extras"] = [
                     {"key": "origin", "value": "DCPR"},
                     {"key": "action", "value": action.value},
-                    {"key": "status", "value": "completed"},
+                    # {"key": "status", "value": "completed"},
                 ]
                 data_dict["private"] = False
                 data_dict["owner_org"] = request_obj.organization_id
@@ -323,6 +323,9 @@ def create_package_from_dcpr_request(
                     "dataset_character_set"
                 ] = DCPRRequestRequiredFields.DATASET_CHARACTER_SET.value
                 data_dict[
+                    "metadata_character_set"
+                ] = DCPRRequestRequiredFields.METADATA_CHARACTER_SET.value
+                data_dict[
                     "metadata_language"
                 ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
                 data_dict["reference_date"] = dt.datetime.now(dt.timezone.utc)
@@ -330,13 +333,13 @@ def create_package_from_dcpr_request(
                     "iso_topic_category"
                 ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
                 data_dict[
-                    "lineage-0-level"
+                    "dataset_lineage-0-level"
                 ] = DCPRRequestRequiredFields.LINEAGE_LEVEL.value
                 data_dict[
-                    "lineage-0-lineage_statement"
+                    "dataset_lineage-0-statement"
                 ] = DCPRRequestRequiredFields.LINEAGE_STATEMENT.value
                 data_dict[
-                    "lineage-0-process_step_description"
+                    "dataset_lineage-0-process_step_description"
                 ] = DCPRRequestRequiredFields.LINEAGE_PROCESS_DESCRIPTION.value
 
                 data_dict["maintainer"] = request_obj.owner_user
