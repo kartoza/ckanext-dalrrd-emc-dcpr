@@ -344,7 +344,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
             "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
             "emc_org_memberships": helpers.get_org_memberships,
-            # added by mohab
             "dcpr_requests_approved_by_nsif": helpers.get_dcpr_requests_approved_by_nsif,
             "is_dcpr_request": helpers.is_dcpr_request,
             "get_dcpr_request_action": helpers.get_dcpr_request_action,
