@@ -34,8 +34,7 @@
 
 {% block primary_content %}
     {% block package_search_results_list %}
-    {% set dcpr_requests_approved_by_nsif = h.dcpr_requests_approved_by_nsif(request.path) %}
-        {{ h.snippet('snippets/package_list.html', packages=page.items+dcpr_requests_approved_by_nsif) }}
+        {{ h.snippet('snippets/package_list.html', packages=page.items) }}
     {% endblock %}
     {% block page_pagination %}
       {{ page.pager(q=q) }}
