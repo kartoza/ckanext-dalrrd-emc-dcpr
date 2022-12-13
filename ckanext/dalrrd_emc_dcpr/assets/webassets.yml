@@ -108,3 +108,9 @@ change-dataset-word-js:
   contents:
     - js/rename_dataset_to_metadata_record.js
   filter: rjsmin
+
+apply-save-search-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_save_search.js
+  contents:
+    - js/save_search.js
+  filter: rjsmin

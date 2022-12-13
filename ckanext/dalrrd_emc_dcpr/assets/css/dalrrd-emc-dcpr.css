@@ -936,3 +936,30 @@ footer {
 /* .facet-outer li{
   display: none;
 } */
+
+
+.save_search_button{
+  border:none;
+  background-color: transparent;
+  position: relative;
+  left:468px;
+  bottom: 68px;
+}
+
+.save_search_button_border{
+  /* font-size: 40px;
+  border-radius: 50%;
+  border: 10px solid rgb(205, 209, 215);
+  padding: 25px; */
+
+  /* background-color:none ; */
+  color: #ec971f;
+  /* border-radius: 50%; */
+  /* border: 1px solid white; */
+  /* padding: 10px; */
+}
+
+.save_search_button_icon{
+  /* background-color:none ; */
+  color: #ec971f;
+}

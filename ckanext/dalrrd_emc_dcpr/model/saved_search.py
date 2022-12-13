@@ -52,7 +52,7 @@ class SavedSearches(model.core.StatefulObjectMixin, model.domain_object.DomainOb
         based on user id.
         """
         query = model.meta.Session.query(cls)
-        return query.filter_by(cls.owner_id)
+        return query.filter_by(**kw)
 
 
 model.meta.mapper(
@@ -61,7 +61,7 @@ model.meta.mapper(
     properties={
         "owner": orm.relationship(
             model.User,
-            backref="ssaved_searches",
+            backref="saved_searches",
             foreign_keys=saved_searches_table.c.owner_user,
         ),
     },
