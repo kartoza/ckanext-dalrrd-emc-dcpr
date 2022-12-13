@@ -5,24 +5,31 @@ ckan.module("change_save_search_icon", function($){
     */
 
     let search_icon = $(".save_search_button_icon")
-
+    var previous_query = ""
+    var query = undefined
     return{
         initialize:function(){
             $.proxyAll(this,/_on/);
             let _this=  this
             $(".save_search_button").on("click",function(){
+                if(previous_query != query){
                 search_icon.toggleClass("fa-bookmark-o fa-bookmark");
                 _this._onSaveSearch()
+            }
             })
         },
 
         _onSaveSearch:function(){
-            let query = location.href.split('?')[1]
+            if(location.href.includes("?") == false){
+                return
+            }
+            query = location.href.split('?')[1]
             fetch(`${window.location.origin}/saved_searches/save_search`,{method:"POST",
             headers:{'Content-Type': 'application/json'}, body:JSON.stringify(query)})
             .then(res=>res.json())
             .then(data=>console.log(data))
             .catch(err=>console.warn(err))
+            previous_query = query
         }
 
     }

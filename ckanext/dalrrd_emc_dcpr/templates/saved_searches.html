@@ -1,10 +1,16 @@
 {% extends "page.html" %}
+
 {% set saved_searches = h.get_saved_searches() %}
-
-{% block content %}
-
-    {% for search in saved_searches %}
-        <p>{{ search }} </p>
-    {% endfor %}
-
+{%- block content %}
+    <div class="saved-searches-container">
+        <div class="saved-searches-holder">
+            {% for search in saved_searches %}
+                <div class="saved-search-card">
+                    <p>{{ search[0] }}</p>
+                    <p>{{ search[1] }}</p>
+                    <p>{{ search[2] }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
