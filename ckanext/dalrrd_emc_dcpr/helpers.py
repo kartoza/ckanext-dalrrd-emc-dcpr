@@ -466,7 +466,7 @@ def get_saved_searches():
     based on a user id
     """
     user_id = c.userobj.id
-    q = f""" select saved_search_title, search_query, saved_search_date from saved_searches where owner_user='{user_id}' """
+    q = f""" select saved_search_title, search_query, saved_search_date from saved_searches where owner_user='{user_id}' order by saved_search_date desc limit 15 """
     rows = model.Session.execute(q)
     saved_searches_list = []
     for row in rows:

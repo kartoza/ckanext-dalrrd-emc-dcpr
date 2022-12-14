@@ -28,7 +28,7 @@ def save_current_search():
     user_id = c.userobj.id
     saved_search_id = uuid.uuid4()
     saved_search_title = _get_saved_search_title(query)
-    q = f""" insert into saved_searches values('{saved_search_id}', '{user_id}', '{query}', '{saved_search_title}','{datetime.now().strftime("%m/%d/%Y%H:%M:%S")}') """
+    q = f""" insert into saved_searches values('{saved_search_id}', '{user_id}', '{query}', '{saved_search_title}','{datetime.now()}') """
     result = model.Session.execute(q)
     model.Session.commit()
     return jsonify({"status": 200})

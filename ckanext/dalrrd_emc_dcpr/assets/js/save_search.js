@@ -27,10 +27,28 @@ ckan.module("change_save_search_icon", function($){
             fetch(`${window.location.origin}/saved_searches/save_search`,{method:"POST",
             headers:{'Content-Type': 'application/json'}, body:JSON.stringify(query)})
             .then(res=>res.json())
-            .then(data=>console.log(data))
             .catch(err=>console.warn(err))
             previous_query = query
         }
 
     }
+})
+
+
+ckan.module("implement_saved_search", function($){
+    // applies a saved search
+    return{
+        initialize:function(){
+            $(".saved-search-card").each(function(i,el){
+                el.addEventListener("click", function(e){
+                    let query_str = el.querySelector("#saved_search_query").innerText
+                    window.location.href = location.origin + "/dataset/?" + query_str
+                })
+
+
+            })
+
+        }
+    }
+
 })
