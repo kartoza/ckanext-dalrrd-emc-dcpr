@@ -1,0 +1,54 @@
+ckan.module("change_save_search_icon", function($){
+    /*
+        changes the icon of the save search after the user
+        clicks on it to save a search.
+    */
+
+    let search_icon = $(".save_search_button_icon")
+    var previous_query = ""
+    var query = undefined
+    return{
+        initialize:function(){
+            $.proxyAll(this,/_on/);
+            let _this=  this
+            $(".save_search_button").on("click",function(){
+                if(previous_query != query){
+                search_icon.toggleClass("fa-bookmark-o fa-bookmark");
+                _this._onSaveSearch()
+            }
+            })
+        },
+
+        _onSaveSearch:function(){
+            if(location.href.includes("?") == false){
+                return
+            }
+            query = location.href.split('?')[1]
+            fetch(`${window.location.origin}/saved_searches/save_search`,{method:"POST",
+            headers:{'Content-Type': 'application/json'}, body:JSON.stringify(query)})
+            .then(res=>res.json())
+            .catch(err=>console.warn(err))
+            previous_query = query
+        }
+
+    }
+})
+
+
+ckan.module("implement_saved_search", function($){
+    // applies a saved search
+    return{
+        initialize:function(){
+            $(".saved-search-card").each(function(i,el){
+                el.addEventListener("click", function(e){
+                    let query_str = el.querySelector("#saved_search_query").innerText
+                    window.location.href = location.origin + "/dataset/?" + query_str
+                })
+
+
+            })
+
+        }
+    }
+
+})

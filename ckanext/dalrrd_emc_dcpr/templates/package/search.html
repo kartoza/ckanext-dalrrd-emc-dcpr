@@ -28,6 +28,10 @@
           data-module="xml_parser"
           >
           <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
+          <button class="save_search_button" title="save this search query" data-module="change_save_search_icon">
+          <!-- <i class="fa fa-circle-thin fa-stack-2x save_search_button_border"></i> -->
+          <i class="fa fa-bookmark-o save_search_button_icon"></i>
+        </button>
         {% endif %}
     </div>
 {% endblock %}

@@ -2,11 +2,13 @@ import json
 import logging
 import typing
 import datetime
+import uuid
 from urllib.parse import quote
 from html import escape as html_escape
 from pathlib import Path
 from shapely import geometry
 from ckan import model
+from .model.saved_search import SavedSearches
 from ckan.plugins import toolkit
 from ckan.lib.helpers import build_nav_main as core_build_nav_main
 
@@ -458,11 +460,16 @@ def _get_git_branch():
     return "development"
 
 
-#    head_dir = Path(__file__).parents[2] / ".git" / "HEAD"
-
-#    with open(head_dir,"r") as f:
-#        content = f.read().splitlines()
-
-#    for line in content:
-#        if line[0:4] == "ref:":
-#            return line.partition("refs/heads/")[2]
+def get_saved_searches():
+    """
+    returns saved searches
+    based on a user id
+    """
+    user_id = c.userobj.id
+    q = f""" select saved_search_title, search_query, saved_search_date from saved_searches where owner_user='{user_id}' order by saved_search_date desc limit 15 """
+    rows = model.Session.execute(q)
+    saved_searches_list = []
+    for row in rows:
+        saved_searches_list.append(row)
+    # saved_searches_list = SavedSearches.get(SavedSearches,owner_user=user_id)
+    return saved_searches_list
