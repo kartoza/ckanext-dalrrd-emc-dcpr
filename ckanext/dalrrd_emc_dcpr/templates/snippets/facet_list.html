@@ -45,8 +45,8 @@
                 {% set item_id = title.replace(' ', '') %}
                 <div id="{{ item_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{ item_id }}">
                 <div class="panel-body" style="padding: 0px">
-			{# {% with items = items or c.search_facets[name]['items'] %} #}
-				{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
+			 {% with items = items or c.search_facets[name]['items'] %}
+{#				{% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}#}
 					{% if item_id == 'DCPRRequest' %}
 						{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth"},
 						'My requests':{"link":"my-dcpr-requests", "access":"my_dcpr_request_list_auth"},

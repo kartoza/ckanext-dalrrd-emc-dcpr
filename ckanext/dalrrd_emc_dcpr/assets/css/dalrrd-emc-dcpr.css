@@ -933,10 +933,9 @@ footer {
   display: none !important;
 }
 
-/* .facet-outer li{
+.facet-outer li{
   display: none;
 } */
-
 
 .save_search_button{
   border:none;
