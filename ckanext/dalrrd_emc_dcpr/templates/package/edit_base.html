@@ -1,0 +1,5 @@
+{% ckan_extends %}
+
+{% block content_action %}
+    {% link_for _('View metadata record'), named_route=pkg.type ~ '.read', id=pkg.name, class_='btn btn-default', icon='eye' %}
+{% endblock %}
