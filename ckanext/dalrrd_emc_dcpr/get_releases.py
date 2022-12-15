@@ -1,9 +1,10 @@
 import requests
 import json
 from pathlib import Path
+import os
 
-username = "Mohab25"
-token = ""
+username = os.environ["kartoza_github_user"]
+token = os.environ["kartoza_github_user_token"]
 
 res = requests.get(
     "https://api.github.com/repos/kartoza/ckanext-dalrrd-emc-dcpr/tags",
