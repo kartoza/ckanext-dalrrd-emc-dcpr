@@ -345,6 +345,7 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
+  padding-left:45px;
 }
 
 .request-row{
@@ -996,4 +997,16 @@ footer {
 
 .saved-search-card > p:first-of-type{
   color:#3A744E;
+}
+
+.metadata-record-thumbnail{
+  width:150px;
+  height: 150px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.metadata-record-desc{
+  padding-left:100px;
 }
