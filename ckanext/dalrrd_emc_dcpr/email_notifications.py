@@ -54,9 +54,11 @@ def get_and_send_notifications_for_user(user) -> int:
     email_last_sent = model.Dashboard.get(user["id"]).email_last_sent
     activity_stream_last_viewed = model.Dashboard.get(
         user["id"]
-    ).activity_stream_last_viewed
+    ).activity_stream_last_viewed  # the dashboard database table only has userid, activity_stream_last_viewed, email_last_sent
 
-    since = max(email_notifications_since, email_last_sent, activity_stream_last_viewed)
+    since = max(
+        email_notifications_since, email_last_sent, activity_stream_last_viewed
+    )  # the youngest
 
     notifications = get_notifications(user, since)
     num_sent = 0
