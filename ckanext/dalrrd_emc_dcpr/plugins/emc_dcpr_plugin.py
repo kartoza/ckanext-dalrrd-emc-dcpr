@@ -353,6 +353,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_maintenance_custom_other_field_data": helpers.get_maintenance_custom_other_field_data,
             "get_release": helpers.get_current_release,
             "get_saved_searches": helpers.get_saved_searches,
+            "get_recent_news": helpers.get_recent_news,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

@@ -473,3 +473,18 @@ def get_saved_searches():
         saved_searches_list.append(row)
     # saved_searches_list = SavedSearches.get(SavedSearches,owner_user=user_id)
     return saved_searches_list
+
+
+def get_recent_news(number=5, exclude=None):
+    news_list = toolkit.get_action("ckanext_pages_list")(
+        None, {"order_publish_date": True, "private": False, "page_type": "news"}
+    )
+    new_list = []
+    for news in news_list:
+        if exclude and news["name"] == exclude:
+            continue
+        new_list.append(news)
+        if len(new_list) == number:
+            break
+
+    return new_list
