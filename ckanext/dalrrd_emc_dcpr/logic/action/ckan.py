@@ -155,6 +155,6 @@ def _act_depending_on_package_visibility(
         result = action(context, data) if access else None
         # if you create, update or patch you are following the dataset
         if access:
-            toolkit.get_action("follow_dataset")(context, data)
+            toolkit.get_action("follow_dataset")(context, result)
 
     return result
