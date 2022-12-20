@@ -18,12 +18,12 @@ dataset_fields:
   - field_name: name
     label: Field identifier
     preset: dataset_slug
-    form_placeholder: eg. my-dataset, this is auto-completed by default.
+    form_placeholder: eg. my-metadata record, this is auto-completed by default.
 
   - field_name: featured
-    label: Feature dataset on EMC landing page?
+    label: Feature metadata record on EMC landing page?
     required: false
-    help_text: Should this dataset be featured on the EMC front page?
+    help_text: Should this metadata record be featured on the EMC front page?
     validators: boolean_validator
     preset: emc_checkbox
 
@@ -78,13 +78,13 @@ dataset_fields:
     label: Purpose
     required: true
     help_text: >-
-      Brief description why this dataset is created - This is a SANS 1878 mandatory field
+      Brief description why this metadata record is created - This is a SANS 1878 mandatory field
 
   - field_name: acknowledgement
     label: Acknowledgement
     required: false
     help_text: >-
-      Recognition of those who contributed to the dataset
+      Recognition of those who contributed to the metadata record
 
   - field_name: status
     label: Status
@@ -106,7 +106,7 @@ dataset_fields:
       - value: under_development
         label: under development
     help_text: >-
-      Status of the dataset- This is a SANS 1878 mandatory field
+      Status of the metadata record- This is a SANS 1878 mandatory field
 
 
   - field_name: usage
@@ -136,7 +136,7 @@ dataset_fields:
     label: Organization Name
     required: true
     preset: emc_dataset_organization
-    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
+    help_text: Organization responsible for the metadata record. This is a SANS 1878 mandatory field
 
   - field_name: contact
     label: Metadata point of contact
@@ -145,7 +145,7 @@ dataset_fields:
       - field_name: individual_name
         label: Individual name
         required: false
-        help_text: name - with surname of the person responsible of this dataset
+        help_text: name - with surname of the person responsible of this metadata record
 
       - field_name: position_name
         label: Role / Position of the responsible individual
@@ -216,11 +216,11 @@ dataset_fields:
     label: Reference date
     required: true
     preset: date
-    help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
+    help_text: Reference date for this metadata record - This is a SANS 1878 mandatory field
 
   - field_name: iso_topic_category
     label: Topic Category
-    help_text: ISO 19115 Topic Category for the dataset - This is a SANS 1878 mandatory field
+    help_text: ISO 19115 Topic Category for the metadata record - This is a SANS 1878 mandatory field
     required: true
     choices_helper: emc_iso_topic_categories
     validators: >-
@@ -260,7 +260,7 @@ dataset_fields:
     preset: emc_free_tags_tag_string_autocomplete
     form_snippet: tag_select.html
     help_text: >-
-      Additional keywords useful for describing the dataset. In order to optimize searchability, it is
+      Additional keywords useful for describing the metadata record. In order to optimize searchability, it is
       recommended to add at least three keywords
     form_placeholder: eg. economy, mental health, government
 
@@ -319,7 +319,7 @@ dataset_fields:
       - value: en
         label: English
     preset: select
-    help_text: Language for the dataset - This is a SANS 1878 mandatory field
+    help_text: Language of the metadata record - This is a SANS 1878 mandatory field
 
   - field_name: metadata_language
     label: Metadata language
@@ -392,7 +392,7 @@ dataset_fields:
         label: GB2312
     preset: select
     help_text: >-
-      Full name of the character coding standard used for the dataset -
+      Full name of the character coding standard used for the metadata record -
       This is a SANS 1878 mandatory field
 
   - field_name: metadata_character_set
@@ -457,7 +457,7 @@ dataset_fields:
         label: GB2312
     preset: select
     help_text: >-
-      Full name of the character coding standard used for the dataset -
+      Full name of the character coding standard used for the metadata record -
       This is a SANS 1878 mandatory field
 
   - field_name: dataset_lineage
@@ -503,7 +503,7 @@ dataset_fields:
       - field_name: statement
         label: Statement
         required: true
-        help_text: general explaination of the data producer's knowledge about the lineage of a dataset - This is a SANS 1878 mandatory field
+        help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
       - field_name: process_step_description
         label: Process step description
@@ -525,13 +525,13 @@ dataset_fields:
       - field_name: processor_individual_name
         label: Processor Individual name
         required: false
-        help_text: name - with surname of the person responsible of processing this dataset
+        help_text: name - with surname of the person responsible of processing this metadata record
 
       - field_name: processing_owner_org
         label: Processing Organization
         required: false
         #preset: emc_dataset_organization
-        help_text: Organization responsible for processing the dataset
+        help_text: Organization responsible for processing the metadata record
 
       - field_name: processor_position_name
         label: Role / Position of the processor individual
@@ -583,7 +583,7 @@ dataset_fields:
         label: Distributor Order Process
         required: false
         form_snippet: markdown.html
-        help_text: information about how the dataset may be obtained, and related instructions and fee information
+        help_text: information about how the metadata record may be obtained, and related instructions and fee information
 
       - field_name: units_of_distribution
         label: Units of distribution
@@ -612,7 +612,7 @@ dataset_fields:
     form_placeholder: Joe Bloggs
     display_property: dc:contributor
     help_text: >-
-        "Name of the individual responsible for the dataset. Provide it in the following
+        "Name of the individual responsible for the metadata record. Provide it in the following
         format: surname, given name, title separated by a delimiter"
 
   - field_name: maintainer_email
@@ -638,7 +638,7 @@ dataset_fields:
           - value: other
             label: other
 
-        help_text: frequency with which changes and additions are made to the dataset after it's submitted
+        help_text: frequency with which changes and additions are made to the metadata record after it's submitted
 
       - field_name: maintenance_date_of_next_update
         label: Date of next update
@@ -660,7 +660,7 @@ dataset_fields:
       - field_name: update_scope_description
         label: Update scope description
         required: false
-        help_text: additional information about the range or extent of the dataset
+        help_text: additional information about the range or extent of the metadata record
 
       - field_name: maintenance_notes
         label: Maintenance notes
@@ -672,7 +672,7 @@ dataset_fields:
     label: Geographic location bounding box
     required: true
     help_text: >-
-      Bounding box for the dataset, expressed as the geographic coordinates of the upper left and lower right
+      Bounding box for the metadata record, expressed as the geographic coordinates of the upper left and lower right
       corners - This is a SANS 1878 mandatory field
     preset: emc_dataset_spatial_extent
     display_snippet: null
@@ -719,7 +719,7 @@ dataset_fields:
     validators: emc_srs_validator
     help_text: >-
       "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
-      respective code for the dataset's spatial coordinate
+      respective code for the metadata record's spatial coordinate
       reference system. It is recommended to use the EPSG spatial catalogue codes whenever possible
       (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
       www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
