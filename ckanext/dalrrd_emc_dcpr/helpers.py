@@ -12,6 +12,8 @@ from .model.saved_search import SavedSearches
 from ckan.plugins import toolkit
 from ckan.lib.helpers import build_nav_main as core_build_nav_main
 
+from ckan.logic import NotAuthorized
+
 from . import constants
 from .logic.action.emc import show_version
 from .constants import DCPRRequestStatus
@@ -226,6 +228,15 @@ def get_featured_datasets():
     return result["results"]
 
 
+def get_featured_datasets_count():
+    """
+    used with facets count
+    """
+    search_action = toolkit.get_action("package_search")
+    result = search_action(data_dict={"q": "featured:true", "include_private": True})
+    return result["count"]
+
+
 def get_recently_modified_datasets():
     search_action = toolkit.get_action("package_search")
     result = search_action(data_dict={"sort": "metadata_modified desc", "rows": 5})
@@ -340,11 +351,56 @@ def get_my_dcpr_requests_count():
     """
     used by the dcpr facet
     """
-    my_requests = toolkit.get_action("my_dcpr_request_list")(
-        {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
-    )
+    try:
+        my_requests = toolkit.get_action("my_dcpr_request_list")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
     return len(my_requests)
-    pass
+
+
+def get_under_preparation_dcpr_requests_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        requests = toolkit.get_action("dcpr_request_list_under_preparation")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(requests)
+
+
+def get_dcpr_requests_awaiting_csi_moderation_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        requests = toolkit.get_action("dcpr_request_list_awaiting_csi_moderation")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(requests)
+
+
+def get_dcpr_requests_awaiting_nsif_moderation_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        requests = toolkit.get_action("dcpr_request_list_awaiting_nsif_moderation")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(requests)
 
 
 def get_dcpr_requests_approved_by_nsif(request_origin):

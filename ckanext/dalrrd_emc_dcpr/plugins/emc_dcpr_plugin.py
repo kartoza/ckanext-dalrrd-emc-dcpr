@@ -355,7 +355,11 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_saved_searches": helpers.get_saved_searches,
             "get_recent_news": helpers.get_recent_news,
             "get_public_dcpr_requests_count": helpers.get_public_dcpr_requests_count,
-            "get_my_dcpr_requests_count": helpers.get_my_dcpr_requests_count(),
+            "get_my_dcpr_requests_count": helpers.get_my_dcpr_requests_count,
+            "get_under_preparation_dcpr_requests_count": helpers.get_under_preparation_dcpr_requests_count,
+            "get_dcpr_requests_awaiting_csi_moderation_count": helpers.get_dcpr_requests_awaiting_csi_moderation_count,
+            "get_dcpr_requests_awaiting_nsif_moderation_count": helpers.get_dcpr_requests_awaiting_nsif_moderation_count,
+            "get_featured_datasets_count": helpers.get_featured_datasets_count,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
