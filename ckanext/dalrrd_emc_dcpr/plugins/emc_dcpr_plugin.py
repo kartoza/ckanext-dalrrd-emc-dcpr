@@ -354,6 +354,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_release": helpers.get_current_release,
             "get_saved_searches": helpers.get_saved_searches,
             "get_recent_news": helpers.get_recent_news,
+            "get_public_dcpr_requests_count": helpers.get_public_dcpr_requests_count,
+            "get_my_dcpr_requests_count": helpers.get_my_dcpr_requests_count(),
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

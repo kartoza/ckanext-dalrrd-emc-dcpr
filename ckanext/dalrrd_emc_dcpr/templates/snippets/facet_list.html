@@ -53,11 +53,11 @@
                 {% endif %}
 				{% with items = initial_items %}
 					{% if item_id == 'DCPRRequest' %}
-						{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth"},
-						'My requests':{"link":"my-dcpr-requests", "access":"my_dcpr_request_list_auth"},
-						'Requests awaiting NSIF moderation':{"link":"awaiting-nsif-moderation-dcpr-requests", "access":"dcpr_request_list_pending_nsif_auth"},
-						'Requests awaiting CSI moderation':{"link":"awaiting-csi-moderation-dcpr-requests", "access":"dcpr_request_list_pending_csi_auth"},
-						'Requests under preparation':{"link":"under-preparation-dcpr-requests", "access":"dcpr_request_list_under_preparation_auth"}}
+						{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth", "count":h.get_public_dcpr_requests_count()},
+						'My requests':{"link":"my-dcpr-requests", "access":"my_dcpr_request_list_auth", "count":"h.get_my_dcpr_requests_count()"},
+						'Requests awaiting NSIF moderation':{"link":"awaiting-nsif-moderation-dcpr-requests", "access":"dcpr_request_list_pending_nsif_auth", "count":"5"},
+						'Requests awaiting CSI moderation':{"link":"awaiting-csi-moderation-dcpr-requests", "access":"dcpr_request_list_pending_csi_auth", "count":"3"},
+						'Requests under preparation':{"link":"under-preparation-dcpr-requests", "access":"dcpr_request_list_under_preparation_auth", "count":"2"}}
 						%}
 
 					{% elif item_id == "FeaturedMetadatarecords" %}
@@ -72,7 +72,7 @@
 								{% set href = request.url_root + "dcpr/" + items[item]["link"]%}
 								{% set label = item %}
 								{% set label_truncated = h.truncate(label, 22) %}
-								{% set count = '' %}
+								{% set count = items[item].count %}
 								{% if not h.check_access(items[item]['access']) %}
 								{% else %}
 									<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}">

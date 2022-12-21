@@ -326,6 +326,27 @@ def get_org_memberships(user_id: str):
     return query.all()
 
 
+def get_public_dcpr_requests_count():
+    """
+    used by the dcpr facet
+    """
+    public_requests = toolkit.get_action("dcpr_request_list_public")(
+        {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+    )
+    return len(public_requests)
+
+
+def get_my_dcpr_requests_count():
+    """
+    used by the dcpr facet
+    """
+    my_requests = toolkit.get_action("my_dcpr_request_list")(
+        {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+    )
+    return len(my_requests)
+    pass
+
+
 def get_dcpr_requests_approved_by_nsif(request_origin):
     """
     this feature required by the nsif team,
