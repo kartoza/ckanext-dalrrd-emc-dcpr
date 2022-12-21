@@ -17,7 +17,8 @@ ckan.module('emc-facets-active', function (jQuery, _) {
                 'vocab_iso_topic_categories': 'ISOTopicCategories',
                 '_vocab_iso_topic_categories_limit': 'ISOTopicCategories',
                 'tags': 'Tags',
-                '_tags_limit': 'Tags'
+                '_tags_limit': 'Tags',
+                'featured': "FeaturedMetadatarecords"
             };
             const keys = Object.keys(filters);
 
