@@ -354,6 +354,12 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_release": helpers.get_current_release,
             "get_saved_searches": helpers.get_saved_searches,
             "get_recent_news": helpers.get_recent_news,
+            "get_public_dcpr_requests_count": helpers.get_public_dcpr_requests_count,
+            "get_my_dcpr_requests_count": helpers.get_my_dcpr_requests_count,
+            "get_under_preparation_dcpr_requests_count": helpers.get_under_preparation_dcpr_requests_count,
+            "get_dcpr_requests_awaiting_csi_moderation_count": helpers.get_dcpr_requests_awaiting_csi_moderation_count,
+            "get_dcpr_requests_awaiting_nsif_moderation_count": helpers.get_dcpr_requests_awaiting_nsif_moderation_count,
+            "get_featured_datasets_count": helpers.get_featured_datasets_count,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
@@ -379,6 +385,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
             facets_dict["dcpr_request"] = toolkit._("DCPR Request")
+            facets_dict["featured"] = toolkit._("Featured Metadata records")
         return facets_dict
 
     def group_facets(
