@@ -7,10 +7,10 @@
 
     {% with items = items or h.get_facet_items_dict(name, search_facets or c.search_facets) %}
 	{% if items or not hide_empty %}
-	    {% if within_tertiary %}
-		{% set nav_class = 'nav nav-pills nav-stacked' %}
-		{% set nav_item_class = ' ' %}
-		{% set wrapper_class = 'nav-facet nav-facet-tertiary' %}
+		{% if within_tertiary %}
+			{% set nav_class = 'nav nav-pills nav-stacked' %}
+			{% set nav_item_class = ' ' %}
+			{% set wrapper_class = 'nav-facet nav-facet-tertiary' %}
 	    {% endif %}
 	    {% block facet_list_item %}
 		<section class="{{ wrapper_class or 'module module-narrow module-shallow' }}">
@@ -24,6 +24,7 @@
 							'ISO Topic Categories': 'fa fa-filter',
 							'Harvest source': 'fa fa-cloud',
 							'DCPR Request': 'fa fa-file',
+							'Featured Metadata records': 'fa fa-star',
 						} %}
 					<div class="panel panel-default">
 						<div class="panel-heading" role="tab" id="head{{ item_id }}">
@@ -58,6 +59,9 @@
 						'Requests awaiting CSI moderation':{"link":"awaiting-csi-moderation-dcpr-requests", "access":"dcpr_request_list_pending_csi_auth"},
 						'Requests under preparation':{"link":"under-preparation-dcpr-requests", "access":"dcpr_request_list_under_preparation_auth"}}
 						%}
+
+					{% elif item_id == "FeaturedMetadatarecords" %}
+							{% set items = {'See all featured records':{"name":"featured", "active":false}} %}
 					{% endif %}
 			{% if items %}
 				<nav aria-label="{{ title }}">
@@ -70,7 +74,6 @@
 								{% set label_truncated = h.truncate(label, 22) %}
 								{% set count = '' %}
 								{% if not h.check_access(items[item]['access']) %}
-
 								{% else %}
 									<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}">
 										<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
@@ -80,6 +83,22 @@
 										</a>
 									</li>
 								{% endif %}
+							{% elif item_id == 'FeaturedMetadatarecords' %}
+								{% set label = item %}
+								{% set count = '' %}
+								{% if "featured" in request.url %}
+									{% set href = h.remove_url_param("featured") %}
+								{% else %}
+									{% set href = h.add_url_param(new_params={"featured":"true"}) %}
+								{% endif %}
+								<li class="{{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %} facet-inner-{{ item_id }}" style="display:list-item">
+									<a href="{{ href }}" title="{{ label if label != label_truncated else '' }}">
+										<span class="item-label">{{ label }}</span>
+										<span class="hidden separator"> - </span>
+										<span class="item-count badge pull-righ">{{ count }}</span>
+									</a>
+								</li>
+
 							{% else %}
 								{% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
 								{% set label = label_function(item) if label_function else item.display_name %}
