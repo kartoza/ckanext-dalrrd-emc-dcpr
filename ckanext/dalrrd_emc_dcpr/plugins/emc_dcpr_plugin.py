@@ -26,6 +26,7 @@ from ..blueprints.emc import emc_blueprint
 from ..blueprints.xml_parser import xml_parser_blueprint
 from ..blueprints.publish import publish_blueprint
 from ..blueprints.saved_searches import saved_searches_blueprint
+from ..blueprints.news import news_blueprint
 from ..cli import commands
 from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
 from ..logic.action import ckan as ckan_actions
@@ -352,6 +353,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_maintenance_custom_other_field_data": helpers.get_maintenance_custom_other_field_data,
             "get_release": helpers.get_current_release,
             "get_saved_searches": helpers.get_saved_searches,
+            "get_recent_news": helpers.get_recent_news,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
@@ -361,6 +363,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             xml_parser_blueprint,
             publish_blueprint,
             saved_searches_blueprint,
+            news_blueprint,
         ]
 
     def dataset_facets(

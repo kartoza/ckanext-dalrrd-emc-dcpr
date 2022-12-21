@@ -1,0 +1,25 @@
+{% extends 'page.html' %}
+
+  {% set pages_total = pages|length %}
+  {% set type='news' %}
+  {% set action = '{0}_show'.format(type) %}
+  {% set pages=c.page.items %}
+  {% block content %}
+    <div style="padding-left: 20px;">
+      <br/>  <br/>
+      {% link_for _('Add Article'), named_route='news.news_new', page='', class_='btn btn-primary', icon=h.pages_get_plus_icon() %}
+      <h1 class="page-heading page-list-header" style="margin-top: 20px;">News</h1>
+      {% if pages %}
+        <div class="page-list">
+          {% set editor = h.get_wysiwyg_editor() %}
+          {% for page in pages %}
+              {% set url = h.url_for('news.news_show', page=page.name) %}
+              {%- snippet 'ckanext_pages/snippets/page_item.html', url=url, page=page -%}
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <p class="empty">{{ _('There are currently no news articles here') }}</p>
+      {% endif %}
+  </div>
+{% endblock %}
