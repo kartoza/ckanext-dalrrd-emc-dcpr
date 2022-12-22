@@ -250,14 +250,21 @@ def get_all_datasets_count(user_obj):
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/116
     """
     # context = {"user":c.user, "auth_user_obj":c.userobj}
-    # data_dict = {"userobj":c.userobj}
-    # packages = toolkit.get_action("package_list")(context=context, data_dict=data_dict)
     # return len(packages)
     # 32000 rows is the maximum of what can be retrieved
     # by ckan at once.
-    q = """ select count(distinct(id)) from package where state='active' and type='dataset' """
-    result = model.Session.execute(q)
-    return result.fetchone()[0]
+    # the question becomes, do i want you to know the private datasets count ?
+    # q = """ select count(distinct(id)) from package where state='active' and type='dataset' """
+    # result = model.Session.execute(q)
+    # return result.fetchone()[0]
+
+    # this doesn't work
+    # results = toolkit.get_action("package_list")(context={"auth_user_obj": c.userobj}, data_dict={'include_private':True})
+
+    result = toolkit.get_action("package_search")(
+        data_dict={"q": "*:*", "include_private": True}
+    )
+    return result["count"]
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
