@@ -32,7 +32,7 @@ xml_parser_blueprint = Blueprint(
 creator = ""
 
 
-@xml_parser_blueprint.route("/", methods=["GET", "POST"])
+@xml_parser_blueprint.route("/", methods=["GET", "POST"], strict_slashes=False)
 def extract_files():
     """
     the blueprint allows for multiple

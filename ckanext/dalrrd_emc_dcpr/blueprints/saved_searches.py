@@ -18,7 +18,9 @@ def index():
     return toolkit.render("saved_searches.html")
 
 
-@saved_searches_blueprint.route("/save_search", methods=["GET", "POST"])
+@saved_searches_blueprint.route(
+    "/save_search", methods=["GET", "POST"], strict_slashes=False
+)
 def save_current_search():
     """
     save the current search
@@ -47,3 +49,19 @@ def _get_saved_search_title(query):
         return "Query saved on " + current_date.replace("/", "-")
     else:
         return query_input.replace("q=", "") + " " + current_date.replace("/", "-")
+
+
+@saved_searches_blueprint.route(
+    "/delete_saved_search", methods=["GET", "POST"], strict_slashes=False
+)
+def delete_saved_search():
+    """
+    deletes a saved search via it's
+    id
+    """
+    if request.method == "POST":
+        saved_search_id = request.json["saved_search_id"]
+        q = f""" delete from saved_searches where saved_search_id ='{saved_search_id}' """
+        model.Session.execute(q)
+        model.Session.commit()
+        return jsonify({"status": 200})

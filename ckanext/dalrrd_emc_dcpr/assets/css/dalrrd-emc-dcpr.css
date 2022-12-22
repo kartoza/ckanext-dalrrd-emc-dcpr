@@ -970,7 +970,6 @@ footer {
   height:100vh;
   display: flex;
   justify-content: center;
-  cursor: pointer;
 }
 
 .saved-searches-holder{
