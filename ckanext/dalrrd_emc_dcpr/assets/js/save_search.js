@@ -71,7 +71,9 @@ ckan.module("delete_saved_search", function($){
                     let empty_paragraph = document.createElement("p")
                     empty_paragraph.innerHTML = "Currently you don't have any saved searches"
                     searches_container.appendChild(empty_paragraph)
-                    empty_paragraph.classList.add("module-content empty")
+                    empty_paragraph.style.color= "#6e6e6e"
+                    empty_paragraph.style.fontStyle = "italic"
+                    empty_paragraph.style.marginTop = "30px"
                 }
             })
             .catch(err=>console.warn(err))
