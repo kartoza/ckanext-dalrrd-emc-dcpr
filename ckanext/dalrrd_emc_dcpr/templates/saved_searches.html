@@ -13,6 +13,9 @@
                         <p id="saved_search_query" style="display: none;">{{ search[1] }}</p>
                         <p>{{ search[2].strftime("%Y-%m-%d %H:%M:%S") }}</p>
                         <p class="saved-search-id" style="display: none;"> {{ search[3] }} </p>
+                        {% if c.userobj.sysadmin %}
+                            <p class="saved-search-user label label-inverse"> {{ h.get_user_name(search[4]) }} </p>
+                        {% endif %}
                         <div>
                             <button class="apply-saved-search btn btn-primary"> Apply saved search </button>
                             <button class="delete-saved-search btn btn-danger" data-search_id = "{{ search[3] }}" data-module="delete_saved_search"> Delete saved search </button>
