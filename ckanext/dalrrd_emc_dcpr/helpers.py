@@ -550,13 +550,25 @@ def get_saved_searches():
     based on a user id
     """
     user_id = c.userobj.id
-    q = f""" select saved_search_title, search_query, saved_search_date, saved_search_id from saved_searches where owner_user='{user_id}' order by saved_search_date desc limit 15 """
+    if c.userobj.sysadmin:
+        q = f""" select saved_search_title, search_query, saved_search_date, saved_search_id, owner_user from saved_searches order by owner_user """
+    else:
+        q = f""" select saved_search_title, search_query, saved_search_date, saved_search_id from saved_searches where owner_user='{user_id}' order by saved_search_date desc """
     rows = model.Session.execute(q)
     saved_searches_list = []
     for row in rows:
         saved_searches_list.append(row)
     # saved_searches_list = SavedSearches.get(SavedSearches,owner_user=user_id)
     return saved_searches_list
+
+
+def get_user_name(user_id):
+    """
+    gets user name by it's id
+    """
+    user_obj = model.Session.query(model.User).filter_by(id=user_id).first()
+    return user_obj.name
+    # toolkit.get_action('user_show')(context={"id":user_id, "ignore_auth":True}, data_dict={})
 
 
 def get_recent_news(number=5, exclude=None):
