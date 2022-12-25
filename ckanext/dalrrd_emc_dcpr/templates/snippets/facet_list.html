@@ -98,7 +98,6 @@
 										<span class="item-count badge pull-righ">{{ count }}</span>
 									</a>
 								</li>
-
 							{% else %}
 								{% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
 								{% set label = label_function(item) if label_function else item.display_name %}
