@@ -124,6 +124,7 @@ services:
         published: *ckan-db-published-port
     volumes:
       - ckan-db-data:/var/lib/postgresql/data
+    command: ["-clog_statement=all"]
 
   datastore-db:
     environment:
