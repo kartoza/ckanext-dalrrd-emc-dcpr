@@ -1,0 +1,10 @@
+{% ckan_extends %}
+
+{% block content_primary_nav %}
+        <ul class="nav nav-tabs">
+          {{ h.build_nav_icon('dashboard.index', _('News feed'), icon='list') }}
+          {{ h.build_nav_icon('dashboard.datasets', _('My Metadata Records'), icon='sitemap') }}
+          {{ h.build_nav_icon('dashboard.organizations', _('My Organisations'), icon='building-o') }}
+          {{ h.build_nav_icon('dashboard.groups', _('My Groups'), icon='users') }}
+        </ul>
+     {% endblock %}

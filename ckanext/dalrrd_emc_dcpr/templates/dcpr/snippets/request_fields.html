@@ -1,0 +1,355 @@
+{% import 'macros/form.html' as form %}
+
+{% if dcpr_request.capture_start_date %}
+  {% set capture_start_date = h.date_str_to_datetime(dcpr_request.capture_start_date).strftime("%Y-%m-%d") %}
+{% else %}
+    {% set capture_start_date = None %}
+{% endif %}
+
+{% if dcpr_request.capture_end_date %}
+  {% set capture_end_date = h.date_str_to_datetime(dcpr_request.capture_end_date).strftime("%Y-%m-%d") %}
+{% else %}
+    {% set capture_end_date = None %}
+{% endif %}
+
+{% block fields %}
+
+  {%- snippet 'dcpr/snippets/inputs/select.html',
+   field = {'field_name': 'organization_name', id: 'field-organization_name',
+           'label': _('Organization Name'),  'options': organizations,
+           'selected': dcpr_request.organization_name,
+           'help_text': 'Name of the organization that is requesting data capture.',
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {%- snippet 'dcpr/snippets/inputs/select.html',
+   field = {'field_name': 'organization_level', id: 'field-organization_level',
+           'label': _('Organization Level'),  'options': organizations,
+           'selected': dcpr_request.organization_level,
+           'help_text': 'Administrative level of the organization (National, Provincial,
+            Municipal, Tribal Authority).',
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'organization_address', id: 'field-organization_address',
+           'label': _('Organization Address'),
+           'value': dcpr_request.organization_address,
+           'help_text': 'Address of the organisation.',
+           'placeholder': _('eg. SASDI address'),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'proposed_project_name', id: 'field-proposed_project_name',
+           'label': _('Proposed Project Name'),
+           'value': dcpr_request.proposed_project_name,
+           'help_text': 'Proposed name for the data capture project.',
+           'is_required': True,
+           'placeholder': _('eg. Data Request'),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/markdown.html',
+   field = {'field_name': 'additional_project_context', id: 'field-additional_project_context',
+           'label': _('Additional project context'),
+           'value': dcpr_request.additional_project_context,
+           'help_text': 'Additional information about the scope of the DCPR request.',
+           'placeholder': _('eg. Some useful notes about the data'),
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'capture_start_date', id: 'field-capture_start_date',
+           'label': _('Capture start date'),
+           'value': capture_start_date,
+           'help_text': 'Proposed start date of the data capture.',
+           'placeholder': _('eg. 2022-01-01'),
+           'type': 'date',
+           'classes': [],
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'capture_end_date', id: 'field-capture_end_date',
+           'label': _('Capture end date'),
+           'value': capture_end_date,
+           'help_text': 'Proposed end date of the data capture.',
+           'placeholder': _('eg. 2022-01-01'),
+           'type': 'date',
+           'classes': [],
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'cost', id: 'field-cost',
+           'label': _('Proposed project cost'),
+           'value': dcpr_request.cost,
+           'help_text': 'Estimated cost for the data capture project.',
+           'placeholder': _('eg. 200,000 Rands'),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data=dcpr_request or {}, errors=errors or {} %}
+
+  {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'spatial_resolution', id: 'field-spatial_resolution',
+           'label': _('Spatial resolution'),
+           'value': dcpr_request.spatial_resolution,
+           'help_text': 'Spatial resolution that is proposed for the data capture.',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {%- snippet 'dcpr/snippets/inputs/select.html',
+   field = {'field_name': 'data_capture_urgency', id: 'field-data_capture_urgency',
+           'label': _('Data capture urgency'),  'options': data_urgency,
+           'selected': dcpr_request.data_capture_urgency,
+           'help_text': 'Urgency of the data capture project (low, medium, high).',
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/markdown.html',
+   field = {'field_name': 'additional_information', id: 'field-additional_information',
+           'label': _('Additional information'),
+           'value': dcpr_request.additional_information,
+           'help_text': 'Any additional details about the project that the user deems relevant
+                         for aiding the NSIF and CSI in their review and moderation process.',
+           'placeholder': _('eg. Some additional notes about the requests'),
+   },
+   errors = errors or {}
+  -%}
+
+
+  {% if nsif_review_ready %}
+     {%- snippet 'dcpr/snippets/inputs/input.html',
+     field = {'field_name': 'nsif_recommendation', id: 'field-nsif_recommendation',
+             'label': _('NSIF recommendation'),
+             'value': dcpr_request.nsif_recommendation,
+             'help_text': 'Whether the NSIF recommends the DCPR request be accepted by CSI
+                           or not. This is the result of the NSIF review process.',
+             'placeholder': _(''),
+             'classes': ['control-full'], 'attrs':
+             {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+     },
+     errors = errors or {}
+    -%}
+
+    {%- snippet 'dcpr/snippets/inputs/markdown.html',
+     field = {'field_name': 'nsif_review_notes', id: 'field-nsif_review_notes',
+             'label': _('NSIF review notes'),
+             'value': dcpr_request.nsif_review_notes,
+             'help_text': 'Notes about the review process acted out by the NSIF representative.',
+             'placeholder': _('eg. NSIF review notes'),
+     },
+     errors = errors or {}
+    -%}
+
+     {%- snippet 'dcpr/snippets/inputs/input.html',
+     field = {'field_name': 'nsif_review_additional_documents', id: 'field-nsif_review_additional_documents',
+             'label': _('NSIF review additional documents'),
+             'value': dcpr_request.nsif_review_additional_documents,
+             'help_text': 'Additional documents that may be attached to the DCPR request
+                           documents during the NSIF review process.',
+             'placeholder': _(''),
+             'classes': ['control-full'], 'attrs':
+             {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+     },
+     errors = errors or {}
+    -%}
+
+  {% endif %}
+
+  {% if csi_review_ready %}
+
+    {%- snippet 'dcpr/snippets/inputs/markdown.html',
+     field = {'field_name': 'csi_moderation_notes', id: 'field-csi_moderation_notes',
+             'label': _('CSI review notes'),
+             'value': dcpr_request.csi_moderation_notes,
+             'help_text': 'Notes about the review process acted out by the CSI
+                           representative.',
+             'placeholder': _(''),
+     },
+     errors = errors or {}
+    -%}
+
+     {%- snippet 'dcpr/snippets/inputs/input.html',
+     field = {'field_name': 'csi_moderation_additional_documents', id: 'field-csi_moderation_additional_documents',
+             'label': _('CSI moderation additional documents'),
+             'value': dcpr_request.csi_moderation_additional_documents,
+             'help_text': 'Additional documents that may be attached to the DCPR request
+                           documents during the NSIF review process.',
+             'placeholder': _(''),
+             'classes': ['control-full'], 'attrs':
+             {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+     },
+     errors = errors or {}
+    -%}
+
+  {% endif %}
+
+  {%- snippet 'dcpr/snippets/inputs/checkbox.html',
+   field = {'field_name': 'dataset_custodian', id: 'field-dataset_custodian',
+           'label': _('Dataset Custodian'),
+           'checked': dcpr_request.dataset_custodian,
+           'value': dcpr_request.dataset_custodian,
+           'help_text': 'Whether the request is being made by a user acting on behalf of the
+                         dataset custodian for the specified datasets or not.',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'data_type', id: 'field-data_type',
+           'label': _('Data type'),
+           'value': dcpr_request.data_type,
+           'help_text': 'Data type of the dataset (vector point, vector, Line, raster RADAR,
+                         etc.)',
+           'placeholder': _('eg. Line'),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'proposed_dataset_title', id: 'field-proposed_dataset_title',
+           'label': _('Proposed dataset title'),
+           'value': dcpr_request.proposed_dataset_title,
+           'help_text': 'Proposed title for the dataset.',
+           'placeholder': _('eg. Line'),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'proposed_abstract', id: 'field-proposed_abstract',
+           'label': _('Proposed abstract'),
+           'value': dcpr_request.proposed_abstract,
+           'help_text': 'Proposed abstract for the dataset.',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'dataset_purpose', id: 'field-dataset_purpose',
+           'label': _('Purposed of dataset'),
+           'value': dcpr_request.dataset_purpose,
+           'help_text': 'Purpose that justifies the existence of the dataset.',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'lineage_statement', id: 'field-lineage_statement',
+           'label': _('Lineage statement'),
+           'value': dcpr_request.lineage_statement,
+           'help_text': 'Information about the lineage of the dataset (which previous data is
+                         it based upon, etc.)',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'associated_attributes', id: 'field-associated_attributes',
+           'label': _('Associated attributes'),
+           'value': dcpr_request.associated_attributes,
+           'help_text': 'Additional alphanumeric attributes that shall be collected, in addition
+                         to the geospatial information.',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/markdown.html',
+   field = {'field_name': 'feature_description', id: 'field-feature_description',
+           'label': _('Feature Description'),
+           'value': dcpr_request.feature_description,
+           'help_text': 'Detailed description of each of the alphanumeric attributes to
+                         collect.',
+           'placeholder': _(''),
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'data_usage_restrictions', id: 'field-data_usage_restrictions',
+           'label': _('Data usage restrictions'),
+           'value': dcpr_request.data_usage_restrictions,
+           'help_text': 'Description of dataset usage restrictions',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+  {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'capture_method', id: 'field-capture_method',
+           'label': _('Method of capture'),
+           'value': dcpr_request.capture_method,
+           'help_text': 'Method to be employed for collecting the raw data (Aerial
+                         photography, cadastral survey, Digitising, etc)',
+           'placeholder': _('eg. Survey'),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = errors or {}
+  -%}
+
+   {%- snippet 'dcpr/snippets/inputs/input.html',
+   field = {'field_name': 'capture_method_detail', id: 'field-capture_method_detail',
+           'label': _('Detail method of capture'),
+           'value': dcpr_request.capture_method_detail,
+           'help_text': 'Further detail about the method of capture that will be used.',
+           'placeholder': _(''),
+           'classes': ['control-full'], 'attrs':
+           {'dcpr_request-module': 'slug-preview-target', 'class': 'form-control'}
+   },
+   errors = {}
+  -%}
+
+
+{% endblock %}
+
+{% block package_basic_fields_custom %}{% endblock %}

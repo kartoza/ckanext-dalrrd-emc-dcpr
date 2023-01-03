@@ -1,0 +1,195 @@
+# NOTE: this file expects to find the $CKAN_IMAGE_TAG variable in its environment
+
+version: "3.8"
+
+# The definitions below, whose name starts with `x-` make use of
+# docker-compose's extension fields, as defined in:
+#
+# https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
+#
+# Briefly, it is a way to keep the docker-compose file DRY. We define common
+# blocks with a name like `x-something`. Then we mark these as being YAML anchors.
+# Later in the file we refer to them using YAML aliases.
+
+# centralized definition of published ports, in order to avoid clashes
+x-ckan-web-published-port: &ckan-web-published-port 5000
+x-pycsw-published-port: &pycsw-published-port 5001
+x-ckan-db-published-port: &ckan-db-published-port 55432
+x-datastore-db-published-port: &datastore-db-published-port 55433
+x-ckan-test-db-published-port: &ckan-test-db-published-port 55434
+x-datastore-test-db-published-port: &datastore-test-db-published-port 55435
+x-solr-published-port: &solr-published-port 8983
+x-csw-harvest-target-published-port: &csw-harvest-target-published-port 55436
+
+# Base volumes for all services based on CKAN (web app, harvesting, etc.)
+x-partial-ckan-volumes: &partial-ckan-volumes
+  volumes:
+    - type: bind
+      source: $PWD/..
+      target: /home/appuser/app
+    - type: bind
+      source: $PWD/ckan-dev-settings.ini
+      target: /home/appuser/ckan.ini
+    - type: bind
+      source: $PWD/who.ini
+      target: /home/appuser/who.ini
+    - ckan-storage:/home/appuser/data
+
+x-email-environment-values: &partial-email-environment-values
+  CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
+  CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
+  CKAN_SMTP_USER: ${CKAN_SMTP_USER}
+  CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
+  CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+
+
+services:
+
+  ckan-web:
+    <<: *partial-ckan-volumes
+    ports:
+      - target: 5000
+        published: *ckan-web-published-port
+
+  ckan-background-worker:
+    <<: *partial-ckan-volumes
+    environment:
+      *partial-email-environment-values
+
+  ckan-harvesting-fetcher:
+    <<: *partial-ckan-volumes
+
+  ckan-harvesting-gatherer:
+    <<: *partial-ckan-volumes
+
+  # NOTE: This is not suitable for staging or production!
+  # Be sure to setup a k8s periodic job and use this command instead:
+  # `launch-ckan-cli harvester run`
+  ckan-harvesting-runner:
+    <<: *partial-ckan-volumes
+    command: [
+      "launch-ckan-cli",
+      "dalrrd-emc-dcpr",
+      "extra-commands",
+      "harvesting-dispatcher",
+      "--post-run-delay-seconds",
+      "60"
+    ]
+    restart: always
+
+  ckan-mail-sender:
+    <<: *partial-ckan-volumes
+    environment:
+      *partial-email-environment-values
+
+  pycsw:
+    environment:
+      - PYCSW_SERVER_URL=http://localhost:5001
+      - PYCSW_REPOSITORY_DB_USERNAME=ckan-dev
+      - PYCSW_REPOSITORY_DB_PASSWORD=ckan-dev
+      - PYCSW_REPOSITORY_DB_HOST=ckan-db
+      - PYCSW_REPOSITORY_DB=ckan-dev
+      - PYCSW_REPOSITORY_MAPPINGS_PATH=/etc/pycsw/pycsw_repository_mappings.py
+      - PYCSW_REPOSITORY_TABLE=emc_pycsw_view
+    ports:
+      - target: 8000
+        published: *pycsw-published-port
+    volumes:
+      - type: bind
+        source: $PWD/../../pycsw
+        target: /home/pycsw/pycsw
+        # target: /usr/lib/python3.8/site-packages/pycsw
+    command: ["--reload"]
+
+  # NOTE: This is not suitable for staging or production!
+  # Be sure to setup a k8s periodic job and use this command instead:
+  # `launch-ckan-cli dalrrd-emc-dcpr pycsw refresh-materialized-view`
+  pycsw-refresher:
+    <<: *partial-ckan-volumes
+    command: [
+      "launch-ckan-cli",
+      "dalrrd-emc-dcpr",
+      "extra-commands",
+      "refresh-pycsw-materialized-view",
+      "--post-run-delay-seconds",
+      "60"
+    ]
+
+  ckan-db:
+    environment:
+      POSTGRES_USER: ckan-dev
+      POSTGRES_PASSWORD: ckan-dev
+    ports:
+      - target: 5432
+        published: *ckan-db-published-port
+    volumes:
+      - ckan-db-data:/var/lib/postgresql/data
+
+  datastore-db:
+    environment:
+      POSTGRES_USER: datastore-dev
+      POSTGRES_PASSWORD: datastore-dev
+    ports:
+      - target: 5432
+        published: *datastore-db-published-port
+    volumes:
+      - datastore-db-data:/var/lib/postgresql/data
+
+  # this is used for running automated integration tests
+  ckan-test-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ckan-test
+      POSTGRES_PASSWORD: ckan-test
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - target: 5432
+        published: *ckan-test-db-published-port
+    volumes:
+      - ckan-test-db-data:/var/lib/postgresql/data
+
+  # this is used for running automated integration tests
+  datastore-test-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      POSTGRES_USER: ckan-datastore-test
+      POSTGRES_PASSWORD: ckan-datastore-test
+      DATASTORE_READONLY_USER: datastore-test-default
+      DATASTORE_READONLY_USER_PASSWORD: datastore-test-default
+    ports:
+      - target: 5432
+        published: *datastore-test-db-published-port
+    volumes:
+      - datastore-test-db-data:/var/lib/postgresql/data
+      - type: bind
+        source: $PWD/datastore-db
+        target: /docker-entrypoint-initdb.d
+
+  solr:
+    ports:
+      - target: 8983
+        published: *solr-published-port
+    volumes:
+      - solr-data:/opt/solr/server/solr/ckan/data
+
+  csw-harvest-target:
+    image: geopython/pycsw:2.6.1
+    ports:
+      - target: 8000
+        published: *csw-harvest-target-published-port
+    volumes:
+      - type: bind
+        source: $PWD/csw-harvest-target/pycsw-config.cfg
+        target: /etc/pycsw/pycsw.cfg
+      - type: bind
+        source: $PWD/csw-harvest-target/apiso-repository.db
+        target: /etc/pycsw/apiso-repository.db
+
+
+volumes:
+  solr-data:
+  ckan-storage:
+  ckan-db-data:
+  ckan-test-db-data:
+  datastore-db-data:
+  datastore-test-db-data:

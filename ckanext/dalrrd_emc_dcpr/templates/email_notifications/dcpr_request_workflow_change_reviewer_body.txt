@@ -1,0 +1,51 @@
+{%- if admin_team_email %}This is an automated email, please do not respond to it as it will not be monitored. If you have an inquiry about the SASDI EMC, please contact its admin team at {{ admin_team_email }} at {{ admin_team_email }}.{% endif %}
+
+You are receiving this email because you are a member of the {{ current_org }} organization, which is responsible for the reivew and moderation of DCPR request {{ dcpr_request.proposed_project_name }}, with a CSI reference id of {{ dcpr_request.csi_reference_id}} in the SASDI Electronic Metadata Catalogue.
+
+{%- if activity_type.name == "SUBMIT_DCPR_REQUEST" %}
+User {{ owner_user_obj.name }} ({{ owner_user_obj.email }}) has submitted this new DCPR request.
+The request is now awaiting to be moderated by a NSIF representative. If you wish to become the request's NSIF reviewer, please follow the link below:
+
+{{ site_url }}{{ become_nsif_reviewer_url }}
+
+Alternatively, please visit its detail page and choose to become its NSIF reviewer.
+Once you are accepted as the reviewer, you will be able to provide NSIF review notes about it and will also be able to accept or reject the request on behalf of the NSIF.
+
+{%- elif activity_type.name == "ACCEPT_DCPR_REQUEST_NSIF" %}
+NSIF user {{ nsif_user_obj.name }} ({{ nsif_user_obj.email }}) has accepted the DCPR request on behalf of the NSIF.
+
+These are the NSIF review notes:
+
+{{ dcpr_request.nsif_review_notes }}
+
+The request is now awaiting to be moderated by a CSI representative. If you wish to become the request's CSI reviewer, please follow the link below:
+
+{{ site_url }}{{ become_csi_reviewer_url }}
+
+Alternatively, please visit the request detail page and choose to become its CSI reviewer.
+Once you are accepted as the reviewer, you will be able to provide CSI review notes about it and will also be able to accept or reject the request on behalf of the CSI.
+
+{%- elif activity_type.name == "RESIGN_NSIF_REVIEWER_DCPR_REQUEST" %}
+Due to the stepping down of the previous NSIF reviewer, the request is now awaiting to be moderated by a NSIF representative.
+If you wish to become the request's NSIF reviewer, please follow the link below and confirm:
+
+{{ site_url }}{{ confirm_nsif_reviewer_role_url }}
+
+Alternatively, please visit its detail page and take the appropriate action.
+
+{%- elif activity_type.name == "RESIGN_CSI_REVIEWER_DCPR_REQUEST" %}
+Due to the stepping down of the previous CSI reviewer, the request is now awaiting to be moderated by a CSI representative.
+If you wish to become the request's CSI reviewer, please follow the link below and confirm:
+
+{{ site_url }}{{ confirm_csi_reviewer_role_url }}
+
+Alternatively, please visit its detail page and take the appropriate action.
+
+{%- endif %}
+
+You may visit the DCPR request details page at:
+
+{{ site_url }}{{ dcpr_request_detail_url }}
+
+
+Best regards, the team at {{ site_title }}

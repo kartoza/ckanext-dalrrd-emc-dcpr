@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<csw:GetRecords
+        xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+        xmlns:gmd="http://www.isotc211.org/2005/gmd"
+        service="CSW"
+        version="2.0.2"
+        resultType="{{ result_type }}"
+        startPosition="{{ start_position }}"
+        maxRecords="{{ max_records }}"
+        outputFormat="{{ output_format }}"
+        outputSchema="{{ output_schema }}"
+>
+    <csw:Query typeNames="{{ typename }}">
+        <csw:ElementSetName>{{ element_set_name }}</csw:ElementSetName>
+    </csw:Query>
+</csw:GetRecords>

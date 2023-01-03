@@ -1,0 +1,116 @@
+vendorized-leaflet-geoman-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet-geoman.js
+  contents:
+    - vendor/leaflet/leaflet.js
+    - vendor/leaflet-geoman/leaflet-geoman.min.js
+  filter: rjsmin
+
+vendorized-leaflet-geoman-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_leaflet-geoman.css
+  contents:
+    - vendor/leaflet/leaflet.css
+    - vendor/leaflet-geoman/leaflet-geoman.css
+  filter: cssrewrite
+
+dataset-spatial-extent-map-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_datasetSpatialExtentMap.js
+  contents:
+    - js/datasetSpatialExtentMap.js
+  filter: rjsmin
+  extra:
+    preload:
+      - base/main
+      - ckanext-dalrrdemcdcpr/vendorized-leaflet-geoman-js
+
+dataset-spatial-extent-map-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_datasetSpatialExtentMap.css
+  contents:
+    - css/dataset-spatial-extent-map.css
+  filter: cssrewrite
+  extra:
+    preload:
+      - ckanext-dalrrdemcdcpr/vendorized-leaflet-geoman-css
+
+dcpr-request-datasets-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_dcprRequestDatasets.js
+  contents:
+    - js/dcprRequestDatasets.js
+  filter: rjsmin
+  extra:
+    preload:
+      - base/main
+
+remove-dcpr-request-datasets-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_removeDcprRequestDatasets.js
+  contents:
+    - js/removeDcprRequestDatasets.js
+  filter: rjsmin
+  extra:
+    preload:
+      - base/main
+
+ckan-base-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_ckan_base.css
+  contents:
+    - css/main.css
+  filter: cssrewrite
+
+dalrrd-emc-dcpr-css:
+  output: ckanext-dalrrdemcdcpr/%(version)s_dalrrd_emc_dcpr.css
+  contents:
+    - css/dalrrd-emc-dcpr.css
+  filter: cssrewrite
+
+temporal-query-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_temporalQuery.js
+  contents:
+    - js/temporalQuery.js
+  filter: rjsmin
+
+xml-parser-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_xmlParser.js
+  contents:
+    - js/xmlParser.js
+  filter: rjsmin
+
+facets-active-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_facetsActive.js
+  contents:
+    - js/facetsActive.js
+  filter: rjsmin
+
+check-access-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_checkAccess.js
+  contents:
+    - js/checkAccess.js
+  filter: rjsmin
+
+custom-select-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_customSelect.js
+  contents:
+    - js/customSelect.js
+  filter: rjsmin
+
+utils-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_utils.js
+  contents:
+    - js/utils.js
+  filter: rjsmin
+
+spatial-search-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_spatial_search.js
+  contents:
+    - js/spatial_search.js
+  filter: rjsmin
+
+change-dataset-word-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_rename_dataset_to_metadata_record.js
+  contents:
+    - js/rename_dataset_to_metadata_record.js
+  filter: rjsmin
+
+apply-save-search-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_save_search.js
+  contents:
+    - js/save_search.js
+  filter: rjsmin

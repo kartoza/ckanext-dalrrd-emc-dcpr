@@ -1,0 +1,49 @@
+scheming_presets_version: 1
+
+about: Additional ckanext-scheming presets for SASDI EMC
+
+about_url: "http://github.com/ckan/ckanext-scheming#preset"
+
+presets:
+  - preset_name: emc_free_tags_tag_string_autocomplete
+    values:
+      validators: >-
+        ignore_missing
+        tag_string_convert
+      classes: control-full
+      form_attrs:
+        data-module: autocomplete
+        data-module-tags: ""
+        data-module-source: "/api/3/action/tag_autocomplete?query=?"
+        class: ""
+
+  - preset_name: emc_dataset_organization
+    values:
+      validators: >-
+        owner_org_validator
+        unicode
+      form_snippet: "organization_with_visibility.html"
+
+  - preset_name: emc_dataset_spatial_extent
+    values:
+      form_snippet: "dataset_spatial_extent.html"
+      validators: emc_bbox_converter
+
+  - preset_name: emc_checkbox
+    values:
+      form_snippet: "dataset_featured.html"
+
+  - preset_name: spatial_resolution_checker
+    values:
+      validators: spatial_resolution_converter natural_number_validator
+
+
+  - preset_name: modified_repeating_subfields
+    values:
+      form_snippet: modified_repeating_subfields.html
+      display_snippet: modified_repeating_subfields.html
+
+  - preset_name: custom_select_field
+    values:
+      form_snippet: custom_select_field.html
+      validators: ignore_missing convert_select_custom_choice_to_extra

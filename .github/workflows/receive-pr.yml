@@ -1,0 +1,62 @@
+# Github does not allow workflows initiated by PRs that come from a fork to
+# have access to secrets or to have `write` access to the repo. As such, we
+# employ the strategy described in:
+#
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+#
+# which basically uses two workflows:
+#
+# - First workflow (this one) is triggered by the PR and proceeds to check the
+# code and build whatever artifacts (in this repo we are building docker images).
+# Since this first workflow is (potentially) initiated by forks submitting a PR,
+# it will most likely not have access to the repo secrets. This means, for example,
+# that it cannot login to dockerhub to push a built docker image (as credentials
+# are stored as secrets). This workflow builds the image and then stores it as an
+# artifact;
+#
+# - Second workflow (handle-pr-artifacts.yml) is triggered by the first one's successful
+# completion. This workflow does have access to secrets. As such, it can retrieve the
+# built artifact and push it
+
+name: Receive PR
+
+on:
+  - pull_request
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Run common CI
+        uses: ./.github/actions/action-common-ci
+        with:
+          image-name: kartoza/ckanext-dalrrd-emc-dcpr
+
+      - name: Save PR number
+        run: |
+          mkdir -p ./pr
+          echo ${{ github.event.number }} > ./pr/NR
+      - name: Get current git commit hash
+        uses: priyesh2609/sha-trim-action@v1.1.1
+
+      - name: Get current git branch name
+        uses: EthanSK/git-branch-name-action@v1
+
+      - name: Replace invalid chars in git branch name
+        shell: bash
+        run: echo "SLUGGED_GIT_BRANCH_NAME=$(echo $GIT_BRANCH_NAME | tr / -)" >> $GITHUB_ENV
+
+      - name: Save docker image and tags
+        env:
+          IMAGE_NAME: ${{ github.repository }}
+        run: |
+          docker save "$IMAGE_NAME:$SLUGGED_GIT_BRANCH_NAME" "$IMAGE_NAME:$TRIMMED_SHA" | gzip > ./pr/built_docker_image.tar.gz
+      - name: Persist artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pr
+          path: pr/

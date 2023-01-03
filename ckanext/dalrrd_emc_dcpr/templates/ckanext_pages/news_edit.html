@@ -1,0 +1,7 @@
+{% extends 'ckanext_pages/news_edit_base.html' %}
+
+{% block subtitle %}{{ _('Edit Article')}} {% endblock %}
+
+{% block primary_content_inner %}
+  {% snippet 'ckanext_pages/emc_base_form.html', page=page, data=data, errors=errors, type='news'%}
+{% endblock %}

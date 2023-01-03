@@ -1,0 +1,18 @@
+{% ckan_extends %}
+
+{% set placeholder = placeholder if placeholder else _('Search metadata records...') %}
+{% block search_input_button %}
+      <span class="input-group-btn">
+       <a class="btn btn-default btn-lg" id="clearSearch">
+          <i class="fa fa-remove"></i>
+        </a>
+        <button class="btn btn-default btn-lg" type="submit" value="search" aria-label="{{_('Submit')}}" id="applySearch">
+          <i class="fa fa-search"></i>
+        </button>
+      </span>
+{% endblock %}
+{% block search_sortby %}
+{% endblock %}
+
+{% block search_title %}
+{% endblock %}

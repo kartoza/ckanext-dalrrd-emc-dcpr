@@ -1,0 +1,110 @@
+{% extends "page.html" %}
+{% block subtitle %}{{ _("Publish DALRRD") }}{% endblock %}
+{% block content %}
+    <div class="container">
+    <section class="py-5 border-bottom" xmlns="http://www.w3.org/1999/html">
+                <div class="mb-3">
+                    <h1 class="fw-bolder mb-5">Publish Metadata</h1>
+                    <h5 class="mb-0 fw-bolder mb-5">Electronic Metadata Catalogue (EMC)</h5>
+                   <span class="text-muted">
+                        The Spatial Data Infrastructure Act (Act 54 of 2003) establishes the electronic metadata catalogue (EMC) as a key component of the South African
+                        Spatial Data Infrastructure (SASDI). In terms of section 12 of the Act, a data custodian must:
+                   </span>
+                        <ul class="text-muted">
+                            <li>Capture and maintain metadata for their spatial information holdings;</li>
+                            <li>Ensure that metadata is available to users by:
+                            <ul>
+                                <li>Making it available to the Department, in a prescribed manner, for inclusion in the electronic metadata catalogue; and</li>
+                                <li>Including it in a manual on functions as prescribed in section 14 of the Promotion of Access to Information Act, (Act 2 of 2000).</li>
+                            </ul>
+                        </ul>
+                    <h5 class="mb-0 fw-bolder mb-5">The purpose of the EMC is to provide a mechanism for data custodians to make spatial data available to users as required in terms of section 12 (2) of the Act</h5>
+                   
+                    <h4 class="mb-0 fw-bolder mb-5">Metadata publication</h4>
+                    <p>A registered and authenticated user can publish metadata using the following mechanisms:</p>
+                </div>
+                {% set logged = False %}
+                {% if c.userobj %}
+                    {% set logged = True %}
+                {% endif %}
+                <div class="row gx-5 justify-content-center" data-module="check-access" data-access="{{ h.check_access('package_create') }}"
+                data-logged="{{ logged }}" style="margin-left: -15px">
+                     <!-- Manual publication -->
+                    <a href="#" data-link="{{ h.url_for('dataset.new') }}" class="new-dataset">
+                    <div class="col-sm-4 publish-action">
+                        <div class="card">
+                            <div class="card-body p-5">
+                                <div class="text-uppercase fw-bold text-primary">
+                                    Manual publication
+                                </div>
+                                <div class="mb-3">
+                                    <span class="text-muted">A registered and authenticated user can publish metadata of
+                                        their data holdings manually by completing a <strong>SANS 1878-1:Metadata compliant form</strong>.</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    </a>
+                    <!-- XML upload -->
+                    <a href="#" data-module="xml_parser" class="xml-upload"
+                    data-link="">
+                        <input type="file"
+                          id = "upload_input"
+                          name = "xml_dataset_files"
+                          onclick=""
+                          style="display: none;"
+                          multiple
+                          data-module="xml_parser"
+                        >
+                    <div class="col-sm-4 publish-action">
+                        <div class="card">
+                            <div class="card-body p-5">
+                                <div class="text-uppercase fw-bold text-muted text-primary">XML upload</div>
+                                <div class="mb-3">
+                                    <span class="text-muted">A registered and authenticated user can publish metadata of
+                                        their data holdings manually by uploading metadata contained in a <strong>SANS 1878-1:Metadata compliant XML file</strong>.</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    </a>
+                     <!-- Harvesting -->
+                    <a href="#" class="harvesting" data-link="{{ h.url_for('harvest.search') }}">
+                    <div class="col-sm-4 publish-action">
+                        <div class="card">
+                            <div class="card-body p-5">
+                                <div class="text-uppercase fw-bold text-muted text-primary">Harvesting</div>
+                                <div class="mb-3">
+                                    <span class="text-muted">A registered and authenticated user can publish metadata by setting up a <strong>CSW-compliant harvesting source</strong> that provides SANS 1878-1:Metadata compliant records</strong>.</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+        </section>
+        <div class="modal" tabindex="-1" role="dialog" id="notAuthorized">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Not Authorized</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Only authorised users are able to publish metadata records, you don't have the required permissions to complete this action</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{  super() }}
+    {% asset "ckanext-dalrrdemcdcpr/check-access-js" %}
+    {% asset "ckanext-dalrrdemcdcpr/xml-parser-js" %}
+{% endblock %}

@@ -1,0 +1,28 @@
+# NOTE: this file expects to find the $GIT_BRANCH_NAME variable in its environment
+# under normal circumstances, this is run in the CI environment, and that variable
+# has been made available by a previous step
+
+version: "3.8"
+
+services:
+
+  ckan-web:
+    volumes:
+      - type: bind
+        source: $PWD/ckan-ci-settings.ini
+        target: /home/appuser/ckan.ini
+      - type: bind
+        source: $PWD/who.ini
+        target: /home/appuser/who.ini
+
+  ckan-db:
+    environment:
+      POSTGRES_USER: ckan-ci
+      POSTGRES_PASSWORD: ckan-ci
+
+  datastore-db:
+    environment:
+      POSTGRES_USER: datastore-ci
+      POSTGRES_PASSWORD: datastore-ci
+      DATASTORE_READONLY_USER: datastore-ci-default
+      DATASTORE_READONLY_USER_PASSWORD: datastore-ci-default

@@ -1,0 +1,119 @@
+{% import 'macros/form.html' as form %}
+
+<fieldset class="dynamic-dataset-fieldset" id="dataset-fieldset-{{ index }}">
+   <div class="panel panel-default" style="margin-bottom: 10px; display: block" >
+                    <div class="panel-heading" >
+                    <h4 class="panel-title">
+                                 Dataset #{{ index }} fields
+                            <button
+                                    id="remove-previous-dataset-button"
+                                    type="button"
+                                    class="btn btn-danger btn-sm pull-right remove-dataset"
+                                    data-module-index="{{ index }}"
+                                    style="margin-top: -2.5px;"
+                                    {% if lenght|int < 2 %}
+                                        disabled
+                                    {% endif %}
+                            >Remove</button>
+                    </h4>
+                 </div>
+    <div class="panel-body">
+    {% call form.input(
+                'proposed_dataset_title',
+                label=_('Dataset title'),
+                id='ds{}-field-proposed_dataset_title'.format(index),
+                value=proposed_dataset_title,
+                error=proposed_dataset_title_error,
+                classes=['control-medium'],
+                is_required=True
+            ) %}
+        {{ form.info(_('Proposed title for the dataset being collected.')) }}
+    {% endcall %}
+    {% call form.checkbox(
+            'dataset_custodian',
+            label=_('Organization is custodian?'),
+            value='ds-{}'.format(index),
+            id='ds{}-field-dataset_custodian'.format(index),
+            checked=dataset_custodian,
+            error=dataset_custodian_error
+        ) %}
+        {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'dataset_purpose',
+                label=_('Dataset purpose'),
+                id='ds{}-field-dataset_purpose'.format(index),
+                value=dataset_purpose,
+                error=dataset_purpose_error,
+                classes=['control-medium'],
+                is_required=True
+            ) %}
+        {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'proposed_abstract',
+                label=_('Dataset abstract'),
+                id='ds{}-field-proposed_abstract'.format(index),
+                value=proposed_abstract,
+                error=proposed_abstract_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'lineage_statement',
+                label=_('Dataset lineage statement'),
+                id='ds{}-field-lineage_statement'.format(index),
+                value=lineage_statement,
+                error=lineage_statement_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Information about the lineage of the dataset being collected (if it is based on previous data, etc.)')) }}
+    {% endcall %}
+    {% call form.input(
+                'data_type',
+                label=_('Data type'),
+                id='ds{}-field-data_type'.format(index),
+                placeholder=_('e.g. Vector line'),
+                value=data_type,
+                error=data_type_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'associated_attributes',
+                label=_('Dataset associated attributes'),
+                id='ds{}-field-associated_attributes'.format(index),
+                value=associated_attributes,
+                error=associated_attributes_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(
+                _('Additional alphanumeric attributes that shall be collected, in addition to the geospatial information.
+                If possible, provide a detailed description of each attribute.')
+                ) }}
+    {% endcall %}
+    {% call form.markdown(
+                'data_usage_restrictions',
+                label=_('Dataset usage restrictions'),
+                id='ds{}-field-data_usage_restrictions'.format(index),
+                value=data_usage_restrictions,
+                error=data_usage_restrictions_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Description of dataset usage restrictions')) }}
+    {% endcall %}
+    {% call form.markdown(
+                'capture_method',
+                label=_('Dataset capture method'),
+                id='ds{}-field-capture_method'.format(index),
+                value=capture_method,
+                error=capture_method_error,
+                classes=['control-medium']
+            ) %}
+        {{ form.info(_('Method to be employed for collecting the raw data (Aerial photography, cadastral survey, etc.)')) }}
+    {% endcall %}
+    </div>
+   </div>
+</fieldset>

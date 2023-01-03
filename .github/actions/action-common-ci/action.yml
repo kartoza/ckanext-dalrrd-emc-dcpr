@@ -1,0 +1,105 @@
+name: 'Common CI'
+description: 'Run common CI steps'
+inputs:
+  image-name:
+    description: 'name of docker image that will be built'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Check code formatting with black
+      uses: psf/black@stable
+      with:
+        options: "--check --verbose"
+
+    - name: Lint code with mypy
+      uses: jpetrucciani/mypy-check@0.971
+      with:
+        path: "ckanext"
+        mypy_flags: "--install-types --non-interactive"
+
+    - name: Setup docker buildx
+      uses: docker/setup-buildx-action@v1.6.0
+
+    - name: Get current git commit hash
+      id: get-git-commit-hash
+      uses: priyesh2609/sha-trim-action@v1.1.1
+
+    - name: Get current git branch name
+      uses: EthanSK/git-branch-name-action@v1
+
+    - name: Replace invalid chars in git branch name
+      shell: bash
+      run: echo "SLUGGED_GIT_BRANCH_NAME=$(echo $GIT_BRANCH_NAME | tr / -)" >> $GITHUB_ENV
+
+    - name: Build docker image
+      working-directory: docker
+      shell: bash
+      env:
+        DEFAULT_BRANCH: main
+      run: |
+        docker pull ${{ inputs.image-name }}:$SLUGGED_GIT_BRANCH_NAME || \
+        docker pull ${{ inputs.image-name }}:$DEFAULT_BRANCH || \
+        true
+        docker image build \
+          --tag "${{ inputs.image-name }}:$SLUGGED_GIT_BRANCH_NAME" \
+          --tag "${{ inputs.image-name }}:$TRIMMED_SHA" \
+          --label git-commit=$TRIMMED_SHA \
+          --label git-branch=$SLUGGED_GIT_BRANCH_NAME \
+          --build-arg "BUILDKIT_INLINE_CACHE=1" \
+          --build-arg "GIT_COMMIT=$TRIMMED_SHA" \
+          --cache-from=${{ inputs.image-name }}:$SLUGGED_GIT_BRANCH_NAME \
+          --cache-from=${{ inputs.image-name }}:$DEFAULT_BRANCH \
+          ..
+
+    - name: Stand up CI CKAN stack
+      working-directory: docker
+      shell: bash
+      run: |
+        python3 compose.py \
+            --compose-file=docker-compose.yml \
+            --compose-file=docker-compose.ci.yml \
+            --image-tag=$SLUGGED_GIT_BRANCH_NAME \
+            up
+
+    - name: Bootstrap CI CKAN stack
+      shell: bash
+      run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry install
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db init
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan harvester initdb
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan db upgrade -p dalrrd_emc_dcpr
+
+    - name: Run unit tests
+      shell: bash
+      run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
+            --ckan-ini docker/ckan-ci-settings.ini \
+            -m unit \
+            --cov
+
+    - name: Run integration tests
+      shell: bash
+      run: |
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan \
+            --config docker/ckan-ci-settings.ini dalrrd-emc-dcpr \
+            load-sample-data create-sample-users
+
+        docker exec -t emc-dcpr_ckan-web_1 poetry run ckan \
+            --config docker/ckan-ci-settings.ini dalrrd-emc-dcpr \
+            load-sample-data create-sample-organizations
+
+        docker exec -t emc-dcpr_ckan-web_1 poetry run pytest \
+            --ckan-ini docker/ckan-ci-settings.ini \
+            -m integration \
+            --cov
+
+    - name: Wind down ckan stack
+      shell: bash
+      working-directory: docker
+      run: |
+        python3 compose.py \
+            --compose-file=docker-compose.yml \
+            --compose-file=docker-compose.ci.yml \
+            --image-tag=$SLUGGED_GIT_BRANCH_NAME \
+            down

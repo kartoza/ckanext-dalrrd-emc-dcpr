@@ -1,0 +1,26 @@
+{% ckan_extends %}
+
+
+{% block package_description  %}
+    <section class="dataset-title-description">
+     {{ super() }}
+    </section>
+{% endblock %}
+
+{% block package_tags %}
+    {#
+        note: the package_tags block is overridden in order to only show free tags (i.e. those that did not
+        come from a vocabulary)
+    #}
+    {% set free_tags = pkg.tags|selectattr("vocabulary_id", "none")|list %}
+    {% if free_tags|length > 0 %}
+        {% snippet "package/snippets/tags.html", tags=free_tags %}
+    {% endif %}
+    <section class="iso-topic-category">
+        <h3> {{ _("ISO Topic Category") }}</h3>
+        <div class="row">
+            <p>{{ pkg.iso_topic_category|first }}</p>
+        </div>
+    </section>
+
+{% endblock %}

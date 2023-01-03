@@ -1,0 +1,72 @@
+{% ckan_extends %}
+{# currently adding this js file isn't working
+  it might have to do with droping volumes
+#}
+
+{% block subtitle %}Metadata record{% endblock %}
+{% set total =  h.emc_get_all_datasets_count(g) %}
+
+{% block breadcrumb_content %}
+    <div class="page-header">
+        <h1>{{ _("Electronic Metadata Catalogue (EMC)") }}</h1>
+        <h5>{{ _("Total number of metadata") }} {{ ungettext('record', 'records', total) }}: {{ total }}</h5>
+        <h5>{{ page.item_count }} {{ _("metadata") }} {{ ungettext('record', 'records', page.item_count) }} {{ _("found") }}</h5>
+        {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + 'metadata record' + 's') + '..', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
+        {% if h.check_access('package_create') %}
+        <button class="btn btn-primary pull-right" onclick="document.getElementById('upload_input').click()"
+          style="margin-left: 10px;"
+          style="margin-left: 10px;"
+          >
+          <i class="fa fa-cloud-upload"></i>{{ _("Add metadata record from xml file") }}
+        </button>
+        <input type="file"
+          id = "upload_input"
+          name = "xml_dataset_files"
+          onclick=""
+          style="display: none;"
+          multiple
+          data-module="xml_parser"
+          >
+          <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
+          <button class="save_search_button" title="save this search query" data-module="change_save_search_icon">
+          <!-- <i class="fa fa-circle-thin fa-stack-2x save_search_button_border"></i> -->
+          <i class="fa fa-bookmark-o save_search_button_icon"></i>
+        </button>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block primary_content %}
+    {% block package_search_results_list %}
+        {{ h.snippet('snippets/package_list.html', packages=page.items) }}
+    {% endblock %}
+    {% block page_pagination %}
+      {{ page.pager(q=q) }}
+    {% endblock %}
+{% endblock %}
+
+{% block secondary_content %}
+    <div data-module="spatial_search"></div>
+    {% snippet "spatial/snippets/spatial_query.html", default_extent="{ \"type\":\"Polygon\",
+    \"coordinates\": [[[16.4699, -34.8212],
+    [32.8931, -34.8212],
+    [32.8931, -22.1265],
+    [16.4699, -22.1265],
+    [16.4699, -34.8212]]]}"%}
+    {% snippet "snippets/temporal_query.html" %}
+    <div class="filters">
+    <div>
+      {% for facet in facet_titles %}
+          {% if facet!= 'tags' %}
+        {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, search_facets=search_facets) }}
+          {% endif %}
+      {% endfor %}
+    {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name='tags', search_facets=search_facets) }}
+    </div>
+    <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
+  </div>
+{% endblock %}
+
+
+{% block package_search_results_api %}
+{% endblock %}

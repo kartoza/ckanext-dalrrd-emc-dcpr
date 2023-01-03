@@ -1,0 +1,47 @@
+{% ckan_extends %}
+
+{% block content_action %}
+    {{ super() }}
+    {#
+        This template is overridden in order to add a button for requesting that a public package be edited
+        Organization editors are not allowed to modify a dataset that is public.
+
+        Ideally published datasets are immutable - any modifications would be published as a new dataset, with the
+        corresponding version increased
+
+        Nevertheless, it the need to modify a public dataset arises, then this must be vetted by one of the organization
+        admins (i.e. publishers)
+
+     #}
+    {% set user_is_editor = h.emc_user_is_org_member(pkg.owner_org, g.userobj, role="editor") %}
+
+
+    {% if user_is_editor %}
+        {% if pkg.private %}
+            {% link_for _('Request publication'),
+                named_route="emc.request_dataset_management",
+                dataset_id=pkg.id,
+                management_command="publication",
+                class_='btn btn-default',
+                icon='graduation-cap' %}
+        {% elif not pkg.private and not h.check_access("package_update", {"id": pkg.id}) %}
+            {% link_for _('Request edit'),
+                named_route="emc.request_dataset_management",
+                dataset_id=pkg.id,
+                management_command="maintenance",
+                class_='btn btn-default',
+                icon='pencil' %}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% block content_primary_nav %}
+  {{ h.build_nav_icon(dataset_type ~ '.read', _('Metadata Record'), id=pkg.id if is_activity_archive else pkg.name, icon='sitemap') }}
+  {{ h.build_nav_icon(dataset_type ~ '.groups', _('Groups'), id=pkg.id if is_activity_archive else pkg.name, icon='users') }}
+  {{ h.build_nav_icon(dataset_type ~ '.activity', _('Activity Stream'), id=pkg.id if is_activity_archive else pkg.name, icon='clock-o') }}
+{% endblock %}
+{% block secondary_content %}
+    {% if pkg.spatial %}
+        {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=pkg.spatial %}
+    {% endif %}
+    {{ super() }}
+{% endblock %}

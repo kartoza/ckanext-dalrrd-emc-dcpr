@@ -1,0 +1,178 @@
+{% ckan_extends %}
+{% block subtitle %}{{ _("Welcome DALRRD") }}{% endblock %}
+{% block content %}
+<header class="masthead">
+    <div id="emcCarousel" class="carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#emcCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#emcCarousel" data-slide-to="1"></li>
+      </ol>
+        <!-- Wrapper for slides -->
+          <div class="carousel-inner">
+            <div class="item active slide-img">
+                <img class="carousel-inner-img" src="{{ url_for('static', filename = 'images/2528CA_clip1.png') }}" alt="EMC">
+              <div class="carousel-caption">
+                  <div class="row justify-content-center">
+                   <div class="col-xl-6">
+                    <div class="text-center text-white">
+                        <h1 class="header-title">{{ _("Electronic Metadata Catalogue (EMC)") }}</h1>
+                        <div class="mb-5 col-auto"><a href="/dataset/"><button class="btn btn-warning btn-lg"  type="submit">{{ _("View All Metadata records") }}</button></a></div>
+                    </div>
+                   </div>
+                  </div>
+              </div>
+            </div>
+
+            <div class="item slide-img">
+                <img class="carousel-inner-img" src="{{ url_for('static', filename = 'images/2528CA_clip2.png') }}" alt="EMC">
+              <div class="carousel-caption">
+                  <div class="row justify-content-center">
+                  <div class="col-xl-6">
+                    <div class="text-center text-white">
+                     <h1 class="header-title">{{ _("Data Capture Project Register (DCPR)") }}</h1>
+                     <div class="mb-5 col-auto"><a href="/dcpr/"><button class="btn btn-warning btn-lg"  type="submit">DCPR</button></a></div>
+                    </div>
+                  </div>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+        <!-- Left and right controls -->
+          <a class="left carousel-control" href="#emcCarousel" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="sr-only">{{ _("Previous") }}</span>
+          </a>
+          <a class="right carousel-control" href="#emcCarousel" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="sr-only">{{ _("Next") }}</span>
+          </a>
+    </div>
+</header>
+<main class="index-search">
+    <div class="container">
+    <h2 class="mb-5 section-title">{{ _("Search for data") }}</h2>
+        <form {% if form_id %}id="{{ form_id }}" {% endif %}class="search-form{% if no_bottom_border %} no-bottom-border{% endif %}" method="get" data-module="select-switch" action="/dataset/">
+            <div class="input-group search-input-group">
+                <input data-testid="home_dataset_search_input" aria-label="{% block header_site_search_label %}{{ placeholder }}{% endblock %}" id="field-giant-search" type="text" class="form-control input-lg" name="q" value="{{ query }}" autocomplete="off" placeholder="Search metadata records...">
+                <span class="input-group-btn">
+                    <button data-testid="home_search_submit" class="btn btn-default btn-lg" type="submit" value="search" aria-label="{{_('Submit')}}">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        </form>
+
+    </div>
+</main>
+ <section class="index-sasdi-theme">
+    <div class="text-center container">
+    <h2 class="mb-5 section-title">{{ _("SASDI Themes") }}</h2>
+        <div class="mb-5">
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Hydrology">
+                <a href="/dataset/?vocab_sasdi_themes=Hydrology" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/hydrology.svg') }}" alt="Hydrology">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Administrative boundaries 1">
+                <a href="/dataset/?vocab_sasdi_themes=Administrative+boundaries+1" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/administrative-boundaries-1.svg') }}" alt="Administrative boundaries 1">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                 <div data-toggle="tooltip" data-placement="top" title="Conservation">
+                <a href="/dataset/?vocab_sasdi_themes=Conservation" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/conservation.svg') }}" alt="Conservation">
+                </a>
+                 </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Land Cover">
+                <a href="/dataset/?vocab_sasdi_themes=Land+Cover" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/land-cover.svg') }}" alt="Land Cover">                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Land Use">
+                <a href="/dataset/?vocab_sasdi_themes=Land+Use" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/land-use.svg') }}" alt="Land Use">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Satellite Imagery">
+                <a href="/dataset/?vocab_sasdi_themes=Satellite+Imagery" class="sasdi">
+                   <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/satellite-imagery.svg') }}" alt="Imagery">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Social Statistics">
+                <a href="/dataset/?vocab_sasdi_themes=Social+Statistics" class="sasdi">
+                   <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/social-statistics.svg') }}" alt="Social Statistics">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Geodesy">
+                <a href="/dataset/?vocab_sasdi_themes=Geodesy" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/geodesy.svg') }}" alt="Geodesy">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Cadastre">
+                <a href="/dataset/?vocab_sasdi_themes=Cadastre" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/cadastre.svg') }}" alt="Cadastre">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Transport">
+                <a href="/dataset/?_vocab_sasdi_themes_limit=0&vocab_sasdi_themes=Transport" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/transport.svg') }}" alt="Transport">
+                </a>
+                </div>
+            </div>
+            <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Aerial Imagery">
+                <a href="/dataset/?_vocab_sasdi_themes_limit=0&vocab_sasdi_themes=Aerial+Imagery" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/aerial-imagery.svg') }}" alt="Aerial Imagery">
+                </a>
+                </div>
+            </div>
+             <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1" >
+                <div data-toggle="tooltip" data-placement="top" title="Wetlands">
+                <a href="/dataset/?vocab_sasdi_themes=Wetlands" class="sasdi">
+                    <img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/wetlands.svg') }}" alt="Wetlands">
+                </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="sample-datasets">
+<div class="container">
+    <div class="mb-5">
+        <div class="col-lg-6 index-datasets">
+            <h2 class="mb-5 section-title">{{ _("Featured Metadata Records") }}</h2>
+            {% set featured_datasets = h.emc_get_featured_datasets() %}
+            {{ h.snippet('snippets/package_list.html', packages=featured_datasets) }}
+        </div>
+        <div class="col-lg-6 index-datasets">
+            <h2 class="mb-5 section-title">{{ _("Recent Metadata Records") }}</h2>
+            {% set recent_datasets = h.emc_get_recently_modified_datasets() %}
+            {{ h.snippet('snippets/package_list.html', packages=recent_datasets) }}
+        </div>
+    </div>
+</div>
+
+</section>
+
+{% endblock %}

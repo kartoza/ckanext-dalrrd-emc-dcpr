@@ -1,0 +1,50 @@
+{% ckan_extends %}
+
+    {#
+        This template is overridden in order to show a dataset's spatial extent map on the right side, below its
+        heading
+    #}
+{% block package_info %}
+    {% if pkg %}
+    <div class="module module-narrow context-info">
+      <div class="follower-heading">
+        <section class="module-content">
+    {% block heading %}
+    {% endblock %}
+        <div class="row follower">
+    {% block nums %}
+              {% set num_followers = h.follow_count('dataset', pkg.id) %}
+              <div class="nums">
+                <dl>
+                    <p>
+                  <span data-module="followers-counter" data-module-id="{{ pkg.id }}" data-module-num_followers="{{ num_followers }}" style="font-weight: 700; font-size: 16px">{{ h.SI_number_span(num_followers) }}</span>
+                   {{ _('followers') }}</p>
+                </dl>
+              </div>
+    {% endblock %}
+    {% block follow_button %}
+              {% if not hide_follow_button %}
+                <div class="follow_button pull-right">
+                  {{ h.follow_button('dataset', pkg.id) }}
+                </div>
+              {% endif %}
+            {% endblock %}
+        </div>
+ </section>
+      </div>
+    </div>
+  {% endif %}
+
+{% if pkg.sasdi_theme|length > 0 %}
+    <div class="module module-narrow module-shallow context-info">
+            <h2 class="module-heading"> {{ _("SASDI Theme") }}</h2>
+            <section class="module-content">
+                {% set sasdi = pkg.sasdi_theme|first %}
+                {% set icon_name = sasdi.replace(' ', '-')|lower + '.svg' %}
+            <p><img  src="{{ url_for('static', filename = 'images/sasdi-themes-svg/'+icon_name) }}" alt="{{ sasdi }}" width="35px">
+            <span class="sasdi-theme-name">{{ pkg.sasdi_theme|first }}</span></p>
+            </section>
+        </div>
+
+{% endif %}
+{% endblock %}

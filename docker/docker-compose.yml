@@ -1,0 +1,76 @@
+# NOTE: this file expects to find the $CKAN_IMAGE_TAG variable in its environment
+
+version: "3.8"
+
+services:
+
+  ckan-web:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+
+  ckan-background-worker:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    command: ["launch-ckan-cli", "jobs", "worker"]
+
+  ckan-harvesting-gatherer:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    command: ["launch-ckan-cli", "harvester", "gather-consumer"]
+
+  ckan-harvesting-fetcher:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    command: ["launch-ckan-cli", "harvester", "fetch-consumer"]
+
+  # NOTE: This needs to be ran as a periodic command, check the
+  # docker-compose.dev.yml file for additional comment
+  ckan-harvesting-runner:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+    command: ["launch-ckan-cli", "harvester", "run"]
+
+  ckan-mail-sender:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+
+  pycsw:
+    image: "geopython/pycsw@sha256:84382cbbd18e9788e9b1bb75299ce24b31403f3b3a4afc036c55c4a96a78cdae"
+    volumes:
+      - type: bind
+        source: $PWD/pycsw/pycsw-config.cfg
+        target: /etc/pycsw/pycsw.cfg
+      - type: bind
+        source: $PWD/pycsw/pycsw_repository_mappings.py
+        target: /etc/pycsw/pycsw_repository_mappings.py
+
+  # NOTE: This needs to be ran as a periodic command, check the
+  # docker-compose.dev.yml file for additional comment
+  pycsw-refresher:
+    image: kartoza/ckanext-dalrrd-emc-dcpr:${CKAN_IMAGE_TAG}
+
+  ckan-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  datastore-db:
+    image: postgis/postgis:13-3.1
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      DATASTORE_READONLY_USER: datastore-default
+      DATASTORE_READONLY_USER_PASSWORD: datastore-default
+    volumes:
+      - type: bind
+        source: $PWD/datastore-db
+        target: /docker-entrypoint-initdb.d
+
+  # NOTE: ckan/solr uses solr v 6.6 which is pretty old (EOL even), but as of CKAN 2.9.x it is
+  # unfortunately still the most recent supported version. More info:
+  # - https://github.com/ckan/ckan/issues/5585
+  # - https://github.com/ckan/ckan/pull/5143
+  # mohab comment, now there is a solr8 image working with ckan 2.9
+  # need to check how it will be integrated.
+  solr:
+    image: ckan/solr
+    volumes:
+      - type: bind
+        source: $PWD/solr/schema.xml
+        target: /opt/solr/server/solr/ckan/conf/schema.xml
+
+  redis:
+    image: redis:6.2

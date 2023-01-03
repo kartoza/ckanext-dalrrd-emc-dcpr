@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+
+**/__pycache__
+
+docker/.env
+
+.git
+
+node_modules
+
+.idea
+.vscode

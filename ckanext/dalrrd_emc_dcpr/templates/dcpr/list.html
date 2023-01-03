@@ -1,0 +1,72 @@
+{% extends "page.html" %}
+
+{% set able_to_create_request = h.check_access('dcpr_request_create_auth') %}
+{% set is_nsif_member = h.emc_user_is_org_member('nsif', g.userobj) %}
+{% set is_csi_member = h.emc_user_is_org_member('csi', g.userobj) %}
+{% set is_sysadmin = g.userobj.sysadmin %}
+{% set has_multiple_request_types = able_to_create_request or is_nsif_member or is_csi_member %}
+
+{% block subtitle %}{{ _('DCPR Requests') }} - {{ super() }}{% endblock %}
+
+{% block secondary_content %}
+    {% snippet 'dcpr/snippets/info.html', dcpr_requests=dcpr_requests %}
+{% endblock%}
+
+{% block content_primary_nav %}
+    {% if has_multiple_request_types or is_sysadmin %}
+        {{ h.build_nav("dcpr.get_public_dcpr_requests", _("Public requests")) }}
+        {% if able_to_create_request %}
+            {{ h.build_nav("dcpr.get_my_dcpr_requests", _("My requests")) }}
+        {% endif %}
+        {%  if is_nsif_member or is_sysadmin %}
+            {{ h.build_nav("dcpr.get_awaiting_nsif_moderation_dcpr_requests", _("Requests awaiting NSIF moderation")) }}
+        {% endif %}
+        {%  if is_csi_member or is_sysadmin %}
+            {{ h.build_nav("dcpr.get_awaiting_csi_moderation_dcpr_requests", _("Requests awaiting CSI moderation")) }}
+        {% endif %}
+        {%  if is_sysadmin %}
+            {{ h.build_nav("dcpr.get_under_preparation_dcpr_requests", _("Requests under preparation")) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block page_primary_action %}
+    {% if able_to_create_request and show_create_button %}
+        {% link_for _('Create DCPR request'), named_route="dcpr.new_dcpr_request", class_='btn btn-primary', icon='plus-square' %}
+    {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+    <section class="module" xmlns="http://www.w3.org/1999/html">
+        <div class="module-content">
+            {% if dcpr_requests %}
+                <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
+                    {% for dcpr_request in page.items %}
+                        {% set num_datasets = dcpr_request.datasets | length %}
+                        <li class="request-item">
+                            <div class="row request-row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <h2 class="dataset-heading">
+                                            {{ h.link_to(h.truncate(dcpr_request.proposed_project_name, 80), h.url_for('dcpr.dcpr_request_show', csi_reference_id=dcpr_request.csi_reference_id)) }}
+                                            <small>{{ dcpr_request.csi_reference_id }}</small>
+                                        </h2>
+                                        <div>{{ num_datasets }} {% if num_datasets == 1 %}{{ _('dataset') }}{% else %}{{ _('datasets') }}{% endif %}</div>
+                                        <div><span {% if dcpr_request.status == "REJECTED" %}class="text-danger"{% endif %}>{{ dcpr_request.status }}</span></div>
+                                        <div>Creator: {{ dcpr_request.owner }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty">{{ _('There are no DCPR requests here yet.') }}</p>
+            {% endif %}
+            {% block page_pagination %}
+                {{ page.pager(q=q) }}
+            {% endblock %}
+        </div>
+    </section>
+{% endblock %}
