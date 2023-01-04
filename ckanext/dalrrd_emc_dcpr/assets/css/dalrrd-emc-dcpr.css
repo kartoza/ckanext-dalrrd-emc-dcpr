@@ -345,6 +345,7 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
+  padding-left: 45px;
 }
 
 .request-row{
@@ -1015,7 +1016,7 @@ footer {
 }
 
 .metadata-record-desc{
-  padding-left:20px;
+  padding-left:100px;
 }
 
 #clearSearch{
