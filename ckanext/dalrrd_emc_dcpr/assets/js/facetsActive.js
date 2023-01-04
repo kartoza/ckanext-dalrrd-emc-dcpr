@@ -35,8 +35,8 @@ ckan.module('emc-facets-active', function (jQuery, _) {
                 '_tags_limit': 'Tags',
                 'featured': "FeaturedMetadatarecords"
             };
-
             const keys = Object.keys(filters);
+
             for(let i=0; i<keys.length; i++){
                 if(getUrlParameter(keys[i])){
                     document.getElementById(filters[keys[i]]).classList.add("in")
