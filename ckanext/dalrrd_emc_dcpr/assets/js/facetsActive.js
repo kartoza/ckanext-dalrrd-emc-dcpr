@@ -9,6 +9,21 @@ ckan.module('emc-facets-active', function (jQuery, _) {
         initialize: function () {
             $.proxyAll(this,/_on/);
             searchInput.addEventListener("change", this._onSearchInputValueChange)
+            let searchUrl = window.location.href
+            let searchUrlSplit = searchUrl.split("&",2)[0]
+            let inputSearchTerm = searchUrlSplit.split("?q=",2)[1]
+            if(inputSearchTerm){
+
+                document.getElementById('applySearch').style.display = 'none';
+                const clearSearch = document.getElementById('clearSearch');
+                clearSearch.style.display = 'block';
+                 console.log(inputSearchTerm);
+                 console.log(searchUrl);
+                clearSearch.addEventListener('click', function (){
+                    window.location.href = searchUrl.replace("?q="+inputSearchTerm,"?q=");
+                });
+            }
+
             const filters = {
                 'organization': 'Organizations',
                 '_organization_limit': 'Organizations',
