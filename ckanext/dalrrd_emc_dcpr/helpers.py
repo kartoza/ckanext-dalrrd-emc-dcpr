@@ -282,8 +282,6 @@ def get_datasets_thumbnail(package):
                 wms_url = resource["url"]
                 parsed_url = dict(parse_qsl(urlparse(wms_url).query))
                 parsed_url["format"] = "image/png; mode=8bit"
-                parsed_url["width"] = "200"
-                parsed_url["height"] = "200"
                 data_thumbnail = "%s?%s" % (
                     wms_url.split("?")[0],
                     urlencode(parsed_url),
