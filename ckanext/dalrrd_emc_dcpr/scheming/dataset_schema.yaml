@@ -768,7 +768,7 @@ dataset_fields:
     required: false
     form_placeholder: https://files.isric.org/public/thumbnails/afsis250m/clyppt.png
     help_text: >-
-      URL for a thumbnail previewing this metadata record which appears in the search page
+      URL for a thumbnail previewing this metadata record which appears in the search page. Use images with 1:1 ratio for better results
 
 
   - field_name: metadata_date_stamp
