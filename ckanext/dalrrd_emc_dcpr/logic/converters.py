@@ -113,7 +113,7 @@ def default_metadata_standard_name(value):
     metadata standard name.
     """
     if value == "":
-        return "sans1878"
+        return "SANS 1878-1:2011"
 
 
 def default_metadata_standard_version(value):

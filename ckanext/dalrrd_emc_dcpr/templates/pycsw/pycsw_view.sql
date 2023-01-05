@@ -61,6 +61,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            c.extras->>'reference_date' AS time_end,
            c.extras->>'purpose' AS purpose,
            c.extras->>'status' AS status,
+           c.extras->>'metadata_standard_name' AS metadata_standard,
+           c.extras->>'metadata_standard_version' AS metadata_standard_version,
            c.extras->>'metadata_character_set' AS metadata_character_set,
            c.extras->>'metadata_date_stamp' AS metadata_date_stamp,
            NULL AS servicetype,
@@ -75,8 +77,23 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS otherconstraints,
            NULL AS classification,
            NULL AS conditionapplyingtoaccessanduse,
-	   NULL AS edition,
-           c.extras->>'lineage' AS lineage,
+	       NULL AS edition,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'level' AS lineage_level,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'statement' AS lineage_statement,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'process_step_description' AS lineage_process_step_description,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'process_step_rationale' AS lineage_process_step_rationale,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'process_step_datetime_from' AS lineage_process_step_datetime_from,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'process_step_datetime_to' AS lineage_process_step_datetime_to,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_individual_name' AS lineage_processor_individual_name,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processing_owner_org' AS lineage_processing_organization,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_position_name' AS lineage_processor_position_name,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_address_city' AS lineage_processor_address_city,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_address_administrative_area' AS lineage_processor_address_administrative_area,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_postal_code' AS lineage_processor_postal_code,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_electronic_mail_address' AS lineage_processor_electronic_mail_address,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'source_description' AS lineage_source_description,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'source_scale_denominator' AS lineage_source_scale_denominator,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'source_reference_system' AS lineage_source_reference_system,
            NULL AS responsiblepartyrole,
            NULL AS specificationtitle,
            NULL AS specificationdate,
@@ -91,6 +108,11 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS cloudcover,
            NULL AS bands,
            -- links: list of dicts with properties: name, description, protocol, url
-           NULL AS links
+           NULL AS links,
+           -- contact
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'individual_name' AS contact_individual_name,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'position_name' AS contact_position_name,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'organisational_role' AS contact_organisational_role
+
     FROM cte_extras AS c
 WITH DATA;
