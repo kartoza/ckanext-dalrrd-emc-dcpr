@@ -13,7 +13,7 @@
       {% block content %}
           {% set date = package['metadata_modified'].split('T')[0] %}
           <div class="row dataset-row">
-          <div class="col-md-3 metadata-record-thumbnail" style="background-image: url('https://files.isric.org/public/thumbnails/afsis250m/clyppt.png');">
+          <div class="col-md-3 metadata-record-thumbnail" style="background-image: url('{{ h.get_datasets_thumbnail(package) }}');">
 
           </div>
         <div class="col-md-9 metadata-record-desc">
