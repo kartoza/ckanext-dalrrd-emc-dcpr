@@ -345,7 +345,6 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
-  padding-left:45px;
 }
 
 .request-row{
@@ -831,7 +830,15 @@ footer {
 }
 
 @media screen and (max-width: 1050px) {
+  .form-actions {
+    position: relative;
+    z-index: 10;
+  }
 
+  .checkbox input[type=checkbox] {
+    z-index: 10;
+  }
+  
   .search-form {
     width: 80%;
     margin: auto;
@@ -1016,5 +1023,5 @@ footer {
 }
 
 .metadata-record-desc{
-  padding-left:100px;
+  padding-left:20px;
 }
