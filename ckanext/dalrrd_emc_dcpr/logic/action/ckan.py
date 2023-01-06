@@ -154,7 +154,9 @@ def _act_depending_on_package_visibility(
         access = toolkit.check_access("package_publish", context, data)
         result = action(context, data) if access else None
         # if you create, update or patch you are following the dataset
-        if access:
-            toolkit.get_action("follow_dataset")(context, result)
+        # this make a failure when the dataset is changed from private to public:
+        # message form contains invalid entries: Y (maybe because the user already follow ? )
+        # if access:
+        #     toolkit.get_action("follow_dataset")(context, result)
 
     return result

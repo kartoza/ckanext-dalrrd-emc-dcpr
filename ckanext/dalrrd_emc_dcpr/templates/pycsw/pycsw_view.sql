@@ -17,12 +17,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
             JOIN "group" AS g ON p.owner_org = g.id
             JOIN package_tag AS pt ON p.id = pt.package_id
             JOIN tag AS t on pt.tag_id = t.id
+            JOIN resource AS res on p.id = res.package_id
         WHERE p.state = 'active'
-         AND p.private = false
+        AND p.private = false
         GROUP BY p.id, g.title
     )
     SELECT
            c.id AS identifier,
+           c.name AS dataset_name,
            'csw:Record' AS typename,
            'http://www.isotc211.org/2005/gmd' AS schema,
            'local' AS mdsource,
@@ -39,6 +41,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS format,
            NULL AS source,
            c.extras->>'reference_date' AS date,
+        --    c.extras->>'reference_date_type' AS reference_date_type,
            c.metadata_modified AS date_modified,
            'http://purl.org/dc/dcmitype/Dataset' AS type,
            ST_AsText(ST_GeomFromGeoJSON(c.extras->>'spatial')) AS wkt_geometry,
@@ -87,6 +90,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_individual_name' AS lineage_processor_individual_name,
            cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processing_owner_org' AS lineage_processing_organization,
            cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_position_name' AS lineage_processor_position_name,
+           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'delivery_point' AS lineage_delivery_point,
            cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_address_city' AS lineage_processor_address_city,
            cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_address_administrative_area' AS lineage_processor_address_administrative_area,
            cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'processor_postal_code' AS lineage_processor_postal_code,
@@ -112,7 +116,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            -- contact
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'individual_name' AS contact_individual_name,
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'position_name' AS contact_position_name,
-           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'organisational_role' AS contact_organisational_role
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'organisational_role' AS contact_organisational_role,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'delivery_point' AS contact_delivery_point,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'address_city' AS contact_address_city,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'address_administrative_area' AS contact_address_administrative_area,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'postal_code' AS contact_postal_code,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'electronic_mail_address' AS contact_electronic_mail_address,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'voice' AS contact_phone,
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'facsimile' AS contact_facsimile
 
     FROM cte_extras AS c
 WITH DATA;

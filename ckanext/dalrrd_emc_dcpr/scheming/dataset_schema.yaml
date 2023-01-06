@@ -218,6 +218,20 @@ dataset_fields:
     preset: date
     help_text: Reference date for this metadata record - This is a SANS 1878 mandatory field
 
+  - field_name: reference_date_type
+    label: Reference date type
+    required: true
+    validators: convert_choices_select_to_int
+    preset: select
+    choices:
+      - value: 001
+        label: Creation
+      - value: 002
+        label: Publication
+      - value: 003
+        label: Revision
+    help_text: Reference date type - This is a SANS 1878 mandatory field
+
   - field_name: iso_topic_category
     label: Topic Category
     help_text: ISO 19115 Topic Category for the metadata record - This is a SANS 1878 mandatory field
@@ -537,6 +551,10 @@ dataset_fields:
         label: Role / Position of the processor individual
         required: false
         help_text: Role/ position of the responsible individual in the orgnization
+
+      - field_name: delivery_point
+        label: Delivery Point
+        required: false
 
       - field_name: processor_address_city
         label: Processor address - City
