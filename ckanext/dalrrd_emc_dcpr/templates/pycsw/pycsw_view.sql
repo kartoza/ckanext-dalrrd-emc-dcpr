@@ -1,5 +1,16 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
-    WITH cte_extras AS (
+    WITH
+
+    -- cte_resources AS (
+    --     select
+    --     "resource".package_id,
+    --     "resource".name,
+    --     "resource".url,
+    --     "resource".description as res
+    --     from "resource"
+    -- ),
+
+    cte_extras AS (
         SELECT
                p.id,
                p.title,
@@ -12,12 +23,16 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
                p.maintainer,
                json_object_agg(pe.key, pe.value) AS extras,
                array_agg(DISTINCT t.name) AS tags
+               --json_object_agg('url', res.url) as links
+               --array_agg(ARRAY[DISTINCT res.url ::text, res.name ::text, res.description ::text]) as links
+               -- array_agg() as links_urls,
+               -- array_agg(DISTINCT ) as links_descriptions
         FROM package AS p
             JOIN package_extra AS pe ON p.id = pe.package_id
             JOIN "group" AS g ON p.owner_org = g.id
             JOIN package_tag AS pt ON p.id = pt.package_id
             JOIN tag AS t on pt.tag_id = t.id
-            JOIN resource AS res on p.id = res.package_id
+            JOIN "resource" as res on p.id = res.package_id
         WHERE p.state = 'active'
         AND p.private = false
         GROUP BY p.id, g.title
@@ -112,7 +127,9 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS cloudcover,
            NULL AS bands,
            -- links: list of dicts with properties: name, description, protocol, url
-           NULL AS links,
+           (select array_agg(ARRAY[res.url, cast(res.extras as json)->>'application_profile' ,res.name, res.description]) from "resource" as res where res.package_id = c.id) AS links,
+        --    c.links_urls AS links_urls,
+        --    c.links_descriptions AS links_descriptions,
            -- contact
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'individual_name' AS contact_individual_name,
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'position_name' AS contact_position_name,
@@ -126,4 +143,5 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'facsimile' AS contact_facsimile
 
     FROM cte_extras AS c
+    -- JOIN cte_resources as res on res.package_id = c.id
 WITH DATA;

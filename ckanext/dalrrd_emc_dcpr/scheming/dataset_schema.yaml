@@ -806,10 +806,27 @@ resource_fields:
     label: Name
     form_placeholder: eg. January 2011 Gold Prices
 
+  - field_name: application_profile
+    label: Application profile
+    help_text: Name of an application profile that can be used with the resource
+
   - field_name: description
     label: Description
-    form_snippet: markdown.html
-    form_placeholder: Some useful notes about the data
+    validators: convert_choices_select_to_int
+    preset: select
+    choices:
+      - value: 001
+        label: download
+      - value: 002
+        label: information
+      - value: 003
+        label: offlineAccess
+      - value: 004
+        label: order
+      - value: 005
+        label: search
+
+    help_text: Please specify the function performed by the resource
 
   - field_name: format
     label: Format

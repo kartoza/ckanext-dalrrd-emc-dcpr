@@ -27,6 +27,7 @@ MD_CORE_MODEL = {
         "pycsw:MetadataType": "metadata_type",
         # bag of metadata element and attributes ONLY, no XML tages
         "pycsw:AnyText": "anytext",
+        "pycsw:SiteURL": "http://localhost:5000/dataset/",  # grap this from a file or a process.
         "pycsw:Language": "language",
         "pycsw:Title": "title",
         "pycsw:DatasetName": "dataset_name",
@@ -116,5 +117,7 @@ MD_CORE_MODEL = {
         "pycsw:Bands": "bands",
         # links: list of dicts with properties: name, description, protocol, url
         "pycsw:Links": "links",
+        # "pycsw:LinksURLs": "links_urls",
+        # "pycsw:LinksDescriptions": "links_descriptions",
     },
 }
