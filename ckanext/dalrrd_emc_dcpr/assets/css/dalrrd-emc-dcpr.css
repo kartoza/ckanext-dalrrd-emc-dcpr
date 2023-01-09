@@ -941,7 +941,7 @@ footer {
   display: none !important;
 }
 
-.facet-outer li{
+.facet-outer li:nth-child(n+10){
   display: none;
 }
 
