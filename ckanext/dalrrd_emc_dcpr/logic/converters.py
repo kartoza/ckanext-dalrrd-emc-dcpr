@@ -98,6 +98,34 @@ def convert_choices_select_to_int(data_dict, context):
         raise toolkit.Invalid("select field should have a string value")
 
 
+def check_if_number(data_dict):
+    """
+    check if the given value can be
+    converted to a number
+    """
+    logger.debug("convert to real number ")
+    if data_dict == "":
+        return ""
+    try:
+        return float(data_dict)
+    except:
+        raise toolkit.Invalid("select field should be a number ")
+
+
+def check_if_int(data_dict):
+    """
+    check if the given value can be
+    converted to an integer
+    """
+    logger.debug("convert to int ")
+    if data_dict == "":
+        return ""
+    try:
+        return int(data_dict)
+    except:
+        raise toolkit.Invalid("select field should be an integer ")
+
+
 def convert_select_custom_choice_to_extra(data_dict):
     """
     adding custom field to select options,

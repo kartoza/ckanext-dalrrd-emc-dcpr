@@ -311,6 +311,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
             "spatial_resolution_converter": converters.spatial_resolution_converter,
             "convert_choices_select_to_int": converters.convert_choices_select_to_int,
+            "check_if_number": converters.check_if_number,
+            "check_if_int": converters.check_if_int,
             "convert_select_custom_choice_to_extra": converters.convert_select_custom_choice_to_extra,
             "doi_validator": validators.doi_validator,
             "metadata_default_standard_name": converters.default_metadata_standard_name,

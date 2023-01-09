@@ -81,6 +81,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            c.extras->>'status' AS status,
            c.extras->>'metadata_standard_name' AS metadata_standard,
            c.extras->>'metadata_standard_version' AS metadata_standard_version,
+           c.extras->>'dataset_character_set' AS dataset_character_set,
            c.extras->>'metadata_character_set' AS metadata_character_set,
            c.extras->>'metadata_date_stamp' AS metadata_date_stamp,
            NULL AS servicetype,
@@ -128,8 +129,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS bands,
            -- links: list of dicts with properties: name, description, protocol, url
            (select array_agg(ARRAY[res.url, cast(res.extras as json)->>'application_profile' ,res.name, res.description]) from "resource" as res where res.package_id = c.id) AS links,
-        --    c.links_urls AS links_urls,
-        --    c.links_descriptions AS links_descriptions,
            -- contact
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'individual_name' AS contact_individual_name,
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'position_name' AS contact_position_name,
@@ -140,7 +139,12 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'postal_code' AS contact_postal_code,
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'electronic_mail_address' AS contact_electronic_mail_address,
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'voice' AS contact_phone,
-           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'facsimile' AS contact_facsimile
+           cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'facsimile' AS contact_facsimile,
+           -- spatial and equivalent scale
+           cast(c.extras->>'spatial' as json) AS bounding_geojson,
+           c.extras->>'equivalent_scale' AS equivalent_scale
+           -- distribution
+           c.
 
     FROM cte_extras AS c
     -- JOIN cte_resources as res on res.package_id = c.id

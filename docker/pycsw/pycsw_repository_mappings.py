@@ -31,6 +31,7 @@ MD_CORE_MODEL = {
         "pycsw:Language": "language",
         "pycsw:Title": "title",
         "pycsw:DatasetName": "dataset_name",
+        "pycsw:DatasetCharacterSet": "dataset_character_set",
         "pycsw:Abstract": "abstract",
         "pycsw:Purpose": "purpose",
         "pycsw:Status": "status",
@@ -117,7 +118,7 @@ MD_CORE_MODEL = {
         "pycsw:Bands": "bands",
         # links: list of dicts with properties: name, description, protocol, url
         "pycsw:Links": "links",
-        # "pycsw:LinksURLs": "links_urls",
-        # "pycsw:LinksDescriptions": "links_descriptions",
+        "pycsw:BoundingGeoJSON": "bounding_geojson",
+        "pycsw:EquivalentScale": "equivalent_scale",
     },
 }
