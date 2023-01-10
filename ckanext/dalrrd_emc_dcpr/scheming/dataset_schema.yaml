@@ -717,7 +717,7 @@ dataset_fields:
       Description about the temporal reference system used (if any) - This is an optional SANS 1878 field"
 
   - field_name: reference_system_additional_info
-    label: Additional information about Reference Systems
+    label: Additional information about Reference Systems (temproal, vertical)
     preset: modified_repeating_subfields
     repeating_subfields:
 
@@ -727,17 +727,13 @@ dataset_fields:
         required: false
 
       - field_name: temporal_extent_period_duration_from
-        label: Temporal extent duration (from)
+        label: Temporal extent duration (Start position)
         preset: date
         required: false
 
       - field_name: temporal_extent_period_duration_to
-        label: Temporal extent duration (to)
+        label: Temporal extent duration (End position)
         preset: date
-        required: false
-
-      - field_name: spatial_temporal_extent
-        label: Spatio-Temporal extent identifier
         required: false
 
       - field_name: minimum_vertical_extent
@@ -754,7 +750,6 @@ dataset_fields:
     form_placeholder: https://files.isric.org/public/thumbnails/afsis250m/clyppt.png
     help_text: >-
       URL for a thumbnail previewing this metadata record which appears in the search page
-
 
   - field_name: metadata_date_stamp
     label: Metadata date stamp

@@ -145,6 +145,10 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            c.extras->>'equivalent_scale' AS equivalent_scale
            -- distribution
            c.
+           -- temporal extent
+
+
+
 
     FROM cte_extras AS c
     -- JOIN cte_resources as res on res.package_id = c.id
