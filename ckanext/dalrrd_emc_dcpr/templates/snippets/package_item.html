@@ -13,7 +13,7 @@
         {% block content %}
           {% set date = package['metadata_modified'].split('T')[0] %}
           <div class="row dataset-row">
-            <div class="col-sm-4 metadata-record-thumbnail" style="background-image: url('https://www.linkpicture.com/q/Rectangle-55.png');">
+            <div class="col-sm-4 metadata-record-thumbnail" style="background-image: url('{{ h.get_datasets_thumbnail(package) }}');">
 
             </div>
             <div class="col-sm-8 metadata-record-desc">

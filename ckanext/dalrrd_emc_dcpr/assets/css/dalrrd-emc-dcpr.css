@@ -1022,7 +1022,7 @@ footer {
   height: 150px;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   border: solid 1px #eee;
 }
 
