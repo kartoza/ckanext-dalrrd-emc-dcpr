@@ -273,24 +273,25 @@ def get_datasets_thumbnail(package):
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
     """
-    data_thumbnail = None
     try:
-        data_thumbnail = package["metadata_thumbnail"]
-
+        if package["metadata_thumbnail"]:
+            data_thumbnail = package["metadata_thumbnail"]
+        else:
+            data_resource = package["resources"]
+            for resource in data_resource:
+                if resource["format"].lower() == "wms":
+                    wms_url = resource["url"]
+                    parsed_url = dict(parse_qsl(urlparse(wms_url).query))
+                    parsed_url["format"] = "image/png; mode=8bit"
+                    data_thumbnail = "%s?%s" % (
+                        wms_url.split("?")[0],
+                        urlencode(parsed_url),
+                    )
+                    break
+                else:
+                    data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
     except KeyError:
-        data_resource = package["resources"]
-        for resource in data_resource:
-            if resource["format"].lower() == "wms":
-                wms_url = resource["url"]
-                parsed_url = dict(parse_qsl(urlparse(wms_url).query))
-                parsed_url["format"] = "image/png; mode=8bit"
-                data_thumbnail = "%s?%s" % (
-                    wms_url.split("?")[0],
-                    urlencode(parsed_url),
-                )
-                break
-            else:
-                data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
+        data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
     return data_thumbnail
 
 
