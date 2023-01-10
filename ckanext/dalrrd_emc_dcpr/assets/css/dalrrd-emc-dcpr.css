@@ -294,7 +294,6 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-item {
   border: 1px solid #ccc;
-  padding-bottom: 20px;
   margin-bottom: 20px;
   background-color: #fff;
 }
@@ -353,6 +352,7 @@ fieldset[disabled] .btn-default.focus {
 
 .datasets-date {
   float: left;
+  margin-top: 7.5%;
 }
 
 .datasets-date-actions{
@@ -730,7 +730,6 @@ footer {
 
 .page-header.module-content {
   padding-top: 0;
-  padding-bottom: 30px;
 }
 
 .page-header .content_action {
@@ -1020,8 +1019,10 @@ footer {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  border: solid 1px #eee;
 }
 
 .metadata-record-desc{
   padding-left:20px;
+  width: 81.3% !important;
 }
