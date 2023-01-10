@@ -288,7 +288,7 @@ def get_datasets_thumbnail(package):
                 )
                 break
             else:
-                data_thumbnail = False
+                data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
     return data_thumbnail
 
 
