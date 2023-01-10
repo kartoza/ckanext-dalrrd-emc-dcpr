@@ -1025,3 +1025,14 @@ footer {
 .metadata-record-desc{
   padding-left:20px;
 }
+
+@media (min-width: 768px) {
+  .form-actions {
+    text-align: center;
+  }
+}
+
+.proposed-date{
+  margin-left: -15px;
+  margin-right: -15px ;
+}
