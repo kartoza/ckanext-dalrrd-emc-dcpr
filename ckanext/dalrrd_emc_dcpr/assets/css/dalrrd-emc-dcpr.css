@@ -344,6 +344,7 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
+  position: relative;
 }
 
 .request-row{
@@ -352,7 +353,10 @@ fieldset[disabled] .btn-default.focus {
 
 .datasets-date {
   float: left;
-  margin-top: 7.5%;
+  position: absolute;
+  bottom: 0px;
+  top: 134px;
+  left: 171px;
 }
 
 .datasets-date-actions{
