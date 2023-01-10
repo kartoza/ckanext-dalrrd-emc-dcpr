@@ -273,9 +273,11 @@ def get_datasets_thumbnail(package):
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
     """
-    if package["metadata_thumbnail"]:
+    data_thumbnail = None
+    try:
         data_thumbnail = package["metadata_thumbnail"]
-    else:
+
+    except KeyError:
         data_resource = package["resources"]
         for resource in data_resource:
             if resource["format"].lower() == "wms":
