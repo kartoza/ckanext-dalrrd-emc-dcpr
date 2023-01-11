@@ -10,7 +10,7 @@ dataset_fields:
 
   - field_name: title
     label: Title
-    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifier for the dataset - This is a SANS 1878 mandatory field
+    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifier for the metadata record- This is a SANS 1878 mandatory field
     preset: title
     required: true
     form_placeholder: eg. A descriptive title
@@ -308,12 +308,12 @@ dataset_fields:
     display_snippet: link.html
 
   - field_name: version
-    label: Dataset version
+    label: Metadata record version
     validators: ignore_missing unicode package_version_validator
     form_placeholder: '1.0'
 
   - field_name: dataset_language
-    label: Dataset language
+    label: Metadata record language
     required: true
     choices:
       - value: en
@@ -322,7 +322,7 @@ dataset_fields:
     help_text: Language of the metadata record - This is a SANS 1878 mandatory field
 
   - field_name: metadata_language
-    label: Metadata language
+    label: Metadata record language
     required: true
     choices:
       - value: en
@@ -331,7 +331,7 @@ dataset_fields:
     help_text: Language for the metadata - This is a SANS 1878 mandatory field
 
   - field_name: dataset_character_set
-    label: Dataset character set
+    label: Metadata record character set
     required: true
     choices:
       - value: ucs-2
@@ -480,11 +480,11 @@ dataset_fields:
           - value: 004
             label: Collection session
           - value: 005
-            label: Dataset
+            label: Metadata record
           - value: 006
             label: Series
           - value: 007
-            label: Non geographic dataset
+            label: Non geographic metadata record
           - value: 8
             label: Dimension group
           - value: 9
