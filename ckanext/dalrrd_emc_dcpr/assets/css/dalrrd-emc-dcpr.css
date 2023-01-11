@@ -1037,6 +1037,17 @@ footer {
   width: 81.3% !important;
 }
 
+@media (min-width: 768px) {
+  .form-actions {
+    text-align: center;
+  }
+}
+
+.proposed-date{
+  margin-left: -15px;
+  margin-right: -15px ;
+}
+
 @media (max-width: 768px) {
   .metadata-record-thumbnail{
     left: 50%;
