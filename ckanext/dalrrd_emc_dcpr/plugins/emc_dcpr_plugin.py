@@ -361,7 +361,11 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_dcpr_requests_awaiting_nsif_moderation_count": helpers.get_dcpr_requests_awaiting_nsif_moderation_count,
             "get_featured_datasets_count": helpers.get_featured_datasets_count,
             "get_user_name": helpers.get_user_name,
+<<<<<<< HEAD
             "get_seo_metatags": helpers.get_seo_metatags,
+=======
+            "get_datasets_thumbnail": helpers.get_datasets_thumbnail,
+>>>>>>> upstream/development
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

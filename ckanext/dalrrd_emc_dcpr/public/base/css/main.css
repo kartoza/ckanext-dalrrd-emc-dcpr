@@ -4092,11 +4092,12 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: #555555;
+  color: #F3881C;
   cursor: default;
   background-color: #fff;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
+  border-bottom: 3px solid #F3881C;
 }
 .nav-tabs.nav-justified {
   width: 100%;
@@ -4768,6 +4769,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   padding-left: 0;
   margin: 20px 0;
   border-radius: 4px;
+  float: right;
 }
 .pagination > li {
   display: inline;
@@ -8261,7 +8263,7 @@ fieldset[disabled] .control-custom.disabled .checkbox.btn.focus {
 }
 .dataset-item {
   border-bottom: 1px dotted #ddd;
-  padding-bottom: 20px;
+  /* padding-bottom: 20px; */
   margin-bottom: 20px;
 }
 @media (max-width: 991px) {
@@ -8286,6 +8288,7 @@ fieldset[disabled] .control-custom.disabled .checkbox.btn.focus {
 .dataset-heading .label {
   position: relative;
   top: -1px;
+  float: right;
 }
 .label-inverse {
   background-color: #555555;
