@@ -1024,6 +1024,12 @@ footer {
   background-repeat: no-repeat;
   background-size: contain;
   border: solid 1px #eee;
+  padding: 0px;
+}
+
+.metadata-record-thumbnail img{
+  width: 100%;
+  height: 100%;
 }
 
 .metadata-record-desc{
@@ -1040,4 +1046,27 @@ footer {
 .proposed-date{
   margin-left: -15px;
   margin-right: -15px ;
+}
+
+@media (max-width: 768px) {
+  .metadata-record-thumbnail{
+    left: 50%;
+    margin-left: -80px;
+  }
+  .metadata-record-desc{
+    padding-left:0px;
+    width: 100% !important;
+  }
+  .datasets-date{
+    top: unset;
+    left: unset;
+    bottom: -3px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .metadata-record-desc {
+    padding-left: 20px;
+    width: 66.66666667% !important;
+  }
 }
