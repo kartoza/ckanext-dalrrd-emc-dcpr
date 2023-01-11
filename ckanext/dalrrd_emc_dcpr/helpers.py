@@ -612,3 +612,21 @@ def get_recent_news(number=5, exclude=None):
             break
 
     return new_list
+
+
+def get_seo_metatags(site_key):
+    """
+    get metatags value for SEO
+    """
+    data_dict = {
+        "site_author": toolkit.config.get(
+            "ckan.site_author",
+        ),
+        "site_description": toolkit.config.get(
+            "ckan.site_description",
+        ),
+        "site_keywords": toolkit.config.get(
+            "ckan.site_keywords",
+        ),
+    }
+    return data_dict[site_key]
