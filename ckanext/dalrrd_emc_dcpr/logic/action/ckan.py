@@ -9,6 +9,8 @@ from ckan.model.domain_object import DomainObject
 from ...model.user_extra_fields import UserExtraFields
 from .dataset_versioning_control import handle_versioning
 from .handle_repeating_subfields import handle_repeating_subfields_naming
+from ..converters import flatten_resource_repeated_field
+
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +91,6 @@ def package_create(original_action, context, data_dict):
     Intercepts the core `package_create` action to check if package
      is being published after being created.
     """
-    # data_dict = handle_repeating_subfields_naming(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
@@ -99,6 +100,7 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
+    flatten_resource_repeated_field(data_dict)
     package_state = data_dict.get("state")
     # if package_state == "draft":
     #     return _act_depending_on_package_visibility(original_action, context, data_dict)

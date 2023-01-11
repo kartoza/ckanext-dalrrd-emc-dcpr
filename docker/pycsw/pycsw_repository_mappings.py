@@ -120,5 +120,9 @@ MD_CORE_MODEL = {
         "pycsw:Links": "links",
         "pycsw:BoundingGeoJSON": "bounding_geojson",
         "pycsw:EquivalentScale": "equivalent_scale",
+        "pycsw:TemporalExtentPositionBegin": "temporal_position_begin",
+        "pycsw:TemporalExtentPositionEnd": "temporal_position_end",
+        "pycsw:VerticalExtentMinimum": "minimum_vertical_ex",
+        "pycsw:VerticalExtentMaximum": "maximum_vertical_ex",
     },
 }

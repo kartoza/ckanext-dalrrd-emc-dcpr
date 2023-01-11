@@ -127,8 +127,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS sensortype,
            NULL AS cloudcover,
            NULL AS bands,
-           -- links: list of dicts with properties: name, description, protocol, url
-           (select array_agg(ARRAY[res.url, cast(res.extras as json)->>'application_profile' ,res.name, res.description]) from "resource" as res where res.package_id = c.id) AS links,
            -- contact
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'individual_name' AS contact_individual_name,
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'position_name' AS contact_position_name,
@@ -142,11 +140,35 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            cast(cast(c.extras->>'contact' as json)->>0 as json)-> 'facsimile' AS contact_facsimile,
            -- spatial and equivalent scale
            cast(c.extras->>'spatial' as json) AS bounding_geojson,
-           c.extras->>'equivalent_scale' AS equivalent_scale
-           -- distribution
-           c.
-           -- temporal extent
+           c.extras->>'equivalent_scale' AS equivalent_scale,
+           -- resources and distribution info
+           -- distribution -> dict of distribution info and resource info.
+            -- distribution info (resource name, version, compression, amdendment, sepc) + distributor info + process order info
+            -- distributor info -> name, org name, position, role, contact [voice, facsimile, city,..etc.]
+            -- order process info -> (fee, planned_available_date, instructions, ..etc)
+            -- order transfer options -> (online, offline).
+            -- resource info -> dicts with properties: name, description, protocol, url
+           (select array_agg(ARRAY[
+            dist_info.
+            res.url as res_url, cast(res.extras as json)->>'application_profile' as res_application_profile,
+            cast(res.extras as json)->>'amendment_number' as res_amendment_number,
+            cast(res.extras as json)->>'file_decompression_technique' as res_decopression_technique,
+            cast(res.extras as json)->>'format_version' as res_format_version,
+            cast(res.extras as json)->>'specification' as res_specification,
+            res.name as res_name, res.description as res_discription,
 
+
+
+
+
+            ])
+            from "resource" as res where res.package_id = c.id) AS distribution_info,
+           -- temporal extent
+           cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'temporal_extent_period_duration_from' AS temporal_position_begin,
+           cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'temporal_extent_period_duration_to' AS temporal_position_end,
+           -- vertical extents
+           cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'minimum_vertical_extent' AS minimum_vertical_ex,
+           cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'maximum_vertical_extent' AS maximum_vertical_ex
 
 
 
