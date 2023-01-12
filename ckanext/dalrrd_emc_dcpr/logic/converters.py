@@ -151,25 +151,3 @@ def default_metadata_standard_version(value):
     """
     if value == "":
         return "1.1"
-
-
-def flatten_resource_repeated_field(data_dict):
-    distribution_fields = {
-        "distribution_offline_source-0-density": "offline_source_density",
-        "distribution_offline_source-0-density_units": "offline_source_density_units",
-        "distribution_offline_source-0-medium_formats": "offline_source_medium_formats",
-        "distribution_offline_source-0-medium_notes": "offline_source_medium_notes",
-        "distribution_offline_source-0-name": "offline_source_name",
-        "distribution_offline_source-0-volumes": "offline_source_volumes",
-    }
-    resources = data_dict.get("resources")
-    if len(resources) > 0:
-        for res in resources:
-            for i in distribution_fields:  # bad with great inputs which is not expected
-                try:
-                    val = deepcopy(res[i])
-                    del res[i]
-                    res[distribution_fields[i]] = val
-                except:
-                    pass
-    raise RuntimeError(resources)

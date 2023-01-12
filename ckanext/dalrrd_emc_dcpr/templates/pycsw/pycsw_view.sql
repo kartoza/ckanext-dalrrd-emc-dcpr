@@ -148,21 +148,23 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
             -- order process info -> (fee, planned_available_date, instructions, ..etc)
             -- order transfer options -> (online, offline).
             -- resource info -> dicts with properties: name, description, protocol, url
-           (select array_agg(ARRAY[
-            dist_info.
-            res.url as res_url, cast(res.extras as json)->>'application_profile' as res_application_profile,
-            cast(res.extras as json)->>'amendment_number' as res_amendment_number,
-            cast(res.extras as json)->>'file_decompression_technique' as res_decopression_technique,
-            cast(res.extras as json)->>'format_version' as res_format_version,
-            cast(res.extras as json)->>'specification' as res_specification,
-            res.name as res_name, res.description as res_discription,
+           (select json_agg(json_build_object('url',res.url, 'name', res.name,'description',res.description ,'extras', res.extras))
+            -- ARRAY[json_agg(to_json(res.extras), to_json(res.url))]
+            --"res_url",res.url,"res_name",res.name, "res_description",res.description
+            -- cast(res.extras as json)->>'application_profile',
+            -- cast(res.extras as json)->>'amendment_number',
+            -- cast(res.extras as json)->>'specification',
+            -- cast(res.extras as json)->>'file_decompression_technique',
+            -- cast(res.extras as json)->>'format_version',
+            -- cast(cast(cast(cast(res.extras as json)->>'distributor' as json)->>0 as json)->'name' as text)
+            -- cast(cast(cast(cast(res.extras as json)->>'distributor' as json)->>0 as json)->'organization_name' as text)
+            -- cast(cast(cast(cast(res.extras as json)->>'distributor' as json)->>0 as json)->'position_name' as text)
+            -- cast(cast(cast(cast(res.extras as json)->>'distributor' as json)->>0 as json)->'role' as text)
+            -- cast(cast(cast(cast(res.extras as json)->>'distributor' as json)->>0 as json)->'role' as text)
 
+            -- two things: return the distributor and work with renaming inisde array.
 
-
-
-
-            ])
-            from "resource" as res where res.package_id = c.id) AS distribution_info,
+            from "resource" as res where res.package_id = c.id) AS links,
            -- temporal extent
            cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'temporal_extent_period_duration_from' AS temporal_position_begin,
            cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'temporal_extent_period_duration_to' AS temporal_position_end,

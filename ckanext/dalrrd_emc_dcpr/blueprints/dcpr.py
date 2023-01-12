@@ -25,6 +25,11 @@ dcpr_blueprint = Blueprint(
 
 
 @dcpr_blueprint.route("/")
+def index():
+    return toolkit.render("dcpr_home.html")
+
+
+@dcpr_blueprint.route("/public")
 def get_public_dcpr_requests():
     return _get_dcpr_request_list("dcpr_request_list_public")
 
