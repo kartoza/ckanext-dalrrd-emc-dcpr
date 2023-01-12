@@ -273,6 +273,7 @@ def get_datasets_thumbnail(package):
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
     """
+    data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
     try:
         if package["metadata_thumbnail"]:
             data_thumbnail = package["metadata_thumbnail"]
@@ -288,10 +289,8 @@ def get_datasets_thumbnail(package):
                         urlencode(parsed_url),
                     )
                     break
-                else:
-                    data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
     except KeyError:
-        data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
+        return data_thumbnail
     return data_thumbnail
 
 
