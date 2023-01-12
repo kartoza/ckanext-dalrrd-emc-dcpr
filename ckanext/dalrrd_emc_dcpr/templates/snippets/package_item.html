@@ -13,8 +13,8 @@
         {% block content %}
           {% set date = package['metadata_modified'].split('T')[0] %}
           <div class="row dataset-row">
-            <div class="col-sm-4 metadata-record-thumbnail" style="background-image: url('{{ h.get_datasets_thumbnail(package) }}');">
-
+            <div class="col-sm-4 metadata-record-thumbnail">
+                <img src="{{ h.get_datasets_thumbnail(package) }}" alt="{{ notes }}" title="{{ title }}"></img>
             </div>
             <div class="col-sm-8 metadata-record-desc">
               <div class="dataset-content">
@@ -75,7 +75,7 @@
                 {% endblock %}
                 {% block notes %}
                   {% if notes %}
-                    <div>{{ notes|urlize }}</div>
+                    <div class="dataset-desc">{{ notes|urlize }}</div>
                   {% else %}
                     <p class="empty">{{ _("This metadata record has no description") }}</p>
                   {% endif %}
