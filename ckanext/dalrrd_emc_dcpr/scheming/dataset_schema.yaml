@@ -426,7 +426,7 @@ dataset_fields:
     repeating_label: Metadata record format information
     repeating_subfields:
 
-      - field_name: metadata_record_format_name
+      - field_name: name
         label: Metadata record format name
         required: true
         placeholder: Electronic metadata record
