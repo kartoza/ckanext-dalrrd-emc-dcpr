@@ -26,7 +26,7 @@ dcpr_blueprint = Blueprint(
 
 @dcpr_blueprint.route("/")
 def index():
-    return toolkit.render("dcpr_home.html")
+    return toolkit.render("data_capture.html")
 
 
 @dcpr_blueprint.route("/public")
