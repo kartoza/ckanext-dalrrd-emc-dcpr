@@ -7,6 +7,8 @@
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
     <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
         <legend>DCPR request owner fields</legend>
+        <div class="form-information">
+        <h2>GENERAL INFORMATION</h2>
         {% if not data.organization_id %}
             {% call form.select(
                 "organization_id",
@@ -77,7 +79,12 @@
         {% endcall %}
         </div>
         </div>
+        </div>
+        <div class="form-information">
+        <h2>DATA INFORMATION</h2>
         {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
+        <div class="proposed-data-info">
+        <div class="col-md-6">
         {% call form.input(
             'spatial_resolution',
             label=_('Spatial resolution'),
@@ -89,6 +96,8 @@
         ) %}
             {{ form.info(_('Spatial resolution that is proposed for the data capture.')) }}
         {% endcall %}
+        </div>
+        <div class="col-md-6">
         {% call form.select(
             'data_capture_urgency',
             label=_('Data capture urgency'),
@@ -100,6 +109,8 @@
         ) %}
             {{ form.info(_('Urgency of the data capture project.')) }}
         {% endcall %}
+        </div>
+        </div>
         {% call form.markdown(
             'additional_project_context',
             label=_('Additional project context'),
@@ -111,6 +122,7 @@
             {{ form.info(_('Additional information about the project and this DCPR request. Please include any relevant
             information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
+        </div>
         {% if data.datasets %}
             <legend>Dataset(s)</legend>
             <div class="list-datasets" data-module="removeDcprRequestDatasets">
