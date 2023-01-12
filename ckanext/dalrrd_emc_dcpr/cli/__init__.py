@@ -90,16 +90,16 @@ class _CkanEmcDataset:
 
 
 @dataclasses.dataclass
-class _CkanBootstrapErrorReport:
+class _CkanBootstrapDCPRErrorReport:
     csi_reference_id: uuid.UUID
     status: str
     error_application: str
     error_description: str
     solution_description: str
     request_date: str
-    nsif_review_additional_documents: str
-    nsif_moderation_notes: str
-    nsif_moderation_date: str
+    csi_review_additional_documents: str
+    csi_moderation_notes: str
+    csi_moderation_date: str
 
     def to_data_dict(self) -> typing.Dict:
         result = {}

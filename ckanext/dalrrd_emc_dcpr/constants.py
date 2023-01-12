@@ -82,19 +82,6 @@ class DcprRequestModerationAction(enum.Enum):
     RESIGN = "RESIGN"
 
 
-class ErrorReportStatus(enum.Enum):
-    SUBMITTED = "SUBMITTED"
-    MODIFICATION_REQUESTED = "MODIFICATION_REQUESTED"
-    APPROVED = "APPROVED"
-    REJECTED = "REJECTED"
-
-
-class ErrorReportModerationAction(enum.Enum):
-    APPROVE = "APPROVE"
-    REJECT = "REJECT"
-    REQUEST_MODIFICATION = "REQUEST_MODIFICATION"
-
-
 DATASET_MINIMAL_SET_OF_FIELDS = [
     "title",
     "name",
