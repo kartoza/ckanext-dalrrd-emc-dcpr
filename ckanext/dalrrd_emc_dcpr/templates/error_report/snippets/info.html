@@ -1,0 +1,16 @@
+{% set requests_count = error_reports | length %}
+{% block heading %}
+<section class="module module-narrow module-shallow">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4><i class="fa fa-info-circle"></i> Error Reports </h4>
+        </div>
+        <div class="panel-body">
+            <p>Error reporting for metadata records that are faulty or have deficiencies.</p>
+            <p>Any registered user can open an error report for particular record which then will be moderated
+                and acted upon if found it is a valid error report.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
