@@ -733,6 +733,11 @@ footer {
   padding-bottom: 30px;
 }
 
+.page-header.module-content {
+  padding-top: 15px;
+  padding-bottom: 30px;
+}
+
 .page-header .content_action {
   float: right;
   margin-top: 3px;

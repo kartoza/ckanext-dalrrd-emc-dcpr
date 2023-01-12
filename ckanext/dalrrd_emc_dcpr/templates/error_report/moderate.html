@@ -1,0 +1,21 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _("Moderate %s" % action) }}{% endblock %}
+
+{% block maintag %}<div class="row" role="main">{% endblock %}
+
+{% block main_content %}
+    <section class="module col-md-6 col-md-offset-3">
+        <div class="module-content">
+            <p>{{ _('Error report moderation') }}</p>
+            <p>{{ _('What action should be taken?') }}</p>
+            <p class="form-actions">
+                <form id='error-report-confirmation-form' action="{{ action_url }}" method="post">
+                    <button class="btn btn-default" type="submit" name="REQUEST_MODIFICATION" >{{ _('Move back to draft') }}</button>
+                    <button class="btn btn-primary" type="submit" name="APPROVE" >{{ _('Approve error report') }}</button>
+                    <button class="btn btn-default" type="submit" name="REJECT" >{{ _('Reject error report') }}</button>
+                </form>
+            </p>
+        </div>
+    </section>
+{% endblock %}

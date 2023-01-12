@@ -23,6 +23,7 @@ from .. import (
 )
 from ..blueprints.dcpr import dcpr_blueprint
 from ..blueprints.emc import emc_blueprint
+from ..blueprints.error_report import error_report_blueprint
 from ..blueprints.xml_parser import xml_parser_blueprint
 from ..blueprints.publish import publish_blueprint
 from ..cli import commands
@@ -33,6 +34,11 @@ from ..logic.action.dcpr import delete as dcpr_delete_actions
 from ..logic.action.dcpr import get as dcpr_get_actions
 from ..logic.action.dcpr import update as dcpr_update_actions
 from ..logic.action import emc as emc_actions
+from ..logic.action.error_report import create as report_create_actions
+from ..logic.action.error_report import update as report_update_actions
+from ..logic.action.error_report import get as report_get_actions
+from ..logic.action.error_report import delete as report_delete_actions
+
 from ..logic import (
     converters,
     validators,
@@ -41,6 +47,7 @@ from ..logic.auth import ckan as ckan_auth
 from ..logic.auth import pages as ckanext_pages_auth
 from ..logic.auth import dcpr as dcpr_auth
 from ..logic.auth import emc as emc_auth
+from ..logic.auth import error_report as error_report_auth
 from ..model.user_extra_fields import UserExtraFields
 
 import ckanext.dalrrd_emc_dcpr.plugins.utils as utils
@@ -258,6 +265,17 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_request_dataset_publication": (
                 emc_auth.authorize_request_dataset_publication
             ),
+            "error_report_create_auth": error_report_auth.error_report_create_auth,
+            "error_report_show_auth": error_report_auth.error_report_show_auth,
+            "error_report_update_by_owner_auth": error_report_auth.error_report_update_by_owner_auth,
+            "error_report_update_by_nsif_auth": error_report_auth.error_report_update_by_nsif_auth,
+            "error_report_nsif_moderate_auth": error_report_auth.error_report_nsif_moderate_auth,
+            "my_error_reports_auth": error_report_auth.my_error_reports_auth,
+            "error_report_submitted_auth": error_report_auth.error_report_submitted_auth,
+            "error_report_list_public_auth": error_report_auth.error_report_list_public_auth,
+            "my_error_report_list_auth": error_report_auth.my_error_report_list_auth,
+            "rejected_error_reports_auth": error_report_auth.rejected_error_reports_auth,
+            "error_report_delete_auth": error_report_auth.error_report_delete_auth,
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -298,6 +316,16 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "user_update": ckan_actions.user_update,
             "user_create": ckan_actions.user_create,
             "user_show": ckan_actions.user_show,
+            "error_report_create": report_create_actions.error_report_create,
+            "error_report_update_by_owner": report_update_actions.error_report_update_by_owner,
+            "error_report_update_by_nsif": report_update_actions.error_report_update_by_nsif,
+            "error_report_nsif_moderate": report_update_actions.error_report_nsif_moderate,
+            "error_report_show": report_get_actions.error_report_show,
+            "error_report_list_public": report_get_actions.error_report_list_public,
+            "my_error_report_list": report_get_actions.my_error_report_list,
+            "rejected_error_reports": report_get_actions.rejected_error_reports,
+            "submitted_error_report_list": report_get_actions.submitted_error_report_list,
+            "error_report_delete": report_delete_actions.error_report_delete,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
@@ -354,6 +382,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return [
             dcpr_blueprint,
             emc_blueprint,
+            error_report_blueprint,
             xml_parser_blueprint,
             publish_blueprint,
         ]

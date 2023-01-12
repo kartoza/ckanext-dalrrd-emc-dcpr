@@ -1,0 +1,55 @@
+{% extends 'page.html' %}
+{% block content_primary_nav %}
+    {% if csi_reference_id %}
+        <h1>{{ _('Edit error report') }}</h1>
+    {% else %}
+        <h1>{{ _('Create new error report') }}{% if data.organization_id %} for organization {{ data.organization_id }}{% endif %}</h1>
+    {% endif %}
+{% endblock %}
+
+{% block content_action %}
+    {% if csi_reference_id %}
+        {% link_for _('View Error report'), named_route="error_report.error_report_show", csi_reference_id=csi_reference_id, class_='btn btn-default', icon='eye' %}
+    {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+
+    {% block form %}
+        {{- h.snippet(
+            form_snippet,
+            csi_reference_id=csi_reference_id,
+            data=data,
+            metadata_records=metadata_records,
+            selected_record=selected_record,
+            enable_owner_fieldset=enable_owner_fieldset,
+            enable_nsif_fieldset=enable_nsif_fieldset,
+            errors=errors,
+            error_summary=error_summary,
+            data_urgency_options=data_urgency_options)
+        -}}
+
+    {% endblock %}
+{% endblock %}
+
+{% block secondary_content %}
+  {% block request_info %}
+    <section class="module module-narrow module-shallow">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+                  <h4>
+                      <i class="fa fa-info-circle"></i>
+                      {{ _('Error Report Info') }}
+                  </h4>
+          </div>
+          <div class="panel-body">
+              <p>Error reporting for ther perceived deficiencies with the existing geospatial datasets.
+                 The EMC/DCPR system extends this to also include reports about perceived
+                 deficiencies with a dataset’s metadata record. Only registered users are able to submit
+                 error reports about existing metadata records.
+              </p>
+          </div>
+      </div>
+    </section>
+  {% endblock %}
+{% endblock %}

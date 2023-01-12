@@ -1,0 +1,63 @@
+{% extends "page.html" %}
+
+{% set able_to_create_error_report = h.check_access('error_report_create_auth') %}
+{% set is_nsif_member = h.emc_user_is_org_member('nsif', g.userobj) %}
+{% set is_sysadmin = g.userobj.sysadmin %}
+{% set has_multiple_report_types = able_to_create_error_report or is_nsif_member %}
+
+{% block subtitle %}{{ _('Error Reports') }} - {{ super() }}{% endblock %}
+
+{% block secondary_content %}
+    {% snippet 'error_report/snippets/info.html', error_reports=error_reports %}
+{% endblock%}
+
+{% block content_primary_nav %}
+    {% if has_multiple_report_types or is_sysadmin %}
+        {{ h.build_nav("error_report.get_error_reports", _("Approved error reports")) }}
+        {% if able_to_create_error_report %}
+            {{ h.build_nav("error_report.get_my_error_reports", _("My error reports")) }}
+        {% endif %}
+        {%  if is_nsif_member or is_sysadmin %}
+            {{ h.build_nav("error_report.get_submitted_error_reports", _("Error reports awaiting NSIF moderation")) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block page_primary_action %}
+    {% if able_to_create_error_report and show_create_button %}
+        {% link_for _('New error report'), named_route="error_report.new_error_report", class_='btn btn-success', icon='plus-square' %}
+    {% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+    <section class="module" xmlns="http://www.w3.org/1999/html">
+        <div class="module-content">
+            {% if error_reports %}
+                <ul class="{{ list_class or 'dataset-list list-unstyled' }}">
+                    {% for error_report in page.items %}
+                        <li class="request-item">
+                            <div class="row request-row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <h2 class="dataset-heading">
+                                            {{ h.link_to(h.truncate(error_report.description or "Error report", 80), h.url_for('error_report.error_report_show', csi_reference_id=error_report.csi_reference_id)) }}
+                                            <small>{{ error_report.csi_reference_id }}</small>
+                                        </h2>
+                                        <div><span {% if error_report.status == "REJECTED" %}class="text-danger"{% endif %}>{{ error_report.status }}</span></div>
+                                        <div>Creator: {{ error_report.owner }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty">{{ _('There are no error reports yet.') }}</p>
+            {% endif %}
+            {% block page_pagination %}
+                {{ page.pager(q=q) }}
+            {% endblock %}
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% import 'macros/form.html' as form %}
+
+<form class="dataset-form" method="post" data-module="basic-form" novalidate>
+    {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
+    <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="error-report-owner-fields">
+
+        {% call form.select(
+                "metadata_record",
+                id="field-metadata_record",
+                label=_("Metadata record"),
+                options=metadata_records,
+                selected=selected_record or metadata_records[0].text,
+                is_required=true
+            ) %}
+                {{ form.info(_('Metadata record that has fault or deficiency')) }}
+            {% endcall %}
+
+        {% call form.input(
+            'error_application',
+            label=_('Error application'),
+            id='field-error-application',
+            placeholder=_(''),
+            value=data.error_application,
+            error=errors.error_application,
+            classes=['control-medium'],
+            is_required=True
+        ) %}
+            {{ form.info(_('Report purpose, whether it is about a deficiency with
+                            the metadata record or with the underlying dataset itself')) }}
+        {% endcall %}
+
+        {% call form.markdown(
+            'error_description',
+            label=_('Error description'),
+            id='field-error_description',
+            value=data.error_description,
+            error=errors.error_description,
+            placeholder=_('e.g. Error description')
+        ) %}
+            {{ form.info(_('Description of the error being reported')) }}
+        {% endcall %}
+
+        {% call form.markdown(
+            'solution_description',
+            label=_('Solution description'),
+            id='field-solution_description',
+            value=data.solution_description,
+            error=errors.solution_description,
+            placeholder=_('e.g. Solution description')
+        ) %}
+            {{ form.info(_('Description of possible solutions to the error being reported')) }}
+        {% endcall %}
+        </div>
+
+    </fieldset>
+    {% if enable_nsif_fieldset %}
+    <fieldset>
+        <legend>NSIF reviewer fields (only enabled for NSI reviewer)</legend>
+        {% call form.markdown(
+            'nsif_moderation_notes',
+            label=_('NSIF moderation notes'),
+            id='field-nsif_moderation_notes',
+            value=data.nsif_moderation_notes,
+            error=errors.nsif_moderation_notes,
+            classes=['control-medium']
+        ) %}
+            {{ form.info(_('Provided by the NSIF reviewers')) }}
+        {% endcall %}
+
+         {% call form.markdown(
+            'nsif_review_additional_documents',
+            label=_('NSIF review additional documents'),
+            id='field-nsif_review_additional_documents',
+            value=data.nsif_review_additional_documents,
+            error=errors.nsif_review_additional_documents,
+            classes=['control-medium']
+        ) %}
+            {{ form.info(_('Provided by the NSIF reviewers')) }}
+        {% endcall %}
+
+    </fieldset>
+    {% endif %}
+
+    {% block form_actions %}
+        {{ form.required_message() }}
+        <div class="form-actions">
+            {% if csi_reference_id and h.check_access("error_report_delete_auth", {"csi_reference_id": csi_reference_id}) %}
+                {% link_for _('Delete Error Report'),
+                    named_route="error_report.error_report_delete",
+                    csi_reference_id=csi_reference_id,
+                    class_='btn btn-danger',
+                    icon='trash'
+                %}
+            {% endif %}
+            <input type="submit" class="btn btn-default" value="{{ _('Save') }}">
+
+        </div>
+    {% endblock %}
+</form>
+
+{#data-module="confirm-action",#}
+{#data-module-content="{{ _('Are you sure you want to delete this error report?') }}"#}
