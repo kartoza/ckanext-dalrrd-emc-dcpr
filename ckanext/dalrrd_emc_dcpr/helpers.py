@@ -267,30 +267,27 @@ def get_all_datasets_count(user_obj):
     return result["count"]
 
 
-def get_datasets_thumbnail(package):
+def get_datasets_thumbnail(data_dict):
     """
     Generate thumbnails based on metadataset
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
     """
     data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
-    try:
-        if package["metadata_thumbnail"]:
-            data_thumbnail = package["metadata_thumbnail"]
-        else:
-            data_resource = package["resources"]
-            for resource in data_resource:
-                if resource["format"].lower() == "wms":
-                    wms_url = resource["url"]
-                    parsed_url = dict(parse_qsl(urlparse(wms_url).query))
-                    parsed_url["format"] = "image/png; mode=8bit"
-                    data_thumbnail = "%s?%s" % (
-                        wms_url.split("?")[0],
-                        urlencode(parsed_url),
-                    )
-                    break
-    except KeyError:
-        return data_thumbnail
+    if data_dict.get("metadata_thumbnail"):
+        data_thumbnail = data_dict.get("metadata_thumbnail")
+    else:
+        data_resource = data_dict.get("resources")
+        for resource in data_resource:
+            if resource["format"].lower() == "wms":
+                wms_url = resource["url"]
+                parsed_url = dict(parse_qsl(urlparse(wms_url).query))
+                parsed_url["format"] = "image/png; mode=8bit"
+                data_thumbnail = "%s?%s" % (
+                    wms_url.split("?")[0],
+                    urlencode(parsed_url),
+                )
+                break
     return data_thumbnail
 
 

@@ -1025,16 +1025,16 @@ footer {
   background-size: contain;
   border: solid 1px #eee;
   padding: 0px;
+  line-height: 150px;
 }
 
 .metadata-record-thumbnail img{
   width: 100%;
-  height: 100%;
+  vertical-align: middle;
 }
 
 .metadata-record-desc{
   padding-left:20px;
-  width: 81.3% !important;
 }
 
 @media (min-width: 768px) {
@@ -1055,7 +1055,7 @@ footer {
   }
   .metadata-record-desc{
     padding-left:0px;
-    width: 100% !important;
+    width: 100%;
   }
   .datasets-date{
     top: unset;
@@ -1067,6 +1067,6 @@ footer {
 @media (min-width: 768px) and (max-width: 1200px) {
   .metadata-record-desc {
     padding-left: 20px;
-    width: 66.66666667% !important;
+    width: 66.66666667%;
   }
 }
