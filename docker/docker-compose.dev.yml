@@ -91,6 +91,7 @@ services:
       - PYCSW_REPOSITORY_DB=ckan-dev
       - PYCSW_REPOSITORY_MAPPINGS_PATH=/etc/pycsw/pycsw_repository_mappings.py
       - PYCSW_REPOSITORY_TABLE=emc_pycsw_view
+      - PYTHONUNBUFFERED=1
     ports:
       - target: 8000
         published: *pycsw-published-port
@@ -124,6 +125,7 @@ services:
         published: *ckan-db-published-port
     volumes:
       - ckan-db-data:/var/lib/postgresql/data
+    command: ["-clog_statement=all"]
 
   datastore-db:
     environment:

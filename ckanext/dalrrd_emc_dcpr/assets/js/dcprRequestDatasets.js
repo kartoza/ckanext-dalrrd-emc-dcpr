@@ -12,6 +12,18 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         initialize: function() {
             jQuery.proxyAll(this, /_on/);
             this.el.on('click', this._onAddDatasetFieldset)
+
+
+            //get url
+            let url = window.location.href
+            let custodianCheckbox = document.getElementsByName("dataset_custodian")
+            console.log(url)
+            if(url.includes("e1")){
+                for (let check of custodianCheckbox){
+                    check.checked = true
+                    check.value = true
+                }
+            }
         },
 
         _onAddDatasetFieldset: function () {

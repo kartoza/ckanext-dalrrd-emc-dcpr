@@ -158,3 +158,59 @@ def claim_reviewer_schema():
 @validator_args
 def resign_reviewer_schema():
     return show_dcpr_request_schema()
+
+
+@validator_args
+def create_error_report_schema(
+    ignore_missing,
+    not_missing,
+    not_empty,
+    unicode_safe,
+):
+    return {
+        "metadata_record": [not_missing, not_empty, unicode_safe],
+        "owner_user": [not_missing, not_empty, unicode_safe],
+        "error_application": [ignore_missing, unicode_safe],
+        "error_description": [not_missing, not_empty],
+        "solution_description": [ignore_missing, unicode_safe],
+        "request_date": [ignore_missing, unicode_safe],
+        "nsif_moderation_notes": [ignore_missing, unicode_safe],
+        "nsif_review_additional_documents": [ignore_missing, unicode_safe],
+        "nsif_moderation_date": [ignore_missing, unicode_safe],
+    }
+
+
+@validator_args
+def update_error_report_by_owner_schema(
+    ignore_missing,
+    not_missing,
+    not_empty,
+    unicode_safe,
+):
+    return {
+        "csi_reference_id": [not_missing, not_empty, unicode_safe],
+        "metadata_record": [not_missing, not_empty, unicode_safe],
+        "status": [ignore_missing, unicode_safe],
+        "error_application": [ignore_missing, unicode_safe],
+        "error_description": [not_missing, not_empty],
+        "solution_description": [ignore_missing, unicode_safe],
+        "request_date": [ignore_missing, unicode_safe],
+        "nsif_moderation_notes": [ignore_missing, unicode_safe],
+        "nsif_review_additional_documents": [ignore_missing, unicode_safe],
+        "nsif_moderation_date": [ignore_missing, unicode_safe],
+    }
+
+
+@validator_args
+def show_error_report_schema(not_missing, not_empty, unicode_safe):
+    return {"csi_reference_id": [not_missing, not_empty, unicode_safe]}
+
+
+@validator_args
+def delete_error_report_schema():
+    return show_error_report_schema()
+
+
+@validator_args
+def moderate_error_report_schema():
+    return show_error_report_schema()

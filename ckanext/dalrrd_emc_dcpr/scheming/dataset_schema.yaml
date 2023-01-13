@@ -52,7 +52,7 @@ dataset_fields:
   - field_name: metadata_standard_name
     label: Metadata standard name
     validators: metadata_default_standard_name
-    required: true
+    required: false
     help_text: >-
       Name(s) of metadata standard used, if multiple standards used, separate them by comma, leave
       blank if the metadata standard used is SANS1878
@@ -61,7 +61,7 @@ dataset_fields:
   - field_name: metadata_standard_version
     label: Metadata standard version
     validators: metadata_default_standard_version
-    required: true
+    required: false
     help_text: >-
       Version(s) of metadata standard used, if multiple standards used, separate versions by comma, leave
       blank if the metadata standard version is 1.1
@@ -130,66 +130,30 @@ dataset_fields:
         required: false
         help_text: date and time of the last use of the resource or resource series (or both) that complete a range, leave empty if not specified.
 
-# owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
-# vanilla ckanext-scheming too
-  - field_name: owner_org
-    label: Organization Name
-    required: true
-    preset: emc_dataset_organization
-    help_text: Organization responsible for the metadata record. This is a SANS 1878 mandatory field
-
-  - field_name: contact
-    label: Metadata point of contact
+  - field_name: user_info
+    label: User contact information
     preset: modified_repeating_subfields
     repeating_subfields:
       - field_name: individual_name
         label: Individual name
         required: false
-        help_text: name - with surname of the person responsible of this metadata record
+        help_text: Name of personnel using this metadata record
+
+      - field_name: organization_name
+        label: Organization name
+        required: false
+        help_text: Name of organization using this metadata record
 
       - field_name: position_name
-        label: Role / Position of the responsible individual
+        label: Position name
         required: false
-        help_text: Role/ position of responsible individual in the organization
+        help_text: role or position of the person using the metadata record
 
-      - field_name: delivery_point
-        label: Delivery Point
+      - field_name: role
+        label: Role
         required: false
-
-      - field_name: address_city
-        label: City
-        required: false
-
-      - field_name: address_administrative_area
-        label: Administrative area
-        required: false
-        help_text: province of the contact location
-
-      - field_name: postal_code
-        label: Postal Code
-        required: false
-
-      - field_name: electronic_mail_address
-        label: Electronic mail address
-        required: false
-        help_text: Address of the electronic mailbox of the responsible organization or individual
-
-      - field_name: voice
-        label: Contact point phone
-        required: false
-        help_text: Telephone number to contact the responsible organization or individual
-
-      - field_name: facsimile
-        label: Contact point facsimile
-        required: false
-        help_text: Facsimile machine number to contact responsible organization or individual
-
-      # this to be implemented as multiple choices.
-      - field_name: organisational_role
-        label: Organisation role
-        required: true
+        help_text: function performed by the organization using the metadata record
         preset: select
-        help_text: function performed by responsible party, This is a SANS 1878 mandatory field
         choices:
           - value: resource_provider
             label: resource provider
@@ -212,11 +176,161 @@ dataset_fields:
           - value: publisher
             label: publisher
 
+
+  - field_name: user_contact_info
+    label: User additional contact info
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+      - field_name: delivery_point
+        label: Usage delivery Point
+        required: false
+
+      - field_name: address_city
+        label: Usage City
+        required: false
+
+      - field_name: address_administrative_area
+        label: Usage Administrative area
+        required: false
+        help_text: province of the contact location
+
+      - field_name: postal_code
+        label: Usage Postal Code
+        required: false
+
+      - field_name: electronic_mail_address
+        label: User Electronic mail address
+        required: false
+        help_text: Address of the electronic mailbox of the user organization or individual
+
+      - field_name: voice
+        label: User phone
+        required: false
+        help_text: Telephone number to contact the user organization or individual
+
+      - field_name: facsimile
+        label: User facsimile
+        required: false
+        help_text: Facsimile machine number to contact user organization or individual
+
+
+# owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
+# vanilla ckanext-scheming too
+  - field_name: owner_org
+    label: Organization Name
+    required: true
+    preset: emc_dataset_organization
+    help_text: Organization responsible for the metadata record. This is a SANS 1878 mandatory field
+
+  - field_name: contact
+    label: Metadata point of contact
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: individual_name
+        label: Individual contact name
+        required: false
+        help_text: name - with surname of the person responsible of this metadata record
+
+      - field_name: position_name
+        label: Role / Position of the contact individual
+        required: false
+        help_text: Role/ position of the contact individual
+
+      - field_name: organisational_role
+        label: Organisation role
+        required: true
+        preset: select
+        help_text: function performed by contact party, This is a SANS 1878 mandatory field
+        choices:
+          # - value: resource_provider
+          #   label: resource provider
+          # - value: custodian
+          #   label: custodian
+          # - value: owner
+          #   label: owner
+          # - value: user
+          #   label: user
+          # - value: distributor
+          #   label: distributor
+          # - value: originator
+          #   label: originator
+          - value: point_of_contact
+            label: point of contact
+          # - value: principal_investigator
+          #   label: principal investigator
+          # - value: processor
+          #   label: processor
+          # - value: publisher
+          #   label: publisher
+
+  - field_name: contact_address
+    label: Metadata point of contact additional info
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: voice
+      label: Contact point phone
+      required: false
+      help_text: Telephone number of individual contact or organization
+
+    - field_name: facsimile
+      label: Contact point facsimile
+      required: false
+      help_text: Facsimile machine number of individual contact or organization
+
+    - field_name: delivery_point
+      label: Delivery Point
+      required: false
+
+    - field_name: city
+      label: City
+      required: false
+      help_text: City of the contact organization or individual
+
+    - field_name: administrative_area
+      label: Administrative area
+      required: false
+      help_text: province of the contact location
+
+    - field_name: postal_code
+      label: Postal Code
+      required: false
+      help_text: postal code of the contact organization or individual
+
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the contact organization or individual
+
+
   - field_name: reference_date
     label: Reference date
-    required: true
-    preset: date
-    help_text: Reference date for this metadata record - This is a SANS 1878 mandatory field
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: date
+      label: Date
+      required: true
+      # validators: >-
+      #   reference_date_convertor
+      preset: date
+      help_text: Reference datetime for this metadata record
+      # you need to add time
+
+    - field_name: date_type
+      label: Reference date type
+      required: true
+      validators: convert_choices_select_to_int
+      preset: select
+      choices:
+        - value: 001
+          label: Creation
+        - value: 002
+          label: Publication
+        - value: 003
+          label: Revision
+      help_text: Reference date type - This is a SANS 1878 mandatory field
 
   - field_name: iso_topic_category
     label: Topic Category
@@ -307,10 +421,40 @@ dataset_fields:
     display_property: foaf:homepage
     display_snippet: link.html
 
-  - field_name: version
-    label: Metadata record version
-    validators: ignore_missing unicode package_version_validator
-    form_placeholder: '1.0'
+  # previously the required field was the resource version, but as the metadata record is the main dataset
+  # we store, this is the required sans1878 field
+  - field_name: metadata_record_format
+    label: Metadata record format information
+    preset: modified_repeating_subfields
+    repeating_label: Metadata record format information
+    repeating_subfields:
+
+      - field_name: name
+        label: Metadata record format name
+        required: true
+        placeholder: Electronic metadata record
+        help_text: Name of the data transfer format, default is Electronic metadata record - This is a SANS 1878 mandatory field
+
+      - field_name: version
+        label: Metadata record version
+        required: true
+        form_placeholder: '1.0'
+        help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
+
+      - field_name: amendment_number
+        label: Amendment number
+        required: false
+        help_text: Amendment number of the format version
+
+      - field_name: specification
+        label: Specification
+        required: false
+        help_text: Name of a subset, profile or product specification of format
+
+      - field_name: file_decompression_technique
+        label: File decompression technique
+        required: false
+        help_text: Recommendations of algorithms or processes that can be applied to read or expand resources to which compression techniques have be applied
 
   - field_name: dataset_language
     label: Metadata record language
@@ -538,6 +682,10 @@ dataset_fields:
         required: false
         help_text: Role/ position of the responsible individual in the orgnization
 
+      - field_name: delivery_point
+        label: Delivery Point
+        required: false
+
       - field_name: processor_address_city
         label: Processor address - City
         required: false
@@ -572,39 +720,6 @@ dataset_fields:
         validators: lineage_source_srs_validator
         help_text: spatial reference system used by the source
       # maybe the source citation to be added?
-
-  - field_name: distribution
-    label: Distribution information
-    preset: modified_repeating_subfields
-    repeating_label: Distribution information
-    repeating_subfields:
-
-      - field_name: order_process
-        label: Distributor Order Process
-        required: false
-        form_snippet: markdown.html
-        help_text: information about how the metadata record may be obtained, and related instructions and fee information
-
-      - field_name: units_of_distribution
-        label: Units of distribution
-        required: false
-        help_text: tiles, layers, geographic areas ...etc., in which data is available
-
-      - field_name: transfer_size
-        label: Transfer size
-        required: false
-        help_text: estimated size of a unit the specified transfer format, expressed in megabytes
-
-      - field_name: online_source
-        label: Distribution online source
-        required: false
-        help_text: information about online source from which the resource can be obtained
-
-      - field_name: offline_source
-        label: Distribution offline source
-        required: false
-        help_text: information about offline source from which the resource can be obtained
-
 
   - field_name: maintainer
     label: Maintainer
@@ -667,6 +782,220 @@ dataset_fields:
         required: false
         help_text: additional information about the requirements for maintaining the resource
 
+  - field_name: distributor
+    label: Distributior
+    preset: modified_repeating_subfields
+    repeating_label: Distribution contact
+    repeating_subfields:
+
+      - field_name: name
+        label: Distributor name
+        required: false
+
+      - field_name: organization_name
+        label: Distributor organisation name
+        required: false
+
+      - field_name: position_name
+        label: Distributor position name
+        help_text: name of position of responsible person
+
+      - field_name: role
+        label: Distributor organization role
+        preset: select
+        choices:
+          # - value: resource_provider
+          #   label: resource provider
+          # - value: custodian
+          #   label: custodian
+          # - value: owner
+          #   label: owner
+          # - value: user
+          #   label: user
+          - value: distributor
+            label: distributor
+        #   - value: originator
+        #     label: originator
+        #   - value: point_of_contact
+        #     label: point of contact
+        #   - value: principal_investigator
+        #     label: principal investigator
+        #   - value: processor
+        #     label: processor
+        #   - value: publisher
+        #     label: publisher
+        # help_text: function performed by Distributor organisation
+
+  - field_name: distributor_contact
+    label: Distributor contact information
+    preset: modified_repeating_subfields
+    repeating_label: Distributor contact information
+    repeating_subfields:
+
+      - field_name: voice
+        label: Distributor phone
+        required: false
+        help_text: Telephone number of the distributing organisation or individual
+
+      - field_name: facsimile
+        label: Distributor facsimile
+        required: false
+        help_text: Facsimile machine number of distributing organisation or individual
+
+      - field_name: delivery_point
+        label: Delivery Point
+        required: false
+
+      - field_name: address_city
+        label: City
+        required: false
+
+      - field_name: address_administrative_area
+        label: Administrative area
+        required: false
+        help_text: province of the contact location
+
+      - field_name: postal_code
+        label: Postal Code
+        required: false
+
+      - field_name: electronic_mail_address
+        label: Electronic mail address
+        required: false
+        help_text: Address of the electronic mailbox of the responsible organization or individual
+
+  - field_name: distributor_order_process
+    label: Distributor Order Process
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+      - field_name: fees
+        label: Distribution fees
+        help_text: fees and terms of retrieving the resource, including monetary units
+
+      - field_name: planned_available_date
+        label: Distribution Planned available date time
+        preset: date
+        help_text: date and time when the resource will be available
+
+      - field_name: ordering_instructions
+        label: Ordering instructions
+        form_snippet: markdown.html
+        help_text: date and time when the resource will be available
+
+      - field_name: turnaround
+        label: Turnaround
+        help_text: typical turnaround time for the filling of an order
+
+  - field_name: distributor_transfer_options
+    label: Distributor transfer options
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: units_of_distribution
+      label: Units of distribution
+      required: false
+      help_text: Tiles, layers, geographic areas ...etc., in which data is available
+
+    - field_name: transfer_size
+      label: Transfer size
+      required: false
+      help_text: Estimated size of a unit the specified transfer format, expressed in megabytes
+
+    - field_name: online_source
+      label: Distribution online source
+      required: false
+      help_text: Information about online source from which the resource can be obtained
+
+  - field_name: distribution_offline_source
+    label: Distribution offline source
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: name
+      label: Medium name
+      preset: select
+      validators: convert_choices_select_to_int
+      choices:
+        - value: 001
+          label: cdROM
+        - value: 002
+          label: dvd
+        - value: 003
+          label: dvdRom
+        - value: 004
+          label: 3halfInchFloppy
+        - value: 005
+          label: 5quarterInchFloopy
+        - value: 006
+          label: 7trackTape
+        - value: 007
+          label: 9trackTape
+        - value: 8
+          label: 3480Cartidge
+        - value: 9
+          label: 3490Cartidge
+        - value: 010
+          label: 3580Cartidge
+        - value: 011
+          label: 4mmCartidgeTape
+        - value: 012
+          label: 8mmCartidgeTape
+        - value: 013
+          label: 1quarterInchCartidgeTape
+        - value: 014
+          label: digitalLinearTape
+        - value: 015
+          label: onLine
+        - value: 016
+          label: satelite
+        - value: 017
+          label: telephoneLink
+        - value: 018
+          label: hardcopy
+        - value: 019
+          label: USB Flashdisk
+        - value: 20
+          label: protable Hardisk
+
+    - field_name: density
+      label: Medium Density
+      validators: check_if_number
+      help_text: Density at which data is recorded
+
+    - field_name: density_units
+      label: Density units
+      help_text: Units of measure for the recording density
+
+    - field_name: volumes
+      validators: check_if_int
+      label: Volumes
+      help_text: Number of items in the media identified.
+
+    - field_name: medium_formats
+      label: Medium formats
+      preset: select
+      validators: convert_choices_select_to_int
+      choices:
+      - value: 001
+        label: cpio
+      - value: 002
+        label: tar
+      - value: 003
+        label: highSierra
+      - value: 004
+        label: iso9660
+      - value: 005
+        label: iso9660RockRidge
+      - value: 006
+        label: iso9660AppleHFS
+
+      help_text: Method used to write to the medium
+
+    - field_name: medium_notes
+      label: Medium notes
+      help_text: Description of other limitations or requirements for using the medium
+
 
   - field_name: spatial
     label: Geographic location bounding box
@@ -679,7 +1008,7 @@ dataset_fields:
 
     # TODO: Add a more pleasant widget, like the one used for the dataset URL, which would show 1/<value>
   - field_name: equivalent_scale
-    label: Spatial resolution
+    label: Spatial resolution equivalent scale
     required: true
     preset: spatial_resolution_checker
     help_text: >-
@@ -732,7 +1061,7 @@ dataset_fields:
       Description about the temporal reference system used (if any) - This is an optional SANS 1878 field"
 
   - field_name: reference_system_additional_info
-    label: Additional information about Reference Systems
+    label: Additional information about Reference Systems (temproal, vertical)
     preset: modified_repeating_subfields
     repeating_subfields:
 
@@ -742,17 +1071,13 @@ dataset_fields:
         required: false
 
       - field_name: temporal_extent_period_duration_from
-        label: Temporal extent duration (from)
+        label: Temporal extent duration (Start position)
         preset: date
         required: false
 
       - field_name: temporal_extent_period_duration_to
-        label: Temporal extent duration (to)
+        label: Temporal extent duration (End position)
         preset: date
-        required: false
-
-      - field_name: spatial_temporal_extent
-        label: Spatio-Temporal extent identifier
         required: false
 
       - field_name: minimum_vertical_extent
@@ -769,7 +1094,6 @@ dataset_fields:
     form_placeholder: https://files.isric.org/public/thumbnails/afsis250m/clyppt.png
     help_text: >-
       URL for a thumbnail previewing this metadata record which appears in the search page. Use images with 1:1 ratio for better results
-
 
   - field_name: metadata_date_stamp
     label: Metadata date stamp
@@ -788,21 +1112,38 @@ resource_fields:
     label: Name
     form_placeholder: eg. January 2011 Gold Prices
 
+  - field_name: application_profile
+    label: Application profile
+    help_text: Name of an application profile that can be used with the resource
+
   - field_name: description
     label: Description
-    form_snippet: markdown.html
-    form_placeholder: Some useful notes about the data
+    validators: convert_choices_select_to_int
+    preset: select
+    choices:
+      - value: 001
+        label: download
+      - value: 002
+        label: information
+      - value: 003
+        label: offlineAccess
+      - value: 004
+        label: order
+      - value: 005
+        label: search
+
+    help_text: Please specify the function performed by the resource
 
   - field_name: format
     label: Format
-    required: true
+    required: false
     preset: resource_format_autocomplete
     help_text: Name of the data transfer format - This is a SANS 1878 mandatory field
 
   - field_name: format_version
     label: Format Version
-    required: true
-    help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
+    required: false
+    help_text: link format
 
   - field_name: amendment_number
     label: Amendment number
@@ -818,3 +1159,216 @@ resource_fields:
     label: File decompression technique
     required: false
     help_text: Recommendations of algorithms or processes that can be applied to read or expand resources to which compression techniques have be applied
+
+  - field_name: distributor
+    label: Distributior
+    preset: modified_repeating_subfields
+    repeating_label: Distribution contact
+    repeating_subfields:
+
+      - field_name: name
+        label: Distributor name
+        required: false
+
+      - field_name: organization_name
+        label: Distributor organisation name
+        required: false
+
+      - field_name: position_name
+        label: Distributor position name
+        help_text: name of position of responsible person
+
+      - field_name: role
+        label: Distributor organization role
+        preset: select
+        choices:
+          - value: resource_provider
+            label: resource provider
+          - value: custodian
+            label: custodian
+          - value: owner
+            label: owner
+          - value: user
+            label: user
+          - value: distributor
+            label: distributor
+          - value: originator
+            label: originator
+          - value: point_of_contact
+            label: point of contact
+          - value: principal_investigator
+            label: principal investigator
+          - value: processor
+            label: processor
+          - value: publisher
+            label: publisher
+        help_text: function performed by Distributor organisation
+
+  - field_name: distributor_contact
+    label: Distributor contact information
+    preset: modified_repeating_subfields
+    repeating_label: Distributor contact information
+    repeating_subfields:
+
+      - field_name: voice
+        label: Distributor phone
+        required: false
+        help_text: Telephone number of the distributing organisation or individual
+
+      - field_name: facsimile
+        label: Distributor facsimile
+        required: false
+        help_text: Facsimile machine number of distributing organisation or individual
+
+      - field_name: delivery_point
+        label: Delivery Point
+        required: false
+
+      - field_name: address_city
+        label: City
+        required: false
+
+      - field_name: address_administrative_area
+        label: Administrative area
+        required: false
+        help_text: province of the contact location
+
+      - field_name: postal_code
+        label: Postal Code
+        required: false
+
+      - field_name: electronic_mail_address
+        label: Electronic mail address
+        required: false
+        help_text: Address of the electronic mailbox of the responsible organization or individual
+
+  - field_name: distributor_order_process
+    label: Distributor Order Process
+    preset: modified_repeating_subfields
+    repeating_subfields:
+      - field_name: fees
+        label: Distribution fees
+        help_text: fees and terms of retrieving the resource, including monetary units
+
+      - field_name: planned_available_date
+        label: Distribution Planned available date time
+        preset: date
+        help_text: date and time when the resource will be available
+
+      - field_name: ordering_instructions
+        label: Ordering instructions
+        form_snippet: markdown.html
+        help_text: date and time when the resource will be available
+
+      - field_name: turnaround
+        label: Turnaround
+        help_text: typical turnaround time for the filling of an order
+
+  - field_name: distributor_transfer_options
+    label: Distributor transfer options
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: units_of_distribution
+      label: Units of distribution
+      required: false
+      help_text: Tiles, layers, geographic areas ...etc., in which data is available
+
+    - field_name: transfer_size
+      label: Transfer size
+      required: false
+      help_text: Estimated size of a unit the specified transfer format, expressed in megabytes
+
+    - field_name: online_source
+      label: Distribution online source
+      required: false
+      help_text: Information about online source from which the resource can be obtained
+
+  - field_name: distribution_offline_source
+    label: Distribution offline source
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: name
+      label: Medium name
+      preset: select
+      validators: convert_choices_select_to_int
+      choices:
+        - value: 001
+          label: cdROM
+        - value: 002
+          label: dvd
+        - value: 003
+          label: dvdRom
+        - value: 004
+          label: 3halfInchFloppy
+        - value: 005
+          label: 5quarterInchFloopy
+        - value: 006
+          label: 7trackTape
+        - value: 007
+          label: 9trackTape
+        - value: 8
+          label: 3480Cartidge
+        - value: 9
+          label: 3490Cartidge
+        - value: 010
+          label: 3580Cartidge
+        - value: 011
+          label: 4mmCartidgeTape
+        - value: 012
+          label: 8mmCartidgeTape
+        - value: 013
+          label: 1quarterInchCartidgeTape
+        - value: 014
+          label: digitalLinearTape
+        - value: 015
+          label: onLine
+        - value: 016
+          label: satelite
+        - value: 017
+          label: telephoneLink
+        - value: 018
+          label: hardcopy
+        - value: 019
+          label: USB Flashdisk
+        - value: 20
+          label: protable Hardisk
+
+    - field_name: density
+      label: Medium Density
+      validators: check_if_number
+      help_text: Density at which data is recorded
+
+    - field_name: density_units
+      label: Density units
+      help_text: Units of measure for the recording density
+
+    - field_name: volumes
+      validators: check_if_int
+      label: Volumes
+      help_text: Number of items in the media identified.
+
+    - field_name: medium_formats
+      label: Medium formats
+      preset: select
+      validators: convert_choices_select_to_int
+      choices:
+      - value: 001
+        label: cpio
+      - value: 002
+        label: tar
+      - value: 003
+        label: highSierra
+      - value: 004
+        label: iso9660
+      - value: 005
+        label: iso9660RockRidge
+      - value: 006
+        label: iso9660AppleHFS
+
+      help_text: Method used to write to the medium
+
+    - field_name: medium_notes
+      label: Medium notes
+      help_text: Description of other limitations or requirements for using the medium

@@ -25,6 +25,11 @@ dcpr_blueprint = Blueprint(
 
 
 @dcpr_blueprint.route("/")
+def index():
+    return toolkit.render("data_capture.html")
+
+
+@dcpr_blueprint.route("/public")
 def get_public_dcpr_requests():
     return _get_dcpr_request_list("dcpr_request_list_public")
 
@@ -98,7 +103,7 @@ def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = F
 
 
 class DcprRequestCreateView(MethodView):
-    def get(self, data=None, errors=None, error_summary=None):
+    def get(self, data=None, errors=None, error_summary=None, type=None):
         toolkit.check_access("dcpr_request_create_auth", {"user": toolkit.g.user})
         data_to_show = data or clean_dict(
             dict_fns.unflatten(
@@ -148,7 +153,7 @@ class DcprRequestCreateView(MethodView):
         }
         return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
 
-    def post(self):
+    def post(self, type=None):
         try:
             flat_data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
@@ -186,7 +191,7 @@ class DcprRequestCreateView(MethodView):
 
 
 new_dcpr_request_view = DcprRequestCreateView.as_view("new_dcpr_request")
-dcpr_blueprint.add_url_rule("/request/new/", view_func=new_dcpr_request_view)
+dcpr_blueprint.add_url_rule("/request/new/<type>", view_func=new_dcpr_request_view)
 
 
 class _DcprUpdateView(MethodView):

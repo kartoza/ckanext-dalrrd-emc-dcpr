@@ -10,6 +10,7 @@ from ...model.user_extra_fields import UserExtraFields
 from .dataset_versioning_control import handle_versioning
 from .handle_repeating_subfields import handle_repeating_subfields_naming
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -89,7 +90,6 @@ def package_create(original_action, context, data_dict):
     Intercepts the core `package_create` action to check if package
      is being published after being created.
     """
-    # data_dict = handle_repeating_subfields_naming(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
@@ -154,7 +154,9 @@ def _act_depending_on_package_visibility(
         access = toolkit.check_access("package_publish", context, data)
         result = action(context, data) if access else None
         # if you create, update or patch you are following the dataset
-        if access:
-            toolkit.get_action("follow_dataset")(context, result)
+        # this make a failure when the dataset is changed from private to public:
+        # message form contains invalid entries: Y (maybe because the user already follow ? )
+        # if access:
+        #     toolkit.get_action("follow_dataset")(context, result)
 
     return result

@@ -733,8 +733,10 @@ footer {
 }
 
 .page-header.module-content {
-  padding-top: 0;
+  padding-top: 15;
+  padding-bottom: 30px;
 }
+
 
 .page-header .content_action {
   float: right;
@@ -841,7 +843,7 @@ footer {
   .checkbox input[type=checkbox] {
     z-index: 10;
   }
-  
+
   .search-form {
     width: 80%;
     margin: auto;
