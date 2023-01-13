@@ -17,8 +17,16 @@
 
                     <h5 class="mb-0 fw-bolder mb-5">Registering Projects</h5>
                 </div>
-                <div class="row gx-5 justify-content-center">
+                {% set logged = False %}
+                {% if c.userobj %}
+                    {% set logged = True %}
+                {% endif %}
+                {% set able_to_create_request = h.check_access('dcpr_request_create_auth') %}
+                {% set able_to_create_error_report = h.check_access('error_report_create_auth') %}
+                <div class="row gx-5 justify-content-center" data-module="check-access" data-access="{{ h.check_access('package_create') }}"
+                data-logged="{{ logged }}">
                      <!-- FORM E1-->
+                    <a href="{{'/dcpr/request/new/e1' if able_to_create_request else '#' }}" data-link="" class="new-dataset">
                     <div class="col-xs-6 col-md-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
@@ -33,7 +41,9 @@
                             </div>
                         </div>
                     </div>
-                     <!-- FORM E2 -->
+                    </a>
+                    <!-- FORM E2 -->
+                    <a href="{{'/dcpr/request/new/e2' if able_to_create_request else '#' }}" data-link="" class="new-dataset">
                     <div class="col-xs-6 col-md-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
@@ -47,20 +57,10 @@
                             </div>
                         </div>
                     </div>
-                    <!-- FORM F-->
-                    <div class="col-xs-6 col-md-3 projects">
-                        <div class="card">
-                            <div class="card-body p-5">
-                                <div class="text-uppercase fw-bold text-muted text-primary">FORM F</div>
-                                <div class="mb-3">
-                                    <span class="text-muted">Users of spatial information may submit their spatial data capture needs in writing to the CSI at least 5 working days before any meeting of the Committee, by completing <strong> FORM F: SUBMISSION OF SPATIAL DATA CAPTURE REQUIREMENTS</strong></span>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+                    </a>
                      <!-- FORM D-->
-                    <div class="col-xs-6 col-md-3">
+                     <a href="{{'/error_report/new/' if able_to_create_error_report else '#' }}" data-link="" class="new-dataset">
+                     <div class="col-xs-6 col-md-3">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-muted text-primary">FORM D</div>
@@ -72,6 +72,22 @@
                             </div>
                         </div>
                     </div>
+                    <!-- FORM F-->
+                    <a href="{{'/dcpr/public' if able_to_create_error_report else '#' }}" data-link="" class="new-dataset">
+                    <div class="col-xs-6 col-md-3 projects">
+                        <div class="card">
+                            <div class="card-body p-5">
+                                <div class="text-uppercase fw-bold text-muted text-primary">List DCPR requests</div>
+                                <div class="mb-3">
+                                    <span class="text-muted">
+                                        Lists of DCPR requests according to permissions and degree of accessibility you have
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    </a>
                 </div>
             </div>
         </section>
