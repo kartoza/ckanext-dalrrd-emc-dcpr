@@ -1,5 +1,13 @@
 {% ckan_extends %}
 
+{% block meta %}
+    {{ super() }}
+    <meta name="title" content="{{ g.site_title }}" />
+    <meta name="author" value="{{ h.get_seo_metatags('site_author') }}" />
+    <meta name="description" content="{{ h.get_seo_metatags('site_description') }}" />
+    <meta name="keywords" content="{{ h.get_seo_metatags('site_keywords') }}" />
+{% endblock %}
+
 {% block styles %}
 {#    {{ super() }}#}
     {% asset 'ckanext-dalrrdemcdcpr/ckan-base-css' %}

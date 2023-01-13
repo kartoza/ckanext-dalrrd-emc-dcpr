@@ -82,15 +82,6 @@ ckan.module("emc-facets-pagination", function ($){
             $.proxyAll(this,/_on/);
             this.el.on('click', this._showMoreFacets);
 
-            for(let i = 0; i<10; i++){
-                $('.facet-outer-Organizations li:eq(' + i + ')').show();
-                $('.facet-outer-SASDIThemes li:eq(' + i + ')').show();
-                $('.facet-outer-ISOTopicCategories li:eq(' + i + ')').show();
-                $('.facet-outer-Tags li:eq(' + i + ')').show();
-                $('.facet-outer-DCPRRequest li:eq(' + i + ')').show();
-                $('.facet-outer-Harvestsource li:eq(' + i + ')').show();
-            }
-
         },
 
         _showMoreFacets: function (e){

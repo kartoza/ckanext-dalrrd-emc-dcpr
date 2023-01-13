@@ -3,7 +3,7 @@ import logging
 import typing
 import datetime
 import uuid
-from urllib.parse import quote
+from urllib.parse import quote, urlparse, parse_qsl, urlencode
 from html import escape as html_escape
 from pathlib import Path
 from shapely import geometry
@@ -265,6 +265,33 @@ def get_all_datasets_count(user_obj):
         data_dict={"q": "*:*", "include_private": True}
     )
     return result["count"]
+
+
+def get_datasets_thumbnail(package):
+    """
+    Generate thumbnails based on metadataset
+    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
+    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
+    """
+    data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
+    try:
+        if package["metadata_thumbnail"]:
+            data_thumbnail = package["metadata_thumbnail"]
+        else:
+            data_resource = package["resources"]
+            for resource in data_resource:
+                if resource["format"].lower() == "wms":
+                    wms_url = resource["url"]
+                    parsed_url = dict(parse_qsl(urlparse(wms_url).query))
+                    parsed_url["format"] = "image/png; mode=8bit"
+                    data_thumbnail = "%s?%s" % (
+                        wms_url.split("?")[0],
+                        urlencode(parsed_url),
+                    )
+                    break
+    except KeyError:
+        return data_thumbnail
+    return data_thumbnail
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
@@ -584,3 +611,21 @@ def get_recent_news(number=5, exclude=None):
             break
 
     return new_list
+
+
+def get_seo_metatags(site_key):
+    """
+    get metatags value for SEO
+    """
+    data_dict = {
+        "site_author": toolkit.config.get(
+            "ckan.site_author",
+        ),
+        "site_description": toolkit.config.get(
+            "ckan.site_description",
+        ),
+        "site_keywords": toolkit.config.get(
+            "ckan.site_keywords",
+        ),
+    }
+    return data_dict[site_key]

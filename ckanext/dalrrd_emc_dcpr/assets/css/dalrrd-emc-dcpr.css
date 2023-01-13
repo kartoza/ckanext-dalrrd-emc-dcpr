@@ -294,7 +294,6 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-item {
   border: 1px solid #ccc;
-  padding-bottom: 20px;
   margin-bottom: 20px;
   background-color: #fff;
 }
@@ -345,7 +344,7 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
-  padding-left:45px;
+  position: relative;
 }
 
 .request-row{
@@ -354,6 +353,10 @@ fieldset[disabled] .btn-default.focus {
 
 .datasets-date {
   float: left;
+  position: absolute;
+  bottom: 0px;
+  top: 134px;
+  left: 171px;
 }
 
 .datasets-date-actions{
@@ -832,6 +835,14 @@ footer {
 }
 
 @media screen and (max-width: 1050px) {
+  .form-actions {
+    position: relative;
+    z-index: 10;
+  }
+
+  .checkbox input[type=checkbox] {
+    z-index: 10;
+  }
 
   .search-form {
     width: 80%;
@@ -935,7 +946,7 @@ footer {
   display: none !important;
 }
 
-.facet-outer li{
+.facet-outer li:nth-child(n+10){
   display: none;
 }
 
@@ -1013,9 +1024,65 @@ footer {
   height: 150px;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
+  border: solid 1px #eee;
+  padding: 0px;
+}
+
+.metadata-record-thumbnail img{
+  width: 100%;
+  height: 100%;
 }
 
 .metadata-record-desc{
-  padding-left:100px;
+  padding-left:20px;
+  width: 81.3% !important;
+}
+
+@media (min-width: 768px) {
+  .form-actions {
+    text-align: center;
+  }
+}
+
+.proposed-date, .proposed-data-info{
+  margin-left: -15px;
+  margin-right: -15px ;
+}
+
+@media (max-width: 768px) {
+  .metadata-record-thumbnail{
+    left: 50%;
+    margin-left: -80px;
+  }
+  .metadata-record-desc{
+    padding-left:0px;
+    width: 100% !important;
+  }
+  .datasets-date{
+    top: unset;
+    left: unset;
+    bottom: -3px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .metadata-record-desc {
+    padding-left: 20px;
+    width: 66.66666667% !important;
+  }
+}
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-style: normal;
+  color: #484848;
+}
+
+.form-information h2{
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
 }
