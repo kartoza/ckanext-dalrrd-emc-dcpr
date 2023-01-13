@@ -309,13 +309,16 @@ dataset_fields:
     preset: modified_repeating_subfields
     repeating_subfields:
 
-    - field_name: reference_datetime
+    - field_name: date
       label: Date
       required: true
-      preset: datetime
+      # validators: >-
+      #   reference_date_convertor
+      preset: date
       help_text: Reference datetime for this metadata record
+      # you need to add time
 
-    - field_name: reference_date_type
+    - field_name: date_type
       label: Reference date type
       required: true
       validators: convert_choices_select_to_int

@@ -151,3 +151,8 @@ def default_metadata_standard_version(value):
     """
     if value == "":
         return "1.1"
+
+
+def reference_date_convertor(value):
+    value = dict(value)
+    raise RuntimeError(value)

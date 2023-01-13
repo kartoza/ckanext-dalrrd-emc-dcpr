@@ -104,6 +104,7 @@ def package_update(original_action, context, data_dict):
     #     return _act_depending_on_package_visibility(original_action, context, data_dict)
     # else:
     #     handle_versioning(context, data_dict)
+    raise RuntimeError(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
