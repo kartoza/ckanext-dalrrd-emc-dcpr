@@ -1,9 +1,9 @@
 {% extends "page.html" %}
-{% block subtitle %}{{ _("Welcome DALRRD") }}{% endblock %}
+{% block subtitle %}{{ _("Data Capture Project Register (DCPR)") }}{% endblock %}
 {% block content %}
-    <section class="bg-light py-5 border-bottom" xmlns="http://www.w3.org/1999/html">
-            <div class="container-fluid px-5 my-5">
-                <div class="mb-5">
+    <div class="container">
+    <section class="py-5 border-bottom" xmlns="http://www.w3.org/1999/html">
+                <div class="mb-3">
                     <h1 class="fw-bolder mb-5">Data Capture Project Register (DCPR)</h1>
                    <span class="text-muted">
                         In terms of section 6.1.3(d) of the Base Dataset Custodianship Policy, base dataset custodians must register their </br>
@@ -11,9 +11,11 @@
                        </br>changing the status of projects.
                    </span>
                     <h5 class="mb-0 fw-bolder mb-5">The purpose DCPR is to achieve the following:</h5>
-                    <p>Reduce duplication of spatial data capture</p>
-                    <p>Ensure efficient, effective and economical spatial data capture</p>
-                    <p>Facilitate the sharing of spatial information</p>
+                    <ul class="text-muted">
+                    <li>Reduce duplication of spatial data capture</li>
+                    <li>Ensure efficient, effective and economical spatial data capture</li>
+                    <li>Facilitate the sharing of spatial information</li>
+                    </ul>
 
                     <h5 class="mb-0 fw-bolder mb-5">Registering Projects</h5>
                 </div>
@@ -24,10 +26,10 @@
                 {% set able_to_create_request = h.check_access('dcpr_request_create_auth') %}
                 {% set able_to_create_error_report = h.check_access('error_report_create_auth') %}
                 <div class="row gx-5 justify-content-center" data-module="check-access" data-access="{{ h.check_access('package_create') }}"
-                data-logged="{{ logged }}">
+                data-logged="{{ logged }}" style="margin-left: -15px; margin-right: -15px">
                      <!-- FORM E1-->
                     <a href="{{'/dcpr/request/new/e1' if able_to_create_request else '#' }}" data-link="" class="new-dataset">
-                    <div class="col-xs-6 col-md-3 projects">
+                    <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-primary">FORM E1</div>
@@ -44,7 +46,7 @@
                     </a>
                     <!-- FORM E2 -->
                     <a href="{{'/dcpr/request/new/e2' if able_to_create_request else '#' }}" data-link="" class="new-dataset">
-                    <div class="col-xs-6 col-md-3 projects">
+                    <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-primary">
@@ -60,7 +62,7 @@
                     </a>
                      <!-- FORM D-->
                      <a href="{{'/error_report/new/' if able_to_create_error_report else '#' }}" data-link="" class="new-dataset">
-                     <div class="col-xs-6 col-md-3">
+                     <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-muted text-primary">FORM D</div>
@@ -72,9 +74,10 @@
                             </div>
                         </div>
                     </div>
+                     </a>
                     <!-- FORM F-->
                     <a href="{{'/dcpr/public' if able_to_create_error_report else '#' }}" data-link="" class="new-dataset">
-                    <div class="col-xs-6 col-md-3 projects">
+                    <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
                                 <div class="text-uppercase fw-bold text-muted text-primary">List DCPR requests</div>
@@ -88,7 +91,7 @@
                         </div>
                     </div>
                     </a>
-                </div>
             </div>
         </section>
+    </div>
 {% endblock %}
