@@ -153,7 +153,7 @@ class DcprRequestCreateView(MethodView):
         }
         return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
 
-    def post(self):
+    def post(self, type=None):
         try:
             flat_data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
