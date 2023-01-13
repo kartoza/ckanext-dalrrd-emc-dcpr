@@ -576,6 +576,9 @@ def get_saved_searches():
     returns saved searches
     based on a user id
     """
+    if c.userobj is None:
+        return []
+
     user_id = c.userobj.id
     if c.userobj.sysadmin:
         q = f""" select saved_search_title, search_query, saved_search_date, saved_search_id, owner_user from saved_searches order by owner_user """
