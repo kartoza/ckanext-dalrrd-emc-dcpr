@@ -17,9 +17,8 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             //get url
             let url = window.location.href
             let custodianCheckbox = document.getElementsByName("dataset_custodian")
-            console.log(url)
             if(url.includes("e1")){
-                for (let check of custodianCheckbox){
+                for (let check of custodianCheckbox){ // sometimes it's more than one dataset
                     check.checked = true
                     check.value = true
                 }

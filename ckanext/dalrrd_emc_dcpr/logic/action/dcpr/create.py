@@ -76,6 +76,7 @@ def dcpr_request_create(context, data_dict):
     logger.debug(f"{schema=}")
     validated_data, errors = toolkit.navl_validate(data_dict, schema, context)
     logger.debug(f"{errors=}")
+    raise RuntimeError(data_dict)
     if errors:
         model.Session.rollback()
         raise toolkit.ValidationError(errors)
