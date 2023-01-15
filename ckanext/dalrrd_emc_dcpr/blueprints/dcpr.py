@@ -735,22 +735,7 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
     for name, value in flat_data_dict.items():
         if name in dataset_fields:
             logger.debug(f"Processing {name=} {value=}...")
-            if name == "dataset_custodian":
-                # the `dataset_custodian` form field is problematic - it is represented
-                # by a checkbox and is only submitted if the HTML element has the
-                # `checked` property. This means that if this `dataset_custodian` field
-                # is not checked, then parsing the form response when there are multiple
-                # datasets becomes trickier - the below code is just an attempt to deal
-                # with this in a less complex way.
-                if isinstance(value, list):
-                    for i in range(num_datasets):
-                        target_value = f"ds-{i + 1}"
-                        datasets[i][name] = target_value in value
-                else:
-                    for i in range(num_datasets):
-                        target_value = f"ds-{i + 1}"
-                        datasets[i][name] = value == target_value
-            elif num_datasets == 1:
+            if num_datasets == 1:
                 datasets[0][name] = value
             else:
                 for ds_index, ds_value in enumerate(value):

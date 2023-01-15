@@ -20,7 +20,7 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
             if(url.includes("e1")){
                 for (let check of custodianCheckbox){ // sometimes it's more than one dataset
                     check.checked = true
-                    check.value = true
+                    check.value = "True"
                 }
             }
         },

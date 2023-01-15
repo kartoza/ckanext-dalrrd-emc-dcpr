@@ -1,10 +1,20 @@
 {% import 'macros/form.html' as form %}
-
+{% set current_url = url_for(request.endpoint,  **request.view_args) %}
+{% if data_custodian == '' %}
+    {% if "e1" in current_url %}
+        {% set selected = "E1" %}
+    {% elif "e2" in current_url %}
+        {% set selected = "E2" %}
+    {% endif %}
+{% else %}
+    {% set selected="E1" if data_custodian == true else "E2" %}
+{% endif %}
 <fieldset class="dynamic-dataset-fieldset" id="dataset-fieldset-{{ index }}">
    <div class="panel panel-default" style="margin-bottom: 10px; display: block" >
                     <div class="panel-heading" >
                     <h4 class="panel-title">
                                  Dataset #{{ index }} fields
+                                 {{ selected }}
                             <button
                                     id="remove-previous-dataset-button"
                                     type="button"
@@ -29,12 +39,13 @@
             ) %}
         {{ form.info(_('Proposed title for the dataset being collected.')) }}
     {% endcall %}
-    {% call form.checkbox(
+    {% call form.select(
             'dataset_custodian',
             label=_('Organization is custodian?'),
-            value='ds-{}'.format(index),
+            options = [{'value':'E1', "text":"submitted as E1 form"}, {'value':'E2', "text":"submitted as E2 form"}],
+            selected= "E1",
             id='ds{}-field-dataset_custodian'.format(index),
-            checked=dataset_custodian,
+            classes=['dataset_custodian'],
             error=dataset_custodian_error
         ) %}
         {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
