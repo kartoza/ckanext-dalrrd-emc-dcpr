@@ -139,8 +139,8 @@ dataset_fields:
         required: false
         help_text: Name of personnel using this metadata record
 
-      - field_name: organization_name
-        label: Organization name
+      - field_name: organisation_name
+        label: Organisation name
         required: false
         help_text: Name of organization using this metadata record
 
@@ -309,12 +309,12 @@ dataset_fields:
     preset: modified_repeating_subfields
     repeating_subfields:
 
-    - field_name: date
+    - field_name: reference
       label: Date
       required: true
       # validators: >-
       #   reference_date_convertor
-      preset: date
+      preset: datetime
       help_text: Reference datetime for this metadata record
       # you need to add time
 
@@ -466,7 +466,7 @@ dataset_fields:
     help_text: Language of the metadata record - This is a SANS 1878 mandatory field
 
   - field_name: metadata_language
-    label: Metadata record language
+    label: Metadata language
     required: true
     choices:
       - value: en
@@ -609,112 +609,147 @@ dataset_fields:
     preset: modified_repeating_subfields
     repeating_label: Lineage
     repeating_subfields:
-      - field_name: level
-        label: Level
-        preset: select
-        required: false
-        validators:  ignore_missing convert_choices_select_to_int
-        choices:
-          - value: 001
-            label: Attribute
-          - value: 002
-            label: Attribute Type
-          - value: 003
-            label: Collection hardware
-          - value: 004
-            label: Collection session
-          - value: 005
-            label: Metadata record
-          - value: 006
-            label: Series
-          - value: 007
-            label: Non geographic metadata record
-          - value: 8
-            label: Dimension group
-          - value: 9
-            label: Feature
-          - value: 010
-            label: Property type
-          - value: 011
-            label: Field Session
-          - value: 012
-            label: Software
-          - value: 013
-            label: Service
-          - value: 014
-            label: Model
 
       - field_name: statement
         label: Statement
         required: true
         help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
-      - field_name: process_step_description
+      # - field_name: level
+      #   label: Level
+      #   preset: select
+      #   required: false
+      #   validators:  ignore_missing convert_choices_select_to_int
+      #   choices:
+      #     - value: 001
+      #       label: Attribute
+      #     - value: 002
+      #       label: Attribute Type
+      #     - value: 003
+      #       label: Collection hardware
+      #     - value: 004
+      #       label: Collection session
+      #     - value: 005
+      #       label: Metadata record
+      #     - value: 006
+      #       label: Series
+      #     - value: 007
+      #       label: Non geographic metadata record
+      #     - value: 8
+      #       label: Dimension group
+      #     - value: 9
+      #       label: Feature
+      #     - value: 010
+      #       label: Property type
+      #     - value: 011
+      #       label: Field Session
+      #     - value: 012
+      #       label: Software
+      #     - value: 013
+      #       label: Service
+      #     - value: 014
+      #       label: Model
+
+  - field_name: lineage_process_step
+    label: Lineage process step
+    preset: modified_repeating_subfields
+    repeating_label: Lineage process step
+    repeating_subfields:
+
+      - field_name: description
         label: Process step description
         required: false
         help_text: description of the event, including related parameters of tolerances
 
-      - field_name: process_step_rationale
+      - field_name: rationale
         label: Process step rationale
         help_text: requirement purpose of the process step
 
-      - field_name: process_step_datetime_from
-        label: Process step date time (from)
-        preset: date
+      - field_name: process    # will be process_step-0-process_date, if not given process_step-0-None_date
+        label: Process step date
+        label_time: process step time
+        preset: datetime
 
-      - field_name: process_step_datetime_to
-        label: Process step date time (to)
-        preset: date
+      - field_name: date_type
+        label: Process step date type
+        validators: convert_choices_select_to_int
+        preset: select
+        choices:
+          - value: 001
+            label: Creation
+          - value: 002
+            label: Publication
+          - value: 003
+            label: Revision
 
-      - field_name: processor_individual_name
+
+  - field_name: lineage_processor
+    label: Lineage processor
+    preset: modified_repeating_subfields
+    repeating_label: Lineage processor
+    repeating_subfields:
+
+      - field_name: individual_name
         label: Processor Individual name
         required: false
         help_text: name - with surname of the person responsible of processing this metadata record
 
-      - field_name: processing_owner_org
+      - field_name: owner_org
         label: Processing Organization
         required: false
         #preset: emc_dataset_organization
         help_text: Organization responsible for processing the metadata record
 
-      - field_name: processor_position_name
+      - field_name: position_name
         label: Role / Position of the processor individual
         required: false
         help_text: Role/ position of the responsible individual in the orgnization
+
+  - field_name: lineage_processor_address
+    label: Lineage processor address
+    preset: modified_repeating_subfields
+    repeating_label: Lineage processor
+    repeating_subfields:
 
       - field_name: delivery_point
         label: Delivery Point
         required: false
 
-      - field_name: processor_address_city
+      - field_name: address_city
         label: Processor address - City
         required: false
 
-      - field_name: processor_address_administrative_area
+      - field_name: administrative_area
         label: Processor address - Administrative area
         required: false
         help_text: province of the processor location
 
-      - field_name: processor_postal_code
+      - field_name: postal_code
         label: Processor Postal Code
         required: false
 
-      - field_name: processor_electronic_mail_address
+      - field_name: electronic_mail_address
         label: Processor Electronic mail address
         required: false
         help_text: Address of the electronic mailbox of the responsible processing organization or individual
 
-      - field_name: source_description
+  - field_name: lineage_source
+    label: Lineage source
+    preset: modified_repeating_subfields
+    repeating_label: Lineage processor
+    repeating_subfields:
+
+      - field_name: description
         label: Source description
         required: false
         help_text: description about the level of the source data
 
-      - field_name: source_scale_denominator
+      - field_name: scale_denominator
         label: Source scale denominator
         required: false
         help_text: denominator of the representative fraction on a source map
 
-      - field_name: source_reference_system
+      - field_name: reference_system
         label: Source reference system
         required: false
         validators: lineage_source_srs_validator
