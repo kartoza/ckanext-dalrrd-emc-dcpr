@@ -28,7 +28,7 @@
                 <div class="row gx-5 justify-content-center" data-module="check-access" data-access="{{ h.check_access('package_create') }}"
                 data-logged="{{ logged }}" style="margin-left: -15px; margin-right: -15px">
                      <!-- FORM E1-->
-                    <a href="{{'/dcpr/request/new/e1' if able_to_create_request else '#' }}" data-link="" class="new-dataset">
+                    <a href="{{'/dcpr/request/new/e1' if able_to_create_request else '/user/login' }}" data-link="" class="new-dataset">
                     <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
@@ -45,7 +45,7 @@
                     </div>
                     </a>
                     <!-- FORM E2 -->
-                    <a href="{{'/dcpr/request/new/e2' if able_to_create_request else '#' }}" data-link="" class="new-dataset">
+                    <a href="{{'/dcpr/request/new/e2' if able_to_create_request else '/user/login' }}" data-link="" class="new-dataset">
                     <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
@@ -61,7 +61,7 @@
                     </div>
                     </a>
                      <!-- FORM D-->
-                     <a href="{{'/error_report/new/' if able_to_create_error_report else '#' }}" data-link="" class="new-dataset">
+                     <a href="{{'/error_report/new/' if able_to_create_error_report else '/user/login' }}" data-link="" class="new-dataset">
                      <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
@@ -76,7 +76,7 @@
                     </div>
                      </a>
                     <!-- FORM F-->
-                    <a href="{{'/dcpr/public' if able_to_create_error_report else '#' }}" data-link="" class="new-dataset">
+                    <a href="{{'/dcpr/public' }}" data-link="" class="new-dataset">
                     <div class="col-sm-3 projects">
                         <div class="card">
                             <div class="card-body p-5">
