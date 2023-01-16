@@ -39,7 +39,9 @@ def dcpr_request_update_by_owner(context, data_dict):
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id
     context["updated_by"] = "owner"
-    request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    request_obj = dcpr_dictization.dcpr_request_dict_save(
+        validated_data, context
+    )  # only adds the request to the session
     context["model"].Session.commit()
     create_dcpr_management_activity(
         request_obj,

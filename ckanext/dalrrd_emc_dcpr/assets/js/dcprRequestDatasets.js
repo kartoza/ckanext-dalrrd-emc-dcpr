@@ -12,21 +12,12 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         initialize: function() {
             jQuery.proxyAll(this, /_on/);
             this.el.on('click', this._onAddDatasetFieldset)
-
-
-            //get url
-            let url = window.location.href
-            let custodianCheckbox = document.getElementsByName("dataset_custodian")
-            console.log(url)
-            if(url.includes("e1")){
-                for (let check of custodianCheckbox){
-                    check.checked = true
-                    check.value = true
-                }
-            }
         },
 
         _onAddDatasetFieldset: function () {
+            // getting the first custodian field selection to use it as default
+            let selected_value = document.getElementById("ds1-field-dataset_custodian").value
+            this.options["first_selection"] = selected_value
             let numExisting = this._getNumDatasetFieldsets()
             this.options.index = numExisting + 1
             this.options.lenght = numExisting + 1
