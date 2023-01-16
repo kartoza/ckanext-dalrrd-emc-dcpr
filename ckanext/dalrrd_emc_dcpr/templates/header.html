@@ -19,7 +19,6 @@
                     ('dataset.search', _('Metadata Records')),
                     ('organization.index', _('Organisations')),
                     ('publish.index', _('Publish')),
-                    ('saved_searches.index', _('Saved Search')),
                     ('dcpr.index', _('DCPR')),
                     ('error_report.get_error_reports', _('Error Reports')),
                     ('group.index', _('Groups')),
@@ -126,6 +125,12 @@
                             </a>
                         </li>
                     {% endif %}
+                    <li>
+                        <a href="{{ h.url_for('saved_searches.index') }}" title="{{ _('Saved Search') }}" data-testid="logout">
+                                <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+                                <span class="text">{{ _('Saved Search') }}</span>
+                            </a>
+                    </li>
                     {% block header_account_log_out_link %}
                         <li>
                             <a href="{{ h.url_for('user.logout') }}" title="{{ _('Log out') }}" data-testid="logout">
