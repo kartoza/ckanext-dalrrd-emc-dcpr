@@ -103,7 +103,6 @@ def dcpr_request_create(context, data_dict):
     )
     logger.debug(f"{validated_data=}")
     context["updated_by"] = "owner"
-    handle_e1_submission(validated_data)
     request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     model.Session.commit()
     logger.debug(f"{request_obj=}")
@@ -180,7 +179,3 @@ def dcpr_geospatial_request_create(context, data_dict):
         model.Session.close()
 
     return request
-
-
-def handle_e1_submission(data_dict):
-    raise RuntimeError(data_dict)

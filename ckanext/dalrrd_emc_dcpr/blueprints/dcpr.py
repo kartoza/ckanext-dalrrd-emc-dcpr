@@ -728,8 +728,10 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
     num_datasets = (
         len(first_ds_field_value) if isinstance(first_ds_field_value, list) else 1
     )
-    logger.debug(f"{num_datasets=}")
 
+    logger.debug("handling dcpr request datasets custodian field")
+    change_dataset_custodian_value(num_datasets, flat_data_dict)
+    logger.debug(f"{num_datasets=}")
     data_dict = {}
     datasets: typing.List[typing.Dict] = [{} for i in range(num_datasets)]
     for name, value in flat_data_dict.items():
@@ -745,3 +747,22 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
             data_dict[name] = value
     data_dict["datasets"] = datasets
     return data_dict
+
+
+def change_dataset_custodian_value(datasets_num: int, ds: dict):
+    """
+    dataset custodian is submitted as E1,E2 form,
+    accordingly we are changing to True/False values.
+    """
+    dataset_custodian = ds["dataset_custodian"]
+    if datasets_num == 1:
+        if dataset_custodian == "E1":
+            ds["dataset_custodian"] = True
+        elif dataset_custodian == "E2":
+            ds["dataset_custodian"] = False
+    else:
+        for idx in range(datasets_num):
+            if dataset_custodian[idx] == "E1":
+                ds["dataset_custodian"][idx] = True
+            elif dataset_custodian[idx] == "E2":
+                ds["dataset_custodian"][idx] = False
