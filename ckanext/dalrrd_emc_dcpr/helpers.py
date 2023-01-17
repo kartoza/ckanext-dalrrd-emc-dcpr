@@ -632,3 +632,11 @@ def get_seo_metatags(site_key):
         ),
     }
     return data_dict[site_key]
+
+
+def get_year():
+    """
+    display current year in the
+    footer
+    """
+    return datetime.datetime.now().year
