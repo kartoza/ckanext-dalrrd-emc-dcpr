@@ -384,8 +384,15 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-heading a {
   color: #3A744E;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+}
+
+.dataset-desc {
+  color: #484848;
+  font-size: 14px;
+  font-weight: 300;
 }
 
 .dataset-heading > a:hover, .dataset-heading > a:focus {
@@ -613,7 +620,7 @@ fieldset[disabled] .btn-default.focus {
 .sample-datasets {
   position: relative;
   background-color: #FFFFFF;
-  color: #3A744E;
+  color: #484848;
   margin-bottom: 20px;
 }
 
