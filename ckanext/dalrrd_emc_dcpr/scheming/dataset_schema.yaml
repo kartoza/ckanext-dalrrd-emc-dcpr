@@ -1445,9 +1445,7 @@ dataset_fields:
     - field_name: stamp
       label: Date
       required: true
-      validators: >-
-          ignore_missing
-      preset: datetime
+      form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 
     - field_name: date_type
