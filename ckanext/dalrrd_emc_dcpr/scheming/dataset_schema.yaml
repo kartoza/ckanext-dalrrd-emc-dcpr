@@ -681,11 +681,11 @@ dataset_fields:
     repeating_subfields:
 
     - field_name: reference
-      label: Date
+      label: Reference datetime
       required: true
       validators: >-
         ignore_missing
-      preset: datetime
+      form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 
     - field_name: date_type
