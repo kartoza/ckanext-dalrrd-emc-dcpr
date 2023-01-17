@@ -266,7 +266,7 @@ dataset_fields:
 
 
   - field_name: responsible_party_contact_info
-    label: Responsible party contact info
+    label: Metadata record responsible party contact info
     preset: modified_repeating_subfields
     repeating_subfields:
 
@@ -281,7 +281,7 @@ dataset_fields:
       help_text: Facsimile machine number of responsible organisation or individual
 
   - field_name: responsible_party_contact_address
-    label: Responsible party contact address
+    label: Metadata record responsible party contact address
     preset: modified_repeating_subfields
     repeating_subfields:
 
@@ -308,7 +308,7 @@ dataset_fields:
       help_text: Address of the electronic mailbox of the user organization or individual
 
   - field_name: contact
-    label: Metadata point of contact
+    label: Metadata record point of contact
     preset: modified_repeating_subfields
     repeating_subfields:
     - field_name: individual_name
@@ -349,7 +349,7 @@ dataset_fields:
         #   label: publisher
 
   - field_name: contact_information
-    label: Metadata point of contact additional info
+    label: Metadata record point of contact additional info
     preset: modified_repeating_subfields
     repeating_subfields:
 
@@ -1427,6 +1427,17 @@ dataset_fields:
       - field_name: maximum_vertical_extent
         label: Maximum vertical extent
         required: false
+
+      - field_name: vertical_extent_unit_of_measure
+        label: Vertical extent unit of measure
+        help_text: vertical unit used for vertical extent information, e.g. meters, feets ..etc.
+        required: false
+
+      - field_name: vertical_datum
+        label: Vertical datum
+        help_text: Origin from which minimum and maximum elevations originated
+        required: false
+
 
   - field_name: metadata_thumbnail
     label: Metadata record thumbnail
