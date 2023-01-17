@@ -18,7 +18,7 @@ dataset_fields:
   - field_name: name
     label: Field identifier
     preset: dataset_slug
-    form_placeholder: eg. my-metadata record, this is auto-completed by default.
+    form_placeholder: url of the metadata record, eg. my-metadata record, this is auto-completed by default.
 
   - field_name: featured
     label: Feature metadata record on EMC landing page?
@@ -30,7 +30,7 @@ dataset_fields:
   - field_name: doi
     label: DOI
     required: false
-    help_text: Digital Object Identifier of the data (if any)
+    help_text: Digital Object Identifier of the metadata record (if any)
     validators: doi_validator
 
   # this multiple checkbox is better to be implemented than these two fields,
@@ -223,7 +223,7 @@ dataset_fields:
     label: Responsible organisation Name
     required: true
     preset: emc_dataset_organization
-    help_text: Organization responsible for the metadata record. This is a SANS 1878 mandatory field
+    help_text: Organisation responsible for the metadata record. This is a SANS 1878 mandatory field
 
   - field_name: responsible_party
     label: Metadata record responsible party
@@ -232,17 +232,17 @@ dataset_fields:
     - field_name: individual_name
       label: Individual name
       required: true
-      help_text: Name of personnel using this metadata record
+      help_text: Name of personnel responsible of this metadata record
 
     - field_name: position_name
       label: Position name
       required: true
-      help_text: role or position of the person using the metadata record
+      help_text: role or position of the person responsible of this metadata record
 
     - field_name: role
       label: Role
       required: true
-      help_text: function performed by the organization using the metadata record
+      help_text: function performed by the organisation responsible of this metadata record
       preset: select
       choices:
         - value: resource_provider
@@ -286,6 +286,7 @@ dataset_fields:
     - field_name: delivery_point
       label: delivery Point
       required: false
+      help_text: address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
 
     - field_name: address_city
       label: City
@@ -303,7 +304,7 @@ dataset_fields:
     - field_name: electronic_mail_address
       label: Electronic mail address
       required: false
-      help_text: Address of the electronic mailbox of the user organization or individual
+      help_text: Address of the electronic mailbox of the user organisation or individual
 
   - field_name: iso_topic_category
     label: Topic Category
@@ -638,12 +639,12 @@ dataset_fields:
     - field_name: voice
       label: Contact point phone
       required: false
-      help_text: Telephone number of individual contact or organization
+      help_text: Telephone number of individual contact or organisation
 
     - field_name: facsimile
       label: Contact point facsimile
       required: false
-      help_text: Facsimile machine number of individual contact or organization
+      help_text: Facsimile machine number of individual contact or organisation
 
   - field_name: contact_address
     label: metadata record contact address
@@ -657,7 +658,7 @@ dataset_fields:
     - field_name: city
       label: City
       required: false
-      help_text: City of the contact organization or individual
+      help_text: City of the contact organisation or individual
 
     - field_name: administrative_area
       label: Administrative area
@@ -667,12 +668,12 @@ dataset_fields:
     - field_name: postal_code
       label: Postal Code
       required: false
-      help_text: postal code of the contact organization or individual
+      help_text: postal code of the contact organisation or individual
 
     - field_name: electronic_mail_address
       label: Electronic mail address
       required: false
-      help_text: Address of the electronic mailbox of the contact organization or individual
+      help_text: Address of the electronic mailbox of the contact organisation or individual
 
   - field_name: reference_date
     label: Reference date
@@ -682,8 +683,8 @@ dataset_fields:
     - field_name: reference
       label: Date
       required: true
-      # validators: >-
-      #   reference_date_convertor
+      validators: >-
+        ignore_missing
       preset: datetime
       help_text: Reference datetime for this metadata record
 
@@ -700,10 +701,6 @@ dataset_fields:
         - value: 003
           label: Revision
       help_text: Reference date type - This is a SANS 1878 mandatory field
-
-
-
-
 
   - field_name: online_resource
     label: Metadata record online information
@@ -1448,8 +1445,8 @@ dataset_fields:
     - field_name: stamp
       label: Date
       required: true
-      # validators: >-
-      #   reference_date_convertor
+      validators: >-
+          ignore_missing
       preset: datetime
       help_text: Reference datetime for this metadata record
 
