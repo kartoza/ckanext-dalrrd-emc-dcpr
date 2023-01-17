@@ -9,18 +9,6 @@ reference_date-0-reference
 #}
 
 {% import 'macros/form.html' as form %}
-{% set date = data.get(field.field_name + '_date') %}
-{% set time = data.get(field.field_name + '_time') %}
-
-{% if not date is string and not time is string %}
-    {% set date = data.get(field.field_name) %}
-
-    {% if date %}
-        {% set parts = data.get(field.field_name).split() %}
-        {% set date = parts[0] %}
-        {% set time = parts[1] %}
-    {% endif %}
-{% endif %}
 
 {% call form.input_block(for=field.field_name, label=field.label, is_required=field.required, classes=field.classes if 'classes' in field else ['control-medium'])%}
     <input type="datetime-local" id="{{ field.field_name }}" name="{{ field.field_name }}" value="{{ data.get(field_id) }}" class="form-control"/>

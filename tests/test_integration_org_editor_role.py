@@ -64,8 +64,7 @@ def test_create_package(name, private, org_role):
         "purpose": "purpose",
         "status": "completed",
         "contact-0-organisational_role": "point_of_contact",
-        "reference_date-0-reference_date": "2023-01-13",
-        "reference_date-0-reference_time": "03:43",
+        "reference_date-0-reference": "2023-01-13",
         "reference_date-0-date_type": "1",
         "metadata_record_format-0-name": "format name",
         "metadata_record_format-0-version": "1.0",
@@ -97,8 +96,7 @@ def test_create_package(name, private, org_role):
         "equivalent_scale": "500",
         "spatial_representation_type": "001",
         "spatial_reference_system": "EPSG:4326",
-        "metadata_date_stamp-0-stamp_date": "2020-01-01",
-        "metadata_date_stamp-0-stamp_time": "03:28",
+        "metadata_date_stamp-0-stamp": "2020-01-01",
         "metadata_date_stamp-0-date_type": "1",
     }
 
@@ -157,8 +155,7 @@ def test_update_package(name, private, org_role):
         "purpose": "purpose",
         "status": "completed",
         "contact-0-organisational_role": "point_of_contact",
-        "reference_date-0-reference_date": "2023-01-13",
-        "reference_date-0-reference_time": "03:43",
+        "reference_date-0-reference": "2023-01-13",
         "reference_date-0-date_type": "1",
         "metadata_record_format-0-name": "format name",
         "metadata_record_format-0-version": "2.0",
@@ -190,8 +187,7 @@ def test_update_package(name, private, org_role):
         "equivalent_scale": "500",
         "spatial_representation_type": "001",
         "spatial_reference_system": "EPSG:4326",
-        "metadata_date_stamp-0-stamp_date": "2020-01-01",
-        "metadata_date_stamp-0-stamp_time": "03:28",
+        "metadata_date_stamp-0-stamp": "2020-01-01",
         "metadata_date_stamp-0-date_type": "1",
     }
     helpers.call_action(
