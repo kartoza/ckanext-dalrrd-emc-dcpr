@@ -97,7 +97,9 @@ def test_create_package(name, private, org_role):
         "equivalent_scale": "500",
         "spatial_representation_type": "001",
         "spatial_reference_system": "EPSG:4326",
-        "metadata_date_stamp": "2020-01-01",
+        "metadata_date_stamp-0-stamp_date": "2020-01-01",
+        "metadata_date_stamp-0-stamp_time": "03:28",
+        "metadata_date_stamp-0-date_type": "1",
     }
 
     helpers.call_action(
@@ -188,7 +190,9 @@ def test_update_package(name, private, org_role):
         "equivalent_scale": "500",
         "spatial_representation_type": "001",
         "spatial_reference_system": "EPSG:4326",
-        "metadata_date_stamp": "2020-01-01",
+        "metadata_date_stamp-0-stamp_date": "2020-01-01",
+        "metadata_date_stamp-0-stamp_time": "03:28",
+        "metadata_date_stamp-0-date_type": "1",
     }
     helpers.call_action(
         "package_create",
