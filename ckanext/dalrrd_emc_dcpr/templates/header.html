@@ -20,7 +20,6 @@
                     ('organization.index', _('Organisations')),
                     ('publish.index', _('Publish')),
                     ('dcpr.index', _('DCPR')),
-                    ('error_report.get_error_reports', _('Error Reports')),
                     ('group.index', _('Groups')),
                     ('home.about', _('About')) ) }}
             {% endblock %}
@@ -125,6 +124,12 @@
                             </a>
                         </li>
                     {% endif %}
+                    <li>
+                        <a href="{{ h.url_for('error_report.get_error_reports') }}" title="{{ _('Error Reports') }}" data-testid="logout">
+                                <i class="fa fa-bug" aria-hidden="true"></i>
+                                <span class="text">{{ _('Error Reports') }}</span>
+                            </a>
+                    </li>
                     <li>
                         <a href="{{ h.url_for('saved_searches.index') }}" title="{{ _('Saved Search') }}" data-testid="logout">
                                 <i class="fa fa-bookmark-o" aria-hidden="true"></i>
