@@ -176,6 +176,16 @@ class DCPRRequestUrgency(enum.Enum):
     HIGH = "High"
 
 
+class DCPRCaptureMethod(enum.Enum):
+    AERIAL_PHOTOGRAPHY = "Aerial Photography"
+    DIGITIZING = "Digitizing"
+    GPS = "GPS coordinate capture"
+    REMOTE_SENSING = "Remote sensing"
+    SCANNING_VECTORISING = "Scanning & vectorising"
+    SURVEY_CADASTRAL = "Survey (cadastral)"
+    SURVEY_QUESTIONNAIRE = "Survey (questionnaire)"
+
+
 class DCPRRequestDataset(
     model.core.StatefulObjectMixin, model.domain_object.DomainObject
 ):
@@ -271,7 +281,7 @@ class DCPRGeospatialRequest(
         return query.filter_by(**kw).first()
 
     def get_notification_targets(
-        self,
+            self,
     ) -> Optional[DCPRGeospatialRequestNotificationTarget]:
         targets = (
             model.meta.Session.query(DCPRGeospatialRequest)

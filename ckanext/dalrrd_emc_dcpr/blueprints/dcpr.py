@@ -16,6 +16,7 @@ from ckan.logic import clean_dict, parse_params, tuplize_dict
 from .. import constants
 from ..helpers import get_status_labels
 from ..model.dcpr_request import DCPRRequestUrgency
+from ..model.dcpr_request import DCPRCaptureMethod
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +150,12 @@ class DcprRequestCreateView(MethodView):
                 {"value": level.value, "text": level.value}
                 for level in DCPRRequestUrgency
             ],
-            # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be different according with the user role
+            "dataset_capture_method_options": [
+                {"value": capture_method.value, "text": capture_method.value}
+                for capture_method in DCPRCaptureMethod
+            ],
+            # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be
+            #  different according with the user role
         }
         return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
 
@@ -252,6 +258,10 @@ class _DcprUpdateView(MethodView):
                         "data_urgency_options": [
                             {"value": level.value, "text": level.value}
                             for level in DCPRRequestUrgency
+                        ],
+                        "dataset_capture_method_options": [
+                            {"value": capture_method.value, "text": capture_method.value}
+                            for capture_method in DCPRCaptureMethod
                         ],
                     },
                 )

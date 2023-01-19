@@ -89,7 +89,7 @@
             'spatial_resolution',
             label=_('Spatial resolution'),
             id='field-spatial_resolution',
-            type='number',
+            type='text',
             value=data.spatial_resolution,
             error=errors.spatial_resolution,
             classes=['control-medium']
@@ -150,14 +150,17 @@
                     lineage_statement_error=errors.lineage_statement,
                     associated_attributes_error=errors.associated_attributes,
                     data_usage_restrictions_error=errors.data_usage_restrictions,
-                    capture_method_error=errors.capture_method
+                    capture_method_error=errors.capture_method,
+                    dataset_capture_method_options=dataset_capture_method_options
                 ) }}
             {% endfor %}
 
         {% else %}
             {{ h.snippet(
                     "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
-                    index=1, lenght=0
+                    index=1,
+                    lenght=0,
+                    dataset_capture_method_options=dataset_capture_method_options
             ) }}
         {% endif %}
 

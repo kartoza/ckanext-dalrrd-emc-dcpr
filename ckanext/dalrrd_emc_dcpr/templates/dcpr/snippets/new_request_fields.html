@@ -194,11 +194,12 @@
         {{ form.info(_('Description of dataset usage restrictions')) }}
     {% endcall %}
 
-    {% call form.markdown(
+    {% call form.select(
         'dataset_capture_method',
         label=_('Dataset capture method'),
         id='field-dataset_capture_method',
-        value=data.dataset_capture_method,
+        options=capture_method_options,
+        selected=data.dataset_capture_method,
         error=errors.dataset_capture_method,
         classes=['control-medium']
     ) %}

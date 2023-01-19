@@ -395,6 +395,8 @@ fieldset[disabled] .btn-default.focus {
   color: #484848;
   font-size: 14px;
   font-weight: 300;
+  text-align: justify;
+  margin-bottom: -8px;
 }
 
 .dataset-heading > a:hover, .dataset-heading > a:focus {

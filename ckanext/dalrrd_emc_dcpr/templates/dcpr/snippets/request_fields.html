@@ -325,10 +325,10 @@
    errors = errors or {}
   -%}
 
-  {%- snippet 'dcpr/snippets/inputs/input.html',
+  {%- snippet 'dcpr/snippets/inputs/select.html',
    field = {'field_name': 'capture_method', id: 'field-capture_method',
            'label': _('Method of capture'),
-           'value': dcpr_request.capture_method,
+           'selected': dcpr_request.capture_method,
            'help_text': 'Method to be employed for collecting the raw data (Aerial
                          photography, cadastral survey, Digitising, etc)',
            'placeholder': _('eg. Survey'),
