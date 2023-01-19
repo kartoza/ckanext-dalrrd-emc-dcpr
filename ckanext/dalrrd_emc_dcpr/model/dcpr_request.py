@@ -181,8 +181,8 @@ class DCPRCaptureMethod(enum.Enum):
     DIGITIZING = "Digitizing"
     GPS = "GPS coordinate capture"
     REMOTE_SENSING = "Remote sensing"
-    SCANNING_VECTORISING = "Scanning & vectorising"
-    SURVEY_CADASTRAL = "Survey (cadastral)"
+    SCANNING = "Scanning & vectorising"
+    SURVEY = "Survey (cadastral)"
     SURVEY_QUESTIONNAIRE = "Survey (questionnaire)"
 
 
