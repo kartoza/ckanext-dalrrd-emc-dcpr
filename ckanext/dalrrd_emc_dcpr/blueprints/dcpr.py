@@ -260,7 +260,10 @@ class _DcprUpdateView(MethodView):
                             for level in DCPRRequestUrgency
                         ],
                         "dataset_capture_method_options": [
-                            {"value": capture_method.value, "text": capture_method.value}
+                            {
+                                "value": capture_method.value,
+                                "text": capture_method.value,
+                            }
                             for capture_method in DCPRCaptureMethod
                         ],
                     },
@@ -347,6 +350,7 @@ csi_edit_dcpr_request_view = DcprRequestCsifUpdateView.as_view("csi_edit_dcpr_re
 dcpr_blueprint.add_url_rule(
     "/request/<csi_reference_id>/csi_edit/", view_func=csi_edit_dcpr_request_view
 )
+
 
 # request show page
 @dcpr_blueprint.route("/request/<csi_reference_id>")
