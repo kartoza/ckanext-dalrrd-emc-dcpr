@@ -177,6 +177,7 @@ class DCPRRequestUrgency(enum.Enum):
 
 
 class DCPRCaptureMethod(enum.Enum):
+
     AERIAL_PHOTOGRAPHY = "Aerial Photography"
     DIGITIZING = "Digitizing"
     GPS = "GPS coordinate capture"
@@ -281,7 +282,7 @@ class DCPRGeospatialRequest(
         return query.filter_by(**kw).first()
 
     def get_notification_targets(
-            self,
+        self,
     ) -> Optional[DCPRGeospatialRequestNotificationTarget]:
         targets = (
             model.meta.Session.query(DCPRGeospatialRequest)
