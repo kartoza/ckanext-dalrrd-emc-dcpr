@@ -1,0 +1,17 @@
+{% ckan_extends %}
+{% set user_created_packages = h.get_user_dashboard_packages(c.userobj.id) %}
+
+
+{% block primary_content_inner %}
+
+  {% if user_created_packages|length>0 %}
+    {% snippet 'snippets/package_list.html', packages=user_created_packages %}
+  {% else %}
+    <p class="empty">
+      {{ _('You haven\'t created any datasets.') }}
+      {% if h.check_access('package_create') %}
+        {% link_for _('Create one now?'), named_route=dataset_type ~ '.new' %}
+      {% endif %}
+    </p>
+  {% endif %}
+{% endblock %}
