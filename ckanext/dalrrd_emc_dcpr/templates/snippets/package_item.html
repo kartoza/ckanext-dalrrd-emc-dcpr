@@ -11,7 +11,8 @@
     {% else %}
       <li class="{{ item_class or "dataset-item" }}">
         {% block content %}
-          {% set date = package['metadata_modified'].split('T')[0] %}
+          {% set date_string = package['metadata_modified']|string %}
+          {% set date = date_string.split('T')[0] %}
           <div class="row dataset-row">
             <div class="col-sm-4 metadata-record-thumbnail">
                 <img src="{{ h.get_datasets_thumbnail(package) }}" alt="{{ notes }}" title="{{ title }}"></img>
