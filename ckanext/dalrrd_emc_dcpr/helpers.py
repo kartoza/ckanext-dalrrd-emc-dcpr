@@ -600,7 +600,23 @@ def get_user_name(user_id):
     """
     user_obj = model.Session.query(model.User).filter_by(id=user_id).first()
     return user_obj.name
-    # toolkit.get_action('user_show')(context={"id":user_id, "ignore_auth":True}, data_dict={})
+
+
+def get_user_id(user_name: str):
+    """
+    gets user id from it's name (the name is also unique)
+    """
+    user_obj = model.Session.query(model.User).filter_by(name=user_name).first()
+    return user_obj.id
+
+
+def get_user_name_from_url(url: str):
+    """
+    get user's name from url
+    """
+    name = url.split("/user/")[1]
+    raise RuntimeError(name)
+    return
 
 
 def get_recent_news(number=5, exclude=None):

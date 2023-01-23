@@ -1,9 +1,7 @@
 {% ckan_extends %}
 {% set user_created_packages = h.get_user_dashboard_packages(c.userobj.id) %}
 
-
 {% block primary_content_inner %}
-
   {% if user_created_packages|length>0 %}
     {% snippet 'snippets/package_list.html', packages=user_created_packages %}
   {% else %}
