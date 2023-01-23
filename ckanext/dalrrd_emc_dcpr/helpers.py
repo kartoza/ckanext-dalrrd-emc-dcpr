@@ -614,9 +614,7 @@ def get_user_name_from_url(url: str):
     """
     get user's name from url
     """
-    name = url.split("/user/")[1]
-    raise RuntimeError(name)
-    return
+    return url.split("/user/")[1]
 
 
 def get_recent_news(number=5, exclude=None):
