@@ -109,6 +109,8 @@ a {
   min-height: 50px;
   margin-bottom: 0;
   border: 1px solid transparent;
+  padding-left: 32px !important;
+  padding-right: 32px !important;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -256,7 +258,7 @@ fieldset[disabled] .btn-default.focus {
 }
 
 .projects {
-  min-height: 350px;
+  min-height: 550px;
 }
 
 /* Datasets */
@@ -384,8 +386,17 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-heading a {
   color: #3A744E;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+}
+
+.dataset-desc {
+  color: #484848;
+  font-size: 14px;
+  font-weight: 300;
+  text-align: justify;
+  margin-bottom: -8px;
 }
 
 .dataset-heading > a:hover, .dataset-heading > a:focus {
@@ -613,7 +624,7 @@ fieldset[disabled] .btn-default.focus {
 .sample-datasets {
   position: relative;
   background-color: #FFFFFF;
-  color: #3A744E;
+  color: #484848;
   margin-bottom: 20px;
 }
 
@@ -1027,16 +1038,16 @@ footer {
   background-size: contain;
   border: solid 1px #eee;
   padding: 0px;
+  line-height: 150px;
 }
 
 .metadata-record-thumbnail img{
   width: 100%;
-  height: 100%;
+  vertical-align: middle;
 }
 
 .metadata-record-desc{
   padding-left:20px;
-  width: 81.3% !important;
 }
 
 @media (min-width: 768px) {
@@ -1057,7 +1068,7 @@ footer {
   }
   .metadata-record-desc{
     padding-left:0px;
-    width: 100% !important;
+    width: 100%;
   }
   .datasets-date{
     top: unset;
@@ -1069,7 +1080,7 @@ footer {
 @media (min-width: 768px) and (max-width: 1200px) {
   .metadata-record-desc {
     padding-left: 20px;
-    width: 66.66666667% !important;
+    width: 66.66666667%;
   }
 }
 label {

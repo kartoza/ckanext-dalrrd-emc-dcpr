@@ -1399,7 +1399,7 @@ dataset_fields:
   #     Description about the temporal reference system used (if any) - This is an optional SANS 1878 field"
 
   - field_name: reference_system_additional_info
-    label: Additional information about Reference Systems (temproal, vertical)
+    label: Additional information about Reference Systems (temporal, vertical)
     preset: modified_repeating_subfields
     repeating_subfields:
 

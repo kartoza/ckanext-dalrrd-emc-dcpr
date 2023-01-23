@@ -176,6 +176,17 @@ class DCPRRequestUrgency(enum.Enum):
     HIGH = "High"
 
 
+class DCPRCaptureMethod(enum.Enum):
+
+    AERIAL_PHOTOGRAPHY = "Aerial Photography"
+    DIGITIZING = "Digitizing"
+    GPS = "GPS coordinate capture"
+    REMOTE_SENSING = "Remote sensing"
+    SCANNING = "Scanning & vectorising"
+    SURVEY = "Survey (cadastral)"
+    SURVEY_QUESTIONNAIRE = "Survey (questionnaire)"
+
+
 class DCPRRequestDataset(
     model.core.StatefulObjectMixin, model.domain_object.DomainObject
 ):
