@@ -20,6 +20,8 @@ from .constants import DCPRRequestStatus
 from .model.dcpr_request import DCPRRequest
 
 from ckan.common import c
+from ckan.lib.dictization.model_dictize import package_dictize
+from ckan.lib.dictization import table_dictize
 
 
 logger = logging.getLogger(__name__)
@@ -637,3 +639,26 @@ def get_year():
     footer
     """
     return datetime.datetime.now().year
+
+
+def get_user_dashboard_packages(user_id):
+    """
+    the current behavior displays
+    all the avialable datastes to the
+    user, we need only the datasets
+    created by the user
+    """
+    # q = f""" select package.*, key, value from package join package_extra on package_id=package.id where package.creator_user_id='{user_id}' """
+    # rows = model.Session.execute(q)
+    # packages = []
+    # for row in rows:
+    #     packages.append(dict(row))
+    # return packages
+    query = model.Session.query(model.Package).filter(
+        model.Package.creator_user_id == user_id
+    )
+    packages = [
+        package_dictize(package, context={"user": user_id, "model": model})
+        for package in query.all()
+    ]
+    return packages
