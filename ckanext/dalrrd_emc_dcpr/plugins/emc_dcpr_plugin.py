@@ -395,6 +395,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_user_name": helpers.get_user_name,
             "get_seo_metatags": helpers.get_seo_metatags,
             "get_datasets_thumbnail": helpers.get_datasets_thumbnail,
+            "get_year": helpers.get_year,
+            "get_user_dashboard_packages": helpers.get_user_dashboard_packages,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
