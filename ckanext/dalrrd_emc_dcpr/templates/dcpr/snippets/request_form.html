@@ -175,8 +175,8 @@
         </div>
 
     </fieldset>
-    {%  if is_nsif_member or is_sysadmin %}
-    <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
+    {%  if enable_nsif_fieldset %}
+    <fieldset>
         <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
         {% call form.markdown(
             'nsif_review_notes',
@@ -190,8 +190,8 @@
         {% endcall %}
     </fieldset>
    {% endif %}
-    {%  if is_csi_member or is_sysadmin %}
-    <fieldset {% if not enable_csi_fieldset %}disabled{% endif %}>
+    {%  if enable_csi_fieldset %}
+    <fieldset>
         <legend>CSI reviewer fields (only enabled for CSI reviewer)</legend>
         {% call form.markdown(
             'csi_moderation_notes',
