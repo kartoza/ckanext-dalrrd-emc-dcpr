@@ -65,7 +65,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL as date_revision,
            c.metadata_created AS date_creation,
            NULL AS date_publication,
-           c.org_name AS organization,
+           c.org_name AS organisation,
            NULL AS securityconstraints,
            NULL AS parentidentifier,
            c.extras->>'iso_topic_category' AS topiccategory,
@@ -133,8 +133,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            cast(cast(c.extras->>'responsible_party_contact_info' as json)->>0 as json)-> 'voice' AS responsible_party_contact_phone,
            cast(cast(c.extras->>'responsible_party_contact_info' as json)->>0 as json)-> 'facsimile' AS responsible_party_contact_facsimile,
            -- distribution_format
-           cast(cast(c.extras->>'distribution_format' as json)->>0 as json)-> 'name' AS format_name,
-           cast(cast(c.extras->>'distribution_format' as json)->>0 as json)-> 'version' AS format_version,
+           cast(cast(c.extras->>'distribution_format' as json)->>0 as json)-> 'name' AS format,
+           cast(cast(c.extras->>'distribution_format' as json)->>0 as json)-> 'version' AS version,
 
            -- spatial and equivalent scale
            cast(c.extras->>'spatial' as json) AS bounding_geojson,
