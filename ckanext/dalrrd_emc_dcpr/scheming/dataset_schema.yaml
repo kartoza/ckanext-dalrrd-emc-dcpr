@@ -606,7 +606,7 @@ dataset_fields:
 
     - field_name: organisational_role
       label: Organisation role
-      required: true
+      required: false
       preset: select
       help_text: function performed by contact party, This is a SANS 1878 mandatory field
       choices:
@@ -674,33 +674,6 @@ dataset_fields:
       label: Electronic mail address
       required: false
       help_text: Address of the electronic mailbox of the contact organisation or individual
-
-  - field_name: reference_date
-    label: Reference date
-    preset: modified_repeating_subfields
-    repeating_subfields:
-
-    - field_name: reference
-      label: Reference datetime
-      required: true
-      validators: >-
-        ignore_missing
-      form_snippet: modified_datetime.html
-      help_text: Reference datetime for this metadata record
-
-    - field_name: date_type
-      label: Reference date type
-      required: true
-      validators: convert_choices_select_to_int
-      preset: select
-      choices:
-        - value: 001
-          label: Creation
-        - value: 002
-          label: Publication
-        - value: 003
-          label: Revision
-      help_text: Reference date type - This is a SANS 1878 mandatory field
 
   - field_name: online_resource
     label: Metadata record online information
@@ -1408,34 +1381,59 @@ dataset_fields:
         form_snippet: markdown.html
         required: false
 
-      - field_name: temporal_extent_period_duration_from
-        label: Temporal extent duration (Start position)
-        preset: date
-        required: false
+      # - field_name: temporal_extent_period_duration_from
+      #   label: Temporal extent duration (Start position)
+      #   preset: date
+      #   required: false
 
-      - field_name: temporal_extent_period_duration_to
-        label: Temporal extent duration (End position)
-        preset: date
-        required: false
+      # - field_name: temporal_extent_period_duration_to
+      #   label: Temporal extent duration (End position)
+      #   preset: date
+      #   required: false
 
-      - field_name: minimum_vertical_extent
-        label: Minimum vertical extent
-        required: false
+      # - field_name: minimum_vertical_extent
+      #   label: Minimum vertical extent
+      #   required: false
 
-      - field_name: maximum_vertical_extent
-        label: Maximum vertical extent
-        required: false
+      # - field_name: maximum_vertical_extent
+      #   label: Maximum vertical extent
+      #   required: false
 
-      - field_name: vertical_extent_unit_of_measure
-        label: Vertical extent unit of measure
-        help_text: vertical unit used for vertical extent information, e.g. meters, feets ..etc.
-        required: false
+      # - field_name: vertical_extent_unit_of_measure
+      #   label: Vertical extent unit of measure
+      #   help_text: vertical unit used for vertical extent information, e.g. meters, feets ..etc.
+      #   required: false
 
-      - field_name: vertical_datum
-        label: Vertical datum
-        help_text: Origin from which minimum and maximum elevations originated
-        required: false
+      # - field_name: vertical_datum
+      #   label: Vertical datum
+      #   help_text: Origin from which minimum and maximum elevations originated
+      #   required: false
+  - field_name: reference_date
+    label: Reference date
+    preset: modified_repeating_subfields
+    repeating_subfields:
 
+    - field_name: reference
+      label: Reference datetime
+      required: true
+      validators: >-
+        ignore_missing
+      form_snippet: modified_datetime.html
+      help_text: Reference datetime for this metadata record
+
+    - field_name: date_type
+      label: Reference date type
+      required: true
+      validators: convert_choices_select_to_int
+      preset: select
+      choices:
+        - value: 001
+          label: Creation
+        - value: 002
+          label: Publication
+        - value: 003
+          label: Revision
+      help_text: Reference date type - This is a SANS 1878 mandatory field
 
   - field_name: metadata_date_stamp
     label: Metadata date stamp
