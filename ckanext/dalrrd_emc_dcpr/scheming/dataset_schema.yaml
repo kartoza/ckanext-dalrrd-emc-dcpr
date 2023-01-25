@@ -1408,7 +1408,7 @@ dataset_fields:
       #   label: Vertical datum
       #   help_text: Origin from which minimum and maximum elevations originated
       #   required: false
-  - field_name: reference_date
+  - field_name: metadata_reference_date
     label: Reference date
     preset: modified_repeating_subfields
     repeating_subfields:
@@ -1435,7 +1435,7 @@ dataset_fields:
           label: Revision
       help_text: Reference date type - This is a SANS 1878 mandatory field
 
-  - field_name: metadata_date_stamp
+  - field_name: date_stamp
     label: Metadata date stamp
     preset: modified_repeating_subfields
     repeating_subfields:
