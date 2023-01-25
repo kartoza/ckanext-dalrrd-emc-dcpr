@@ -112,7 +112,7 @@ MD_CORE_MODEL = {
         "pycsw:CloudCover": "cloudcover",
         "pycsw:Bands": "bands",
         # links: list of dicts with properties: name, description, protocol, url
-        "pycsw:Links": "links",
+        # "pycsw:Links": "links",
         "pycsw:BoundingGeoJSON": "bounding_geojson",
         "pycsw:EquivalentScale": "equivalent_scale",
         "pycsw:ReferenceSystemsAdditionalInfo": "reference_systems_additional_info",
