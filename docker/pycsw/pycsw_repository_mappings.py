@@ -42,7 +42,7 @@ MD_CORE_MODEL = {
         "pycsw:Format": "format",
         "pycsw:Version": "version",
         "pycsw:Source": "source",
-        "pycsw:Date": "reference_date",
+        "pycsw:Date": "date",
         "pycsw:DateType": "reference_date_type",
         "pycsw:Modified": "date_modified",
         "pycsw:Type": "type",
