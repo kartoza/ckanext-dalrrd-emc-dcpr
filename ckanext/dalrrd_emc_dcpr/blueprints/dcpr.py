@@ -768,15 +768,16 @@ def change_dataset_custodian_value(datasets_num: int, ds: dict):
     dataset custodian is submitted as E1,E2 form,
     accordingly we are changing to True/False values.
     """
-    dataset_custodian = ds["dataset_custodian"]
-    if datasets_num == 1:
-        if dataset_custodian == "E1":
-            ds["dataset_custodian"] = True
-        elif dataset_custodian == "E2":
-            ds["dataset_custodian"] = False
-    else:
-        for idx in range(datasets_num):
-            if dataset_custodian[idx] == "E1":
-                ds["dataset_custodian"][idx] = True
-            elif dataset_custodian[idx] == "E2":
-                ds["dataset_custodian"][idx] = False
+    dataset_custodian = ds.get("dataset_custodian")  # legacy data don't have this
+    if dataset_custodian is not None:
+        if datasets_num == 1:
+            if dataset_custodian == "E1":
+                ds["dataset_custodian"] = True
+            elif dataset_custodian == "E2":
+                ds["dataset_custodian"] = False
+        else:
+            for idx in range(datasets_num):
+                if dataset_custodian[idx] == "E1":
+                    ds["dataset_custodian"][idx] = True
+                elif dataset_custodian[idx] == "E2":
+                    ds["dataset_custodian"][idx] = False

@@ -15,10 +15,10 @@
         <ul class="nav navbar-nav">
             {% block header_site_navigation_tabs %}
                 {{ h.emc_build_nav_main(
-                    ('dataset.search', _('Metadata Records')),
+                    ('dataset.search', _('Search Metadata')),
                     ('organization.index', _('Organisations')),
-                    ('publish.index', _('Publish')),
-                    ('dcpr.index', _('DCPR')),
+                    ('publish.index', _('Publish Metadata')),
+                    ('dcpr.index', _('Register a Project')),
                     ('group.index', _('Groups')),
                     ('home.about', _('About')) ) }}
             {% endblock %}
