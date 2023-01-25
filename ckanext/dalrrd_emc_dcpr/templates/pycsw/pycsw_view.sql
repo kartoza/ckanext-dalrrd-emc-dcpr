@@ -53,7 +53,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            c.notes AS abstract,
            concat_ws(', ', VARIADIC c.tags) AS keywords,
            NULL AS keywordstype,
-           NULL AS format,
+        --    NULL AS format,
            NULL AS source,
            c.metadata_modified AS date_modified,
            'http://purl.org/dc/dcmitype/Dataset' AS type,
@@ -75,14 +75,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS denominator,
            NULL AS distancevalue,
            NULL AS distanceuom,
-           cast(cast(c.extras->>'reference_date' as json)->>0 as json)-> 'reference' AS reference_date,
-           cast(cast(c.extras->>'reference_date' as json)->>0 as json)-> 'date_type' AS reference_date_type,
+           cast(cast(c.extras->>'metadata_reference_date' as json)->>0 as json)-> 'reference' AS reference_date,
+           cast(cast(c.extras->>'metadata_reference_date' as json)->>0 as json)-> 'date_type' AS reference_date_type,
            c.extras->>'metadata_standard_name' AS metadata_standard,
            c.extras->>'metadata_standard_version' AS metadata_standard_version,
            c.extras->>'dataset_character_set' AS dataset_character_set,
            c.extras->>'metadata_character_set' AS metadata_character_set,
-           cast(cast(c.extras->>'metadata_date_stamp' as json)->>0 as json)-> 'stamp' AS stamp_date,
-           cast(cast(c.extras->>'metadata_date_stamp' as json)->>0 as json)-> 'date_type' AS stamp_date_type,
+           cast(cast(c.extras->>'date_stamp' as json)->>0 as json)-> 'stamp' AS stamp_date,
+           cast(cast(c.extras->>'date_stamp' as json)->>0 as json)-> 'date_type' AS stamp_date_type,
            NULL AS servicetype,
            NULL AS servicetypeversion,
            NULL AS operation,
@@ -171,7 +171,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
 
             --from "resource" as res where res.package_id = c.id) AS links,
            -- temporal extent
-           cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'description' AS reference_systems_additional_info,
+           cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'description' AS reference_systems_additional_info
 
 
     FROM cte_extras AS c
