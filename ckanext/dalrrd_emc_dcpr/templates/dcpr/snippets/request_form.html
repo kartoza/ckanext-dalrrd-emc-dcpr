@@ -175,7 +175,8 @@
         </div>
 
     </fieldset>
-    <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
+    {%  if enable_nsif_fieldset %}
+    <fieldset>
         <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
         {% call form.markdown(
             'nsif_review_notes',
@@ -188,7 +189,9 @@
             {{ form.info(_('DCPR review notes, as provided by the NSIF reviewers')) }}
         {% endcall %}
     </fieldset>
-    <fieldset {% if not enable_csi_fieldset %}disabled{% endif %}>
+   {% endif %}
+    {%  if enable_csi_fieldset %}
+    <fieldset>
         <legend>CSI reviewer fields (only enabled for CSI reviewer)</legend>
         {% call form.markdown(
             'csi_moderation_notes',
@@ -201,6 +204,7 @@
             {{ form.info(_('DCPR review notes, as provided by the CSI reviewers')) }}
         {% endcall %}
     </fieldset>
+    {% endif %}
     {% block form_actions %}
         {{ form.required_message() }}
         <div class="form-actions">
