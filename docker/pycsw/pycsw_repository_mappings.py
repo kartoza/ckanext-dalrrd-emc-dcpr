@@ -31,6 +31,7 @@ MD_CORE_MODEL = {
         "pycsw:Language": "language",
         "pycsw:Title": "title",
         "pycsw:DatasetName": "dataset_name",
+        "pycsw:MetadataCharacterSet": "metadata_character_set",
         "pycsw:DatasetCharacterSet": "dataset_character_set",
         "pycsw:Abstract": "abstract",
         "pycsw:Edition": "edition",
@@ -115,5 +116,7 @@ MD_CORE_MODEL = {
         "pycsw:BoundingGeoJSON": "bounding_geojson",
         "pycsw:EquivalentScale": "equivalent_scale",
         "pycsw:ReferenceSystemsAdditionalInfo": "reference_systems_additional_info",
+        "pycsw:StampDate": "stamp_date",
+        "pycsw:StampDateType": "stamp_date_type",
     },
 }

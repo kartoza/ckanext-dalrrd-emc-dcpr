@@ -136,6 +136,13 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            cast(cast(c.extras->>'distribution_format' as json)->>0 as json)-> 'name' AS format,
            cast(cast(c.extras->>'distribution_format' as json)->>0 as json)-> 'version' AS version,
 
+           -- metadata online resource
+           cast(cast(c.extras->>'online_resource' as json)->>0 as json)-> 'linkage' AS online_resource_linkage,
+           cast(cast(c.extras->>'online_resource' as json)->>0 as json)-> 'name' AS online_resource_name,
+           cast(cast(c.extras->>'online_resource' as json)->>0 as json)-> 'application_profile' AS online_resource_application_profile,
+           cast(cast(c.extras->>'online_resource' as json)->>0 as json)-> 'description' AS online_resource_description,
+
+
            -- spatial and equivalent scale
            cast(c.extras->>'spatial' as json) AS bounding_geojson,
            c.extras->>'equivalent_scale' AS equivalent_scale,
