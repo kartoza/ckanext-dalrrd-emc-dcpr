@@ -209,6 +209,8 @@ def build_pages_nav_main(*args):
         page_name = toolkit.request.path.split("/")[-1]
 
     for page in pages_list:
+        if page.get("title") == "About":
+            continue  # nsif staff decided they don't want about page.
         type_ = "blog" if page["page_type"] == "blog" else "pages"
         name = quote(page["name"])
         title = html_escape(page["title"])
@@ -220,7 +222,6 @@ def build_pages_nav_main(*args):
         else:
             li = toolkit.literal("<li>") + link + toolkit.literal("</li>")
         output = output + li
-
     return output
 
 
