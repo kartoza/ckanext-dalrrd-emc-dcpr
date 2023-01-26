@@ -98,6 +98,8 @@ a {
 .navbar-default {
   background-color: #ffffff;
    border-color: #e7e7e7;
+   padding-left: 0px !important;
+   padding-right: 0px !important;
  }
 
 .navbar-default .navbar-text {
@@ -109,8 +111,8 @@ a {
   min-height: 50px;
   margin-bottom: 0;
   border: 1px solid transparent;
-  padding-left: 32px !important;
-  padding-right: 32px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
 
 .navbar-default .navbar-nav > li > a {
