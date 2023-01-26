@@ -14,14 +14,27 @@
       {% block header_site_navigation %}
         <ul class="nav navbar-nav">
             {% block header_site_navigation_tabs %}
-                {{ h.emc_build_nav_main(
-                    ('dataset.search', _('Search Metadata')),
+            <li> <a href="{{ url_for('dataset.search') }}" class="image" title="{{ _('Search Metadata') }}">
+                <i class="fa fa-search"></i><span class="text">{{ _(' Search Metadata') }}</span></a></li>
+            <li> <a href="{{ url_for('organization.index') }}" class="image" title="{{ _('Organisations') }}">
+                <i class="fa fa-users"></i><span class="text">{{ _(' Organisations') }}</span></a></li>
+            <li> <a href="{{ url_for('publish.index') }}" class="image" title="{{ _('Publish Metadata') }}">
+                <i class="fa fa-file"></i><span class="text">{{ _(' Publish Metadata') }}</span></a></li>
+            <li> <a href="{{ url_for('dcpr.index') }}" class="image" title="{{ _('Register a Project') }}">
+                    <i class="fa fa-project-diagram"></i><span class="text">{{ _(' Register a Project') }}</span></a></li>
+
+
+
+                {#
+                {{ h.build_nav_icon(
+                    ('dataset.search', _('Search Metadata'), icon="search"),
                     ('organization.index', _('Organisations')),
                     ('publish.index', _('Publish Metadata')),
                     ('dcpr.index', _('Register a Project')),
                     ('group.index', _('Groups')),
                     ('home.about', _('About'))
                      ) }}
+                     #}
             {% endblock %}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" >
