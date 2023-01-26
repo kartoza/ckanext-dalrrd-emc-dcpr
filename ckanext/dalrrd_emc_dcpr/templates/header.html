@@ -21,9 +21,7 @@
             <li> <a href="{{ url_for('publish.index') }}" class="image" title="{{ _('Publish Metadata') }}">
                 <i class="fa fa-file"></i><span class="text">{{ _(' Publish Metadata') }}</span></a></li>
             <li> <a href="{{ url_for('dcpr.index') }}" class="image" title="{{ _('Register a Project') }}">
-                    <i class="fa fa-project-diagram"></i><span class="text">{{ _(' Register a Project') }}</span></a></li>
-
-
+                    <i class="fa fa-clipboard"></i><span class="text">{{ _(' Register a Project') }}</span></a></li>
 
                 {#
                 {{ h.build_nav_icon(
@@ -38,7 +36,7 @@
             {% endblock %}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" >
-            <span class="help">Resources</span></a>
+            <i class="fa fa-cogs"></i><span class="help"> Resources</span></a>
                 <ul class="dropdown-menu">
                     <li> <a href="/pages/about" class="image" title="{{ _('About EMC-DCPR') }}">
                         <span class="text">{{ _('About EMC-DCPR') }}</span></a></li>
@@ -68,7 +66,8 @@
             </li>
             <li>
                 <a href="/contact" class="" data-toggle="" role="button" aria-haspopup="true" aria-expanded="false" >
-                <span class="">Contact</span></a>
+                    <i class="fa fa-address-card"></i> <span class="">Contact</span>
+            </a>
             </li>
         </ul>
       {% endblock %}
