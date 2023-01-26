@@ -20,12 +20,15 @@
                     ('publish.index', _('Publish Metadata')),
                     ('dcpr.index', _('Register a Project')),
                     ('group.index', _('Groups')),
-                    ('home.about', _('About')) ) }}
+                    ('home.about', _('About'))
+                     ) }}
             {% endblock %}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" >
             <span class="help">Resources</span></a>
                 <ul class="dropdown-menu">
+                    <li> <a href="/pages/about" class="image" title="{{ _('About EMC-DCPR') }}">
+                        <span class="text">{{ _('About EMC-DCPR') }}</span></a></li>
                     <li> <a href="/pages/help" class="image" title="{{ _('Help overview') }}">
                         <span class="text">{{ _('Help Overview') }}</span></a></li>
                     <li> <a href="/pages/frequently-asked-questions" class="image" title="{{ _('FAQ') }}">
@@ -48,7 +51,6 @@
                         <span class="text">{{ _('Error Reporting') }}</span></a></li>
                     <li> <a href="/pages/system-usage-reporting" class="image" title="{{ _('System Usage Reporting') }}">
                         <span class="text">{{ _('System Usage Reporting') }}</span></a></li>
-
                 </ul>
             </li>
         </ul>
