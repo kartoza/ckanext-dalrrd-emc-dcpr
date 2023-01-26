@@ -16,14 +16,14 @@
 
   {% if is_myself %}
     <p class="empty">
-      {{ _('You haven\'t created any datasets.') }}
+      {{ _('You haven\'t created any metadata records.') }}
       {% if h.check_access('package_create') %}
         {% link_for _('Create one now?'), named_route='dataset.new' %}
       {% endif %}
     </p>
   {% else %}
     <p class="empty">
-      {{ _('User hasn\'t created any datasets.') }}
+      {{ _('User hasn\'t created any metadata records.') }}
     </p>
   {% endif %}
 {% endif %}
