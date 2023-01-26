@@ -13,3 +13,7 @@
     /* removing the colons ":" from lealfet layers names */
     content: "" !important;
 }
+
+.contact-title{
+    color: #ec971f;
+}
