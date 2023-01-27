@@ -1099,3 +1099,12 @@ label {
   font-style: normal;
   font-weight: 600;
 }
+
+.repeating-fields-container{
+  -moz-column-count: 2;
+  column-count: 2;
+}
+
+#field-responsible_party_contact_address-0-postal_code{
+  margin-top:14px;
+}

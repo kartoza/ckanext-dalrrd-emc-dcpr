@@ -262,6 +262,11 @@ dataset_fields:
         - value: publisher
           label: publisher
 
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the user organisation or individual
+
 
   - field_name: responsible_party_contact_info
     label: Metadata record responsible party contact info
@@ -300,11 +305,6 @@ dataset_fields:
     - field_name: postal_code
       label: Postal Code
       required: false
-
-    - field_name: electronic_mail_address
-      label: Electronic mail address
-      required: false
-      help_text: Address of the electronic mailbox of the user organisation or individual
 
   - field_name: iso_topic_category
     label: Topic Category
@@ -631,6 +631,11 @@ dataset_fields:
         # - value: publisher
         #   label: publisher
 
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the contact organisation or individual
+
   - field_name: contact_information
     label: Metadata record point of contact additional info
     preset: modified_repeating_subfields
@@ -669,11 +674,6 @@ dataset_fields:
       label: Postal Code
       required: false
       help_text: postal code of the contact organisation or individual
-
-    - field_name: electronic_mail_address
-      label: Electronic mail address
-      required: false
-      help_text: Address of the electronic mailbox of the contact organisation or individual
 
   - field_name: online_resource
     label: Metadata record online information
