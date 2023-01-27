@@ -14,6 +14,10 @@
     content: "" !important;
 }
 
+.leaflet-control-layers-base  > label::after{
+    /* removing the colons ":" from lealfet layers names, dataset page */
+    content: "" !important;}
+
 .contact-title{
     color: #ec971f;
 }

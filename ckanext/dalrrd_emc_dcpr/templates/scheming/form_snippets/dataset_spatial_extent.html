@@ -2,6 +2,7 @@
 
 {% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-js" %}
 {% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-css" %}
+{% asset "ckanext-dalrrdemcdcpr/spatial-search-js" %}
 
 {% set map_config = h.get_common_map_config() %}
 {% set default_bounding_box = h.emc_default_bounding_box() %}
@@ -27,7 +28,7 @@
             data-module-default-extent="{{ default_bounding_box }}"
             data-module-form-input-id="{{ input_id }}"
     >
-        <div id="dataset-spatial-extent-map-container"></div>
+        <div id="dataset-spatial-extent-map-container" data-module="spatial_search" data-caller="dataset-extent"></div>
         <div id="dataset-spatial-extent-map-attribution">
             {% snippet "spatial/snippets/map_attribution.html", map_config=map_config %}
         </div>

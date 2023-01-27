@@ -14,18 +14,27 @@ ckan.module("spatial_search", function($){
     var drawer
     var drawerEnabled = false
 
+    let path = location.pathname;
+
     return{
         initialize:function(){
+            console.log("spatial search loaded!")
             let _this = this
             if(document.readyState == "complete"){_this.mapper(); }
             else{window.addEventListener("load", (e)=>{
                 setTimeout(_this.mapper(),1500);
             })}
-            $.proxyAll(this,/_on/);
+            $.proxyAll(this,/mapper/);
         },
         mapper: function(){
             var _this = this
-            let Lmap = window.map
+            let Lmap
+            if(path.includes("dataset/new") || path.includes("dcpr/request/new")){
+                Lmap = LeafletMapFromExtentModule
+            }
+            else{
+                Lmap = window.map
+            }
             let getDivisionCaps = function(division){
                 let _caps = division.charAt(0).toUpperCase() + division.slice(1);
                 division_caps = _caps.replace("_", " ")
@@ -73,11 +82,13 @@ ckan.module("spatial_search", function($){
                                 let bounds = geojson_from_feature.getBounds()
                                 let bound_str = bounds.toBBoxString()
                                 $('#ext_bbox').val(bound_str)
-                                setTimeout(function() {
+                                $('#field-spatial').val(bound_str)
+                                $('#field-spatial_extent').val(bound_str)
+                                if(! location.pathname.includes("dataset/new") && ! path.includes("dcpr/request/new")){setTimeout(function() {
                                     map.fitBounds(bounds);
                                     var form = $(".search-form");
                                     form.submit();
-                                  }, 200);
+                                  }, 200)};
                                 }})
                             }
                         },)
