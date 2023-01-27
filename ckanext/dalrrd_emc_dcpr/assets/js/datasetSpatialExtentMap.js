@@ -5,6 +5,7 @@
 * Displays a leaflet map
 *
 * */
+var LeafletMapFromExtentModule
 ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
     return {
         options: {
@@ -87,42 +88,7 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
             //this.map.addLayer(this.rectangleLayer)
             this.map.fitBounds(this.rectangleLayer.getBounds())
 
-            // adding South Africa boundaries.
-            let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
-            let divisions_overlay = {}
-            let _this = this
-            divisions.forEach(division =>{
-                var division_caps = _this.captializeFirstLetter(division).replace("_"," ")
-                divisions_overlay[division_caps] = L.layerGroup()
-                let division_json = L.geoJson(null,{
-                    onEachFeature:function(feature, layer){
-
-                        /* for reasons related to browser cache
-                           i put this functionality here instead
-                           of in it's own function */
-
-                        layer.on({'click':function(e){
-                            let geojson_from_feature = L.geoJson(e.target.feature)
-                            let bounds = geojson_from_feature.getBounds()
-                            let bound_str = bounds.toBBoxString()
-                            _this.formInputElement.setAttribute("value",bound_str)
-                            setTimeout(function() {
-                                _this.map.fitBounds(bounds);
-                              }, 200);
-                        }})
-                    }
-                })
-                let url = `${location.origin}/sa_boundaries/sa_${division}.geojson`
-                fetch(url).then(res=>res.json()).then((data)=>{
-                data.features.forEach(item=>{
-                    division_json.addData(item)
-                })
-            }).then(() => {
-                divisions_overlay[division_caps].addLayer(division_json)
-            })
-            })
-            let layerControl = L.control.layers(null,divisions_overlay)
-            layerControl.addTo(this.map);
+            LeafletMapFromExtentModule = this.map
         },
 
         _onRemove: function (event) {
