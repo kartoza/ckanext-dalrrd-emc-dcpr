@@ -188,9 +188,12 @@ def handle_date_fields(root_ob):
     transform date strings
     to dates.
     """
-    date_fields = ["reference_date"]
+    date_fields = [
+        "metadata_reference_date_and_stamp-0-stamp",
+        "metadata_reference_date_and_stamp-0-reference",
+    ]
     for field in date_fields:
-        iso_date_field = handle_date_field(root_ob[field])
+        iso_date_field = handle_date_field(root_ob.get(field))
         root_ob.update(iso_date_field)
     return root_ob
 
@@ -272,3 +275,9 @@ def change_name_special_chars_to_underscore(title: str) -> str:
             title = title.replace(i, "_")
 
     return title
+
+
+################### notes #######################
+# change the format of the error messages, for example with this error:
+#    "error creating package "xml dataset upload test2": That URL is already in use."
+# the user isn't providing URL, rather a title, so prompt to change the title.
