@@ -344,7 +344,6 @@ fieldset[disabled] .btn-default.focus {
   padding-right: 1px;
   background-color: #fff;
   border: 1px solid #ccc;
-  border-bottom:none;
 }
 
 .dataset-row{
