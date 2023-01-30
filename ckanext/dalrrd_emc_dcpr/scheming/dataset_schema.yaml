@@ -457,14 +457,6 @@ dataset_fields:
       preset: select
       help_text: Language of the metadata record - This is a SANS 1878 mandatory field
 
-    - field_name: metadata_language
-      label: Metadata language
-      required: true
-      choices:
-        - value: en
-          label: English
-      preset: select
-      help_text: Language for the metadata - This is a SANS 1878 mandatory field
 
     - field_name: dataset_character_set
       label: Metadata record character set
@@ -530,6 +522,15 @@ dataset_fields:
       help_text: >-
         Full name of the character coding standard used for the metadata record -
         This is a SANS 1878 mandatory field
+
+    - field_name: metadata_language
+      label: Metadata language
+      required: true
+      choices:
+        - value: en
+          label: English
+      preset: select
+      help_text: Language for the metadata - This is a SANS 1878 mandatory field
 
     - field_name: metadata_character_set
       label: Metadata character set
