@@ -128,7 +128,7 @@ a {
 }
 
 body {
-  background: #FFF url("../../../base/images/bg.png");
+  background: #FFF		 url("../../../base/images/bg.png");
   height: 100%;
  }
 
@@ -344,6 +344,7 @@ fieldset[disabled] .btn-default.focus {
   padding-right: 1px;
   background-color: #fff;
   border: 1px solid #ccc;
+  border-bottom:none;
 }
 
 .dataset-row{
@@ -1105,6 +1106,14 @@ label {
   column-count: 2;
 }
 
-#field-responsible_party_contact_address-0-postal_code{
+label[for=field-responsible_party_contact_address-0-postal_code]{
   margin-top:14px;
+}
+
+label[for=field-contact_address-0-postal_code]{
+  margin-top:14px;
+}
+
+label[for=field-online_resource-0-description]{
+  margin-top:14px
 }
