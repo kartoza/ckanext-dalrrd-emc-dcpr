@@ -299,11 +299,11 @@ dataset_fields:
       required: false
       help_text: address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
 
-    - field_name: address_city
+    - field_name: city
       label: City
       required: false
 
-    - field_name: address_administrative_area
+    - field_name: administrative_area
       label: Administrative area
       required: false
       help_text: province of the contact location
@@ -598,7 +598,7 @@ dataset_fields:
 
 
   - field_name: lineage_statement
-    label: Statement
+    label: Lineage statement
     required: true
     help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
@@ -617,7 +617,7 @@ dataset_fields:
       required: false
       help_text: Role/ position of the contact individual
 
-    - field_name: organisational_role
+    - field_name: role
       label: Organisation role
       required: false
       preset: select
