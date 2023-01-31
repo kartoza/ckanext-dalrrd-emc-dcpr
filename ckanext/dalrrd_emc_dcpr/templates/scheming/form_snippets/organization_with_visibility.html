@@ -11,8 +11,7 @@
 {% endmacro %}
 
 {% set organizations_available = h.organizations_available('create_dataset') %}
-<div class="form-row">
-    <div class="col-md-6">
+<div class="form-row repeating-fields-container">
     {% snippet "scheming/form_snippets/_organization_select.html",
     field=field,
     data=data,
@@ -21,15 +20,12 @@
     org_required=not h.check_config_permission('create_unowned_dataset')
       or h.scheming_field_required(field),
     organization_option_tag=organization_option_tag %}
-    </div>
-
     {#
         Below we modify the `Visibility` field's behavior depending on whether the user is allowed to publish
         a dataset or not
     #}
     {% set user_can_publish_dataset = h.check_access('package_publish', data) %}
     {% set show_visibility_selector = organizations_available and user_can_publish_dataset %}
-    <div class="col-md-6">
     {% block package_metadata_fields_visibility %}
         <div class="control-group form-group control-medium">
             <label for="field-private" class="control-label">{{ _('Visibility') }}</label>
@@ -48,5 +44,5 @@
             </div>
         </div>
     {% endblock %}
-</div>
+
 </div>
