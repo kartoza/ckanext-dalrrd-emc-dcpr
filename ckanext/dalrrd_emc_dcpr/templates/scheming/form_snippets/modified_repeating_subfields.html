@@ -16,6 +16,7 @@
             subfield,
             field_name=field.field_name ~ '-' ~ index ~ '-' ~ subfield.field_name)
           %}
+           <div class="col-md-6">
           {%- snippet 'scheming/snippets/form_field.html',
             field=sf,
             data=flat,
@@ -24,6 +25,7 @@
             entity_type=entity_type,
             object_type=object_type
           -%}
+           </div>
         {% endfor %}
       </div>
     </div>
@@ -67,7 +69,7 @@
 	  {% endif %}
 	</div>
 
-	<div name="repeating-template" style="display:none">{{ repeating_panel('REPEATING-INDEX0', 'REPEATING-INDEX1') }}</div>
+	<div class="repeating-template" style="display:none">{{ repeating_panel('REPEATING-INDEX0', 'REPEATING-INDEX1') }}</div>
       </fieldset>
     </div>
 {% endcall %}
