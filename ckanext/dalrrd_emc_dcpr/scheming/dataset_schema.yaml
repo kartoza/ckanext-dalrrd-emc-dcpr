@@ -48,21 +48,27 @@ dataset_fields:
 
   # these two fields are better to be implemented as above
   # after several discussions, this is always SANS1878
-  - field_name: metadata_standard_name
-    label: Metadata standard name
-    validators: metadata_default_standard_name
-    required: false
-    help_text: >-
-      Name(s) of metadata standard used, if multiple standards used, separate them by comma, leave
-      blank if the metadata standard used is SANS1878
 
-  - field_name: metadata_standard_version
-    label: Metadata standard version
-    validators: metadata_default_standard_version
-    required: false
-    help_text: >-
-      Version(s) of metadata standard used, if multiple standards used, separate versions by comma, leave
-      blank if the metadata standard version is 1.1
+  - field_name: metadata_standard
+    label: Metadata Standard
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: name
+      label: Metadata standard name
+      validators: metadata_default_standard_name
+      required: false
+      help_text: >-
+        Name(s) of metadata standard used, if multiple standards used, separate them by comma, leave
+        blank if the metadata standard used is SANS1878
+
+    - field_name: version
+      label: Metadata standard version
+      validators: metadata_default_standard_version
+      required: false
+      help_text: >-
+        Version(s) of metadata standard used, if multiple standards used, separate versions by comma, leave
+        blank if the metadata standard version is 1.1
 
   - field_name: notes
     label: Abstract
@@ -262,6 +268,11 @@ dataset_fields:
         - value: publisher
           label: publisher
 
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the user organisation or individual
+
 
   - field_name: responsible_party_contact_info
     label: Metadata record responsible party contact info
@@ -288,11 +299,11 @@ dataset_fields:
       required: false
       help_text: address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
 
-    - field_name: address_city
+    - field_name: city
       label: City
       required: false
 
-    - field_name: address_administrative_area
+    - field_name: administrative_area
       label: Administrative area
       required: false
       help_text: province of the contact location
@@ -301,40 +312,40 @@ dataset_fields:
       label: Postal Code
       required: false
 
-    - field_name: electronic_mail_address
-      label: Electronic mail address
-      required: false
-      help_text: Address of the electronic mailbox of the user organisation or individual
+  - field_name: topic_and_sasdi_theme
+    label: Topic category and SASDI theme
+    preset: modified_repeating_subfields
+    repeating_subfields:
 
-  - field_name: iso_topic_category
-    label: Topic Category
-    help_text: ISO 19115 Topic Category for the metadata record - This is a SANS 1878 mandatory field
-    required: true
-    choices_helper: emc_iso_topic_categories
-    validators: >-
-      ignore_missing
-      convert_to_tags(iso_topic_categories)
-    output_validators: >-
-      convert_from_tags(iso_topic_categories)
-      ignore_missing
-    form_snippet: "vocab_select.html"
-    display_snippet: "vocab_tag_display.html"
-    # display_snippet: null
+    - field_name: iso_topic_category
+      label: Topic Category
+      help_text: ISO 19115 Topic Category for the metadata record - This is a SANS 1878 mandatory field
+      required: true
+      choices_helper: emc_iso_topic_categories
+      validators: >-
+        ignore_missing
+        convert_to_tags(iso_topic_categories)
+      output_validators: >-
+        convert_from_tags(iso_topic_categories)
+        ignore_missing
+      form_snippet: "vocab_select.html"
+      display_snippet: "vocab_tag_display.html"
+      # display_snippet: null
 
-  - field_name: sasdi_theme
-    label: SASDI Theme
-    help_text: South African Spatial Data Infrastructure Theme
-    choices_helper: emc_sasdi_themes
-    validators: >-
-      ignore_missing
-      convert_to_tags(sasdi_themes)
-    output_validators: >-
-      scheming_required
-      scheming_choices
-      convert_from_tags(sasdi_themes)
-      ignore_missing
-    form_snippet: vocab_select.html
-    display_snippet: vocab_tag_display.html
+    - field_name: sasdi_theme
+      label: SASDI Theme
+      help_text: South African Spatial Data Infrastructure Theme
+      choices_helper: emc_sasdi_themes
+      validators: >-
+        ignore_missing
+        convert_to_tags(sasdi_themes)
+      output_validators: >-
+        scheming_required
+        scheming_choices
+        convert_from_tags(sasdi_themes)
+        ignore_missing
+      form_snippet: vocab_select.html
+      display_snippet: vocab_tag_display.html
     # display_snippet: null
 
   # - field_name: custom_tags
@@ -430,164 +441,167 @@ dataset_fields:
       #   required: false
       #   help_text: Recommendations of algorithms or processes that can be applied to read or expand resources to which compression techniques have be applied
 
-  - field_name: dataset_language
-    label: Metadata record language
-    required: true
-    choices:
-      - value: en
-        label: English
-    preset: select
-    help_text: Language of the metadata record - This is a SANS 1878 mandatory field
 
-  - field_name: metadata_language
-    label: Metadata language
-    required: true
-    choices:
-      - value: en
-        label: English
-    preset: select
-    help_text: Language for the metadata - This is a SANS 1878 mandatory field
-
-  - field_name: dataset_character_set
-    label: Metadata record character set
-    required: true
-    choices:
-      - value: ucs-2
-        label: UCS-2
-      - value: ucs-4
-        label: UCS-4
-      - value: utf-7
-        label: UTF-7
-      - value: utf-8
-        label: UTF-8
-      - value: utf-16
-        label: UTF-16
-      - value: 8859part1
-        label: 8859-1
-      - value: 8859part2
-        label: 8859-2
-      - value: 8859part3
-        label: 8859-3
-      - value: 8859part4
-        label: 8859-4
-      - value: 8859part5
-        label: 8859-5
-      - value: 8859part6
-        label: 8859-6
-      - value: 8859part7
-        label: 8859-7
-      - value: 8859part8
-        label: 8859-8
-      - value: 8859part9
-        label: 8859-9
-      - value: 8859part10
-        label: 8859-10
-      - value: 8859part11
-        label: 8859-11
-      - value: 8859part13
-        label: 8859-13
-      - value: 8859part14
-        label: 8859-14
-      - value: 8859part15
-        label: 8859-15
-      - value: 8859part16
-        label: 8859-16
-      - value: jis
-        label: jis
-      - value: shiftJIS
-        label: shiftJIS
-      - value: eucJP
-        label: eucJP
-      - value: usAscii
-        label: ASCII
-      - value: ebcdic
-        label: ebcdic
-      - value: eucKR
-        label: eucKR
-      - value: big5
-        label: big5
-      - value: GB2312
-        label: GB2312
-    preset: select
-    help_text: >-
-      Full name of the character coding standard used for the metadata record -
-      This is a SANS 1878 mandatory field
-
-  - field_name: metadata_character_set
-    label: Metadata character set
-    required: true
-    choices:
-      - value: ucs-2
-        label: UCS-2
-      - value: ucs-4
-        label: UCS-4
-      - value: utf-7
-        label: UTF-7
-      - value: utf-8
-        label: UTF-8
-      - value: utf-16
-        label: UTF-16
-      - value: 8859part1
-        label: 8859-1
-      - value: 8859part2
-        label: 8859-2
-      - value: 8859part3
-        label: 8859-3
-      - value: 8859part4
-        label: 8859-4
-      - value: 8859part5
-        label: 8859-5
-      - value: 8859part6
-        label: 8859-6
-      - value: 8859part7
-        label: 8859-7
-      - value: 8859part8
-        label: 8859-8
-      - value: 8859part9
-        label: 8859-9
-      - value: 8859part10
-        label: 8859-10
-      - value: 8859part11
-        label: 8859-11
-      - value: 8859part13
-        label: 8859-13
-      - value: 8859part14
-        label: 8859-14
-      - value: 8859part15
-        label: 8859-15
-      - value: 8859part16
-        label: 8859-16
-      - value: jis
-        label: jis
-      - value: shiftJIS
-        label: shiftJIS
-      - value: eucJP
-        label: eucJP
-      - value: usAscii
-        label: ASCII
-      - value: ebcdic
-        label: ebcdic
-      - value: eucKR
-        label: eucKR
-      - value: big5
-        label: big5
-      - value: GB2312
-        label: GB2312
-    preset: select
-    help_text: >-
-      Full name of the character coding standard used for the metadata record -
-      This is a SANS 1878 mandatory field
-
-  - field_name: dataset_lineage
-    label: Lineage
+  - field_name: metadata_language_and_character_set
+    label: Metadata and Metadata record language and character set
     preset: modified_repeating_subfields
-    repeating_label: Lineage
     repeating_subfields:
 
-      - field_name: statement
-        label: Statement
-        required: true
-        help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
+
+    - field_name: dataset_language
+      label: Metadata record language
+      required: true
+      choices:
+        - value: en
+          label: English
+      preset: select
+      help_text: Language of the metadata record - This is a SANS 1878 mandatory field
+
+
+    - field_name: dataset_character_set
+      label: Metadata record character set
+      required: true
+      choices:
+        - value: ucs-2
+          label: UCS-2
+        - value: ucs-4
+          label: UCS-4
+        - value: utf-7
+          label: UTF-7
+        - value: utf-8
+          label: UTF-8
+        - value: utf-16
+          label: UTF-16
+        - value: 8859part1
+          label: 8859-1
+        - value: 8859part2
+          label: 8859-2
+        - value: 8859part3
+          label: 8859-3
+        - value: 8859part4
+          label: 8859-4
+        - value: 8859part5
+          label: 8859-5
+        - value: 8859part6
+          label: 8859-6
+        - value: 8859part7
+          label: 8859-7
+        - value: 8859part8
+          label: 8859-8
+        - value: 8859part9
+          label: 8859-9
+        - value: 8859part10
+          label: 8859-10
+        - value: 8859part11
+          label: 8859-11
+        - value: 8859part13
+          label: 8859-13
+        - value: 8859part14
+          label: 8859-14
+        - value: 8859part15
+          label: 8859-15
+        - value: 8859part16
+          label: 8859-16
+        - value: jis
+          label: jis
+        - value: shiftJIS
+          label: shiftJIS
+        - value: eucJP
+          label: eucJP
+        - value: usAscii
+          label: ASCII
+        - value: ebcdic
+          label: ebcdic
+        - value: eucKR
+          label: eucKR
+        - value: big5
+          label: big5
+        - value: GB2312
+          label: GB2312
+      preset: select
+      help_text: >-
+        Full name of the character coding standard used for the metadata record -
+        This is a SANS 1878 mandatory field
+
+    - field_name: metadata_language
+      label: Metadata language
+      required: true
+      choices:
+        - value: en
+          label: English
+      preset: select
+      help_text: Language for the metadata - This is a SANS 1878 mandatory field
+
+    - field_name: metadata_character_set
+      label: Metadata character set
+      required: true
+      choices:
+        - value: ucs-2
+          label: UCS-2
+        - value: ucs-4
+          label: UCS-4
+        - value: utf-7
+          label: UTF-7
+        - value: utf-8
+          label: UTF-8
+        - value: utf-16
+          label: UTF-16
+        - value: 8859part1
+          label: 8859-1
+        - value: 8859part2
+          label: 8859-2
+        - value: 8859part3
+          label: 8859-3
+        - value: 8859part4
+          label: 8859-4
+        - value: 8859part5
+          label: 8859-5
+        - value: 8859part6
+          label: 8859-6
+        - value: 8859part7
+          label: 8859-7
+        - value: 8859part8
+          label: 8859-8
+        - value: 8859part9
+          label: 8859-9
+        - value: 8859part10
+          label: 8859-10
+        - value: 8859part11
+          label: 8859-11
+        - value: 8859part13
+          label: 8859-13
+        - value: 8859part14
+          label: 8859-14
+        - value: 8859part15
+          label: 8859-15
+        - value: 8859part16
+          label: 8859-16
+        - value: jis
+          label: jis
+        - value: shiftJIS
+          label: shiftJIS
+        - value: eucJP
+          label: eucJP
+        - value: usAscii
+          label: ASCII
+        - value: ebcdic
+          label: ebcdic
+        - value: eucKR
+          label: eucKR
+        - value: big5
+          label: big5
+        - value: GB2312
+          label: GB2312
+      preset: select
+      help_text: >-
+        Full name of the character coding standard used for the metadata record -
+        This is a SANS 1878 mandatory field
+
+
+  - field_name: lineage_statement
+    label: Lineage statement
+    required: true
+    help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
 
   - field_name: contact
@@ -604,7 +618,7 @@ dataset_fields:
       required: false
       help_text: Role/ position of the contact individual
 
-    - field_name: organisational_role
+    - field_name: role
       label: Organisation role
       required: false
       preset: select
@@ -631,6 +645,11 @@ dataset_fields:
         # - value: publisher
         #   label: publisher
 
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the contact organisation or individual
+
   - field_name: contact_information
     label: Metadata record point of contact additional info
     preset: modified_repeating_subfields
@@ -654,6 +673,7 @@ dataset_fields:
     - field_name: delivery_point
       label: Delivery Point
       required: false
+      help_text:  address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
 
     - field_name: city
       label: City
@@ -670,11 +690,6 @@ dataset_fields:
       required: false
       help_text: postal code of the contact organisation or individual
 
-    - field_name: electronic_mail_address
-      label: Electronic mail address
-      required: false
-      help_text: Address of the electronic mailbox of the contact organisation or individual
-
   - field_name: online_resource
     label: Metadata record online information
     preset: modified_repeating_subfields
@@ -683,10 +698,12 @@ dataset_fields:
 
     - field_name: linkage
       label: URL
+      help_text: location(address) for on-line access using a uniform resource locator address or similar addressing scheme
 
     - field_name: name
       label: Name
       form_placeholder: eg. January 2011 Gold Prices
+      help_text: Name of the online resource
 
     - field_name: application_profile
       label: Application profile
@@ -1317,53 +1334,57 @@ dataset_fields:
     preset: emc_dataset_spatial_extent
     display_snippet: null
 
-    # TODO: Add a more pleasant widget, like the one used for the dataset URL, which would show 1/<value>
-  - field_name: equivalent_scale
-    label: Spatial resolution equivalent scale
-    required: true
-    preset: spatial_resolution_checker
-    help_text: >-
-      Level of detail expressed as the scale of a comparable hardcopy map or
-      chart. Provide it as the denominator of a representative fraction,
-      i.e. the number below the line in a vulgar fraction - This is a
-      SANS 1878 mandatory field
+  - field_name: spatial_parameters
+    label: Spatial parameters
+    preset: modified_repeating_subfields
+    repeating_subfields:
 
-  - field_name: spatial_representation_type
-    label: Spatial representation type
-    required: true
-    help_text: >-
-        Method used to spatially represent geographic information - This is
-        a SANS 1878 mandatory field
-    choices:
-      - value: "001"
-        label: Vector (vector data is used to represent geographic data)
-      - value: "002"
-        label: Grid (grid data is used to represent geographic data)
-      - value: "003"
-        label: Text table (textual or tabular data is used to represent geographic data)
-      - value: "004"
-        label: Triangulated Irregular Network (TIN)
-      - value: "005"
-        label: >-
-          Stereo Model (Three-dimensional view formed by the intersecting homologous rays of  an
-          overlapping pair of images)
-      - value: "006"
-        label: Video (Scene from a video recording)
-      - value: "007"
-        label: Image (Image formats, e.g. Tiff/BMP/JPEG/SID, etc. - Not a grid)
-    preset: select
+    - field_name: equivalent_scale
+      label: Spatial resolution equivalent scale
+      required: true
+      preset: spatial_resolution_checker
+      help_text: >-
+        Level of detail expressed as the scale of a comparable hardcopy map or
+        chart. Provide it as the denominator of a representative fraction,
+        i.e. the number below the line in a vulgar fraction - This is a
+        SANS 1878 mandatory field
 
-  - field_name: spatial_reference_system
-    label: Spatial Reference System Identifier
-    required: true
-    validators: emc_srs_validator
-    help_text: >-
-      "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
-      respective code for the metadata record's spatial coordinate
-      reference system. It is recommended to use the EPSG spatial catalogue codes whenever possible
-      (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
-      www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
-      coordinate reference systems  - This is a SANS 1878 mandatory field"
+    - field_name: spatial_representation_type
+      label: Spatial representation type
+      required: true
+      help_text: >-
+          Method used to spatially represent geographic information - This is
+          a SANS 1878 mandatory field
+      choices:
+        - value: "001"
+          label: Vector (vector data is used to represent geographic data)
+        - value: "002"
+          label: Grid (grid data is used to represent geographic data)
+        - value: "003"
+          label: Text table (textual or tabular data is used to represent geographic data)
+        - value: "004"
+          label: Triangulated Irregular Network (TIN)
+        - value: "005"
+          label: >-
+            Stereo Model (Three-dimensional view formed by the intersecting homologous rays of  an
+            overlapping pair of images)
+        - value: "006"
+          label: Video (Scene from a video recording)
+        - value: "007"
+          label: Image (Image formats, e.g. Tiff/BMP/JPEG/SID, etc. - Not a grid)
+      preset: select
+
+    - field_name: spatial_reference_system
+      label: Spatial Reference System Identifier
+      required: true
+      validators: emc_srs_validator
+      help_text: >-
+        "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
+        respective code for the metadata record's spatial coordinate
+        reference system. It is recommended to use the EPSG spatial catalogue codes whenever possible
+        (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
+        www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
+        coordinate reference systems  - This is a SANS 1878 mandatory field"
 
   # - field_name: temporal_reference_system
   #   label: Temporal Reference System Information
@@ -1373,13 +1394,8 @@ dataset_fields:
 
   - field_name: reference_system_additional_info
     label: Additional information about Reference Systems (temporal, vertical)
-    preset: modified_repeating_subfields
-    repeating_subfields:
-
-      - field_name: description
-        label: Temporal and spatial extents description
-        form_snippet: markdown.html
-        required: false
+    form_snippet: markdown.html
+    required: false
 
       # - field_name: temporal_extent_period_duration_from
       #   label: Temporal extent duration (Start position)
@@ -1408,7 +1424,7 @@ dataset_fields:
       #   label: Vertical datum
       #   help_text: Origin from which minimum and maximum elevations originated
       #   required: false
-  - field_name: metadata_reference_date
+  - field_name: metadata_reference_date_and_stamp
     label: Reference date
     preset: modified_repeating_subfields
     repeating_subfields:
@@ -1421,7 +1437,7 @@ dataset_fields:
       form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 
-    - field_name: date_type
+    - field_name: reference_date_type
       label: Reference date type
       required: true
       validators: convert_choices_select_to_int
@@ -1435,19 +1451,14 @@ dataset_fields:
           label: Revision
       help_text: Reference date type - This is a SANS 1878 mandatory field
 
-  - field_name: date_stamp
-    label: Metadata date stamp
-    preset: modified_repeating_subfields
-    repeating_subfields:
-
     - field_name: stamp
-      label: Date
+      label: Stamp date
       required: true
       form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 
-    - field_name: date_type
-      label: Reference date type
+    - field_name: stamp_date_type
+      label: Stamp date type
       required: true
       validators: convert_choices_select_to_int
       preset: select

@@ -10,13 +10,12 @@
 {% macro repeating_panel(index, index1) %}
   <div class="scheming-subfield-group" data-field="{{ field.field_name }}" data-group-index="{{ index }}">
     <div class="panel panel-default" style="border-top: 1px solid #ced4da;">
-      <div class="panel-body fields-content" style="border-bottom: 1px solid #ced4da;">
+      <div class="panel-body fields-content repeating-fields-container" style="border-bottom: 1px solid #ced4da;">
         {% for subfield in field.repeating_subfields %}
           {% set sf = dict(
             subfield,
             field_name=field.field_name ~ '-' ~ index ~ '-' ~ subfield.field_name)
           %}
-           <div class="col-md-6">
           {%- snippet 'scheming/snippets/form_field.html',
             field=sf,
             data=flat,
@@ -25,7 +24,6 @@
             entity_type=entity_type,
             object_type=object_type
           -%}
-           </div>
         {% endfor %}
       </div>
     </div>
@@ -42,34 +40,34 @@
   [],
   field.classes if 'classes' in field else ['control-medium'],
   is_required=h.scheming_field_required(field)) %}
-    <div {{ form.attributes(field.get('form_attrs', {})) }}>
-      <fieldset name="scheming-repeating-subfields" class="scheming-fieldset" data-module="scheming-repeating-subfields">
-	{% set alert_warning = h.scheming_language_text(field.form_alert_warning) %}
-	{% if alert_warning %}
-	  <section class="alert alert-warning">
-	    {{ alert_warning|safe }}
-	  </section>
-	{% endif %}
+  <div {{ form.attributes(field.get('form_attrs', {})) }}>
+    <fieldset name="scheming-repeating-subfields" class="scheming-fieldset" data-module="scheming-repeating-subfields">
+      {% set alert_warning = h.scheming_language_text(field.form_alert_warning) %}
+      {% if alert_warning %}
+        <section class="alert alert-warning">
+          {{ alert_warning|safe }}
+        </section>
+      {% endif %}
 
-	{%- set group_data = data[field.field_name] -%}
-	{%- set group_count = group_data|length -%}
-	{%- if not group_count and 'id' not in data -%}
-	  {%- set group_count = field.form_blanks|default(1) -%}
-	{%- endif -%}
+      {%- set group_data = data[field.field_name] -%}
+      {%- set group_count = group_data|length -%}
+      {%- if not group_count and 'id' not in data -%}
+        {%- set group_count = field.form_blanks|default(1) -%}
+      {%- endif -%}
 
-	<div class="scheming-repeating-subfields-group">
-	    {{ repeating_panel(0, 1) }}
-	</div>
-	<div class="control-medium">
-	  {% set help_text = h.scheming_language_text(field.help_text) %}
-	  {% if help_text %}
-	    <div class="info-block mrgn-tp-md">
-	      {{ help_text }}
-	    </div>
-	  {% endif %}
-	</div>
+      <div class="scheming-repeating-subfields-group">
+          {{ repeating_panel(0, 1) }}
+      </div>
+      <div class="control-medium">
+        {% set help_text = h.scheming_language_text(field.help_text) %}
+        {% if help_text %}
+          <div class="info-block mrgn-tp-md">
+            {{ help_text }}
+          </div>
+        {% endif %}
+      </div>
 
-	<div class="repeating-template" style="display:none">{{ repeating_panel('REPEATING-INDEX0', 'REPEATING-INDEX1') }}</div>
-      </fieldset>
-    </div>
+      <div name="repeating-template" style="display:none">{{ repeating_panel('REPEATING-INDEX0', 'REPEATING-INDEX1') }}</div>
+    </fieldset>
+  </div>
 {% endcall %}
