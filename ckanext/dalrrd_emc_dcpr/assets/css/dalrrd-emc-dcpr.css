@@ -1064,6 +1064,7 @@ footer {
   .form-actions {
     text-align: center;
   }
+
 }
 
 .proposed-date, .proposed-data-info{
@@ -1084,6 +1085,10 @@ footer {
     top: unset;
     left: unset;
     bottom: -3px;
+  }
+  .repeating-fields-container{
+    -moz-column-count: 1;
+    column-count: 1;
   }
 }
 
