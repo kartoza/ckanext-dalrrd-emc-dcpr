@@ -18,7 +18,6 @@ from ckan import (
     model,
 )
 from ckan.plugins import toolkit
-
 from ckanext.dalrrd_emc_dcpr.cli.utils import get_jinja_env
 
 logger = logging.getLogger(__name__)

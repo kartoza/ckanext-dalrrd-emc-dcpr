@@ -38,7 +38,7 @@ def extract_files():
     the blueprint allows for multiple
     files to be sent at once, extract
     each and call parse_xml_dataset.
-    retutn success after all files
+    return success after all files
     parsed.
     """
     # files = request.files.to_dict()
