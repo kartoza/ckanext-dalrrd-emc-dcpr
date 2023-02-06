@@ -16,6 +16,7 @@ from ckan.logic import clean_dict, parse_params, tuplize_dict
 from .. import constants
 from ..helpers import get_status_labels
 from ..model.dcpr_request import DCPRRequestUrgency
+from ..model.dcpr_request import DCPRCaptureMethod
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,11 @@ dcpr_blueprint = Blueprint(
 
 
 @dcpr_blueprint.route("/")
+def index():
+    return toolkit.render("data_capture.html")
+
+
+@dcpr_blueprint.route("/public")
 def get_public_dcpr_requests():
     return _get_dcpr_request_list("dcpr_request_list_public")
 
@@ -98,7 +104,7 @@ def _get_dcpr_request_list(ckan_action: str, should_show_create_action: bool = F
 
 
 class DcprRequestCreateView(MethodView):
-    def get(self, data=None, errors=None, error_summary=None):
+    def get(self, data=None, errors=None, error_summary=None, type=None):
         toolkit.check_access("dcpr_request_create_auth", {"user": toolkit.g.user})
         data_to_show = data or clean_dict(
             dict_fns.unflatten(
@@ -144,11 +150,16 @@ class DcprRequestCreateView(MethodView):
                 {"value": level.value, "text": level.value}
                 for level in DCPRRequestUrgency
             ],
-            # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be different according with the user role
+            "dataset_capture_method_options": [
+                {"value": capture_method.value, "text": capture_method.value}
+                for capture_method in DCPRCaptureMethod
+            ],
+            # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be
+            #  different according with the user role
         }
         return toolkit.render("dcpr/edit.html", extra_vars=extra_vars)
 
-    def post(self):
+    def post(self, type=None):
         try:
             flat_data_dict = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form)))
@@ -186,7 +197,7 @@ class DcprRequestCreateView(MethodView):
 
 
 new_dcpr_request_view = DcprRequestCreateView.as_view("new_dcpr_request")
-dcpr_blueprint.add_url_rule("/request/new/", view_func=new_dcpr_request_view)
+dcpr_blueprint.add_url_rule("/request/new/<type>", view_func=new_dcpr_request_view)
 
 
 class _DcprUpdateView(MethodView):
@@ -247,6 +258,13 @@ class _DcprUpdateView(MethodView):
                         "data_urgency_options": [
                             {"value": level.value, "text": level.value}
                             for level in DCPRRequestUrgency
+                        ],
+                        "dataset_capture_method_options": [
+                            {
+                                "value": capture_method.value,
+                                "text": capture_method.value,
+                            }
+                            for capture_method in DCPRCaptureMethod
                         ],
                     },
                 )
@@ -332,6 +350,7 @@ csi_edit_dcpr_request_view = DcprRequestCsifUpdateView.as_view("csi_edit_dcpr_re
 dcpr_blueprint.add_url_rule(
     "/request/<csi_reference_id>/csi_edit/", view_func=csi_edit_dcpr_request_view
 )
+
 
 # request show page
 @dcpr_blueprint.route("/request/<csi_reference_id>")
@@ -723,29 +742,16 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
     num_datasets = (
         len(first_ds_field_value) if isinstance(first_ds_field_value, list) else 1
     )
-    logger.debug(f"{num_datasets=}")
 
+    logger.debug("handling dcpr request datasets custodian field")
+    change_dataset_custodian_value(num_datasets, flat_data_dict)
+    logger.debug(f"{num_datasets=}")
     data_dict = {}
     datasets: typing.List[typing.Dict] = [{} for i in range(num_datasets)]
     for name, value in flat_data_dict.items():
         if name in dataset_fields:
             logger.debug(f"Processing {name=} {value=}...")
-            if name == "dataset_custodian":
-                # the `dataset_custodian` form field is problematic - it is represented
-                # by a checkbox and is only submitted if the HTML element has the
-                # `checked` property. This means that if this `dataset_custodian` field
-                # is not checked, then parsing the form response when there are multiple
-                # datasets becomes trickier - the below code is just an attempt to deal
-                # with this in a less complex way.
-                if isinstance(value, list):
-                    for i in range(num_datasets):
-                        target_value = f"ds-{i + 1}"
-                        datasets[i][name] = target_value in value
-                else:
-                    for i in range(num_datasets):
-                        target_value = f"ds-{i + 1}"
-                        datasets[i][name] = value == target_value
-            elif num_datasets == 1:
+            if num_datasets == 1:
                 datasets[0][name] = value
             else:
                 for ds_index, ds_value in enumerate(value):
@@ -755,3 +761,23 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
             data_dict[name] = value
     data_dict["datasets"] = datasets
     return data_dict
+
+
+def change_dataset_custodian_value(datasets_num: int, ds: dict):
+    """
+    dataset custodian is submitted as E1,E2 form,
+    accordingly we are changing to True/False values.
+    """
+    dataset_custodian = ds.get("dataset_custodian")  # legacy data don't have this
+    if dataset_custodian is not None:
+        if datasets_num == 1:
+            if dataset_custodian == "E1":
+                ds["dataset_custodian"] = True
+            elif dataset_custodian == "E2":
+                ds["dataset_custodian"] = False
+        else:
+            for idx in range(datasets_num):
+                if dataset_custodian[idx] == "E1":
+                    ds["dataset_custodian"][idx] = True
+                elif dataset_custodian[idx] == "E2":
+                    ds["dataset_custodian"][idx] = False

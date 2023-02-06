@@ -98,6 +98,8 @@ a {
 .navbar-default {
   background-color: #ffffff;
    border-color: #e7e7e7;
+   padding-left: 0px !important;
+   padding-right: 0px !important;
  }
 
 .navbar-default .navbar-text {
@@ -109,6 +111,8 @@ a {
   min-height: 50px;
   margin-bottom: 0;
   border: 1px solid transparent;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -124,7 +128,7 @@ a {
 }
 
 body {
-  background: #FFF url("../../../base/images/bg.png");
+  background: #FFF		 url("../../../base/images/bg.png");
   height: 100%;
  }
 
@@ -256,7 +260,7 @@ fieldset[disabled] .btn-default.focus {
 }
 
 .projects {
-  min-height: 350px;
+  min-height: 550px;
 }
 
 /* Datasets */
@@ -294,7 +298,6 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-item {
   border: 1px solid #ccc;
-  padding-bottom: 20px;
   margin-bottom: 20px;
   background-color: #fff;
 }
@@ -345,6 +348,7 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-row{
   margin: 10px;
+  position: relative;
 }
 
 .request-row{
@@ -353,6 +357,10 @@ fieldset[disabled] .btn-default.focus {
 
 .datasets-date {
   float: left;
+  position: absolute;
+  bottom: 0px;
+  top: 134px;
+  left: 171px;
 }
 
 .datasets-date-actions{
@@ -380,8 +388,17 @@ fieldset[disabled] .btn-default.focus {
 
 .dataset-heading a {
   color: #3A744E;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+}
+
+.dataset-desc {
+  color: #484848;
+  font-size: 14px;
+  font-weight: 300;
+  text-align: justify;
+  margin-bottom: -8px;
 }
 
 .dataset-heading > a:hover, .dataset-heading > a:focus {
@@ -609,7 +626,7 @@ fieldset[disabled] .btn-default.focus {
 .sample-datasets {
   position: relative;
   background-color: #FFFFFF;
-  color: #3A744E;
+  color: #484848;
   margin-bottom: 20px;
 }
 
@@ -729,14 +746,10 @@ footer {
 }
 
 .page-header.module-content {
-  padding-top: 0;
+  padding-top: 15;
   padding-bottom: 30px;
 }
 
-.page-header.module-content {
-  padding-top: 15px;
-  padding-bottom: 30px;
-}
 
 .page-header .content_action {
   float: right;
@@ -800,6 +813,12 @@ footer {
 .module .read-more {
   font-weight: bold;
   color: #F3881C;
+  pointer-events: auto;
+}
+
+.show-more-button button{
+  border: none;
+  background-color: transparent;
 }
 
 .module .read-more a{
@@ -829,6 +848,14 @@ footer {
 }
 
 @media screen and (max-width: 1050px) {
+  .form-actions {
+    position: relative;
+    z-index: 10;
+  }
+
+  .checkbox input[type=checkbox] {
+    z-index: 10;
+  }
 
   .search-form {
     width: 80%;
@@ -875,11 +902,21 @@ footer {
     min-height: 100px;
   }
 
+  .flash-messages{
+    margin: 15px;
+  }
+
 }
 
 @media (max-width: 477px) {
   .new-dataset{
     margin-top: 15px;
+  }
+}
+
+@media (max-width: 264px) {
+  .footer-text{
+    margin-top: -15px;
   }
 }
 
@@ -920,4 +957,162 @@ footer {
 
 #flDebug{
   display: none !important;
+}
+
+.facet-outer li:nth-child(n+10){
+  display: none;
+}
+
+
+.save_search_button{
+  border:none;
+  background-color: transparent;
+  position: relative;
+  left:468px;
+  bottom: 68px;
+}
+
+.save_search_button_border{
+  /* font-size: 40px;
+  border-radius: 50%;
+  border: 10px solid rgb(205, 209, 215);
+  padding: 25px; */
+
+  /* background-color:none ; */
+  color: #ec971f;
+  /* border-radius: 50%; */
+  /* border: 1px solid white; */
+  /* padding: 10px; */
+}
+
+.save_search_button_icon{
+  /* background-color:none ; */
+  color: #ec971f;
+}
+
+.saved-searches-container{
+  width:100%;
+  height:100vh;
+  display: flex;
+  overflow-y: scroll;
+  justify-content: center;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.saved-searches-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.saved-searches-holder{
+  width: 80%;
+  height:100%;
+}
+
+.saved-search-card{
+  width:100%;
+  height:150px;
+  background-color: white;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.saved-search-card > p{
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.saved-search-card > p:first-of-type{
+  color:#3A744E;
+}
+
+.metadata-record-thumbnail{
+  width:150px;
+  height: 150px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: solid 1px #eee;
+  padding: 0px;
+  line-height: 150px;
+}
+
+.metadata-record-thumbnail img{
+  width: 100%;
+  vertical-align: middle;
+}
+
+.metadata-record-desc{
+  padding-left:20px;
+}
+
+@media (min-width: 768px) {
+  .form-actions {
+    text-align: center;
+  }
+}
+
+.proposed-date, .proposed-data-info{
+  margin-left: -15px;
+  margin-right: -15px ;
+}
+
+@media (max-width: 768px) {
+  .metadata-record-thumbnail{
+    left: 50%;
+    margin-left: -80px;
+  }
+  .metadata-record-desc{
+    padding-left:0px;
+    width: 100%;
+  }
+  .datasets-date{
+    top: unset;
+    left: unset;
+    bottom: -3px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .metadata-record-desc {
+    padding-left: 20px;
+    width: 66.66666667%;
+  }
+}
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-style: normal;
+  color: #484848;
+}
+
+.form-information h2{
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.repeating-fields-container{
+  -moz-column-count: 2;
+  column-count: 2;
+}
+
+label[for=field-responsible_party_contact_address-0-postal_code]{
+  margin-top:14px;
+}
+
+label[for=field-contact_address-0-postal_code]{
+  margin-top:14px;
+}
+
+label[for=field-online_resource-0-description]{
+  margin-top:14px
 }

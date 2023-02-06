@@ -4,10 +4,10 @@
 #}
 
 {% block subtitle %}Metadata record{% endblock %}
+{% set total =  h.emc_get_all_datasets_count(g) %}
 
 {% block breadcrumb_content %}
     <div class="page-header">
-    {% set total =  h.emc_get_all_datasets_count(g.userobj) %}
         <h1>{{ _("Electronic Metadata Catalogue (EMC)") }}</h1>
         <h5>{{ _("Total number of metadata") }} {{ ungettext('record', 'records', total) }}: {{ total }}</h5>
         <h5>{{ page.item_count }} {{ _("metadata") }} {{ ungettext('record', 'records', page.item_count) }} {{ _("found") }}</h5>
@@ -28,14 +28,17 @@
           data-module="xml_parser"
           >
           <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
+          <button class="save_search_button" title="save this search query" data-module="change_save_search_icon">
+          <!-- <i class="fa fa-circle-thin fa-stack-2x save_search_button_border"></i> -->
+          <i class="fa fa-bookmark-o save_search_button_icon"></i>
+        </button>
         {% endif %}
     </div>
 {% endblock %}
 
 {% block primary_content %}
     {% block package_search_results_list %}
-    {% set dcpr_requests_approved_by_nsif = h.dcpr_requests_approved_by_nsif(request.path) %}
-        {{ h.snippet('snippets/package_list.html', packages=page.items+dcpr_requests_approved_by_nsif) }}
+        {{ h.snippet('snippets/package_list.html', packages=page.items) }}
     {% endblock %}
     {% block page_pagination %}
       {{ page.pager(q=q) }}
@@ -58,7 +61,7 @@
         {{ h.snippet('snippets/facet_list.html', title=facet_titles[facet], name=facet, search_facets=search_facets) }}
           {% endif %}
       {% endfor %}
-    {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name='tags', search_facets=search_facets, total=page.item_count) }}
+    {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name='tags', search_facets=search_facets) }}
     </div>
     <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
   </div>

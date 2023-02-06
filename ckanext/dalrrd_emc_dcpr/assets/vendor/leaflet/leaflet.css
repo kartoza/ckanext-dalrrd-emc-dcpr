@@ -638,3 +638,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	margin-left: -12px;
 	border-right-color: #fff;
 	}
+
+
+.dataset-map-expanded #dataset-map{
+		width:1125px !important;
+		height:395px !important;
+		top:-400px !important;
+		margin-bottom:15px;
+	}

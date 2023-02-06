@@ -11,11 +11,13 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
 
         initialize: function() {
             jQuery.proxyAll(this, /_on/);
-            console.log('inside the initialize function for module dcprRequestDatasets')
             this.el.on('click', this._onAddDatasetFieldset)
         },
 
         _onAddDatasetFieldset: function () {
+            // getting the first custodian field selection to use it as default
+            let selected_value = document.getElementById("ds1-field-dataset_custodian").value
+            this.options["first_selection"] = selected_value
             let numExisting = this._getNumDatasetFieldsets()
             this.options.index = numExisting + 1
             this.options.lenght = numExisting + 1

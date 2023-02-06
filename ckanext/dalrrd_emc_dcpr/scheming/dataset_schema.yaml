@@ -6,12 +6,11 @@ scheming_version: 2
 dataset_type: dataset
 about: CKAN schema for the SASDI EMC. This schema holds SANS1878-related fields
 
-
 dataset_fields:
 
   - field_name: title
     label: Title
-    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifer for the dataset - This is a SANS 1878 mandatory field
+    help_text: Name by which the cited resource is known, the automatically filled URL is a unique identifier for the metadata record- This is a SANS 1878 mandatory field
     preset: title
     required: true
     form_placeholder: eg. A descriptive title
@@ -19,20 +18,19 @@ dataset_fields:
   - field_name: name
     label: Field identifier
     preset: dataset_slug
-    form_placeholder: eg. my-dataset, this is auto-completed by default.
+    form_placeholder: url of the metadata record, eg. my-metadata record, this is auto-completed by default.
 
   - field_name: featured
-    label: Feature dataset on EMC landing page?
+    label: Feature metadata record on EMC landing page?
     required: false
-    help_text: Should this dataset be featured on the EMC front page?
+    help_text: Should this metadata record be featured on the EMC front page?
     validators: boolean_validator
     preset: emc_checkbox
-
 
   - field_name: doi
     label: DOI
     required: false
-    help_text: Digital Object Identifier of the data (if any)
+    help_text: Digital Object Identifier of the metadata record (if any)
     validators: doi_validator
 
   # this multiple checkbox is better to be implemented than these two fields,
@@ -49,46 +47,28 @@ dataset_fields:
   #   help_text: Name of metadata standard used - This is a SANS 1878 mandatory field
 
   # these two fields are better to be implemented as above
-  - field_name: metadata_standard_name
-    label: Metadata standard name
-    required: true
-    help_text: >-
-      Name(s) of metadata standard used, if multiple standards used, separate them by comma
-      - This is a SANS 1878 mandatory field
+  # after several discussions, this is always SANS1878
 
-  - field_name: metadata_standard_version
-    label: Metadata standard version
-    required: true
-    help_text: >-
-      Version(s) of metadata standard used, if multiple standards used, separate versions by comma
-      - This is a SANS 1878 mandatory field
-
-  - field_name: citation
-    label: Citation
+  - field_name: metadata_standard
+    label: Metadata Standard
     preset: modified_repeating_subfields
     repeating_subfields:
-      - field_name: citation_title
-        label: Citation title
-        required: true
-        help_text: name by which the cited dataset is known
-      - field_name: citation_date
-        label: Citation date
-        preset: date
-        required: true
-        help_text: reference date for cited resource
-      # the citation identifier could be a choice field limited to identifiers we have and others choice field enabling the user to insert a unique one
-      - field_name: citation_identifier
-        label: Citation identifier
-        required: true
 
-      - field_name: citation_identifier_type
-        label: Citation identifier type
-        required: false
+    - field_name: name
+      label: Metadata standard name
+      validators: metadata_default_standard_name
+      required: false
+      help_text: >-
+        Name(s) of metadata standard used, if multiple standards used, separate them by comma, leave
+        blank if the metadata standard used is SANS1878
 
-      - field_name: citation_responsible_party
-        label: Citation responsible party
-        required: true
-
+    - field_name: version
+      label: Metadata standard version
+      validators: metadata_default_standard_version
+      required: false
+      help_text: >-
+        Version(s) of metadata standard used, if multiple standards used, separate versions by comma, leave
+        blank if the metadata standard version is 1.1
 
   - field_name: notes
     label: Abstract
@@ -97,143 +77,275 @@ dataset_fields:
     form_placeholder: eg. Some useful notes about the data
     help_text: Brief narrative summary of the content of the resource - This is a SANS 1878 mandatory field
 
-  - field_name: purpose
-    label: Purpose
-    required: true
-    help_text: >-
-      Breif description why this dataset is created - This is a SANS 1878 mandatory field
+  # - field_name: purpose
+  #   label: Purpose
+  #   required: true
+  #   help_text: >-
+  #     Brief description why this metadata record is created - This is a SANS 1878 mandatory field
 
-  - field_name: acknowledgement
-    label: Acknowledgement
-    required: false
-    help_text: >-
-      Recognition of those who contributed to the dataset - This is a SANS 1878 mandatory field
+  # - field_name: acknowledgement
+  #   label: Acknowledgement
+  #   required: false
+  #   help_text: >-
+  #     Recognition of those who contributed to the metadata record
 
-  - field_name: status
-    label: Status
-    required: true
-    preset: select
-    choices:
-      - value: completed
-        label: completed
-      - value: historical_archive
-        label: historical archive
-      - value: obsolete
-        label: obsolete
-      - value: ongoing
-        label: ongoing
-      - value: planned
-        label: planned
-      - value: required
-        label: required
-      - value: under_development
-        label: under development
-    help_text: >-
-      Status of the dataset- This is a SANS 1878 mandatory field
+  # - field_name: status
+  #   label: Status
+  #   required: true
+  #   preset: select
+  #   choices:
+  #     - value: completed
+  #       label: completed
+  #     - value: historical_archive
+  #       label: historical archive
+  #     - value: obsolete
+  #       label: obsolete
+  #     - value: ongoing
+  #       label: ongoing
+  #     - value: planned
+  #       label: planned
+  #     - value: required
+  #       label: required
+  #     - value: under_development
+  #       label: under development
+  #   help_text: >-
+  #     Status of the metadata record- This is a SANS 1878 mandatory field
+
+
+  # - field_name: usage
+  #   label: Resource Specific usage
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+  #     - field_name: specific_usage
+  #       label: Specific usage
+  #       required: false
+  #       help_text: brief description of the resource or resource series usage (or both)
+
+  #     - field_name: datetime_from
+  #       label: Usage date time (from)
+  #       preset: date
+  #       required: false
+  #       help_text: date and time of the first use of the resource or resource series (or both)
+
+  #     - field_name: datetime_to
+  #       label: Usage date time (to)
+  #       preset: date
+  #       required: false
+  #       help_text: date and time of the last use of the resource or resource series (or both) that complete a range, leave empty if not specified.
+
+  # - field_name: user_info
+  #   label: User contact information
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+  #     - field_name: individual_name
+  #       label: Individual name
+  #       required: false
+  #       help_text: Name of personnel using this metadata record
+
+  #     - field_name: organisation_name
+  #       label: Organisation name
+  #       required: false
+  #       help_text: Name of organization using this metadata record
+
+  #     - field_name: position_name
+  #       label: Position name
+  #       required: false
+  #       help_text: role or position of the person using the metadata record
+
+  #     - field_name: role
+  #       label: Role
+  #       required: false
+  #       help_text: function performed by the organization using the metadata record
+  #       preset: select
+  #       choices:
+  #         - value: resource_provider
+  #           label: resource provider
+  #         - value: custodian
+  #           label: custodian
+  #         - value: owner
+  #           label: owner
+  #         - value: user
+  #           label: user
+  #         - value: distributor
+  #           label: distributor
+  #         - value: originator
+  #           label: originator
+  #         - value: point_of_contact
+  #           label: point of contact
+  #         - value: principal_investigator
+  #           label: principal investigator
+  #         - value: processor
+  #           label: processor
+  #         - value: publisher
+  #           label: publisher
+
+
+  # - field_name: user_contact_info
+  #   label: User additional contact info
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #     - field_name: voice
+  #       label: User phone
+  #       required: false
+  #       help_text: Telephone number to contact the user organization or individual
+
+  #     - field_name: facsimile
+  #       label: User facsimile
+  #       required: false
+  #       help_text: Facsimile machine number to contact user organization or individual
+
+  # - field_name: user_contact_address
+  #   label: User contact address
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #     - field_name: delivery_point
+  #       label: Usage delivery Point
+  #       required: false
+
+  #     - field_name: address_city
+  #       label: Usage City
+  #       required: false
+
+  #     - field_name: address_administrative_area
+  #       label: Usage Administrative area
+  #       required: false
+  #       help_text: province of the contact location
+
+  #     - field_name: postal_code
+  #       label: Usage Postal Code
+  #       required: false
+
+  #     - field_name: electronic_mail_address
+  #       label: User Electronic mail address
+  #       required: false
+  #       help_text: Address of the electronic mailbox of the user organization or individual
+
 
 # owner_org is also responsible for rendering the visibility selector for a dataset. This is how it is done on
-  # vanilla ckanext-scheming too
-  - field_name: metadata_point_of_contact
-    label: Metadata point of contact
-    preset: modified_repeating_subfields
-    repeating_subfields:
-      - field_name: individual_name
-        label: Individual name
-        required: false
-        help_text: name - with surname of the person responsible of this dataset
-
-      - field_name: position_name
-        label: Role / Position of the responsible individual
-        required: false
-        help_text: Role/ position of responsible individual in the organization
-
-      - field_name: contact_point_address_city
-        label: City
-        required: false
-
-      - field_name: contact_point_address_administrative_area
-        label: Administrative area
-        required: false
-        help_text: province of the contact location
-
-      - field_name: contact_point_postal_code
-        label: Postal Code
-        required: false
-
-      - field_name: contact_point_electronic_mail_address
-        label: Electronic mail address
-        required: false
-        help_text: Address of the electronic mailbox of the responsible organization or individual
-
-      # this to be implemented as multiple choices.
-      - field_name: organizational_role
-        label: Organization role
-        required: true
-        preset: select
-        choices:
-          - value: resource_provider
-            label: resource provider
-          - value: custodian
-            label: custodian
-          - value: owner
-            label: owner
-          - value: user
-            label: user
-          - value: distributor
-            label: distributor
-          - value: originator
-            label: originator
-          - value: point_of_contact
-            label: point of contact
-          - value: principal_investigator
-            label: principal investigator
-          - value: processor
-            label: processor
-          - value: publisher
-            label: publisher
-
+# vanilla ckanext-scheming too
   - field_name: owner_org
-    label: Organization
+    label: Responsible organisation Name
     required: true
     preset: emc_dataset_organization
-    help_text: Organization responsible for the dataset. This is a SANS 1878 mandatory field
+    help_text: Organisation responsible for the metadata record. This is a SANS 1878 mandatory field
 
-  - field_name: reference_date
-    label: Reference date
-    required: true
-    preset: date
-    help_text: Reference date for this dataset - This is a SANS 1878 mandatory field
+  - field_name: responsible_party
+    label: Metadata record responsible party
+    preset: modified_repeating_subfields
+    repeating_subfields:
+    - field_name: individual_name
+      label: Individual name
+      required: true
+      help_text: Name of personnel responsible of this metadata record
+
+    - field_name: position_name
+      label: Position name
+      required: true
+      help_text: role or position of the person responsible of this metadata record
+
+    - field_name: role
+      label: Role
+      required: true
+      help_text: function performed by the organisation responsible of this metadata record
+      preset: select
+      choices:
+        - value: resource_provider
+          label: resource provider
+        - value: owner
+          label: owner
+        - value: distributor
+          label: distributor
+        - value: originator
+          label: originator
+        - value: point_of_contact
+          label: point of contact
+        - value: principal_investigator
+          label: principal investigator
+        - value: processor
+          label: processor
+        - value: publisher
+          label: publisher
+
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the user organisation or individual
 
 
-  - field_name: iso_topic_category
-    label: Topic Category
-    help_text: ISO 19115 Topic Category for the dataset - This is a SANS 1878 mandatory field
-    required: true
-    choices_helper: emc_iso_topic_categories
-    validators: >-
-      ignore_missing
-      convert_to_tags(iso_topic_categories)
-    output_validators: >-
-      convert_from_tags(iso_topic_categories)
-      ignore_missing
-    form_snippet: "vocab_select.html"
-    display_snippet: "vocab_tag_display.html"
-    # display_snippet: null
+  - field_name: responsible_party_contact_info
+    label: Metadata record responsible party contact info
+    preset: modified_repeating_subfields
+    repeating_subfields:
 
-  - field_name: sasdi_theme
-    label: SASDI Theme
-    help_text: South African Spatial Data Infrastructure Theme
-    choices_helper: emc_sasdi_themes
-    validators: >-
-      ignore_missing
-      convert_to_tags(sasdi_themes)
-    output_validators: >-
-      scheming_required
-      scheming_choices
-      convert_from_tags(sasdi_themes)
-      ignore_missing
-    form_snippet: vocab_select.html
-    display_snippet: vocab_tag_display.html
+    - field_name: voice
+      label: Phone
+      required: false
+      help_text: Telephone number of responsible organisation or individual
+
+    - field_name: facsimile
+      label: Facsimile
+      required: false
+      help_text: Facsimile machine number of responsible organisation or individual
+
+  - field_name: responsible_party_contact_address
+    label: Metadata record responsible party contact address
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: delivery_point
+      label: delivery Point
+      required: false
+      help_text: address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
+
+    - field_name: city
+      label: City
+      required: false
+
+    - field_name: administrative_area
+      label: Administrative area
+      required: false
+      help_text: province of the contact location
+
+    - field_name: postal_code
+      label: Postal Code
+      required: false
+
+  - field_name: topic_and_sasdi_theme
+    label: Topic category and SASDI theme
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: iso_topic_category
+      label: Topic Category
+      help_text: ISO 19115 Topic Category for the metadata record - This is a SANS 1878 mandatory field
+      required: true
+      choices_helper: emc_iso_topic_categories
+      validators: >-
+        ignore_missing
+        convert_to_tags(iso_topic_categories)
+      output_validators: >-
+        convert_from_tags(iso_topic_categories)
+        ignore_missing
+      form_snippet: "vocab_select.html"
+      display_snippet: "vocab_tag_display.html"
+      # display_snippet: null
+
+    - field_name: sasdi_theme
+      label: SASDI Theme
+      help_text: South African Spatial Data Infrastructure Theme
+      choices_helper: emc_sasdi_themes
+      validators: >-
+        ignore_missing
+        convert_to_tags(sasdi_themes)
+      output_validators: >-
+        scheming_required
+        scheming_choices
+        convert_from_tags(sasdi_themes)
+        ignore_missing
+      form_snippet: vocab_select.html
+      display_snippet: vocab_tag_display.html
     # display_snippet: null
 
   # - field_name: custom_tags
@@ -247,7 +359,7 @@ dataset_fields:
     preset: emc_free_tags_tag_string_autocomplete
     form_snippet: tag_select.html
     help_text: >-
-      Additional keywords useful for describing the dataset. In order to optimize searchability, it is
+      Additional keywords useful for describing the metadata record. In order to optimize searchability, it is
       recommended to add at least three keywords
     form_placeholder: eg. economy, mental health, government
 
@@ -283,416 +395,1084 @@ dataset_fields:
   #           label: Theme
 
 
-  - field_name: license_id
-    label: License
-    form_snippet: license.html
-    help_text: License definitions and additional information can be found at http://opendefinition.org/
+  # - field_name: license_id
+  #   label: License
+  #   form_snippet: license.html
+  #   help_text: License definitions and additional information can be found at http://opendefinition.org/
 
-  - field_name: url
-    label: Source
-    form_placeholder: http://example.com/dataset.json
-    display_property: foaf:homepage
-    display_snippet: link.html
+  # - field_name: url
+  #   label: Source
+  #   form_placeholder: http://example.com/dataset.json
+  #   display_property: foaf:homepage
+  #   display_snippet: link.html
 
-  - field_name: version
-    label: Dataset version
-    validators: ignore_missing unicode package_version_validator
-    form_placeholder: '1.0'
+  # previously the required field was the resource version, but as the metadata record is the main dataset
+  # we store, this is the required sans1878 field
+  # - field_name: metadata_record_format
+  #   label: Metadata record format information
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Metadata record format information
+  #   repeating_subfields:
 
-  - field_name: dataset_language
-    label: Dataset language
-    required: true
-    choices:
-      - value: en
-        label: English
-    preset: select
-    help_text: Language for the dataset - This is a SANS 1878 mandatory field
+  #     - field_name: name
+  #       label: Metadata record format name
+  #       required: true
+  #       placeholder: Electronic metadata record
+  #       help_text: Name of the data transfer format, default is Electronic metadata record - This is a SANS 1878 mandatory field
 
-  - field_name: metadata_language
-    label: Metadata language
-    required: true
-    choices:
-      - value: en
-        label: English
-    preset: select
-    help_text: Language for the metadata - This is a SANS 1878 mandatory field
+  #     - field_name: version
+  #       label: Metadata record version
+  #       required: true
+  #       form_placeholder: '1.0'
+  #       help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
 
-  - field_name: dataset_character_set
-    label: Dataset character set
-    required: true
-    choices:
-      - value: ucs-2
-        label: UCS-2
-      - value: ucs-4
-        label: UCS-4
-      - value: utf-7
-        label: UTF-7
-      - value: utf-8
-        label: UTF-8
-      - value: utf-16
-        label: UTF-16
-      - value: 8859part1
-        label: 8859-1
-      - value: 8859part2
-        label: 8859-2
-      - value: 8859part3
-        label: 8859-3
-      - value: 8859part4
-        label: 8859-4
-      - value: 8859part5
-        label: 8859-5
-      - value: 8859part6
-        label: 8859-6
-      - value: 8859part7
-        label: 8859-7
-      - value: 8859part8
-        label: 8859-8
-      - value: 8859part9
-        label: 8859-9
-      - value: 8859part10
-        label: 8859-10
-      - value: 8859part11
-        label: 8859-11
-      - value: 8859part13
-        label: 8859-13
-      - value: 8859part14
-        label: 8859-14
-      - value: 8859part15
-        label: 8859-15
-      - value: 8859part16
-        label: 8859-16
-      - value: jis
-        label: jis
-      - value: shiftJIS
-        label: shiftJIS
-      - value: eucJP
-        label: eucJP
-      - value: usAscii
-        label: ASCII
-      - value: ebcdic
-        label: ebcdic
-      - value: eucKR
-        label: eucKR
-      - value: big5
-        label: big5
-      - value: GB2312
-        label: GB2312
-    preset: select
-    help_text: >-
-      Full name of the character coding standard used for the dataset -
-      This is a SANS 1878 mandatory field
+      # - field_name: amendment_number
+      #   label: Amendment number
+      #   required: false
+      #   help_text: Amendment number of the format version
 
-  - field_name: lineage
-    label: Lineage
+      # - field_name: specification
+      #   label: Specification
+      #   required: false
+      #   help_text: Name of a subset, profile or product specification of format
+
+      # - field_name: file_decompression_technique
+      #   label: File decompression technique
+      #   required: false
+      #   help_text: Recommendations of algorithms or processes that can be applied to read or expand resources to which compression techniques have be applied
+
+
+  - field_name: metadata_language_and_character_set
+    label: Metadata and Metadata record language and character set
     preset: modified_repeating_subfields
     repeating_subfields:
-      - field_name: level
-        label: Level
-        preset: select
-        required: false
-        validators: convert_choices_select_to_int
-        choices:
-          - value: 001
-            label: Attribute
-          - value: 002
-            label: Attribute Type
-          - value: 003
-            label: Collection hardware
-          - value: 004
-            label: Collection session
-          - value: 005
-            label: Dataset
-          - value: 006
-            label: Series
-          - value: 007
-            label: Non geographic dataset
-          - value: 8
-            label: Dimension group
-          - value: 9
-            label: Feature
-          - value: 010
-            label: Property type
-          - value: 011
-            label: Field Session
-          - value: 012
-            label: Software
-          - value: 013
-            label: Service
-          - value: 014
-            label: Model
-      - field_name: lineage_statement
-        label: Statement
-        required: true
-        help_text: general explaination of the data producer's knowledge about the lineage of a dataset - - This is a SANS 1878 mandatory field
-      - field_name: process_step_description
-        label: Process step description
-        required: true
-        help_text: description of the event, including related parameters of tolerances
-      - field_name: process_step_rationale
-        label: Process step rationale
-        help_text: requirement purpose of the process setp
-
-      - field_name: process_step_datetime_from
-        label: Process step date time (from)
-        preset: date
-
-      - field_name: process_step_datetime_to
-        label: Process step date time (to)
-        preset: date
 
 
-      - field_name: processor_individual_name
-        label: Processor Individual name
-        required: false
-        help_text: name - with surname of the person responsible of processing this dataset
+    - field_name: dataset_language
+      label: Metadata record language
+      required: true
+      choices:
+        - value: en
+          label: English
+      preset: select
+      help_text: Language of the metadata record - This is a SANS 1878 mandatory field
 
-      - field_name: processing_owner_org
-        label: Processing Organization
-        required: false
-        #preset: emc_dataset_organization
-        help_text: Organization responsible for processing the dataset
 
-      - field_name: processor_position_name
-        label: Role / Position of the processor individual
-        required: false
-        help_text: Role/ position of the responsible individual in the orgnization
+    - field_name: dataset_character_set
+      label: Metadata record character set
+      required: true
+      choices:
+        - value: ucs-2
+          label: UCS-2
+        - value: ucs-4
+          label: UCS-4
+        - value: utf-7
+          label: UTF-7
+        - value: utf-8
+          label: UTF-8
+        - value: utf-16
+          label: UTF-16
+        - value: 8859part1
+          label: 8859-1
+        - value: 8859part2
+          label: 8859-2
+        - value: 8859part3
+          label: 8859-3
+        - value: 8859part4
+          label: 8859-4
+        - value: 8859part5
+          label: 8859-5
+        - value: 8859part6
+          label: 8859-6
+        - value: 8859part7
+          label: 8859-7
+        - value: 8859part8
+          label: 8859-8
+        - value: 8859part9
+          label: 8859-9
+        - value: 8859part10
+          label: 8859-10
+        - value: 8859part11
+          label: 8859-11
+        - value: 8859part13
+          label: 8859-13
+        - value: 8859part14
+          label: 8859-14
+        - value: 8859part15
+          label: 8859-15
+        - value: 8859part16
+          label: 8859-16
+        - value: jis
+          label: jis
+        - value: shiftJIS
+          label: shiftJIS
+        - value: eucJP
+          label: eucJP
+        - value: usAscii
+          label: ASCII
+        - value: ebcdic
+          label: ebcdic
+        - value: eucKR
+          label: eucKR
+        - value: big5
+          label: big5
+        - value: GB2312
+          label: GB2312
+      preset: select
+      help_text: >-
+        Full name of the character coding standard used for the metadata record -
+        This is a SANS 1878 mandatory field
 
-      - field_name: processor_address_city
-        label: Processor adderss - City
-        required: false
+    - field_name: metadata_language
+      label: Metadata language
+      required: true
+      choices:
+        - value: en
+          label: English
+      preset: select
+      help_text: Language for the metadata - This is a SANS 1878 mandatory field
 
-      - field_name: processor_address_administrative_area
-        label: Processor address - Administrative area
-        required: false
-        help_text: province of the processor location
+    - field_name: metadata_character_set
+      label: Metadata character set
+      required: true
+      choices:
+        - value: ucs-2
+          label: UCS-2
+        - value: ucs-4
+          label: UCS-4
+        - value: utf-7
+          label: UTF-7
+        - value: utf-8
+          label: UTF-8
+        - value: utf-16
+          label: UTF-16
+        - value: 8859part1
+          label: 8859-1
+        - value: 8859part2
+          label: 8859-2
+        - value: 8859part3
+          label: 8859-3
+        - value: 8859part4
+          label: 8859-4
+        - value: 8859part5
+          label: 8859-5
+        - value: 8859part6
+          label: 8859-6
+        - value: 8859part7
+          label: 8859-7
+        - value: 8859part8
+          label: 8859-8
+        - value: 8859part9
+          label: 8859-9
+        - value: 8859part10
+          label: 8859-10
+        - value: 8859part11
+          label: 8859-11
+        - value: 8859part13
+          label: 8859-13
+        - value: 8859part14
+          label: 8859-14
+        - value: 8859part15
+          label: 8859-15
+        - value: 8859part16
+          label: 8859-16
+        - value: jis
+          label: jis
+        - value: shiftJIS
+          label: shiftJIS
+        - value: eucJP
+          label: eucJP
+        - value: usAscii
+          label: ASCII
+        - value: ebcdic
+          label: ebcdic
+        - value: eucKR
+          label: eucKR
+        - value: big5
+          label: big5
+        - value: GB2312
+          label: GB2312
+      preset: select
+      help_text: >-
+        Full name of the character coding standard used for the metadata record -
+        This is a SANS 1878 mandatory field
 
-      - field_name: processor_postal_code
-        label: Processor Postal Code
-        required: false
 
-      - field_name: processor_electronic_mail_address
-        label: Processor Electronic mail address
-        required: false
-        help_text: Address of the electronic mailbox of the responsible processing organization or individual
-
-#  - field_name: author
-#    label: Author
-#    form_placeholder: Joe Bloggs
-#    display_property: dc:creator
-#
-#  - field_name: author_email
-#    label: Author Email
-#    form_placeholder: joe@example.com
-#    display_property: dc:creator
-#    display_snippet: email.html
-#    display_email_name_field: author
-
-  - field_name: distribution
-    label: Distribution information
-    preset: modified_repeating_subfields
-    repeating_label: Distribution information
-    repeating_subfields:
-      # - field_name: distribution_format_name
-      #   label: Distribution format name
-      #   required: true
-      #   form_placeholder: Distribution format(s) name - This is a SANS 1878 mandatory field
-
-      # - field_name: distribution_format_version
-      #   label: Distribution format version
-      #   required: true
-      #   form_placeholder: Distribution format version (date, number ..etc.)- This is a SANS 1878 mandatory field
-
-      # - field_name: distribution_format_amendment_number
-      #   label: Distribution format amendment number
-      #   required: false
-      #   form_placeholder: Amendment number of the format version
-
-      # - field_name: distribution_format_specification
-      #   label: Distribution format specification
-      #   required: false
-      #   form_placeholder: Name of subset, profile or product specification of format
-
-      # - field_name: distribution_format_specification
-      #   label: Distribution format specification
-      #   required: false
-      #   form_placeholder: Name of subset, profile or product specification of format
-
-      - field_name: distributor_contact
-        label: Distributor Contact
-        required: true
-        help_text:  Name of party from whom the dataset can be obtained - This is a SANS 1878 mandatory field
-
-      - field_name: distribution_order_process
-        label: Distributor Order Process
-        required: false
-        form_snippet: markdown.html
-        help_text: information about how the dataset may be obtained, and related instructions and fee information
-
-      - field_name: units_of_distribution
-        label: Units of distribution
-        required: false
-        help_text: tiles, layers, geographic areas ..etc., in which data is available
-
-      - field_name: distribution_online_source
-        label: Distribution online source
-        required: false
-        help_text: information about online source from which the resource can be obtained
-
-  - field_name: maintainer
-    label: Maintainer
+  - field_name: lineage_statement
+    label: Lineage statement
     required: true
-    form_placeholder: Joe Bloggs
-    display_property: dc:contributor
-    help_text: >-
-        "Name of the individual responsible for the dataset. Provide it in the following
-        format: surname, given name, title separated by a delimiter - This is a SANS 1878 mandatory field"
+    help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
-  - field_name: maintainer_email
-    label: Maintainer Email
-    form_placeholder: joe@example.com
-    display_property: dc:contributor
-    display_snippet: email.html
-    display_email_name_field: maintainer
 
-  - field_name: maintenance_information
-    label: Maintenance information
+  - field_name: contact
+    label: Metadata record point of contact
     preset: modified_repeating_subfields
     repeating_subfields:
-      - field_name: maintenance_and_update_frequency
-        label: Maintenance and update frequency
-        required: false
-        preset: custom_select_field
-        choices:
-          - value: monthly
-            label: monthly
-          - value: yearly
-            label: yearly
-          - value: other
-            label: other
+    - field_name: individual_name
+      label: Individual contact name
+      required: false
+      help_text: name - with surname of the person responsible of this metadata record
 
-        help_text: frequency with which changes and additions are made to the dataset after it's submitted
+    - field_name: position_name
+      label: Role / Position of the contact individual
+      required: false
+      help_text: Role/ position of the contact individual
 
-      - field_name: maintenance_date_of_next_update
-        label: Date of next update
-        required: false
-        preset: date
-        help_text: scheduled revision date
+    - field_name: role
+      label: Organisation role
+      required: false
+      preset: select
+      help_text: function performed by contact party, This is a SANS 1878 mandatory field
+      choices:
+        # - value: resource_provider
+        #   label: resource provider
+        # - value: custodian
+        #   label: custodian
+        # - value: owner
+        #   label: owner
+        # - value: user
+        #   label: user
+        # - value: distributor
+        #   label: distributor
+        # - value: originator
+        #   label: originator
+        - value: point_of_contact
+          label: point of contact
+        # - value: principal_investigator
+        #   label: principal investigator
+        # - value: processor
+        #   label: processor
+        # - value: publisher
+        #   label: publisher
 
-      - field_name: user_defined_maintenance_frequency
-        label: User defined maintenance frequency
-        required: false
-        preset: date
-        help_text: additional maintenance periods other than the scheduled update
+    - field_name: electronic_mail_address
+      label: Electronic mail address
+      required: false
+      help_text: Address of the electronic mailbox of the contact organisation or individual
 
-      - field_name: update_scope
-        label: Update scope
-        required: false
-        help_text: scope of data to which maintenance is applied
+  - field_name: contact_information
+    label: Metadata record point of contact additional info
+    preset: modified_repeating_subfields
+    repeating_subfields:
 
-      - field_name: update_scope_description
-        label: Update scope description
-        required: false
-        help_text: additional information about the range or extent of the dataset
+    - field_name: voice
+      label: Contact point phone
+      required: false
+      help_text: Telephone number of individual contact or organisation
 
-      - field_name: maintenance_notes
-        label: Maintenance notes
-        required: false
-        help_text: additional information about the requirements for maintaining the resource
+    - field_name: facsimile
+      label: Contact point facsimile
+      required: false
+      help_text: Facsimile machine number of individual contact or organisation
+
+  - field_name: contact_address
+    label: metadata record contact address
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: delivery_point
+      label: Delivery Point
+      required: false
+      help_text:  address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
+
+    - field_name: city
+      label: City
+      required: false
+      help_text: City of the contact organisation or individual
+
+    - field_name: administrative_area
+      label: Administrative area
+      required: false
+      help_text: province of the contact location
+
+    - field_name: postal_code
+      label: Postal Code
+      required: false
+      help_text: postal code of the contact organisation or individual
+
+  - field_name: online_resource
+    label: Metadata record online information
+    preset: modified_repeating_subfields
+    repeating_label: Metadata record online information
+    repeating_subfields:
+
+    - field_name: linkage
+      label: URL
+      help_text: location(address) for on-line access using a uniform resource locator address or similar addressing scheme
+
+    - field_name: name
+      label: Name
+      form_placeholder: eg. January 2011 Gold Prices
+      help_text: Name of the online resource
+
+    - field_name: application_profile
+      label: Application profile
+      help_text: Name of an application profile that can be used with the resource
+
+    - field_name: description
+      label: Description
+      validators: convert_choices_select_to_int
+      preset: select
+      choices:
+        - value: 001
+          label: download
+        - value: 002
+          label: information
+        - value: 003
+          label: offlineAccess
+        - value: 004
+          label: order
+        - value: 005
+          label: search
+
+      help_text: Please specify the function performed by the resource
+
+      # - field_name: level
+      #   label: Level
+      #   preset: select
+      #   required: false
+      #   validators:  ignore_missing convert_choices_select_to_int
+      #   choices:
+      #     - value: 001
+      #       label: Attribute
+      #     - value: 002
+      #       label: Attribute Type
+      #     - value: 003
+      #       label: Collection hardware
+      #     - value: 004
+      #       label: Collection session
+      #     - value: 005
+      #       label: Metadata record
+      #     - value: 006
+      #       label: Series
+      #     - value: 007
+      #       label: Non geographic metadata record
+      #     - value: 8
+      #       label: Dimension group
+      #     - value: 9
+      #       label: Feature
+      #     - value: 010
+      #       label: Property type
+      #     - value: 011
+      #       label: Field Session
+      #     - value: 012
+      #       label: Software
+      #     - value: 013
+      #       label: Service
+      #     - value: 014
+      #       label: Model
+
+  # - field_name: lineage_process_step
+  #   label: Lineage process step
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage process step
+  #   repeating_subfields:
+
+  #     - field_name: description
+  #       label: Process step description
+  #       required: false
+  #       help_text: description of the event, including related parameters of tolerances
+
+  #     - field_name: rationale
+  #       label: Process step rationale
+  #       help_text: requirement purpose of the process step
+
+  #     - field_name: process    # will be process_step-0-process_date, if not given process_step-0-None_date
+  #       label: Process step date
+  #       label_time: process step time
+  #       preset: datetime
+
+  #     - field_name: date_type
+  #       label: Process step date type
+  #       validators: convert_choices_select_to_int
+  #       preset: select
+  #       choices:
+  #         - value: 001
+  #           label: Creation
+  #         - value: 002
+  #           label: Publication
+  #         - value: 003
+  #           label: Revision
+
+
+  # - field_name: lineage_processor
+  #   label: Lineage processor
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage processor
+  #   repeating_subfields:
+
+  #     - field_name: individual_name
+  #       label: Processor Individual name
+  #       required: false
+  #       help_text: name - with surname of the person responsible of processing this metadata record
+
+  #     - field_name: owner_org
+  #       label: Processing Organization
+  #       required: false
+  #       #preset: emc_dataset_organization
+  #       help_text: Organization responsible for processing the metadata record
+
+  #     - field_name: position_name
+  #       label: Role / Position of the processor individual
+  #       required: false
+  #       help_text: Role/ position of the responsible individual in the orgnization
+
+  # - field_name: lineage_processor_contact_information
+  #   label: Lineage processor contact info
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #   - field_name: voice
+  #     label: Processor phone
+  #     required: false
+  #     help_text: Telephone number of individual contact or organization
+
+  #   - field_name: facsimile
+  #     label: Processor facsimile
+  #     required: false
+  #     help_text: Facsimile machine number of individual contact or organization
+
+  # - field_name: lineage_processor_address
+  #   label: Lineage processor address
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage processor address
+  #   repeating_subfields:
+
+  #     - field_name: delivery_point
+  #       label: Delivery Point
+  #       required: false
+
+  #     - field_name: address_city
+  #       label: Processor address - City
+  #       required: false
+
+  #     - field_name: administrative_area
+  #       label: Processor address - Administrative area
+  #       required: false
+  #       help_text: province of the processor location
+
+  #     - field_name: postal_code
+  #       label: Processor Postal Code
+  #       required: false
+
+  #     - field_name: electronic_mail_address
+  #       label: Processor Electronic mail address
+  #       required: false
+  #       help_text: Address of the electronic mailbox of the responsible processing organization or individual
+
+  # - field_name: lineage_source
+  #   label: Lineage source
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage processor
+  #   repeating_subfields:
+
+  #     - field_name: title
+  #       label: Source title
+  #       help_text: title by which source is known
+
+  #     - field_name: identifier
+  #       label: Source identifier
+  #       help_text: unique identifier of the source
+
+  #     - field_name: identifier_type
+  #       label: Identifier type
+  #       help_text: type of source identifier
+
+  #     - field_name: date
+  #       label: Date
+  #       # validators: >-
+  #       #   reference_date_convertor
+  #       preset: datetime
+  #       help_text: Reference datetime for the source
+
+  #     - field_name: date_type
+  #       label: Reference date type
+  #       validators: convert_choices_select_to_int
+  #       preset: select
+  #       choices:
+  #         - value: 001
+  #           label: Creation
+  #         - value: 002
+  #           label: Publication
+  #         - value: 003
+  #           label: Revision
+  #       help_text: Source reference date type
+
+  #     - field_name: description
+  #       label: Source description
+  #       required: false
+  #       help_text: description about the level of the source data
+
+  #     - field_name: scale_denominator
+  #       label: Source scale denominator
+  #       required: false
+  #       help_text: denominator of the representative fraction on a source map
+
+  #     - field_name: reference_system
+  #       label: Source reference system
+  #       required: false
+  #       validators: lineage_source_srs_validator
+  #       help_text: spatial reference system used by the source
+
+  # - field_name: lineage_source_responsible_party
+  #   label: Lineage source responsible party
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage processor
+  #   repeating_subfields:
+
+  #     - field_name: name
+  #       label: individual name
+  #       required: false
+  #       help_text: name of individual person responsible of metadata record source
+
+  #     - field_name: organization_name
+  #       label: Organisation name
+  #       required: false
+  #       help_text: name of responsible organisation of metadata record source
+
+  #     - field_name: position_name
+  #       label: Position name
+  #       help_text: name of position of responsible person of metadata record source
+
+  #     - field_name: role
+  #       label: Organization role
+  #       preset: select
+  #       choices:
+  #         - value: resource_provider
+  #           label: resource provider
+  #         - value: custodian
+  #           label: custodian
+  #         - value: owner
+  #           label: owner
+  #         - value: user
+  #           label: user
+  #         - value: distributor
+  #           label: distributor
+  #         - value: originator
+  #           label: originator
+  #         - value: point_of_contact
+  #           label: point of contact
+  #         - value: principal_investigator
+  #           label: principal investigator
+  #         - value: processor
+  #           label: processor
+  #         - value: publisher
+  #           label: publisher
+  #       help_text: function performed by responsible organisation
+
+  # - field_name: lineage_source_contact
+  #   label: Lineage source contact info
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage source contact information
+  #   repeating_subfields:
+
+  #       - field_name: voice
+  #         label: Source contact phone
+  #         required: false
+  #         help_text: Telephone number of the organisation or individual responsible of the source of the metadata record
+
+  #       - field_name: facsimile
+  #         label: Source contact facsimile
+  #         required: false
+  #         help_text: Facsimile machine number of organisation or individual responsible of the source of the metadata record
+
+  # - field_name: lineage_source_contact_address
+  #   label: Lineage source contact address
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Lineage source contact address
+  #   repeating_subfields:
+
+  #       - field_name: delivery_point
+  #         label: Delivery Point
+  #         required: false
+
+  #       - field_name: address_city
+  #         label: City
+  #         required: false
+
+  #       - field_name: address_administrative_area
+  #         label: Administrative area
+  #         required: false
+  #         help_text: province of the contact location
+
+  #       - field_name: postal_code
+  #         label: Postal Code
+  #         required: false
+
+  #       - field_name: electronic_mail_address
+  #         label: Electronic mail address
+  #         required: false
+  #         help_text: Address of the electronic mailbox of the responsible organization or individual
+
+
+  # - field_name: maintainer
+  #   label: Maintainer
+  #   required: false
+  #   form_placeholder: Joe Bloggs
+  #   display_property: dc:contributor
+  #   help_text: >-
+  #       "Name of the individual responsible for the metadata record. Provide it in the following
+  #       format: surname, given name, title separated by a delimiter"
+
+  # - field_name: maintainer_email
+  #   label: Maintainer Email
+  #   form_placeholder: joe@example.com
+  #   display_property: dc:contributor
+  #   display_snippet: email.html
+  #   display_email_name_field: maintainer
+
+  # - field_name: maintenance_information
+  #   label: Maintenance information
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #     - field_name: maintenance_and_update_frequency
+  #       label: Maintenance and update frequency
+  #       required: false
+  #       # help_text: frequency with which changes and additions are made to the metadata record after it's submitted
+  #       preset: custom_select_field
+  #       choices:
+  #         - value: 001
+  #           label: continual
+  #         - value: 002
+  #           label: daily
+  #         - value: 003
+  #           label: weekly
+  #         - value: 004
+  #           label: fortnightly
+  #         - value: 005
+  #           label: monthly
+  #         - value: 006
+  #           label: quarterly
+  #         - value: 007
+  #           label: biannually
+  #         - value: 8
+  #           label: annually
+  #         - value: 9
+  #           label: asNeeded
+
+  #     - field_name: date_of_next_update
+  #       label: Date
+  #       # validators: >-
+  #       #   reference_date_convertor
+  #       preset: datetime
+  #       help_text: scheduled revision date
+
+  #     - field_name: date_type
+  #       label: Date type
+  #       validators: convert_choices_select_to_int
+  #       preset: select
+  #       choices:
+  #         - value: 001
+  #           label: Revision
+
+  #     - field_name: notes
+  #       label: Maintenance notes
+  #       required: false
+  #       help_text: additional information about the requirements for maintaining the resource
+
+
+  # - field_name: user_defined_maintenance_frequency
+  #   label: User defined maintenance frequency
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #   - field_name: from
+  #     label: User defined maintenance frequency(from)
+  #     preset: datetime
+  #     help_text: additional maintenance periods other than the scheduled update
+
+  #   - field_name: to
+  #     label: User defined maintenance frequency(to)
+  #     preset: datetime
+  #     help_text: additional maintenance periods other than the scheduled update
+
+  # - field_name: update_scope
+  #   label: Update scope
+  #   preset: select
+  #   choices:
+  #     - value: 001
+  #       label: Revision
+  #   help_text: scope of data to which maintenance is applied
+
+  # - field_name: description
+  #   label: Update scope description
+
+  - field_name: distribution_format
+    label: Distribution format
+    preset: modified_repeating_subfields
+    repeating_label: Distribution contact
+    repeating_subfields:
+
+      - field_name: name
+        label: Metadata record distribution format name
+        required: true
+        placeholder: Electronic metadata record
+        help_text: Name of the data transfer format, default is Electronic metadata record - This is a SANS 1878 mandatory field
+
+      - field_name: version
+        label: Metadata record distribution format version
+        required: true
+        form_placeholder: '1.0'
+        help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
+
+      # - field_name: name
+      #   label: Distributor name
+      #   required: false
+
+      # - field_name: organization_name
+      #   label: Distributor organisation name
+      #   required: false
+
+      # - field_name: position_name
+      #   label: Distributor position name
+      #   help_text: name of position of responsible person
+
+      # - field_name: role
+      #   label: Distributor organization role
+      #   preset: select
+      #   choices:
+          # - value: resource_provider
+          #   label: resource provider
+          # - value: custodian
+          #   label: custodian
+          # - value: owner
+          #   label: owner
+          # - value: user
+          #   label: user
+          # - value: distributor
+          #   label: distributor
+        #   - value: originator
+        #     label: originator
+        #   - value: point_of_contact
+        #     label: point of contact
+        #   - value: principal_investigator
+        #     label: principal investigator
+        #   - value: processor
+        #     label: processor
+        #   - value: publisher
+        #     label: publisher
+        # help_text: function performed by Distributor organisation
+
+  # - field_name: distributor_contact
+  #   label: Distributor contact information
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Distributor contact information
+  #   repeating_subfields:
+
+  #     - field_name: voice
+  #       label: Distributor phone
+  #       required: false
+  #       help_text: Telephone number of the distributing organisation or individual
+
+  #     - field_name: facsimile
+  #       label: Distributor facsimile
+  #       required: false
+  #       help_text: Facsimile machine number of distributing organisation or individual
+
+  #     - field_name: delivery_point
+  #       label: Delivery Point
+  #       required: false
+
+  #     - field_name: address_city
+  #       label: City
+  #       required: false
+
+  #     - field_name: address_administrative_area
+  #       label: Administrative area
+  #       required: false
+  #       help_text: province of the contact location
+
+  #     - field_name: postal_code
+  #       label: Postal Code
+  #       required: false
+
+  #     - field_name: electronic_mail_address
+  #       label: Electronic mail address
+  #       required: false
+  #       help_text: Address of the electronic mailbox of the responsible organization or individual
+
+  # - field_name: distributor_order_process
+  #   label: Distributor Order Process
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #     - field_name: fees
+  #       label: Distribution fees
+  #       help_text: fees and terms of retrieving the resource, including monetary units
+
+  #     - field_name: planned_available_date
+  #       label: Distribution Planned available date time
+  #       preset: date
+  #       help_text: date and time when the resource will be available
+
+  #     - field_name: ordering_instructions
+  #       label: Ordering instructions
+  #       form_snippet: markdown.html
+  #       help_text: date and time when the resource will be available
+
+  #     - field_name: turnaround
+  #       label: Turnaround
+  #       help_text: typical turnaround time for the filling of an order
+
+  # - field_name: distributor_transfer_options
+  #   label: Distributor transfer options
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #   - field_name: units_of_distribution
+  #     label: Units of distribution
+  #     required: false
+  #     help_text: Tiles, layers, geographic areas ...etc., in which data is available
+
+  #   - field_name: transfer_size
+  #     label: Transfer size
+  #     required: false
+  #     help_text: Estimated size of a unit the specified transfer format, expressed in megabytes
+
+  #   - field_name: online_source
+  #     label: Distribution online source
+  #     required: false
+  #     help_text: Information about online source from which the resource can be obtained
+
+  # - field_name: distribution_offline_source
+  #   label: Distribution offline source
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #   - field_name: name
+  #     label: Medium name
+  #     preset: select
+  #     validators: convert_choices_select_to_int
+  #     choices:
+  #       - value: 001
+  #         label: cdROM
+  #       - value: 002
+  #         label: dvd
+  #       - value: 003
+  #         label: dvdRom
+  #       - value: 004
+  #         label: 3halfInchFloppy
+  #       - value: 005
+  #         label: 5quarterInchFloopy
+  #       - value: 006
+  #         label: 7trackTape
+  #       - value: 007
+  #         label: 9trackTape
+  #       - value: 8
+  #         label: 3480Cartidge
+  #       - value: 9
+  #         label: 3490Cartidge
+  #       - value: 010
+  #         label: 3580Cartidge
+  #       - value: 011
+  #         label: 4mmCartidgeTape
+  #       - value: 012
+  #         label: 8mmCartidgeTape
+  #       - value: 013
+  #         label: 1quarterInchCartidgeTape
+  #       - value: 014
+  #         label: digitalLinearTape
+  #       - value: 015
+  #         label: onLine
+  #       - value: 016
+  #         label: satelite
+  #       - value: 017
+  #         label: telephoneLink
+  #       - value: 018
+  #         label: hardcopy
+  #       - value: 019
+  #         label: USB Flashdisk
+  #       - value: 20
+  #         label: protable Hardisk
+
+  #   - field_name: density
+  #     label: Medium Density
+  #     validators: check_if_number
+  #     help_text: Density at which data is recorded
+
+  #   - field_name: density_units
+  #     label: Density units
+  #     help_text: Units of measure for the recording density
+
+  #   - field_name: volumes
+  #     validators: check_if_int
+  #     label: Volumes
+  #     help_text: Number of items in the media identified.
+
+  #   - field_name: medium_formats
+  #     label: Medium formats
+  #     preset: select
+  #     validators: convert_choices_select_to_int
+  #     choices:
+  #     - value: 001
+  #       label: cpio
+  #     - value: 002
+  #       label: tar
+  #     - value: 003
+  #       label: highSierra
+  #     - value: 004
+  #       label: iso9660
+  #     - value: 005
+  #       label: iso9660RockRidge
+  #     - value: 006
+  #       label: iso9660AppleHFS
+
+  #     help_text: Method used to write to the medium
+
+  #   - field_name: medium_notes
+  #     label: Medium notes
+  #     help_text: Description of other limitations or requirements for using the medium
 
 
   - field_name: spatial
     label: Geographic location bounding box
     required: true
     help_text: >-
-      Bounding box for the dataset, expressed as the geographic coordinates of the upper left and lower right
+      Bounding box for the metadata record, expressed as the geographic coordinates of the upper left and lower right
       corners - This is a SANS 1878 mandatory field
     preset: emc_dataset_spatial_extent
     display_snippet: null
 
-    # TODO: Add a more pleasant widget, like the one used for the dataset URL, which would show 1/<value>
-  - field_name: equivalent_scale
-    label: Spatial resolution
-    required: true
-    preset: spatial_resolution_checker
-    help_text: >-
-      Level of detail expressed as the scale of a comparable hardcopy map or
-      chart. Provide it as the denominator of a representative fraction,
-      i.e. the number below the line in a vulgar fraction - This is a
-      SANS 1878 mandatory field
-
-  - field_name: spatial_representation_type
-    label: Spatial representation type
-    required: true
-    help_text: >-
-        Method used to spatially represent geographic information - This is
-        a SANS 1878 mandatory field
-    choices:
-      - value: "001"
-        label: Vector (vector data is used to represent geographic data)
-      - value: "002"
-        label: Grid (grid data is used to represent geographic data)
-      - value: "003"
-        label: Text table (textual or tabular data is used to represent geographic data)
-      - value: "004"
-        label: Triangulated Irregular Network (TIN)
-      - value: "005"
-        label: >-
-          Stereo Model (Three-dimensional view formed by the intersecting homologous rays of  an
-          overlapping pair of images)
-      - value: "006"
-        label: Video (Scene from a video recording)
-      - value: "007"
-        label: Image (Image formats, e.g. Tiff/BMP/JPEG/SID, etc. - Not a grid)
-    preset: select
-
-  - field_name: spatial_reference_system
-    label: Spatial Reference System Identifier
-    required: true
-    validators: emc_srs_validator
-    help_text: >-
-      "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
-      respective code for the dataset's spatial coordinate
-      reference system. It is recommended to use the EPSG spatial catalogue codes whenever possible
-      (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
-      www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
-      coordinate reference systems  - This is a SANS 1878 mandatory field"
-
-  - field_name: temporal_reference_system
-    label: Temporal Reference System Information
-    required: false
-    help_text: >-
-      Description about the temporal reference system used (if any) - This is partly a SANS 1878 mandatory field"
-
-  - field_name: reference_system_additional_info
-    label: Additional information about Reference Systems
+  - field_name: spatial_parameters
+    label: Spatial parameters
     preset: modified_repeating_subfields
     repeating_subfields:
-      - field_name: temporal_extent_period_duration_from
-        label: Temporal extent duration (from)
-        preset: date
-        required: false
 
-      - field_name: temporal_extent_period_duration_to
-        label: Temporal extent duration (to)
-        preset: date
-        required: false
+    - field_name: equivalent_scale
+      label: Spatial resolution equivalent scale
+      required: true
+      preset: spatial_resolution_checker
+      help_text: >-
+        Level of detail expressed as the scale of a comparable hardcopy map or
+        chart. Provide it as the denominator of a representative fraction,
+        i.e. the number below the line in a vulgar fraction - This is a
+        SANS 1878 mandatory field
 
-      - field_name: minimum_vertical_extent
-        label: Minimum vertical extent
-        required: false
+    - field_name: spatial_representation_type
+      label: Spatial representation type
+      required: true
+      help_text: >-
+          Method used to spatially represent geographic information - This is
+          a SANS 1878 mandatory field
+      choices:
+        - value: "001"
+          label: Vector (vector data is used to represent geographic data)
+        - value: "002"
+          label: Grid (grid data is used to represent geographic data)
+        - value: "003"
+          label: Text table (textual or tabular data is used to represent geographic data)
+        - value: "004"
+          label: Triangulated Irregular Network (TIN)
+        - value: "005"
+          label: >-
+            Stereo Model (Three-dimensional view formed by the intersecting homologous rays of  an
+            overlapping pair of images)
+        - value: "006"
+          label: Video (Scene from a video recording)
+        - value: "007"
+          label: Image (Image formats, e.g. Tiff/BMP/JPEG/SID, etc. - Not a grid)
+      preset: select
 
-      - field_name: maximum_vertical_extent
-        label: Maximum vertical extent
-        required: false
+    - field_name: spatial_reference_system
+      label: Spatial Reference System Identifier
+      required: true
+      validators: emc_srs_validator
+      help_text: >-
+        "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the
+        respective code for the metadata record's spatial coordinate
+        reference system. It is recommended to use the EPSG spatial catalogue codes whenever possible
+        (e.g. EPSG:32635). Alternatively it is recommended to use a reference as shown on the
+        www.spatialreference.org website, which features EPSG, ESRI and user-defined references to well-known
+        coordinate reference systems  - This is a SANS 1878 mandatory field"
 
-  - field_name: metadata_date_stamp
-    label: Metadata date stamp
-    required: true
-    preset: date
+  # - field_name: temporal_reference_system
+  #   label: Temporal Reference System Information
+  #   required: false
+  #   help_text: >-
+  #     Description about the temporal reference system used (if any) - This is an optional SANS 1878 field"
+
+  - field_name: reference_system_additional_info
+    label: Additional information about Reference Systems (temporal, vertical)
+    form_snippet: markdown.html
+    required: false
+
+      # - field_name: temporal_extent_period_duration_from
+      #   label: Temporal extent duration (Start position)
+      #   preset: date
+      #   required: false
+
+      # - field_name: temporal_extent_period_duration_to
+      #   label: Temporal extent duration (End position)
+      #   preset: date
+      #   required: false
+
+      # - field_name: minimum_vertical_extent
+      #   label: Minimum vertical extent
+      #   required: false
+
+      # - field_name: maximum_vertical_extent
+      #   label: Maximum vertical extent
+      #   required: false
+
+      # - field_name: vertical_extent_unit_of_measure
+      #   label: Vertical extent unit of measure
+      #   help_text: vertical unit used for vertical extent information, e.g. meters, feets ..etc.
+      #   required: false
+
+      # - field_name: vertical_datum
+      #   label: Vertical datum
+      #   help_text: Origin from which minimum and maximum elevations originated
+      #   required: false
+  - field_name: metadata_reference_date_and_stamp
+    label: Reference date
+    preset: modified_repeating_subfields
+    repeating_subfields:
+
+    - field_name: reference
+      label: Reference datetime
+      required: true
+      validators: >-
+        ignore_missing
+      form_snippet: modified_datetime.html
+      help_text: Reference datetime for this metadata record
+
+    - field_name: reference_date_type
+      label: Reference date type
+      required: true
+      validators: convert_choices_select_to_int
+      preset: select
+      choices:
+        - value: 001
+          label: Creation
+        - value: 002
+          label: Publication
+        - value: 003
+          label: Revision
+      help_text: Reference date type - This is a SANS 1878 mandatory field
+
+    - field_name: stamp
+      label: Stamp date
+      required: true
+      form_snippet: modified_datetime.html
+      help_text: Reference datetime for this metadata record
+
+    - field_name: stamp_date_type
+      label: Stamp date type
+      required: true
+      validators: convert_choices_select_to_int
+      preset: select
+      choices:
+        - value: 001
+          label: Creation
+      help_text: date metadata was created- This is a SANS 1878 mandatory field
+
+  - field_name: metadata_thumbnail
+    label: Metadata record thumbnail
+    required: false
+    form_placeholder: https://files.isric.org/public/thumbnails/afsis250m/clyppt.png
     help_text: >-
-      date that the metadata was created
-
-
+      URL for a thumbnail previewing this metadata record which appears in the search page. Use images with 1:1 ratio for better results
 
 resource_fields:
 
@@ -704,18 +1484,263 @@ resource_fields:
     label: Name
     form_placeholder: eg. January 2011 Gold Prices
 
-  - field_name: description
-    label: Description
-    form_snippet: markdown.html
-    form_placeholder: Some useful notes about the data
+  # - field_name: application_profile
+  #   label: Application profile
+  #   help_text: Name of an application profile that can be used with the resource
+
+  # - field_name: description
+  #   label: Description
+  #   validators: convert_choices_select_to_int
+  #   preset: select
+  #   choices:
+  #     - value: 001
+  #       label: download
+  #     - value: 002
+  #       label: information
+  #     - value: 003
+  #       label: offlineAccess
+  #     - value: 004
+  #       label: order
+  #     - value: 005
+  #       label: search
+
+  #   help_text: Please specify the function performed by the resource
 
   - field_name: format
     label: Format
-    required: true
+    required: false
     preset: resource_format_autocomplete
     help_text: Name of the data transfer format - This is a SANS 1878 mandatory field
 
   - field_name: format_version
     label: Format Version
-    required: true
-    help_text: Version of the data transfer format (date, number, etc) - This is a SANS 1878 mandatory field
+    required: false
+    help_text: link format
+
+  # - field_name: amendment_number
+  #   label: Amendment number
+  #   required: false
+  #   help_text: Amendment number of the format version
+
+  # - field_name: specification
+  #   label: Specification
+  #   required: false
+  #   help_text: Name of a subset, profile or product specification of format
+
+  # - field_name: file_decompression_technique
+  #   label: File decompression technique
+  #   required: false
+  #   help_text: Recommendations of algorithms or processes that can be applied to read or expand resources to which compression techniques have be applied
+
+  # - field_name: distributor
+  #   label: Distributior
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Distribution contact
+  #   repeating_subfields:
+
+  #     - field_name: name
+  #       label: Distributor name
+  #       required: false
+
+  #     - field_name: organization_name
+  #       label: Distributor organisation name
+  #       required: false
+
+  #     - field_name: position_name
+  #       label: Distributor position name
+  #       help_text: name of position of responsible person
+
+  #     - field_name: role
+  #       label: Distributor organization role
+  #       preset: select
+  #       choices:
+  #         - value: resource_provider
+  #           label: resource provider
+  #         - value: custodian
+  #           label: custodian
+  #         - value: owner
+  #           label: owner
+  #         - value: user
+  #           label: user
+  #         - value: distributor
+  #           label: distributor
+  #         - value: originator
+  #           label: originator
+  #         - value: point_of_contact
+  #           label: point of contact
+  #         - value: principal_investigator
+  #           label: principal investigator
+  #         - value: processor
+  #           label: processor
+  #         - value: publisher
+  #           label: publisher
+  #       help_text: function performed by Distributor organisation
+
+  # - field_name: distributor_contact
+  #   label: Distributor contact information
+  #   preset: modified_repeating_subfields
+  #   repeating_label: Distributor contact information
+  #   repeating_subfields:
+
+  #     - field_name: voice
+  #       label: Distributor phone
+  #       required: false
+  #       help_text: Telephone number of the distributing organisation or individual
+
+  #     - field_name: facsimile
+  #       label: Distributor facsimile
+  #       required: false
+  #       help_text: Facsimile machine number of distributing organisation or individual
+
+  #     - field_name: delivery_point
+  #       label: Delivery Point
+  #       required: false
+
+  #     - field_name: address_city
+  #       label: City
+  #       required: false
+
+  #     - field_name: address_administrative_area
+  #       label: Administrative area
+  #       required: false
+  #       help_text: province of the contact location
+
+  #     - field_name: postal_code
+  #       label: Postal Code
+  #       required: false
+
+  #     - field_name: electronic_mail_address
+  #       label: Electronic mail address
+  #       required: false
+  #       help_text: Address of the electronic mailbox of the responsible organization or individual
+
+  # - field_name: distributor_order_process
+  #   label: Distributor Order Process
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+  #     - field_name: fees
+  #       label: Distribution fees
+  #       help_text: fees and terms of retrieving the resource, including monetary units
+
+  #     - field_name: planned_available_date
+  #       label: Distribution Planned available date time
+  #       preset: date
+  #       help_text: date and time when the resource will be available
+
+  #     - field_name: ordering_instructions
+  #       label: Ordering instructions
+  #       form_snippet: markdown.html
+  #       help_text: date and time when the resource will be available
+
+  #     - field_name: turnaround
+  #       label: Turnaround
+  #       help_text: typical turnaround time for the filling of an order
+
+  # - field_name: distributor_transfer_options
+  #   label: Distributor transfer options
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #   - field_name: units_of_distribution
+  #     label: Units of distribution
+  #     required: false
+  #     help_text: Tiles, layers, geographic areas ...etc., in which data is available
+
+  #   - field_name: transfer_size
+  #     label: Transfer size
+  #     required: false
+  #     help_text: Estimated size of a unit the specified transfer format, expressed in megabytes
+
+  #   - field_name: online_source
+  #     label: Distribution online source
+  #     required: false
+  #     help_text: Information about online source from which the resource can be obtained
+
+  # - field_name: distribution_offline_source
+  #   label: Distribution offline source
+  #   preset: modified_repeating_subfields
+  #   repeating_subfields:
+
+  #   - field_name: name
+  #     label: Medium name
+  #     preset: select
+  #     validators: convert_choices_select_to_int
+  #     choices:
+  #       - value: 001
+  #         label: cdROM
+  #       - value: 002
+  #         label: dvd
+  #       - value: 003
+  #         label: dvdRom
+  #       - value: 004
+  #         label: 3halfInchFloppy
+  #       - value: 005
+  #         label: 5quarterInchFloopy
+  #       - value: 006
+  #         label: 7trackTape
+  #       - value: 007
+  #         label: 9trackTape
+  #       - value: 8
+  #         label: 3480Cartidge
+  #       - value: 9
+  #         label: 3490Cartidge
+  #       - value: 010
+  #         label: 3580Cartidge
+  #       - value: 011
+  #         label: 4mmCartidgeTape
+  #       - value: 012
+  #         label: 8mmCartidgeTape
+  #       - value: 013
+  #         label: 1quarterInchCartidgeTape
+  #       - value: 014
+  #         label: digitalLinearTape
+  #       - value: 015
+  #         label: onLine
+  #       - value: 016
+  #         label: satelite
+  #       - value: 017
+  #         label: telephoneLink
+  #       - value: 018
+  #         label: hardcopy
+  #       - value: 019
+  #         label: USB Flashdisk
+  #       - value: 20
+  #         label: protable Hardisk
+
+  #   - field_name: density
+  #     label: Medium Density
+  #     validators: check_if_number
+  #     help_text: Density at which data is recorded
+
+  #   - field_name: density_units
+  #     label: Density units
+  #     help_text: Units of measure for the recording density
+
+  #   - field_name: volumes
+  #     validators: check_if_int
+  #     label: Volumes
+  #     help_text: Number of items in the media identified.
+
+  #   - field_name: medium_formats
+  #     label: Medium formats
+  #     preset: select
+  #     validators: convert_choices_select_to_int
+  #     choices:
+  #     - value: 001
+  #       label: cpio
+  #     - value: 002
+  #       label: tar
+  #     - value: 003
+  #       label: highSierra
+  #     - value: 004
+  #       label: iso9660
+  #     - value: 005
+  #       label: iso9660RockRidge
+  #     - value: 006
+  #       label: iso9660AppleHFS
+
+  #     help_text: Method used to write to the medium
+
+  #   - field_name: medium_notes
+  #     label: Medium notes
+  #     help_text: Description of other limitations or requirements for using the medium

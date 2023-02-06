@@ -129,6 +129,10 @@ class ErrorReportCreateView(MethodView):
             if data_dict.get("metadata_record") is None:
                 data_dict["metadata_record"] = request.args.get("metadata_record")
             try:
+<<<<<<< HEAD
+=======
+                data_dict["owner_user"] = toolkit.g.user
+>>>>>>> e97d2c7640c423291ce993cffebd27196601f57f
                 error_report = toolkit.get_action("error_report_create")(
                     context={
                         "user": toolkit.g.user,

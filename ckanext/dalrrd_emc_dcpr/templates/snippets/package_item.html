@@ -10,81 +10,81 @@
       {% endfor %}
     {% else %}
       <li class="{{ item_class or "dataset-item" }}">
-      {% block content %}
-          {% set date = package['metadata_modified'].split('T')[0] %}
+        {% block content %}
+          {% set date_string = package['metadata_modified']|string %}
+          {% set date = date_string.split('T')[0] %}
           <div class="row dataset-row">
-          <div class="col-md-3"></div>
-          <div class="col-md-9 ">
-        <div class="dataset-content">
-          {% block heading %}
-            <h2 class="dataset-heading">
-            {% block heading_title %}
-                <div data-testid="search_item_anchor"></div>
-                {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
-              {% endblock %}
-              {% block heading_private %}
-                {% if package.private %}
-                  <span class="dataset-private label label-inverse">
-                      <i class="fa fa-lock"></i>
-                      {{ _('Private') }}
-                  </span>
-                {% endif %}
-              {% endblock %}
+            <div class="col-sm-4 metadata-record-thumbnail">
+                <img src="{{ h.get_datasets_thumbnail(package) }}" alt="" title="{{ title }}">
+            </div>
+            <div class="col-sm-8 metadata-record-desc">
+              <div class="dataset-content">
+                {% block heading %}
+                  <h2 class="dataset-heading">
+                    {% block heading_title %}
+                      <div data-testid="search_item_anchor"></div>
+                      {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
+                    {% endblock %}
+                    {% block heading_private %}
+                      {% if package.private %}
+                        <span class="dataset-private label label-inverse">
+                            <i class="fa fa-lock"></i>
+                            {{ _('Private') }}
+                        </span>
+                      {% endif %}
+                    {% endblock %}
 
-                {% block dcpr %}
-                {% if h.is_dcpr_request(package) %}
-                 <span class="dataset-dcpr label label-default pull-right">
-                    <i class="fa"></i>
-                    {{ _('DCPR') }}
-                 </span>
-                <br>
-                {% set action = h.get_dcpr_request_action(package) %}
-                {% if action == "ACCEPT" %}
-                <span class="dataset-dcpr label label-success pull-right"
-                      title="Metadata record is from an approved DCPR request">
-                    <i class="fa"></i>
-                    {{ _('Accepted') }}
-                </span>
-                {% else %}
-                <span class="dataset-dcpr label label-danger pull-right"
-                title="Metadata record is from a rejected DCPR request">
-                    <i class="fa"></i>
-                    {{ _('Rejected') }}
-                </span>
-                {% endif %}
-                {% endif %}
+                    {% block dcpr %}
+                      {% if h.is_dcpr_request(package) %}
+                        <span class="dataset-dcpr label label-default pull-right">
+                            <i class="fa"></i>
+                            {{ _('DCPR') }}
+                        </span>
+                        <br>
+                        {% set action = h.get_dcpr_request_action(package) %}
+                        {% if action == "ACCEPT" %}
+                        <span class="dataset-dcpr label label-success pull-right"
+                            title="Metadata record is from an approved DCPR request">
+                          <i class="fa"></i>
+                          {{ _('Accepted') }}
+                        </span>
+                        {% else %}
+                        <span class="dataset-dcpr label label-danger pull-right"
+                            title="Metadata record is from a rejected DCPR request">
+                          <i class="fa"></i>
+                          {{ _('Rejected') }}
+                        </span>
+                        {% endif %}
+                      {% endif %}
 
+                    {% endblock %}
+
+                    {% block heading_meta %}
+                      {% if package.get('state', '').startswith('draft') %}
+                        <span class="label label-info">{{ _('Draft') }}</span>
+                      {% elif package.get('state', '').startswith('deleted') %}
+                        <span class="label label-danger">{{ _('Deleted') }}</span>
+                      {% endif %}
+                      {{ h.popular('recent views', package.tracking_summary.recent, min=10) if package.tracking_summary }}
+                    {% endblock %}
+                  </h2>
                 {% endblock %}
-
-              {% block heading_meta %}
-                {% if package.get('state', '').startswith('draft') %}
-                  <span class="label label-info">{{ _('Draft') }}</span>
-                {% elif package.get('state', '').startswith('deleted') %}
-                  <span class="label label-danger">{{ _('Deleted') }}</span>
-                {% endif %}
-                {{ h.popular('recent views', package.tracking_summary.recent, min=10) if package.tracking_summary }}
-              {% endblock %}
-            </h2>
-          {% endblock %}
-          {% block banner %}
-            {% if banner %}
-              <span class="banner">{{ _('Popular') }}</span>
-            {% endif %}
-          {% endblock %}
-          {% block notes %}
-            {% if notes %}
-              <div>{{ notes|urlize }}</div>
-            {% else %}
-              <p class="empty">{{ _("This metadata record has no description") }}</p>
-            {% endif %}
-          {% endblock %}
-        </div>
+                {% block banner %}
+                  {% if banner %}
+                    <span class="banner">{{ _('Popular') }}</span>
+                  {% endif %}
+                {% endblock %}
+                {% block notes %}
+                  {% if notes %}
+                    <div class="dataset-desc">{{ notes|urlize }}</div>
+                  {% else %}
+                    <p class="empty">{{ _("This metadata record has no description") }}</p>
+                  {% endif %}
+                {% endblock %}
+              </div>
               {% block resources %}
               {% endblock %}
               <div class="row datasets-date-actions">
-                  <div class="datasets-date">
-                      Metadata Record Updated {{ date }}
-                  </div>
                   <div class="dataset-action pull-right" style="display: none">
                       <a class="dataset-action-items" href="{{ h.url_for('%s.read' % package.type, id=package.name)}}"><i class="fa fa-bars"></i>
                           Metadata
@@ -97,10 +97,12 @@
                       </a>
                   </div>
               </div>
-
+            </div>
+            <div class="datasets-date">
+              Metadata Record Updated {{ date }}
+            </div>
           </div>
-          </div>
-    {% endblock %}
-  </li>
+        {% endblock %}
+      </li>
   {% endif %}
 {% endblock %}

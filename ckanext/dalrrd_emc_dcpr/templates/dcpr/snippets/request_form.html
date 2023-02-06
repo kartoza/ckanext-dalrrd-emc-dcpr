@@ -7,6 +7,8 @@
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
     <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
         <legend>DCPR request owner fields</legend>
+        <div class="form-information">
+        <h2>GENERAL INFORMATION</h2>
         {% if not data.organization_id %}
             {% call form.select(
                 "organization_id",
@@ -21,7 +23,7 @@
         {% endif %}
         {% call form.input(
             'proposed_project_name',
-            label=_('Proposed Project Name'),
+            label=_('Proposed project name'),
             id='field-proposed_project_name',
             placeholder=_('e.g. Data Request'),
             value=data.proposed_project_name,
@@ -31,9 +33,11 @@
         ) %}
             {{ form.info(_('Proposed name for the data capture project.')) }}
         {% endcall %}
+        <div class="proposed-date">
+        <div class="col-md-4">
         {% call form.input(
             'capture_start_date',
-            label=_('Capture start date'),
+            label=_('Proposed capture start date'),
             id='field-capture_start_date',
             type='date',
             placeholder=_('eg. 2022-01-01'),
@@ -44,9 +48,11 @@
         ) %}
             {{ form.info(_('Proposed start date of the data capture.')) }}
         {% endcall %}
+        </div>
+        <div class="col-md-4">
         {% call form.input(
             'capture_end_date',
-            label=_('Capture end date'),
+            label=_('Proposed capture end date'),
             id='field-capture_end_date',
             type='date',
             placeholder=_('eg. 2022-01-01'),
@@ -57,9 +63,11 @@
         ) %}
             {{ form.info(_('Proposed end date of the data capture.')) }}
         {% endcall %}
+        </div>
+        <div class="col-md-4">
         {% call form.input(
             'cost',
-            label=_('Estimated cost'),
+            label=_('Estimated cost in SA Rand'),
             id='field-cost',
             type='number',
             value=data.cost,
@@ -69,18 +77,27 @@
         ) %}
             {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
         {% endcall %}
+        </div>
+        </div>
+        </div>
+        <div class="form-information">
+        <h2>DATA INFORMATION</h2>
         {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
+        <div class="proposed-data-info">
+        <div class="col-md-6">
         {% call form.input(
             'spatial_resolution',
             label=_('Spatial resolution'),
             id='field-spatial_resolution',
-            type='number',
+            type='text',
             value=data.spatial_resolution,
             error=errors.spatial_resolution,
             classes=['control-medium']
         ) %}
             {{ form.info(_('Spatial resolution that is proposed for the data capture.')) }}
         {% endcall %}
+        </div>
+        <div class="col-md-6">
         {% call form.select(
             'data_capture_urgency',
             label=_('Data capture urgency'),
@@ -92,6 +109,8 @@
         ) %}
             {{ form.info(_('Urgency of the data capture project.')) }}
         {% endcall %}
+        </div>
+        </div>
         {% call form.markdown(
             'additional_project_context',
             label=_('Additional project context'),
@@ -103,6 +122,7 @@
             {{ form.info(_('Additional information about the project and this DCPR request. Please include any relevant
             information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
+        </div>
         {% if data.datasets %}
             <legend>Dataset(s)</legend>
             <div class="list-datasets" data-module="removeDcprRequestDatasets">
@@ -130,14 +150,17 @@
                     lineage_statement_error=errors.lineage_statement,
                     associated_attributes_error=errors.associated_attributes,
                     data_usage_restrictions_error=errors.data_usage_restrictions,
-                    capture_method_error=errors.capture_method
+                    capture_method_error=errors.capture_method,
+                    dataset_capture_method_options=dataset_capture_method_options
                 ) }}
             {% endfor %}
 
         {% else %}
             {{ h.snippet(
                     "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
-                    index=1, lenght=0
+                    index=1,
+                    lenght=0,
+                    dataset_capture_method_options=dataset_capture_method_options
             ) }}
         {% endif %}
 
@@ -152,8 +175,9 @@
         </div>
 
     </fieldset>
-    <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
-        <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
+    {%  if enable_nsif_fieldset %}
+    <fieldset>
+        <legend>NSIF reviewer field</legend>
         {% call form.markdown(
             'nsif_review_notes',
             label=_('NSIF review notes'),
@@ -165,8 +189,10 @@
             {{ form.info(_('DCPR review notes, as provided by the NSIF reviewers')) }}
         {% endcall %}
     </fieldset>
-    <fieldset {% if not enable_csi_fieldset %}disabled{% endif %}>
-        <legend>CSI reviewer fields (only enabled for CSI reviewer)</legend>
+   {% endif %}
+    {%  if enable_csi_fieldset %}
+    <fieldset>
+        <legend>CSI reviewer field</legend>
         {% call form.markdown(
             'csi_moderation_notes',
             label=_('CSI review notes'),
@@ -178,6 +204,7 @@
             {{ form.info(_('DCPR review notes, as provided by the CSI reviewers')) }}
         {% endcall %}
     </fieldset>
+    {% endif %}
     {% block form_actions %}
         {{ form.required_message() }}
         <div class="form-actions">
@@ -189,7 +216,7 @@
                     icon='trash'
                 %}
             {% endif %}
-            <input type="submit" class="btn btn-default" value="{{ _('Save') }}">
+            <input type="submit" class="btn btn-primary" value="{{ _('Submit form') }}">
 
         </div>
     {% endblock %}

@@ -1,4 +1,37 @@
 {% import 'macros/form.html' as form %}
+{# these if statements tries to control the display and submit of dataset custodian field #}
+{% if index|int > 1 %}
+
+{# the case where this is the second, third, ... datasets #}
+    {% if dataset_custodian == '' or not dataset_custodian %}
+        {% if dataset_custodian is false %}
+            {% set selected = "E2" %}
+        {% else %}
+            {% set selected = first_selection %}
+        {% endif %}
+    {% else %}
+        {% if dataset_custodian is false %}
+            {% set selected = "E2" %}
+        {% else %}
+            {% set selected = "E1" %}
+        {% endif %}
+    {% endif %}
+{% else %}
+    {% set current_url = url_for(request.endpoint,  **request.view_args) %}
+    {% if dataset_custodian == '' or not dataset_custodian %}
+        {% if dataset_custodian is false %}
+            {% set selected = "E2" %}
+        {% elif "e1" in current_url %}
+            {% set selected = "E1" %}
+        {% elif "e2" in current_url %}
+            {% set selected = "E2" %}
+        {% endif %}
+    {% else %}
+        {% if dataset_custodian is true  %}
+            {% set selected="E1" %}
+        {% endif %}
+    {% endif %}
+{% endif %}
 
 <fieldset class="dynamic-dataset-fieldset" id="dataset-fieldset-{{ index }}">
    <div class="panel panel-default" style="margin-bottom: 10px; display: block" >
@@ -29,12 +62,13 @@
             ) %}
         {{ form.info(_('Proposed title for the dataset being collected.')) }}
     {% endcall %}
-    {% call form.checkbox(
+    {% call form.select(
             'dataset_custodian',
             label=_('Organization is custodian?'),
-            value='ds-{}'.format(index),
+            options = [{'value':'E1', "text":"submitted as E1 form"}, {'value':'E2', "text":"submitted as E2 form"}],
+            selected= selected,
             id='ds{}-field-dataset_custodian'.format(index),
-            checked=dataset_custodian,
+            classes=['dataset_custodian'],
             error=dataset_custodian_error
         ) %}
         {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
@@ -104,11 +138,12 @@
             ) %}
         {{ form.info(_('Description of dataset usage restrictions')) }}
     {% endcall %}
-    {% call form.markdown(
+    {% call form.select(
                 'capture_method',
                 label=_('Dataset capture method'),
                 id='ds{}-field-capture_method'.format(index),
-                value=capture_method,
+                options=dataset_capture_method_options,
+                selected=capture_method,
                 error=capture_method_error,
                 classes=['control-medium']
             ) %}

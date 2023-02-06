@@ -39,7 +39,9 @@ def dcpr_request_update_by_owner(context, data_dict):
     toolkit.check_access("dcpr_request_update_by_owner_auth", context, validated_data)
     validated_data["owner_user"] = context["auth_user_obj"].id
     context["updated_by"] = "owner"
-    request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
+    request_obj = dcpr_dictization.dcpr_request_dict_save(
+        validated_data, context
+    )  # only adds the request to the session
     context["model"].Session.commit()
     create_dcpr_management_activity(
         request_obj,
@@ -309,56 +311,71 @@ def create_package_from_dcpr_request(
                 data_dict["extras"] = [
                     {"key": "origin", "value": "DCPR"},
                     {"key": "action", "value": action.value},
-                    {"key": "status", "value": "completed"},
+                    # {"key": "status", "value": "completed"},
                 ]
                 data_dict["private"] = False
                 data_dict["owner_org"] = request_obj.organization_id
                 data_dict[
-                    "spatial_reference_system"
+                    "spatial_parameters-0-spatial_reference_system"
                 ] = DCPRRequestRequiredFields.SPATIAL_REFERENCE_SYSTEM.value
                 data_dict[
-                    "dataset_language"
+                    "metadata_language_and_character_set-0-dataset_language"
                 ] = DCPRRequestRequiredFields.DATASET_LANGUAGE.value
                 data_dict[
-                    "dataset_character_set"
+                    "metadata_language_and_character_set-0-dataset_character_set"
                 ] = DCPRRequestRequiredFields.DATASET_CHARACTER_SET.value
                 data_dict[
-                    "metadata_language"
-                ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
-                data_dict["reference_date"] = dt.datetime.now(dt.timezone.utc)
+                    "metadata_language_and_character_set-0-metadata_character_set"
+                ] = DCPRRequestRequiredFields.METADATA_CHARACTER_SET.value
                 data_dict[
-                    "iso_topic_category"
+                    "metadata_language_and_character_set-0-metadata_language"
+                ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
+                data_dict[
+                    "metadata_reference_date_and_stamp-0-reference"
+                ] = dt.datetime.now(dt.timezone.utc)
+                data_dict[
+                    "metadata_reference_date_and_stamp-0-reference_date_type"
+                ] = DCPRRequestRequiredFields.REFERENCE_DATE_TYPE
+                data_dict[
+                    "metadata_reference_date_and_stamp-0-stamp"
+                ] = dt.datetime.now(dt.timezone.utc)
+                data_dict[
+                    "metadata_reference_date_and_stamp-0-stamp_date_type"
+                ] = DCPRRequestRequiredFields.STAMP_DATE_TYPE
+                data_dict[
+                    "topic_and_sasdi_theme-0-iso_topic_category"
                 ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
                 data_dict[
-                    "lineage-0-level"
-                ] = DCPRRequestRequiredFields.LINEAGE_LEVEL.value
-                data_dict[
-                    "lineage-0-lineage_statement"
+                    "lineage_tatement"
                 ] = DCPRRequestRequiredFields.LINEAGE_STATEMENT.value
                 data_dict[
-                    "lineage-0-process_step_description"
-                ] = DCPRRequestRequiredFields.LINEAGE_PROCESS_DESCRIPTION.value
-
-                data_dict["maintainer"] = request_obj.owner_user
-                data_dict[
-                    "equivalent_scale"
+                    "spatial_parameters-0-equivalent_scale"
                 ] = DCPRRequestRequiredFields.EQUIVALENT_SCALE.value
                 data_dict[
-                    "spatial_representation_type"
+                    "spatial_parameters-0-spatial_representation_type"
                 ] = DCPRRequestRequiredFields.SPATIAL_REPRESENTATION_TYPE.value
                 data_dict["notes"] = DCPRRequestRequiredFields.NOTES.value
                 data_dict[
-                    "metadata_standard_name"
+                    "metadata_standard-0-name"
                 ] = DCPRRequestRequiredFields.METADATA_STANDARD_NAME.value
                 data_dict[
-                    "metadata_standard_version"
+                    "metadata_standard-0-version"
                 ] = DCPRRequestRequiredFields.METADATA_STANDARD_VERSION.value
-                data_dict["status"] = DCPRRequestRequiredFields.STATUS.value
                 data_dict[
-                    "distribution-0-distributor_contact"
-                ] = DCPRRequestRequiredFields.DISTRIBUTOR_CONTACT.value
-                data_dict["metadata_date_stamp"] = dt.datetime.now(dt.timezone.utc)
-                data_dict["purpose"] = dataset.dataset_purpose
+                    "distribution_format-0-name"
+                ] = DCPRRequestRequiredFields.DISTRIBUTION_FORMAT_NAME.value
+                data_dict[
+                    "distribution_format-0-version"
+                ] = DCPRRequestRequiredFields.DISTRIBUTION_FORMAT_VERSION.value
+                data_dict[
+                    "responsible_party-0-individual_name"
+                ] = DCPRRequestRequiredFields.RESPONSIBLE_PARTY_INDIVIDUAL_NAME.value
+                data_dict[
+                    "responsible_party-0-position_name"
+                ] = DCPRRequestRequiredFields.RESPONSIBLE_PARTY_POSITION_NAME.value
+                data_dict[
+                    "responsible_party-0-role"
+                ] = DCPRRequestRequiredFields.RESPONSIBLE_PARTY_ROLE.value
 
                 result = toolkit.get_action("package_create")(context, data_dict)
         except toolkit.NotAuthorized:

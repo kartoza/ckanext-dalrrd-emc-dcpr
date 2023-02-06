@@ -26,6 +26,10 @@ from ..blueprints.emc import emc_blueprint
 from ..blueprints.error_report import error_report_blueprint
 from ..blueprints.xml_parser import xml_parser_blueprint
 from ..blueprints.publish import publish_blueprint
+from ..blueprints.saved_searches import saved_searches_blueprint
+from ..blueprints.news import news_blueprint
+from ..blueprints.error_report import error_report_blueprint
+from ..blueprints.contact import contact_blueprint
 from ..cli import commands
 from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
 from ..logic.action import ckan as ckan_actions
@@ -43,6 +47,7 @@ from ..logic import (
     converters,
     validators,
 )
+
 from ..logic.auth import ckan as ckan_auth
 from ..logic.auth import pages as ckanext_pages_auth
 from ..logic.auth import dcpr as dcpr_auth
@@ -262,6 +267,17 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_request_dataset_maintenance": (
                 emc_auth.authorize_request_dataset_maintenance
             ),
+            "error_report_create_auth": error_report_auth.error_report_create_auth,
+            "error_report_show_auth": error_report_auth.error_report_show_auth,
+            "error_report_update_by_owner_auth": error_report_auth.error_report_update_by_owner_auth,
+            "error_report_update_by_nsif_auth": error_report_auth.error_report_update_by_nsif_auth,
+            "error_report_nsif_moderate_auth": error_report_auth.error_report_nsif_moderate_auth,
+            "my_error_reports_auth": error_report_auth.my_error_reports_auth,
+            "error_report_submitted_auth": error_report_auth.error_report_submitted_auth,
+            "error_report_list_public_auth": error_report_auth.error_report_list_public_auth,
+            "my_error_report_list_auth": error_report_auth.my_error_report_list_auth,
+            "rejected_error_reports_auth": error_report_auth.rejected_error_reports_auth,
+            "error_report_delete_auth": error_report_auth.error_report_delete_auth,
             "emc_request_dataset_publication": (
                 emc_auth.authorize_request_dataset_publication
             ),
@@ -337,9 +353,14 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_moderation_choices_validator": validators.dcpr_moderation_choices_validator,
             "spatial_resolution_converter": converters.spatial_resolution_converter,
             "convert_choices_select_to_int": converters.convert_choices_select_to_int,
+            "check_if_number": converters.check_if_number,
+            "check_if_int": converters.check_if_int,
             "convert_select_custom_choice_to_extra": converters.convert_select_custom_choice_to_extra,
             "doi_validator": validators.doi_validator,
-            # "expand_tags_composite": converters.expand_tags_composite,
+            "metadata_default_standard_name": converters.default_metadata_standard_name,
+            "metadata_default_standard_version": converters.default_metadata_standard_version,
+            "lineage_source_srs_validator": validators.lineage_source_srs_validator,
+            "reference_date_convertor": converters.reference_date_convertor,
         }
 
     def is_fallback(self) -> bool:
@@ -369,13 +390,28 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "dcpr_get_next_intermediate_dcpr_request_status": helpers.get_next_intermediate_dcpr_status,
             "dcpr_user_is_dcpr_request_owner": helpers.user_is_dcpr_request_owner,
             "emc_org_memberships": helpers.get_org_memberships,
-            # added by mohab
             "dcpr_requests_approved_by_nsif": helpers.get_dcpr_requests_approved_by_nsif,
             "is_dcpr_request": helpers.is_dcpr_request,
             "get_dcpr_request_action": helpers.get_dcpr_request_action,
             "mod_scheming_flatten_subfield": helpers.mod_scheming_flatten_subfield,
             "get_today_date": helpers.get_today_date,
             "get_maintenance_custom_other_field_data": helpers.get_maintenance_custom_other_field_data,
+            "get_release": helpers.get_current_release,
+            "get_saved_searches": helpers.get_saved_searches,
+            "get_recent_news": helpers.get_recent_news,
+            "get_public_dcpr_requests_count": helpers.get_public_dcpr_requests_count,
+            "get_my_dcpr_requests_count": helpers.get_my_dcpr_requests_count,
+            "get_under_preparation_dcpr_requests_count": helpers.get_under_preparation_dcpr_requests_count,
+            "get_dcpr_requests_awaiting_csi_moderation_count": helpers.get_dcpr_requests_awaiting_csi_moderation_count,
+            "get_dcpr_requests_awaiting_nsif_moderation_count": helpers.get_dcpr_requests_awaiting_nsif_moderation_count,
+            "get_featured_datasets_count": helpers.get_featured_datasets_count,
+            "get_user_name": helpers.get_user_name,
+            "get_user_name_from_url": helpers.get_user_name_from_url,
+            "get_user_id": helpers.get_user_id,
+            "get_seo_metatags": helpers.get_seo_metatags,
+            "get_datasets_thumbnail": helpers.get_datasets_thumbnail,
+            "get_year": helpers.get_year,
+            "get_user_dashboard_packages": helpers.get_user_dashboard_packages,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
@@ -385,6 +421,10 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             error_report_blueprint,
             xml_parser_blueprint,
             publish_blueprint,
+            saved_searches_blueprint,
+            news_blueprint,
+            error_report_blueprint,
+            contact_blueprint,
         ]
 
     def dataset_facets(
@@ -400,6 +440,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
             facets_dict["dcpr_request"] = toolkit._("DCPR Request")
+            facets_dict["featured"] = toolkit._("Featured Metadata records")
         return facets_dict
 
     def group_facets(
