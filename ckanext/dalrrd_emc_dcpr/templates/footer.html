@@ -6,16 +6,15 @@
 #}
 {% block footer_content %}
     <div class="content">
-        <div class="footer-text">Copyright &copy; -  {{ h.get_year() }} SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE
-            <div class="emc-current-version" style="float:right; margin-right:10px">
-                <!-- <div class="=footer-text">current staging version : RC0.1 {{ emc_version.git_sha }}</div> -->
-                <div class="=footer-text">current version :{{ h.get_release() }}</div>
-            </div>
+        <div class="footer-text">
+            <p>Copyright &copy; SOUTH AFRICAN SPATIAL DATA INFRASTRUCTURE {{ h.get_year() }}</p>
+            <p>Powered by CKAN, developed by Kartoza</p>
+            <p>Version: {{ h.get_release() }}</p>
         </div>
-        <div class="language">
-            {% block footer_lang %}
-            {% endblock %}
-        </div>
+
+        {% block footer_lang %}
+        {% endblock %}
+
     </div>
 {% endblock %}
 {# {% set emc_version = h.emc_show_version() %} #}
