@@ -437,7 +437,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             facets_dict[
                 f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"
             ] = toolkit._("ISO Topic Categories")
-            facets_dict["reference_date"] = toolkit._("Reference Date")
+            # facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
             facets_dict["dcpr_request"] = toolkit._("DCPR Request")
             facets_dict["featured"] = toolkit._("Featured Metadata records")
