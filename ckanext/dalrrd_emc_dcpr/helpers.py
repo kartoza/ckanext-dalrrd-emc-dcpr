@@ -270,6 +270,22 @@ def get_all_datasets_count(user_obj):
     return result["count"]
 
 
+def get_org_public_records_count(org_id: str) -> int:
+    """
+    the default behavior is showing fixed
+    number of recoreds for orgs if the
+    user is not a part of them in org
+    list page, we are adjusting
+    """
+    query = model.Session.query(model.Package).filter(
+        model.Package.owner_org == org_id,
+        model.Package.private == "f",
+        model.Package.state == "active",
+    )
+    count = len(query.all())
+    return count
+
+
 def get_datasets_thumbnail(data_dict):
     """
     Generate thumbnails based on metadataset
