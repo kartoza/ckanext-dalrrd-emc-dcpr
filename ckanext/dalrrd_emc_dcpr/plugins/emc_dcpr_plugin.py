@@ -23,6 +23,7 @@ from .. import (
 )
 from ..blueprints.dcpr import dcpr_blueprint
 from ..blueprints.emc import emc_blueprint
+from ..blueprints.error_report import error_report_blueprint
 from ..blueprints.xml_parser import xml_parser_blueprint
 from ..blueprints.publish import publish_blueprint
 from ..blueprints.saved_searches import saved_searches_blueprint
@@ -280,6 +281,17 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "emc_request_dataset_publication": (
                 emc_auth.authorize_request_dataset_publication
             ),
+            "error_report_create_auth": error_report_auth.error_report_create_auth,
+            "error_report_show_auth": error_report_auth.error_report_show_auth,
+            "error_report_update_by_owner_auth": error_report_auth.error_report_update_by_owner_auth,
+            "error_report_update_by_nsif_auth": error_report_auth.error_report_update_by_nsif_auth,
+            "error_report_nsif_moderate_auth": error_report_auth.error_report_nsif_moderate_auth,
+            "my_error_reports_auth": error_report_auth.my_error_reports_auth,
+            "error_report_submitted_auth": error_report_auth.error_report_submitted_auth,
+            "error_report_list_public_auth": error_report_auth.error_report_list_public_auth,
+            "my_error_report_list_auth": error_report_auth.my_error_report_list_auth,
+            "rejected_error_reports_auth": error_report_auth.rejected_error_reports_auth,
+            "error_report_delete_auth": error_report_auth.error_report_delete_auth,
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -406,6 +418,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         return [
             dcpr_blueprint,
             emc_blueprint,
+            error_report_blueprint,
             xml_parser_blueprint,
             publish_blueprint,
             saved_searches_blueprint,
@@ -424,7 +437,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             facets_dict[
                 f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"
             ] = toolkit._("ISO Topic Categories")
-            facets_dict["reference_date"] = toolkit._("Reference Date")
+            # facets_dict["reference_date"] = toolkit._("Reference Date")
             facets_dict["harvest_source_title"] = toolkit._("Harvest source")
             facets_dict["dcpr_request"] = toolkit._("DCPR Request")
             facets_dict["featured"] = toolkit._("Featured Metadata records")
