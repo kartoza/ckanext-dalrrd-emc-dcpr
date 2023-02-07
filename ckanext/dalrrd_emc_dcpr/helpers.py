@@ -278,7 +278,9 @@ def get_org_public_records_count(org_id: str) -> int:
     list page, we are adjusting
     """
     query = model.Session.query(model.Package).filter(
-        model.Package.owner_org == org_id, model.Package.private == "f"
+        model.Package.owner_org == org_id,
+        model.Package.private == "f",
+        model.Package.state == "active",
     )
     count = len(query.all())
     return count
