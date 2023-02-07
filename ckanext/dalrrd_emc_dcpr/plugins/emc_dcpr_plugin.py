@@ -412,6 +412,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_datasets_thumbnail": helpers.get_datasets_thumbnail,
             "get_year": helpers.get_year,
             "get_user_dashboard_packages": helpers.get_user_dashboard_packages,
+            "get_org_public_records_count": helpers.get_org_public_records_count,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:
