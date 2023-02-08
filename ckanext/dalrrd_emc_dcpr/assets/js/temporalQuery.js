@@ -17,7 +17,7 @@ ckan.module('emc-temporal-query', function (jQuery, _) {
                 if(self.value){
                     let new_parameter = self.id + '=' + self.value;
                     let new_url = ''
-                    if(getUrlParameter(self.id)){
+                    if(url.toString().includes(self.id)){
                         let old_parameter = self.id + '=' + getUrlParameter(self.id);
                         new_url = url.toString().replace(old_parameter, new_parameter);
                     }
@@ -25,7 +25,7 @@ ckan.module('emc-temporal-query', function (jQuery, _) {
                         const sep = (url.toString().endsWith('/') ) ? ( '?'): ('&')
                         new_url = url + sep + new_parameter
                     }
-                    window.open(new_url, "_self")
+                     window.open(new_url, "_self")
                 }
                 else{
                     if(getUrlParameter(self.id)){

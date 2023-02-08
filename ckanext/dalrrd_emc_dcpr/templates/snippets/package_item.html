@@ -76,7 +76,7 @@
                 {% endblock %}
                 {% block notes %}
                   {% if notes %}
-                    <div class="dataset-desc">{{ notes|urlize }}</div>
+                    <div class="dataset-desc">{{ notes|urlize|truncate(80,True,'...',0) }}</div>
                   {% else %}
                     <p class="empty">{{ _("This metadata record has no description") }}</p>
                   {% endif %}

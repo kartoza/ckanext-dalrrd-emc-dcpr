@@ -7,10 +7,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-#    - name: Check code formatting with black
-#      uses: psf/black@stable
-#      with:
-#        options: "--check --verbose"
+    # - name: Check code formatting with black
+    #   uses: psf/black@stable
+    #   with:
+    #     options: "--check --verbose"
 
     - name: Lint code with mypy
       uses: jpetrucciani/mypy-check@0.971
