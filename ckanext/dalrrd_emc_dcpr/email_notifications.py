@@ -12,6 +12,7 @@ This module reimplements the core CKAN email notifications in order to:
 import datetime as dt
 import logging
 import re
+import json
 
 from ckan import (
     logic,
@@ -94,6 +95,7 @@ def send_notification(user, email_dict):
             email_dict["body"],
         )
     except ckan.lib.mailer.MailerException:
+        logger.error(ckan.lib.mailer.MailerException)
         raise
     else:
         logger.debug(f"Email sent!")

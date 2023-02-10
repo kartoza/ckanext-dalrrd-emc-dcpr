@@ -30,6 +30,7 @@ from ..blueprints.saved_searches import saved_searches_blueprint
 from ..blueprints.news import news_blueprint
 from ..blueprints.error_report import error_report_blueprint
 from ..blueprints.contact import contact_blueprint
+from ..blueprints.sys_stats import stats_blueprint
 from ..cli import commands
 from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
 from ..logic.action import ckan as ckan_actions
@@ -426,6 +427,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             news_blueprint,
             error_report_blueprint,
             contact_blueprint,
+            stats_blueprint,
         ]
 
     def dataset_facets(
