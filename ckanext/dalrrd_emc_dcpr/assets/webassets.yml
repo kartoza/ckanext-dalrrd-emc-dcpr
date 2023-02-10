@@ -114,3 +114,19 @@ apply-save-search-js:
   contents:
     - js/save_search.js
   filter: rjsmin
+
+vendor-plot-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_jquery_plot.js
+  contents:
+    - vendor/plot/jquery.flot.js
+    - vendor/plot/excanvas.js
+  filter: rjsmin
+
+plotter-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_plotter.js
+  contents:
+    - js/plotter.js
+  filter: rjsmin
+  extra:
+    preload:
+      - ckanext-dalrrdemcdcpr/vendor-plot-js
