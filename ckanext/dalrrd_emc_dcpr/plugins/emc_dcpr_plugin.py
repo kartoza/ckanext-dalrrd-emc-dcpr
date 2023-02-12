@@ -361,7 +361,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "metadata_default_standard_name": converters.default_metadata_standard_name,
             "metadata_default_standard_version": converters.default_metadata_standard_version,
             "lineage_source_srs_validator": validators.lineage_source_srs_validator,
-            "reference_date_convertor": converters.reference_date_convertor,
         }
 
     def is_fallback(self) -> bool:

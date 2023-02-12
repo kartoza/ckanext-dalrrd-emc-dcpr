@@ -1342,7 +1342,7 @@ dataset_fields:
     - field_name: equivalent_scale
       label: Spatial resolution equivalent scale
       required: true
-      preset: spatial_resolution_checker
+      # preset: spatial_resolution_checker
       help_text: >-
         Level of detail expressed as the scale of a comparable hardcopy map or
         chart. Provide it as the denominator of a representative fraction,
@@ -1424,6 +1424,7 @@ dataset_fields:
       #   label: Vertical datum
       #   help_text: Origin from which minimum and maximum elevations originated
       #   required: false
+
   - field_name: metadata_reference_date_and_stamp
     label: Reference date
     preset: modified_repeating_subfields
@@ -1432,8 +1433,6 @@ dataset_fields:
     - field_name: reference
       label: Reference datetime
       required: true
-      validators: >-
-        ignore_missing
       form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 

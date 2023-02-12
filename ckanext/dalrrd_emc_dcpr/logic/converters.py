@@ -7,6 +7,7 @@ import ckan.lib.navl.dictization_functions as df
 
 Invalid = df.Invalid
 
+import datetime
 
 from ckan.common import _
 import ckan.lib.navl.dictization_functions as df
@@ -151,8 +152,3 @@ def default_metadata_standard_version(value):
     """
     if value == "":
         return "1.1"
-
-
-def reference_date_convertor(value):
-    value = dict(value)
-    raise RuntimeError(value)
