@@ -1487,8 +1487,10 @@ resource_fields:
   #   label: Application profile
   #   help_text: Name of an application profile that can be used with the resource
 
-  # - field_name: description
-  #   label: Description
+  - field_name: description
+    label: Description
+    form_snippet: markdown.html
+
   #   validators: convert_choices_select_to_int
   #   preset: select
   #   choices:

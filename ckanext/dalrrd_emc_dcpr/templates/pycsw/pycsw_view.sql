@@ -22,17 +22,14 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
                g.title AS org_name,
                p.maintainer,
                json_object_agg(pe.key, pe.value) AS extras,
-               array_agg(DISTINCT t.name) AS tags
-               --json_object_agg('url', res.url) as links
-               --array_agg(ARRAY[DISTINCT res.url ::text, res.name ::text, res.description ::text]) as links
-               -- array_agg() as links_urls,
-               -- array_agg(DISTINCT ) as links_descriptions
-        FROM package AS p
+               array_agg(DISTINCT t.name) AS tags,
+               (select json_object_agg('name':'value')) As links
+            FROM package AS p
             JOIN package_extra AS pe ON p.id = pe.package_id
             JOIN "group" AS g ON p.owner_org = g.id
             JOIN package_tag AS pt ON p.id = pt.package_id
             JOIN tag AS t on pt.tag_id = t.id
-            JOIN "resource" as res on p.id = res.package_id
+            JOIN "resource" AS res on p.id = res.package_id
         WHERE p.state = 'active'
         AND p.private = false
         GROUP BY p.id, g.title
