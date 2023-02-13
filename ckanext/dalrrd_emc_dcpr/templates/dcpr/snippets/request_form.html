@@ -3,7 +3,7 @@
 {% asset "ckanext-dalrrdemcdcpr/dcpr-request-datasets-js" %}
 {% asset "ckanext-dalrrdemcdcpr/remove-dcpr-request-datasets-js" %}
 
-<form class="dataset-form" method="post" data-module="basic-form" novalidate>
+<form class="dataset-form request-edit" method="post" data-module="basic-form" novalidate>
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
     <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
         <legend>DCPR request owner fields</legend>

@@ -23,8 +23,7 @@ def index():
 )
 def save_current_search():
     """
-    save the current search
-    query with user_id
+    save the current search query with user_id
     """
     query = request.json
     user_id = c.userobj.id
@@ -56,8 +55,7 @@ def _get_saved_search_title(query):
 )
 def delete_saved_search():
     """
-    deletes a saved search via it's
-    id
+    deletes a saved search via it's id
     """
     if request.method == "POST":
         saved_search_id = request.json["saved_search_id"]
