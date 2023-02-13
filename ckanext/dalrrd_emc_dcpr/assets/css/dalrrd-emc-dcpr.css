@@ -283,10 +283,18 @@ fieldset[disabled] .btn-default.focus {
 }
 
 .page-header {
-  margin-top: 30px;
+  margin-top: 0px;
   border-bottom: 0 solid #ddd;
   background-color: transparent;
   border-radius: 0 3px 0 0;
+}
+
+.page-header >h1{
+  margin-top: 0;
+}
+
+.toolbar{
+  margin-bottom: 0;
 }
 
 .search-form {
@@ -668,14 +676,14 @@ footer {
   margin-bottom: initial;
   color: #3A744E;
   background: #3A744E url("../../../base/images/bg.png");
-  padding: 23px 0;
+  padding: 0px 0;
 }
 
 .footer-text {
   text-align: center;
   color: #fff;
   font-size: 14px;
-  margin-top:3px
+  margin-top:10px
 }
 
 .language form {
@@ -1056,6 +1064,7 @@ footer {
   .form-actions {
     text-align: center;
   }
+
 }
 
 .proposed-date, .proposed-data-info{
@@ -1076,6 +1085,10 @@ footer {
     top: unset;
     left: unset;
     bottom: -3px;
+  }
+  .repeating-fields-container{
+    -moz-column-count: 1;
+    column-count: 1;
   }
 }
 
@@ -1100,6 +1113,23 @@ label {
   font-weight: 600;
 }
 
+.border-bottom {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.form-row{
+  margin-bottom: 30px;
+}
+
+#dataset-edit{
+  background-color: #fff;
+  border: 1px solid #e7e7e7;
+}
+
+#dataset-edit > div{
+  padding: 0 10px 0 10px;
+}
+
 .repeating-fields-container{
   -moz-column-count: 2;
   column-count: 2;
@@ -1115,4 +1145,17 @@ label[for=field-contact_address-0-postal_code]{
 
 label[for=field-online_resource-0-description]{
   margin-top:14px
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group .info-block {
+  font-size: 10px;
+  margin-top: 0;
+}
+
+.footer-text > p{
+  margin-bottom: 0;
 }
