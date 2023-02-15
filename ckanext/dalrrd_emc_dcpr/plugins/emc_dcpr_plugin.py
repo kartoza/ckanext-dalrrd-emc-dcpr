@@ -16,6 +16,8 @@ from flask import Blueprint
 from sqlalchemy import orm
 
 from ckanext.harvest.utils import DATASET_TYPE_NAME as HARVEST_DATASET_TYPE_NAME
+from ckanext.harvest.harvesters.ckanharvester import CKANHarvester
+
 
 from .. import (
     constants,

@@ -305,7 +305,6 @@ def create_package_from_dcpr_request(
                 data_dict = {}
 
                 package_name = dataset.proposed_dataset_title.lower().replace(" ", "")
-
                 data_dict["name"] = package_name
                 data_dict["title"] = dataset.proposed_dataset_title
                 data_dict["extras"] = [
@@ -346,7 +345,7 @@ def create_package_from_dcpr_request(
                     "topic_and_sasdi_theme-0-iso_topic_category"
                 ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
                 data_dict[
-                    "lineage_tatement"
+                    "lineage_statement"
                 ] = DCPRRequestRequiredFields.LINEAGE_STATEMENT.value
                 data_dict[
                     "spatial_parameters-0-equivalent_scale"
@@ -376,7 +375,6 @@ def create_package_from_dcpr_request(
                 data_dict[
                     "responsible_party-0-role"
                 ] = DCPRRequestRequiredFields.RESPONSIBLE_PARTY_ROLE.value
-
                 result = toolkit.get_action("package_create")(context, data_dict)
         except toolkit.NotAuthorized:
             result = None

@@ -23,7 +23,8 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
                p.maintainer,
                json_object_agg(pe.key, pe.value) AS extras,
                array_agg(DISTINCT t.name) AS tags,
-               (select json_object_agg('name':'value')) As links
+            --    (select * from LATERAL (select json_array_elements_text(json_agg(json_build_object('name',res.name, 'description', res.description,'protocol', res.format, 'url', res.url)))) AS inner ) As links
+               (select json_build_object('title', res.name,'description', res.description,'type', res.format, 'href', res.url)::text) As links
             FROM package AS p
             JOIN package_extra AS pe ON p.id = pe.package_id
             JOIN "group" AS g ON p.owner_org = g.id
@@ -32,7 +33,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
             JOIN "resource" AS res on p.id = res.package_id
         WHERE p.state = 'active'
         AND p.private = false
-        GROUP BY p.id, g.title
+        GROUP BY p.id, g.title, res.id
     )
     SELECT
            c.id AS identifier,
@@ -171,6 +172,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
             --from "resource" as res where res.package_id = c.id) AS links,
            -- temporal extent
            cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'description' AS reference_systems_additional_info
+           --links
 
 
     FROM cte_extras AS c
