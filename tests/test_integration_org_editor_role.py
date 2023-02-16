@@ -164,7 +164,6 @@ def test_update_package(name, private, org_role):
         role=org_role,
     )
     data_dict = {
-        "name": name,
         "private": private,
         "title": name,
         "doi": "",
