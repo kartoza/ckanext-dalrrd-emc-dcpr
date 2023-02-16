@@ -13,6 +13,7 @@ def create_dcpr_request_schema(
     not_empty,
     unicode_safe,
     is_positive_integer,
+    natural_number_validator,
     isodate,
     convert_group_name_or_id_to_id,
     dcpr_end_date_after_start_date_validator,
@@ -32,7 +33,7 @@ def create_dcpr_request_schema(
             dcpr_end_date_after_start_date_validator,
         ],
         "capture_end_date": [not_empty, isodate],
-        "cost": [not_missing, not_empty, is_positive_integer],
+        "cost": [not_missing, not_empty, natural_number_validator],
         "spatial_extent": [ignore_missing, unicode_safe],
         "spatial_resolution": [ignore_missing, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
@@ -138,8 +139,8 @@ def create_dcpr_request_dataset_schema(
     return {
         "dcpr_request_id": [ignore],
         "dataset_id": [ignore],
-        "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_purpose": [not_empty, not_missing, unicode_safe],
+        "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_custodian": [boolean_validator],
         "data_type": [ignore_missing, unicode_safe],
         "proposed_abstract": [ignore_missing, unicode_safe],
@@ -147,6 +148,13 @@ def create_dcpr_request_dataset_schema(
         "associated_attributes": [ignore_missing, unicode_safe],
         "data_usage_restrictions": [ignore_missing, unicode_safe],
         "capture_method": [ignore_missing, unicode_safe],
+        "organisation_adddress": [ignore_missing, unicode_safe],
+        # "contact_person_name": [ignore_missing, unicode_safe],
+        # "contact_person_designation": [ignore_missing, unicode_safe],
+        # "contact_person_email_address": [ignore_missing, unicode_safe],
+        # "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
+        # "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
+        # "organisation_level": [ignore_missing, unicode_safe],
     }
 
 

@@ -305,8 +305,7 @@ def create_package_from_dcpr_request(
                 data_dict = {}
 
                 package_name = dataset.proposed_dataset_title.lower().replace(" ", "")
-
-                data_dict["name"] = package_name
+                # data_dict["name"] = package_name
                 data_dict["title"] = dataset.proposed_dataset_title
                 data_dict["extras"] = [
                     {"key": "origin", "value": "DCPR"},
@@ -314,6 +313,7 @@ def create_package_from_dcpr_request(
                     # {"key": "status", "value": "completed"},
                 ]
                 data_dict["private"] = False
+                data_dict["dataset_purpose"] = "dcpr request"
                 data_dict["owner_org"] = request_obj.organization_id
                 data_dict[
                     "spatial_parameters-0-spatial_reference_system"
@@ -332,22 +332,18 @@ def create_package_from_dcpr_request(
                 ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
                 data_dict[
                     "metadata_reference_date_and_stamp-0-reference"
-                ] = dt.datetime.now(dt.timezone.utc)
+                ] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 data_dict[
                     "metadata_reference_date_and_stamp-0-reference_date_type"
-                ] = DCPRRequestRequiredFields.REFERENCE_DATE_TYPE
+                ] = "1"
                 data_dict[
                     "metadata_reference_date_and_stamp-0-stamp"
-                ] = dt.datetime.now(dt.timezone.utc)
-                data_dict[
-                    "metadata_reference_date_and_stamp-0-stamp_date_type"
-                ] = DCPRRequestRequiredFields.STAMP_DATE_TYPE
+                ] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                data_dict["metadata_reference_date_and_stamp-0-stamp_date_type"] = "1"
                 data_dict[
                     "topic_and_sasdi_theme-0-iso_topic_category"
                 ] = DCPRRequestRequiredFields.ISO_TOPIC_CATEGORY.value
-                data_dict[
-                    "lineage_tatement"
-                ] = DCPRRequestRequiredFields.LINEAGE_STATEMENT.value
+                data_dict["lineage_statement"] = "Formed from a DCPR request"
                 data_dict[
                     "spatial_parameters-0-equivalent_scale"
                 ] = DCPRRequestRequiredFields.EQUIVALENT_SCALE.value
@@ -376,7 +372,6 @@ def create_package_from_dcpr_request(
                 data_dict[
                     "responsible_party-0-role"
                 ] = DCPRRequestRequiredFields.RESPONSIBLE_PARTY_ROLE.value
-
                 result = toolkit.get_action("package_create")(context, data_dict)
         except toolkit.NotAuthorized:
             result = None

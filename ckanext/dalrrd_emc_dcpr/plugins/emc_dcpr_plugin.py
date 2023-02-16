@@ -16,6 +16,8 @@ from flask import Blueprint
 from sqlalchemy import orm
 
 from ckanext.harvest.utils import DATASET_TYPE_NAME as HARVEST_DATASET_TYPE_NAME
+from ckanext.harvest.harvesters.ckanharvester import CKANHarvester
+
 
 from .. import (
     constants,
@@ -361,7 +363,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "metadata_default_standard_name": converters.default_metadata_standard_name,
             "metadata_default_standard_version": converters.default_metadata_standard_version,
             "lineage_source_srs_validator": validators.lineage_source_srs_validator,
-            "reference_date_convertor": converters.reference_date_convertor,
         }
 
     def is_fallback(self) -> bool:

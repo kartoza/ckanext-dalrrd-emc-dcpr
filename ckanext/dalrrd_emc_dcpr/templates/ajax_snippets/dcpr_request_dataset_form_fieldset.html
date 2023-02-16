@@ -74,22 +74,12 @@
         {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
     {% endcall %}
     {% call form.markdown(
-                'dataset_purpose',
-                label=_('Dataset purpose'),
-                id='ds{}-field-dataset_purpose'.format(index),
-                value=dataset_purpose,
-                error=dataset_purpose_error,
-                classes=['control-medium'],
-                is_required=True
-            ) %}
-        {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
-    {% endcall %}
-    {% call form.markdown(
                 'proposed_abstract',
                 label=_('Dataset abstract'),
                 id='ds{}-field-proposed_abstract'.format(index),
                 value=proposed_abstract,
                 error=proposed_abstract_error,
+                is_required=True,
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Proposed abstract for the dataset being collected.')) }}
@@ -100,10 +90,24 @@
                 id='ds{}-field-lineage_statement'.format(index),
                 value=lineage_statement,
                 error=lineage_statement_error,
+                is_required=True,
                 classes=['control-medium']
             ) %}
         {{ form.info(_('Information about the lineage of the dataset being collected (if it is based on previous data, etc.)')) }}
     {% endcall %}
+
+    {% call form.markdown(
+        'dataset_purpose',
+        label=_('Dataset purpose'),
+        id='ds{}-field-dataset_purpose'.format(index),
+        value=dataset_purpose,
+        error=dataset_purpose_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
+    {% endcall %}
+
     {% call form.input(
                 'data_type',
                 label=_('Data type'),

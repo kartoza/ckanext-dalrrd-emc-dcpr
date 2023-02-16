@@ -95,10 +95,10 @@ services:
     ports:
       - target: 8000
         published: *pycsw-published-port
-    volumes:
-      - type: bind
-        source: $PWD/../../pycsw
-        target: /home/pycsw/pycsw
+    # volumes:
+    #   - type: bind
+    #     source: $PWD/../../pycsw
+    #     target: /home/pycsw/pycsw
         # target: /usr/lib/python3.8/site-packages/pycsw
     command: ["--reload"]
 

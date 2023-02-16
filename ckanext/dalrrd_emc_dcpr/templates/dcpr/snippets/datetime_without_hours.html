@@ -9,5 +9,5 @@ Example:
 #}
 
 <span class="dcpr-datetime" data-datetime="{{ h.render_datetime(datetime_obj, date_format='%Y-%m-%dT%H:%M:%S%z') }}">
-    {{ h.render_datetime(datetime_obj, with_hours=False) if datetime_obj is not none else 'None'}}
+    {{ h.render_datetime(datetime_obj, with_hours=True) if datetime_obj is not none else 'None'}}
 </span>
