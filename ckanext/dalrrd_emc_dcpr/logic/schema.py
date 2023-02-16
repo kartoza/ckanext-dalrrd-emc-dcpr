@@ -149,12 +149,12 @@ def create_dcpr_request_dataset_schema(
         "data_usage_restrictions": [ignore_missing, unicode_safe],
         "capture_method": [ignore_missing, unicode_safe],
         "organisation_adddress": [ignore_missing, unicode_safe],
-        "contact_person_name": [ignore_missing, unicode_safe],
-        "contact_person_designation": [ignore_missing, unicode_safe],
-        "contact_person_email_address": [ignore_missing, unicode_safe],
-        "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
-        "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
-        "organisation_level": [ignore_missing, unicode_safe],
+        # "contact_person_name": [ignore_missing, unicode_safe],
+        # "contact_person_designation": [ignore_missing, unicode_safe],
+        # "contact_person_email_address": [ignore_missing, unicode_safe],
+        # "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
+        # "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
+        # "organisation_level": [ignore_missing, unicode_safe],
     }
 
 

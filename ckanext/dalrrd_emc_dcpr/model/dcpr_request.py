@@ -83,13 +83,13 @@ dcpr_request_dataset_table = Table(
     Column("data_usage_restrictions", types.UnicodeText),
     Column("capture_method", types.UnicodeText),
     Column("capture_method_detail", types.UnicodeText),
-    Column("organisation_level", types.UnicodeText),
-    Column("organisation_adddress", types.UnicodeText),
-    Column("contact_person_name", types.UnicodeText),
-    Column("contact_person_designation", types.UnicodeText),
-    Column("contact_person_email_address", types.UnicodeText),
-    Column("dcpr_contact_person_phone", types.UnicodeText),
-    Column("dcpr_contact_person_fax_number", types.UnicodeText),
+    # Column("organisation_level", types.UnicodeText),
+    # Column("organisation_adddress", types.UnicodeText),
+    # Column("contact_person_name", types.UnicodeText),
+    # Column("contact_person_designation", types.UnicodeText),
+    # Column("contact_person_email_address", types.UnicodeText),
+    # Column("dcpr_contact_person_phone", types.UnicodeText),
+    # Column("dcpr_contact_person_fax_number", types.UnicodeText),
 )
 
 dcpr_request_notification_table = Table(
