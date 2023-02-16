@@ -9,10 +9,11 @@ def handle_named_url(data_dict: dict):
     """
     title = data_dict.get("title")
     name = _remove_special_characters_from_package_url(title)
-    name = name.replace(" ", "-")
-    name += "-" + str(uuid.uuid4())
-    name = name.lower()
-    return name
+    if name is not None:
+        name = name.replace(" ", "-")
+        name += "-" + str(uuid.uuid4())
+        name = name.lower()
+        return name
 
 
 def _remove_special_characters_from_package_url(url):
@@ -22,7 +23,8 @@ def _remove_special_characters_from_package_url(url):
     urls, replace them
     """
     special_chars = "!\"”'#$%&'()*+,-./:;<=>?@[\]^`{|}~."
-    for i in url:
-        if i in special_chars:
-            url.replace(i, "-")
-    return url
+    if url is not None:
+        for i in url:
+            if i in special_chars:
+                url.replace(i, "-")
+        return url
