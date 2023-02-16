@@ -10,7 +10,7 @@ ckan.module("change_save_search_icon", function($){
     return{
         initialize:function(){
             $.proxyAll(this,/_on/);
-            let _this=  this
+            let _this=  this;
             $(".save_search_button").on("click",function(){
                 if(previous_query != query){
                 search_icon.toggleClass("fa-bookmark-o fa-bookmark");

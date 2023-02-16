@@ -971,14 +971,33 @@ footer {
   display: none;
 }
 
-
 .save_search_button{
   border:none;
   background-color: transparent;
+  float:right;
   position: relative;
-  left:468px;
-  bottom: 68px;
+  right:300px;
+  top: 10px;
 }
+
+/* @media (min-width:1200px) {
+  .save_search_button{
+    right:300px;
+  }
+} */
+
+@media (max-width:1199px) {
+  .save_search_button{
+    right:245px;
+  }
+}
+
+@media (max-width:1050px) {
+  .save_search_button{
+    right:0px;
+  }
+}
+
 
 .save_search_button_border{
   /* font-size: 40px;
