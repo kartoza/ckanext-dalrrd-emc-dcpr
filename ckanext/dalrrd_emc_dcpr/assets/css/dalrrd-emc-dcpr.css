@@ -1072,6 +1072,33 @@ footer {
   margin-right: -15px ;
 }
 
+.dcpr-org{
+  margin-left: -15px;
+  margin-right: -15px ;
+
+}
+
+.dcpr-contact{
+  display: inline-block;
+  margin-left: -15px;
+  margin-right: -15px ;
+}
+
+.dcpr-contact-filler{
+  visibility: hidden;
+}
+
+@media(max-width: 991px){
+  .dcpr-contact{
+    display: block;
+  }
+
+  .dcpr-contact-filler{
+    display: none;
+  }
+
+}
+
 @media (max-width: 768px) {
   .metadata-record-thumbnail{
     left: 50%;

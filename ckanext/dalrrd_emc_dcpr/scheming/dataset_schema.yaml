@@ -15,10 +15,10 @@ dataset_fields:
     required: true
     form_placeholder: eg. A descriptive title
 
-  - field_name: name
-    label: Field identifier
-    preset: dataset_slug
-    form_placeholder: url of the metadata record, eg. my-metadata record, this is auto-completed by default.
+  # - field_name: name
+  #   label: Field identifier
+  #   preset: dataset_slug
+  #   form_placeholder: url of the metadata record, eg. my-metadata record, this is auto-completed by default.
 
   - field_name: featured
     label: Feature metadata record on EMC landing page?
@@ -601,7 +601,7 @@ dataset_fields:
   - field_name: lineage_statement
     label: Lineage statement
     required: true
-    help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
+    help_text: general explanation of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
 
   - field_name: contact

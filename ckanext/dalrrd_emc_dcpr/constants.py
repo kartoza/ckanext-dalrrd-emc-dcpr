@@ -252,5 +252,5 @@ class DCPRRequestRequiredFields(enum.Enum):
     REFERENCE_DATE_TYPE = "Creation"
     STAMP_DATE_TYPE = "Creation"
     RESPONSIBLE_PARTY_INDIVIDUAL_NAME = "individual_name"
-    RESPONSIBLE_PARTY_POSITION_NAME = "position_name"
-    RESPONSIBLE_PARTY_ROLE = "role"
+    RESPONSIBLE_PARTY_POSITION_NAME = "dataset custodian"
+    RESPONSIBLE_PARTY_ROLE = "owner"
