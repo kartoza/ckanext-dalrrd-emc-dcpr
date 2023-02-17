@@ -1205,3 +1205,8 @@ label[for=field-online_resource-0-description]{
 .footer-text > p{
   margin-bottom: 0;
 }
+
+
+.organization_dataset_custodian{
+  display: none;
+}

@@ -22,9 +22,10 @@ def _remove_special_characters_from_package_url(url):
     accepted by CKAN for dataset
     urls, replace them
     """
-    special_chars = "!\"”'#$%&'()*+,-./:;<=>?@[\]^`{|}~."
+    special_chars = "!\"”'#$%&'()*+,-./:;<=>?@[\]^`{|}~.[]"
     if url is not None:
         for i in url:
             if i in special_chars:
-                url.replace(i, "-")
+                url = url.replace(i, "-")
+
         return url
