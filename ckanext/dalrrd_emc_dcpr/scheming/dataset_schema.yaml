@@ -449,7 +449,7 @@ dataset_fields:
 
 
     - field_name: dataset_language
-      label: Metadata record language
+      label: Dataset language
       required: true
       choices:
         - value: en
@@ -459,7 +459,7 @@ dataset_fields:
 
 
     - field_name: dataset_character_set
-      label: Metadata record character set
+      label: Dataset character set
       required: true
       choices:
         - value: ucs-2

@@ -305,6 +305,7 @@ def create_package_from_dcpr_request(
                 data_dict = {}
 
                 package_name = dataset.proposed_dataset_title.lower().replace(" ", "")
+                # package_name = _remove_special_characters_from_package_url(package_name) # mechanism to ensure names are safe, chagne the behavior with multiple datasets
                 # data_dict["name"] = package_name
                 data_dict["title"] = dataset.proposed_dataset_title
                 data_dict["extras"] = [
