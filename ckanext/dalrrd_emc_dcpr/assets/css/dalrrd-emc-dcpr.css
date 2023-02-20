@@ -971,6 +971,7 @@ footer {
   display: none;
 }
 
+
 .save_search_button{
   border:none;
   background-color: transparent;
@@ -1204,6 +1205,10 @@ label[for=field-online_resource-0-description]{
 
 .footer-text > p{
   margin-bottom: 0;
+}
+
+.package-stages > li{
+  width: 33.33%;
 }
 
 
