@@ -14,10 +14,8 @@ Example:
 #}
 {% set s1 = stages[0] or 'active' %}
 {% set s2 = stages[1] or 'uncomplete' %}
-{% set s3 = stages[2] or 'uncompler' %}
 {% if s1 != 'uncomplete' %}{% set class = 'stage-1' %}{% endif %}
 {% if s2 != 'uncomplete' %}{% set class = 'stage-2' %}{% endif %}
-{% if s3 != 'uncomplete' %}{% set class = 'stage-3' %}{% endif %}
 
 
 <ol class="stages {{ class }} package-stages">
@@ -33,18 +31,6 @@ Example:
       <span class="highlight">{{ _('Metadata record details') }}</span>
     {% else %}
       {% if s1 == 'active' %}
-        {# stage 1 #}
-        <button class="highlight" name="save" value="go-resources" type="submit">{{ _('Metadata record details') }}</button>
-      {% else %}
-        {% link_for _('Metadata record details'), named_route='metadata.record.details', class_="highlight" %}
-      {% endif %}
-    {% endif %}
-  </li>
-  <li class="last {{ s3 }}">
-    {% if s3 != 'complete' %}
-      <span class="highlight">{{ _('Add data') }}</span>
-    {% else %}
-      {% if s2 == 'active' %}
         {# stage 1 #}
         <button class="highlight" name="save" value="go-resources" type="submit">{{ _('Add data') }}</button>
       {% else %}
