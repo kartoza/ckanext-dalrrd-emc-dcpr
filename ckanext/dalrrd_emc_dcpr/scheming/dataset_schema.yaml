@@ -1453,6 +1453,8 @@ dataset_fields:
     - field_name: stamp
       label: Stamp date
       required: true
+      validators: >-
+        ignore_missing
       form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 
