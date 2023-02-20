@@ -15,10 +15,10 @@ dataset_fields:
     required: true
     form_placeholder: eg. A descriptive title
 
-  - field_name: name
-    label: Field identifier
-    preset: dataset_slug
-    form_placeholder: url of the metadata record, eg. my-metadata record, this is auto-completed by default.
+  # - field_name: name
+  #   label: Field identifier
+  #   preset: dataset_slug
+  #   form_placeholder: url of the metadata record, eg. my-metadata record, this is auto-completed by default.
 
   - field_name: featured
     label: Feature metadata record on EMC landing page?
@@ -449,7 +449,7 @@ dataset_fields:
 
 
     - field_name: dataset_language
-      label: Metadata record language
+      label: Dataset language
       required: true
       choices:
         - value: en
@@ -459,7 +459,7 @@ dataset_fields:
 
 
     - field_name: dataset_character_set
-      label: Metadata record character set
+      label: Dataset character set
       required: true
       choices:
         - value: ucs-2
@@ -601,7 +601,7 @@ dataset_fields:
   - field_name: lineage_statement
     label: Lineage statement
     required: true
-    help_text: general explaination of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
+    help_text: general explanation of the data producer's knowledge about the lineage of a metadata record - This is a SANS 1878 mandatory field
 
 
   - field_name: contact
@@ -1342,7 +1342,7 @@ dataset_fields:
     - field_name: equivalent_scale
       label: Spatial resolution equivalent scale
       required: true
-      preset: spatial_resolution_checker
+      # preset: spatial_resolution_checker
       help_text: >-
         Level of detail expressed as the scale of a comparable hardcopy map or
         chart. Provide it as the denominator of a representative fraction,
@@ -1424,6 +1424,7 @@ dataset_fields:
       #   label: Vertical datum
       #   help_text: Origin from which minimum and maximum elevations originated
       #   required: false
+
   - field_name: metadata_reference_date_and_stamp
     label: Reference date
     preset: modified_repeating_subfields
@@ -1432,8 +1433,6 @@ dataset_fields:
     - field_name: reference
       label: Reference datetime
       required: true
-      validators: >-
-        ignore_missing
       form_snippet: modified_datetime.html
       help_text: Reference datetime for this metadata record
 
@@ -1488,8 +1487,10 @@ resource_fields:
   #   label: Application profile
   #   help_text: Name of an application profile that can be used with the resource
 
-  # - field_name: description
-  #   label: Description
+  - field_name: description
+    label: Description
+    form_snippet: markdown.html
+
   #   validators: convert_choices_select_to_int
   #   preset: select
   #   choices:

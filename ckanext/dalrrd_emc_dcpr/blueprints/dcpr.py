@@ -739,7 +739,7 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
     # how many datasets have been submitted?
     first_ds_field_value = flat_data_dict.get(dataset_fields[0])
     num_datasets = (
-        len(first_ds_field_value) if isinstance(first_ds_field_value, list) else 1
+        len(first_ds_field_value) - 1 if isinstance(first_ds_field_value, list) else 1
     )
 
     logger.debug("handling dcpr request datasets custodian field")

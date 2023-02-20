@@ -130,8 +130,6 @@ DATASET_FULL_SET_OF_FIELDS = [
     "metadata_standard-0-name",
     "metadata_standard-0-version",
     "notes",
-    "acknowledgement",
-    "status",
     "responsible_party-0-individual_name",
     "responsible_party-0-position_name",
     "responsible_party-0-role",
@@ -182,6 +180,56 @@ DATASET_FULL_SET_OF_FIELDS = [
 ]
 
 
+XML_DATASET_NAMING_MAPPING = {
+    "title": "title",
+    "name": "name",
+    "featured": "featured",
+    "doi": "doi",
+    "notes": "notes",
+    "private": "private",
+    "tagString": "tag_string",
+    "MetadataStandardName": "metadata_standard-0-name",
+    "MetadataStandardVersion": "metadata_standard-0-version",
+    "OwnerOrg": "owner_org",
+    "ResponsiblePartyIndividualName": "responsible_party-0-individual_name",
+    "ResponsiblePartyRole": "responsible_party-0-role",
+    "ResponsiblePartyPositionName": "responsible_party-0-position_name",
+    "ResponsiblePartyElectronicMailAddress": "responsible_party-0-electronic_mail_address",
+    "ResponsiblePartyContactAddressDeliveryPoint": "responsible_party_contact_address-0-delivery_point",
+    "ResponsiblePartyContactAddressCity": "responsible_party_contact_address-0-city",
+    "ResponsiblePartyContactAddressAdministrativeArea": "responsible_party_contact_address-0-administrative_area",
+    "ResponsiblePartyContactAddressPostalCode": "responsible_party_contact_address-0-postal_code",
+    "ResponsiblePartyContactInfoVoice": "responsible_party_contact_info-0-voice",
+    "ResponsiblePartyContactInfoFacsimile": "responsible_party_contact_info-0-facsimile",
+    "ReferenceDate": "metadata_reference_date_and_stamp-0-reference",
+    "ReferenceDateType": "metadata_reference_date_and_stamp-0-reference_date_type",
+    "IsoTopicCategory": "topic_and_sasdi_theme-0-iso_topic_category",
+    "LineageStatement": "lineage_statement",
+    "DatasetLanguage": "metadata_language_and_character_set-0-dataset_language",
+    "MetadataLanguage": "metadata_language_and_character_set-0-metadata_language",
+    "DatasetCharacterset": "metadata_language_and_character_set-0-dataset_character_set",
+    "MetadataCharacterset": "metadata_language_and_character_set-0-metadata_character_set",
+    "DistributionFormatName": "distribution_format-0-name",
+    "DistributionFormatVersion": "distribution_format-0-version",
+    "spatial": "spatial",
+    "EquivalentScale": "spatial_parameters-0-equivalent_scale",
+    "SpatialRepresentationType": "spatial_parameters-0-spatial_representation_type",
+    "SpatialReferenceSystem": "spatial_parameters-0-spatial_reference_system",
+    "StampDate": "metadata_reference_date_and_stamp-0-stamp",
+    "StampDateType": "metadata_reference_date_and_stamp-0-stamp_date_type",
+    "ContactIndividualName": "contact-0-individual_name",
+    "ContactPositionName": "contact-0-position_name",
+    "ContactRole": "contact-0-role",
+    "ContactElectronicMailAddress": "contact-0-electronic_mail_address",
+    "ContactAddressDeliveryPoint": "contact_address-0-delivery_point",
+    "ContactAddressCity": "contact_address-0-city",
+    "ContactAddressAdministrativeArea": "contact_address-0-administrative_area",
+    "ContactAddressPostalCode": "contact_address-0-postal_code",
+    "ContactInformationVoice": "contact_information-0-voice",
+    "ContactInformationFacsimile": "contact_information-0-facsimile",
+}
+
+
 class DCPRRequestRequiredFields(enum.Enum):
     DATASET_LANGUAGE = "en"
     DATASET_CHARACTER_SET = "ucs-2"
@@ -204,5 +252,5 @@ class DCPRRequestRequiredFields(enum.Enum):
     REFERENCE_DATE_TYPE = "Creation"
     STAMP_DATE_TYPE = "Creation"
     RESPONSIBLE_PARTY_INDIVIDUAL_NAME = "individual_name"
-    RESPONSIBLE_PARTY_POSITION_NAME = "position_name"
-    RESPONSIBLE_PARTY_ROLE = "role"
+    RESPONSIBLE_PARTY_POSITION_NAME = "dataset custodian"
+    RESPONSIBLE_PARTY_ROLE = "owner"

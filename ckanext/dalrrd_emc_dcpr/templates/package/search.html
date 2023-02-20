@@ -11,6 +11,14 @@
         <h1>{{ _("Electronic Metadata Catalogue (EMC)") }}</h1>
         <h5>{{ _("Total number of metadata") }} {{ ungettext('record', 'records', total) }}: {{ total }}</h5>
         <h5>{{ page.item_count }} {{ _("metadata") }} {{ ungettext('record', 'records', page.item_count) }} {{ _("found") }}</h5>
+        {% if c %}
+          {% if c.userobj is not none%}
+            <button class="save_search_button" title="save this search query" data-module="change_save_search_icon">
+              <!-- <i class="fa fa-circle-thin fa-stack-2x save_search_button_border"></i> -->
+              <i class="fa fa-bookmark-o save_search_button_icon"></i>
+            </button>
+          {% endif %}
+        {% endif %}
         {% snippet 'snippets/search_form.html', form_id='dataset-search-form', type=dataset_type, query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search ' + 'metadata record' + 's') + '..', facets=facets, show_empty=request.params, error=query_error, fields=fields %}
         {% if h.check_access('package_create') %}
         <button class="btn btn-primary pull-right" onclick="document.getElementById('upload_input').click()"
@@ -28,10 +36,6 @@
           data-module="xml_parser"
           >
           <a class="btn btn-primary pull-right" href="{{ h.url_for('dataset.new') }}" style="color: #fff">{{ _('Add metadata record') }}</a>
-          <button class="save_search_button" title="save this search query" data-module="change_save_search_icon">
-          <!-- <i class="fa fa-circle-thin fa-stack-2x save_search_button_border"></i> -->
-          <i class="fa fa-bookmark-o save_search_button_icon"></i>
-        </button>
         {% endif %}
     </div>
 {% endblock %}

@@ -10,8 +10,10 @@ from datetime import datetime
 from ..constants import (
     DATASET_MINIMAL_SET_OF_FIELDS as xml_minimum_set,
     DATASET_FULL_SET_OF_FIELDS as xml_full_set,
+    XML_DATASET_NAMING_MAPPING as DATASET_NAMING_MAPPING,
 )
 from xml.parsers.expat import ExpatError
+import json
 
 # About this Blueprint:
 # -------------
@@ -93,6 +95,8 @@ def check_file_fields(xml_file) -> dict:
     if root is not None:
         # return and object of the root
         root = return_object_root(root)
+        # map standarized names into db fields names
+        root = map_xml_fields(root)
         # has field more than maximum set
         maximum_fields_check_ob = maximum_fields_check(root, file_name_reference)
         if maximum_fields_check_ob["state"] == False:
@@ -101,8 +105,13 @@ def check_file_fields(xml_file) -> dict:
         minimum_set_check_ob = minimum_set_check(root, file_name_reference)
         if minimum_set_check_ob["state"] == False:
             return {"state": False, "msg": minimum_set_check_ob["msg"]}
-        root = handle_date_fields(root)
+        root = lowercase_dataset_values(root)
+        root = handle_responsible_party_choices_fields(root)
+        root = handle_numeric_choices(root)
+        root = set_language_abbreviation(root)
+        # root = handle_date_fields(root)
         return create_ckan_dataset(root)
+
         # things went ok
     else:
         return {"state": False, "msg": "something went wrong during dataset creation"}
@@ -180,7 +189,163 @@ def minimum_set_check(root_ob: dict, file_name_reference: str):
     return {"state": True}
 
 
-def handle_date_fields(root_ob):
+def lowercase_dataset_values(root_ob):
+    """
+    the metadata creation with CKAN is a
+    very subtle thing, if values provided
+    with xml files are captilaized, some
+    validation rules will fail (e.g. UCS-2 for
+    metadata characterset will fail vs ucs-2
+    ) hence lower everything.
+    """
+
+    textual_fields = [
+        "metadata_language_and_character_set-0-dataset_character_set",
+        "metadata_language_and_character_set-0-metadata_character_set",
+        "topic_and_sasdi_theme-0-iso_topic_category",
+        "topic_and_sasdi_theme-0-sasdi_theme",
+    ]
+    for key, value in root_ob.items():
+        if key in textual_fields:
+            try:
+                root_ob[key] = value.lower()
+            except:
+                "the case of dates ..etc"
+                pass
+    return root_ob
+
+
+def handle_responsible_party_choices_fields(root: dict) -> dict:
+    """
+    choices fields are strict,
+    only a handlful of choices
+    to be returned, here were
+    handling different variations
+    that can be provided by the user
+    for choices.
+    """
+
+    responsible_party_role = {
+        "resource provider": "resource_provider",
+        "point of contact": "point_of_contact",
+        "principal investigator": "principal_investigator",
+    }
+
+    contact_role = {"point of contact": "point_of_contact"}
+
+    responsible_party_role_value = root["responsible_party-0-role"]
+    contact_role_value = root.get("contact-0-role")
+    rprv = responsible_party_role_value.lower()
+    rprv_ = responsible_party_role.get(rprv)
+    crv_ = None
+    if contact_role_value is not None:
+        crv = contact_role_value.lower()
+        crv_ = contact_role.get(crv)
+
+    if rprv_ is not None:
+        root["responsible_party-0-role"] = rprv_
+
+    if crv_ is not None:
+        root["contact-0-role"] = crv_
+
+    return root
+
+
+def handle_numeric_choices(root):
+    """
+    some choices fields have a
+    number value to be submitted
+    these are provided by the
+    user as text, corresponding
+    number values should be returned
+    """
+
+    online_resource_description = {
+        "download": 1,
+        "information": 2,
+        "offlineAccess": 3,
+        "order": 4,
+        "search": 5,
+    }
+    spatial_parameters_spatial_representation_type = {
+        "vector": 1,
+        "grid": 2,
+        "text table": 3,
+        "triangulated irregular network": 4,
+        "stereo model": 5,
+        "video": 6,
+        "image": 7,
+    }
+    metadata_reference_date_and_stamp_reference_date_type = {
+        "creation": 1,
+        "publication": 2,
+        "revision": 3,
+    }
+    metadata_reference_date_and_stamp_stamp_date_type = {"creation": 1}
+
+    online_res_desc_value = root.get("online_resource-0-description")
+    if online_res_desc_value is not None:
+        online_res_desc_value = online_res_desc_value.lower()
+    sprt = root["spatial_parameters-0-spatial_representation_type"].lower()
+    reference_date_type_value = root[
+        "metadata_reference_date_and_stamp-0-reference_date_type"
+    ].lower()
+    stamp_date_type_value = root[
+        "metadata_reference_date_and_stamp-0-stamp_date_type"
+    ].lower()
+
+    online_res_desc_value_ = online_resource_description.get(online_res_desc_value)
+    if online_res_desc_value_ is not None:
+        root["online_resource-0-description"] = online_res_desc_value_
+
+    sprt_ = spatial_parameters_spatial_representation_type.get(sprt)
+    if sprt_ is not None:
+        root["spatial_parameters-0-spatial_representation_type"] = sprt_
+
+    reference_date_type_value_ = (
+        metadata_reference_date_and_stamp_reference_date_type.get(
+            reference_date_type_value
+        )
+    )
+    if reference_date_type_value_ is not None:
+        root[
+            "metadata_reference_date_and_stamp-0-reference_date_type"
+        ] = reference_date_type_value_
+
+    stamp_date_type_value_ = metadata_reference_date_and_stamp_stamp_date_type.get(
+        stamp_date_type_value
+    )
+    if stamp_date_type_value_ is not None:
+        root[
+            "metadata_reference_date_and_stamp-0-stamp_date_type"
+        ] = stamp_date_type_value_
+
+    return root
+
+
+def set_language_abbreviation(root: dict) -> dict:
+    """
+    if dataset language and metadata
+    language provided as "english"
+    not "en" it will be rejected
+    """
+    dataset_lang = root.get("metadata_language_and_character_set-0-dataset_language")
+    if dataset_lang is not None:
+        dataset_lang = dataset_lang.lower()
+    metadata_lang = root.get("metadata_language_and_character_set-0-metadata_language")
+    if metadata_lang is not None:
+        metadata_lang = metadata_lang.lower()
+
+    if dataset_lang == "english":
+        root["metadata_language_and_character_set-0-dataset_language"] = "en"
+
+    if metadata_lang == "english":
+        root["metadata_language_and_character_set-0-metadata_language"] = "en"
+
+    return root
+
+
+def handle_date_fields(root_ob: dict) -> dict:
     """
     date fields need to be
     iso compliant inorder
@@ -194,8 +359,17 @@ def handle_date_fields(root_ob):
     ]
     for field in date_fields:
         iso_date_field = handle_date_field(root_ob.get(field))
-        root_ob.update(iso_date_field)
+        root_ob[field] = iso_date_field
     return root_ob
+
+
+def handle_date_field(date_field):
+    """
+    returns a date from iso-string
+    YY-MM-DDTHH:MM:SS
+    """
+    iso_date = datetime.fromisoformat(date_field)
+    return iso_date
 
 
 def create_ckan_dataset(root_ob):
@@ -208,27 +382,22 @@ def create_ckan_dataset(root_ob):
     package_title = change_name_special_chars_to_underscore(package_title)
     slug_url_field = package_title.replace(" ", "-")
     slug_url_field = slug_url_field.lower()
-    root_ob.update({"name": slug_url_field})
+    # root_ob.update({"name": slug_url_field})
     create_action = toolkit.get_action("package_create")
     try:
         create_action(data_dict=root_ob)
     except ValidationError as e:
-        error_summary = e.error_summary.get("Name")
-        error_summary = "" if error_summary is None else error_summary
+
+        if e.error_summary is None:
+            summary = ""
+        else:
+
+            summary = json.dumps(e.error_summary)
         return {
             "state": False,
-            "msg": f'error creating package "{package_title}": ' + error_summary,
+            "msg": f'error creating package "{package_title}": ' + summary,
         }
     return {"state": True, "msg": f'package "{package_title}" were created'}
-
-
-def handle_date_field(date_field):
-    """
-    returns a date from iso-string
-    YY-MM-DDTHH:MM:SS
-    """
-    iso_date = datetime.fromisoformat(date_field)
-    return {date_field: iso_date}
 
 
 # def get_creator_id(ckan_package_ob):
@@ -275,6 +444,45 @@ def change_name_special_chars_to_underscore(title: str) -> str:
             title = title.replace(i, "_")
 
     return title
+
+
+def check_fields_mapping() -> list:
+    """
+    construct new checkers (minimum, maximum)
+    with simplified names
+    """
+
+    dataset_keys = list(DATASET_NAMING_MAPPING.keys())
+    dataset_values = list(DATASET_NAMING_MAPPING.values())
+    new_mapped_set = []
+    for item in xml_minimum_set:
+        try:
+            new_val_pos = dataset_values.index(item)
+            new_mapped_set.append(dataset_keys[new_val_pos])
+        except ValueError:
+            new_mapped_set.append(item)
+    return new_mapped_set
+
+
+def map_xml_fields(root: dict) -> dict:
+    """
+    give more user friendly naming
+    for the different fields, avoid
+    the look of the repeating subfields
+    field_name-0-subfield_name
+    """
+    import copy
+
+    root_cp = copy.deepcopy(root)
+    for k in root_cp.keys():
+        try:
+            db_field_name = DATASET_NAMING_MAPPING[k]
+            root[db_field_name] = root.pop(k)
+        except KeyError:
+            # the key will presist and fail in max/min checks
+            pass
+
+    return root
 
 
 ################### notes #######################
