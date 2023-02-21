@@ -48,7 +48,7 @@
                 <div class="panel-body" style="padding: 0px">
                 {% with items = items or h.get_facet_items_dict(name, search_facets, 80000) %}
 					{% if item_id == 'DCPRRequest' %}
-						{% set items = {'Public requests':{"link":"", "access":"dcpr_request_list_public_auth", "count":h.get_public_dcpr_requests_count()},
+						{% set items = {'Public requests':{"link":"public", "access":"dcpr_request_list_public_auth", "count":h.get_public_dcpr_requests_count()},
 						'My requests':{"link":"my-dcpr-requests", "access":"my_dcpr_request_list_auth", "count":h.get_my_dcpr_requests_count()},
 						'Requests awaiting NSIF moderation':{"link":"awaiting-nsif-moderation-dcpr-requests", "access":"dcpr_request_list_pending_nsif_auth", "count":h.get_dcpr_requests_awaiting_nsif_moderation_count()},
 						'Requests awaiting CSI moderation':{"link":"awaiting-csi-moderation-dcpr-requests", "access":"dcpr_request_list_pending_csi_auth", "count":h.get_dcpr_requests_awaiting_csi_moderation_count()},
