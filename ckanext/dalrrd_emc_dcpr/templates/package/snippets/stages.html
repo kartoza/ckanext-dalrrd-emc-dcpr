@@ -17,7 +17,8 @@ Example:
 {% if s1 != 'uncomplete' %}{% set class = 'stage-1' %}{% endif %}
 {% if s2 != 'uncomplete' %}{% set class = 'stage-2' %}{% endif %}
 
-<ol class="stages {{ class }}">
+
+<ol class="stages {{ class }} package-stages">
   <li class="first {{ s1 }}">
     {% if s1 != 'complete' %}
       <span class="highlight">{{ _('Create metadata record') }}</span>
@@ -27,7 +28,7 @@ Example:
   </li>
   <li class="last {{ s2 }}">
     {% if s2 != 'complete' %}
-      <span class="highlight">{{ _('Add data') }}</span>
+      <span class="highlight">{{ _('Metadata record details') }}</span>
     {% else %}
       {% if s1 == 'active' %}
         {# stage 1 #}

@@ -17,7 +17,13 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
 
         _onAddDatasetFieldset: function () {
             // getting the first custodian field selection to use it as default
-            let selected_value = document.getElementById("ds1-field-dataset_custodian").value
+            let selected_value = ''
+            try{
+                selected_value = document.getElementById("ds1-field-dataset_custodian").value
+            }
+            catch (e) {
+                selected_value = ''
+            }
             this.options["first_selection"] = selected_value
             let numExisting = this._getNumDatasetFieldsets()
             this.options.index = numExisting + 1

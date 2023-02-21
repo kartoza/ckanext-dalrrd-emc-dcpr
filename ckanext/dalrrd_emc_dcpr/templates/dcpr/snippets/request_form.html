@@ -253,9 +253,9 @@
             information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
         </div>
-        {% if data.datasets %}
-            <legend>Dataset(s)</legend>
+        <legend>Dataset(s)</legend>
             <div class="list-datasets" data-module="removeDcprRequestDatasets">
+        {% if data.datasets %}
             {% for ds in data.datasets %}
                 {% set dataset_id = 'dataset'+ loop.index|string %}
                 {{ h.snippet(
@@ -347,12 +347,8 @@
         {{ form.required_message() }}
         <div class="form-actions">
             {% if csi_reference_id and h.check_access("dcpr_request_delete_auth", {"csi_reference_id": csi_reference_id}) %}
-                {% link_for _('Delete DCPR request'),
-                    named_route="dcpr.dcpr_request_delete",
-                    csi_reference_id=csi_reference_id,
-                    class_='btn btn-danger',
-                    icon='trash'
-                %}
+                <a class="btn btn-danger" href="{% url_for 'dcpr.dcpr_request_delete', csi_reference_id=csi_reference_id %}" data-module="confirm-action"
+                data-module-content="{{ 'Are you sure you want to delete DCPR request - %s?' % (data.proposed_project_name) }}"><i class="fa fa-trash"></i>{{ _('Delete DCPR request') }}</a>
             {% endif %}
             <input type="submit" class="btn btn-primary" value="{{ _('Submit form') }}">
 

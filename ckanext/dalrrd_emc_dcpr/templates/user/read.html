@@ -1,8 +1,8 @@
 {% ckan_extends %}
 {% block package_list %}
-{% set user_created_packages = h.get_user_dashboard_packages(c.userobj.id) %}
 
 {% if is_myself %}
+    {% set user_created_packages = h.get_user_dashboard_packages(c.userobj.id) %}
     {% set returned_packages = user_created_packages  %}
 {% else %}
     {% set user_name_from_url = h.get_user_name_from_url(url_for(request.endpoint, **request.view_args)) %}
