@@ -15,6 +15,7 @@ which builds the dictionary by iterating over the table columns.
 
 import logging
 import typing
+import ast
 
 import ckan.lib.dictization as ckan_dictization
 
@@ -76,6 +77,14 @@ def dcpr_request_dict_save(validated_data_dict: typing.Dict, context: typing.Dic
 def dcpr_request_dataset_list_save(
     datasets: typing.List[typing.Dict], dcpr_request, context: typing.Dict
 ) -> None:
+    dconstructed_dicts = deconstruct_list_values(datasets)
+    if len(dconstructed_dicts) > 1:
+        for dataset_dict in dconstructed_dicts:
+            dataset_dict = sepecial_fields_resolve(dataset_dict)
+            dataset_dict["dcpr_request_id"] = dcpr_request.csi_reference_id
+            dcpr_dataset_save(dataset_dict, context)
+        return
+
     for dataset_dict in datasets:
         dataset_dict["dcpr_request_id"] = dcpr_request.csi_reference_id
         dcpr_dataset_save(dataset_dict, context)
@@ -88,3 +97,57 @@ def dcpr_dataset_save(dcpr_dataset_dict: typing.Dict, context: typing.Dict):
     obj.from_dict(dcpr_dataset_dict)
     session.add(obj)
     return obj
+
+
+def deconstruct_list_values(dataset: list) -> list:
+    """
+    sometimes instead of having
+    multiple dicts holding different
+    dcpr datasets, one dict might be
+    submitted where the same key has
+    a list of values
+    """
+    dataset_dict = dataset[0]
+    titles = dataset_dict.get("proposed_dataset_title")
+    lineage = dataset_dict.get("lineage_statement")
+    try:
+        titles = ast.literal_eval(titles)
+        lineage = ast.literal_eval(lineage)
+
+    except:
+        return []
+    if isinstance(titles, list) or isinstance(lineage, list):
+        datasets = []
+        dataset_keys = dataset_dict.keys()
+        for i in range(len(titles)):
+            new_dict = {}
+            for key in dataset_keys:
+                if isinstance(dataset_dict[key], list):  # sometimes they come as list
+                    value = dataset_dict[key][i]
+                else:
+                    try:
+                        value = ast.literal_eval(dataset_dict[key])[i]
+                    except:
+                        continue
+                new_dict[key] = value
+            datasets.append(new_dict)
+
+        return datasets
+    else:
+        return []
+
+
+def sepecial_fields_resolve(data_dict: dict):
+    """
+    there are some special fields
+    like the dataset_custodian that
+    needs to be converted to some
+    values first
+    """
+    custodian_value = data_dict.get("dataset_custodian")
+    if custodian_value == "E1":
+        data_dict["dataset_custodian"] = True
+    elif custodian_value == "E2":
+        data_dict["dataset_custodian"] = False
+
+    return data_dict

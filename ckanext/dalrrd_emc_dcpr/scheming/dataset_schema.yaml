@@ -1376,7 +1376,7 @@ dataset_fields:
 
     - field_name: spatial_reference_system
       label: Spatial Reference System Identifier
-      required: true
+      required: false
       validators: emc_srs_validator
       help_text: >-
         "Name of spatial reference system. Provide it as a colon-separated sequence of <ref>:<code> with the

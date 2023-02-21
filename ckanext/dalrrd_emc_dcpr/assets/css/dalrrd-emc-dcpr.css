@@ -1208,5 +1208,9 @@ label[for=field-online_resource-0-description]{
 
 
 .organization_dataset_custodian{
-  display: none;
+}
+
+select[id$="field-dataset_custodian"]{
+  background-color: #eee !important;
+  opacity: 1 !important;
 }
