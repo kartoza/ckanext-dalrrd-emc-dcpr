@@ -251,9 +251,9 @@
             information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
         </div>
-        {% if data.datasets %}
-            <legend>Dataset(s)</legend>
+        <legend>Dataset(s)</legend>
             <div class="list-datasets" data-module="removeDcprRequestDatasets">
+        {% if data.datasets %}
             {% for ds in data.datasets %}
                 {% set dataset_id = 'dataset'+ loop.index|string %}
                 {{ h.snippet(
