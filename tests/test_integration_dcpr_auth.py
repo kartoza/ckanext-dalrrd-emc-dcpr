@@ -747,10 +747,19 @@ def _get_dcpr_request(user, organization):
             "capture_end_date": "2022-01-02",
             "cost": "200000",
             "organization_id": organization["id"],
+            "organisation_level": "national",
+            "spatial_resolution": "1/3000",
+            "contact_person_name": "contact1",
             "datasets": [
                 {
                     "proposed_dataset_title": "dummy",
                     "dataset_purpose": "dummy",
+                    "lineage_statement": "lineage statement",
+                    "proposed_abstract": "proposed abstract",
+                    "topic_category": "farming",
+                    "metadata_characterset": "ucs-2",
+                    "dataset_characterset": "ucs-2",
+                    "data_type": "001",
                 }
             ],
         },
