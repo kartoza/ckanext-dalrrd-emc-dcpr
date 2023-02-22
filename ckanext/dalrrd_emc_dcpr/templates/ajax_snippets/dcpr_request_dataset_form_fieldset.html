@@ -146,7 +146,15 @@
                 'capture_method',
                 label=_('Dataset capture method'),
                 id='ds{}-field-capture_method'.format(index),
-                options=dataset_capture_method_options,
+                options=[
+                    {'value': 'Aerial Photography', 'text': 'Aerial Photography'},
+                    {'value': 'Digitizing', 'text': 'Digitizing'},
+                    {'value': 'GPS coordinate capture', 'text': 'GPS coordinate capture'},
+                    {'value': 'Remote sensing', 'text': 'Remote sensing'},
+                    {'value': 'Scanning & vectorising', 'text': 'Scanning & vectorising'},
+                    {'value': 'Survey (cadastral)', 'text': 'Survey (cadastral)'},
+                    {'value': 'Survey (questionnaire)', 'text': 'Survey (questionnaire)'}
+                ],
                 selected=capture_method,
                 error=capture_method_error,
                 classes=['control-medium']
