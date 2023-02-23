@@ -6,12 +6,13 @@ from functools import partial
 import ckan.plugins as plugins
 import ckan.lib.helpers as h
 import ckan.lib.search as search
-
+import ckan.lib.plugins as lib_plugins
 import ckan.plugins.toolkit as toolkit
 import datetime as dt
 import dateutil.parser
 from ckan import model
 from ckan.common import _, g
+from ckan.common import c
 from flask import Blueprint
 from sqlalchemy import orm
 
@@ -141,7 +142,14 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             data_dict["fq"] = "+capacity:public " + data_dict["fq"]
 
         query = search.query_for(model.Package)
-        query.run(data_dict, permission_labels=None)
+        if context.get("ignore_auth") or c.userobj.sysadmin:
+            labels = None
+        else:
+            labels = lib_plugins.get_permission_labels().get_user_dataset_labels(
+                c.userobj
+            )
+
+        query.run(data_dict, permission_labels=labels)
 
         facets = query.facets
 
@@ -158,7 +166,6 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             else []
         )
         group_titles_by_name = dict(groups)
-
         restructured_facets = {}
         for key, value in facets.items():
             restructured_facets[key] = {"title": key, "items": []}

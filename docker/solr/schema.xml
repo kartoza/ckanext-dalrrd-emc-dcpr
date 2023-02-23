@@ -253,6 +253,8 @@ schema. In this case the version should be set to the next CKAN version number.
 <uniqueKey>index_id</uniqueKey>
 <defaultSearchField>text</defaultSearchField>
 <solrQueryParser defaultOperator="AND"/>
+
+
 <!--
 see https://solr.apache.org/guide/6_6/copying-fields.html for copyField
 
