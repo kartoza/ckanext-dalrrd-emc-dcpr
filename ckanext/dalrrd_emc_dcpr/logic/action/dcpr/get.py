@@ -131,13 +131,13 @@ def _get_dcpr_request_list(
         query = query.filter(filter_)
     query = (
         query.order_by(
-            dcpr_request.DCPRRequest.status,
-            dcpr_request.DCPRRequest.submission_date,
+            # dcpr_request.DCPRRequest.status,
+            dcpr_request.DCPRRequest.submission_date.desc(),
             dcpr_request.DCPRRequest.nsif_review_date,
             dcpr_request.DCPRRequest.csi_moderation_date,
             dcpr_request.DCPRRequest.proposed_project_name,
         )
-        .limit(data_.get("limit", 10))
-        .offset(data_.get("offset", 0))
+        # .limit(data_.get("limit", 10))
+        # .offset(data_.get("offset", 0))
     )
     return [dcpr_dictization.dcpr_request_dictize(i, context) for i in query.all()]

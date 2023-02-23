@@ -16,7 +16,8 @@ from ckan.logic import clean_dict, parse_params, tuplize_dict
 from .. import constants
 from ..helpers import get_status_labels
 from ..model.dcpr_request import DCPRRequestUrgency
-from ..model.dcpr_request import DCPRCaptureMethod
+from ..model.dcpr_request import DCPRCaptureMethod, DCPRTOPICCATEGORY, DCPRCHARACTERSET
+
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +154,13 @@ class DcprRequestCreateView(MethodView):
                 {"value": capture_method.value, "text": capture_method.value}
                 for capture_method in DCPRCaptureMethod
             ],
+            "topic_categories": [
+                {"value": topic.value, "text": topic.value}
+                for topic in DCPRTOPICCATEGORY
+            ],
+            "charactersets": [
+                {"value": char.value, "text": char.value} for char in DCPRCHARACTERSET
+            ]
             # TODO: perhaps we can provide the name of the form that will be shown, as it will presumably be
             #  different according with the user role
         }
@@ -264,6 +272,14 @@ class _DcprUpdateView(MethodView):
                                 "text": capture_method.value,
                             }
                             for capture_method in DCPRCaptureMethod
+                        ],
+                        "topic_categories": [
+                            {"value": topic.value, "text": topic.value}
+                            for topic in DCPRTOPICCATEGORY
+                        ],
+                        "charactersets": [
+                            {"value": char.value, "text": char.value}
+                            for char in DCPRCHARACTERSET
                         ],
                     },
                 )
@@ -735,13 +751,15 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
         "associated_attributes",
         "data_usage_restrictions",
         "capture_method",
+        "topic_category",
+        "dataset_characterset",
+        "metadata_characterset",
     ]
-    # how many datasets have been submitted?
+    # how many datasets have been submitted?'
     first_ds_field_value = flat_data_dict.get(dataset_fields[0])
     num_datasets = (
         len(first_ds_field_value) - 1 if isinstance(first_ds_field_value, list) else 1
     )
-
     logger.debug("handling dcpr request datasets custodian field")
     change_dataset_custodian_value(num_datasets, flat_data_dict)
     logger.debug(f"{num_datasets=}")

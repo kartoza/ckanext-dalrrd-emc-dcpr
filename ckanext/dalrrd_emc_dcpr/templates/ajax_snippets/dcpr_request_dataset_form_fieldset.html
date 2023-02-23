@@ -33,6 +33,96 @@
     {% endif %}
 {% endif %}
 
+{# the custodian option should be only one that is being selected alread #}
+
+{% if selected=="E1" %}
+    {% set option = [{"value":"E1", "text":"submitted as E1 form"}] %}
+{% else %}
+    {% set option = [{"value":"E2", "text":"submitted as E2 form"}] %}
+{% endif %}
+
+
+ {% set ISO_TOPIC_CATEGORIES= [
+    {"value":"farming", "text":"Farming"},
+    {"value":"biota", "text":"Biota"},
+    {"value":"boundaries", "text":"Boundaries"},
+    {"value":"climatologyMeteorologyAtmosphere", "text":"Climatology, Meteorology, Atmosphere"},
+    {"value":"economy", "text":"Economy"},
+    {"value":"elevation", "text":"Elevation"},
+    {"value":"environment", "text":"Environment"},
+    {"value":"geoscientificInformation", "text":"Geoscientific Information"},
+    {"value":"health", "text":"Health"},
+    {"value":"imageryBaseMapsEarthCover", "text":"Imagery, Basemaps, Earth Cover"},
+    {"value":"intelligenceMilitary", "text":"Intelligence, Millitary"},
+    {"value":"inlandWaters", "text":"Inland Waters"},
+    {"value":"location", "text":"Location"},
+    {"value":"oceans", "text":"Oceans"},
+    {"value":"planningCadastre", "text":"Planning, Cadastre"},
+    {"value":"society", "text":"Society"},
+    {"value":"structure", "text":"Structure"},
+    {"value":"transportation", "text":"Transportation"},
+    {"value":"utilitiesCommuinication", "text":"Utilities, Communication"},
+] %}
+
+{% set data_types = [
+    {"value": "001", "text": "Vector (vector data is used to represent geographic data)"}
+    ,{"value": "002", "text": "Grid (grid data is used to represent geographic data)"}
+    ,{"value": "003", "text": "Text table (textual or tabular data is used to represent geographic data)"}
+    ,{"value": "004", "text": "Triangulated Irregular Network (TIN)"}
+    ,{"value": "005", "text":"Stereo Model"}
+    ,{"value":"006", "text":"Video (Scene from a video recording)"}
+    ,{"value":"007", "text":"Image (Image formats, e.g. Tiff/BMP/JPEG/SID, etc. - Not a grid)"}
+]
+%}
+
+
+{% set charactersets = [
+    {"text":"UCS 2" , "value":"ucs-2"},
+    {"text":"UCS 4" , "value":"ucs-4"},
+    {"text":"UTF 7" , "value":"utf-7"},
+    {"text":"UTF 8" , "value":"utf-8"},
+    {"text":"UTF 16" , "value":"utf-16"},
+    {"text":"ISO8859_1" , "value":"8859part1"},
+    {"text":"ISO8859_2" , "value":"8859part2"},
+    {"text":"ISO8859_3" , "value":"8859part3"},
+    {"text":"ISO8859_4" , "value":"8859part4"},
+    {"text":"ISO8859_5" , "value":"8859part5"},
+    {"text":"ISO8859_6" , "value":"8859part6"},
+    {"text":"ISO8859_7" , "value":"8859part7"},
+    {"text":"ISO8859_8" , "value":"8859part8"},
+    {"text":"ISO8859_9" , "value":"8859part9"},
+    {"text":"ISO8859_10" , "value":"8859part10"},
+    {"text":ISO8859_11 , "value":"8859part11"},
+    {"text":"ISO8859_13" , "value":"8859part13"},
+    {"text":"ISO8859_14" , "value":"8859part14"},
+    {"text":"ISO8859_15" , "value":"8859part15"},
+    {"text":"ISO8859_16" , "value": "8859part16"},
+    {"text":"jis" , "value": "jis"},
+    {"text":"shiftJIS" , "value": "shiftJIS"},
+    {"text":"eucJP" , "value": "eucJP"},
+    {"text":"ASCII" , "value": "usAscii"},
+    {"text":"ebcdic" , "value": "ebcdic"},
+    {"text":"eucKR" , "value": "eucKR"},
+    {"text":"big5" , "value": "big5"},
+    {"text":"GB2312" , "value": "GB2312"}
+    ]
+%}
+
+
+{%
+    set capture_methods = [
+    {"text":"Aerial Photography","value":"Aerial Photography"},
+    {"text":"Digitizing", "value":"Digitizing"},
+    {"text":"GPS coordinate capture", "value":"GPS coordinate capture"},
+    {"text":"Remote sensing", "value":"Remote sensing"},
+    {"text":"Scanning & vectorising", "value":"Scanning & vectorising"},
+    {"text":"Survey (cadastral)", "value":"Survey (cadastral)"},
+    {"text":"Survey (questionnaire)", "value":"Survey (questionnaire)"},
+    ]
+
+%}
+
+
 <fieldset class="dynamic-dataset-fieldset" id="dataset-fieldset-{{ index }}">
    <div class="panel panel-default" style="margin-bottom: 10px; display: block" >
                     <div class="panel-heading" >
@@ -42,6 +132,7 @@
                                     id="remove-previous-dataset-button"
                                     type="button"
                                     class="btn btn-danger btn-sm pull-right remove-dataset"
+                                    data-module="removeDcprRequestDatasets"
                                     data-module-index="{{ index }}"
                                     style="margin-top: -2.5px;"
                                     {% if lenght|int < 2 %}
@@ -65,11 +156,11 @@
     {% call form.select(
             'dataset_custodian',
             label=_('Organization is custodian?'),
-            options = [{'value':'E1', "text":"submitted as E1 form"}, {'value':'E2', "text":"submitted as E2 form"}],
+            options = option,
             selected= selected,
             id='ds{}-field-dataset_custodian'.format(index),
             classes=['dataset_custodian','organization_dataset_custodian'],
-            error=dataset_custodian_error
+            error=dataset_custodian_error,
         ) %}
         {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
     {% endcall %}
@@ -108,17 +199,60 @@
     {{ form.info(_('Purpose that justifies the existence of the dataset being collected in the context of the project.')) }}
     {% endcall %}
 
-    {% call form.input(
+
+    {% call form.select(
+        "topic_category",
+        id='ds{}-field-topic_category'.format(index),
+        label=_("ISO Topic category"),
+        options=ISO_TOPIC_CATEGORIES,
+        selected=topic_category,
+        is_required=True,
+        error=topic_category_error
+
+    ) %}
+        {{ form.info(_('ISO Topic category')) }}
+    {% endcall %}
+
+    {% call form.select(
                 'data_type',
                 label=_('Data type'),
                 id='ds{}-field-data_type'.format(index),
-                placeholder=_('e.g. Vector line'),
-                value=data_type,
+                options=data_types,
+                selected=data_type,
                 error=data_type_error,
-                classes=['control-medium']
+                classes=['control-medium'],
+                is_required=True
             ) %}
         {{ form.info(_('Data type of the dataset being collected (vector point, vector line, raster, RADAR, etc.')) }}
     {% endcall %}
+
+    {% call form.select(
+        'dataset_characterset',
+        label=_('Dataset Characterset'),
+        id='ds{}-field-dataset_characterset'.format(index),
+        options=charactersets,
+        selected=dataset_characterset,
+        error=dataset_characterset_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Dataset characterset')) }}
+    {% endcall %}
+
+    {% call form.select(
+        'metadata_characterset',
+        label=_('Metadata Characterset'),
+        id='ds{}-field-metadata_characterset'.format(index),
+        options=charactersets,
+        selected=metadata_characterset,
+        error=metadata_characterset_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Metadata characterset')) }}
+    {% endcall %}
+
+
     {% call form.markdown(
                 'associated_attributes',
                 label=_('Dataset associated attributes'),

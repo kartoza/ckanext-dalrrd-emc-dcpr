@@ -230,20 +230,63 @@ XML_DATASET_NAMING_MAPPING = {
 }
 
 
+# this is necessary to ensure consistancy with saeon extra names
+
+DATASET_SUBFIELDS_MAPPING = {
+    "metadata_standard-0-name": "metadata_standard",
+    "metadata_standard-0-version": "metadata_standard_version",
+    "responsible_party-0-individual_name": "responsible_party_individual_name",
+    "responsible_party-0-role": "responsible_party_role",
+    "responsible_party-0-position_name": "responsible_party_position_name",
+    "responsible_party-0-electronic_mail_address": "responsible_party_electronic_mail_address",
+    "responsible_party_contact_address-0-delivery_point": "responsible_party_contact_address_delivery_point",
+    "responsible_party_contact_address-0-city": "responsible_party_contact_address_city",
+    "responsible_party_contact_address-0-administrative_area": "responsible_party_contact_address_administrative_area",
+    "responsible_party_contact_address-0-postal_code": "responsible_party_contact_address_postal_code",
+    "responsible_party_contact_info-0-voice": "responsible_party_contact_info_voice",
+    "responsible_party_contact_info-0-facsimile": "responsible_party_contact_info_facsimile",
+    "metadata_reference_date_and_stamp-0-reference": "reference_date",
+    "metadata_reference_date_and_stamp-0-reference_date_type": "reference_datetype",
+    "metadata_reference_date_and_stamp-0-stamp": "stamp_date",
+    "metadata_reference_date_and_stamp-0-stamp_date_type": "stamp_datetype",
+    "topic_and_sasdi_theme-0-iso_topic_category": "iso_topic_category",
+    "lineage_statement": "lineage_statement",
+    "metadata_language_and_character_set-0-dataset_language": "dataset_language",
+    "metadata_language_and_character_set-0-metadata_language": "metadata_language",
+    "metadata_language_and_character_set-0-dataset_character_set": "dataset_character_set",
+    "metadata_language_and_character_set-0-metadata_character_set": "metadata_character_set",
+    "distribution_format-0-name": "format_name",
+    "distribution_format-0-version": "format_version",
+    "spatial_parameters-0-equivalent_scale": "equivalent_scale",
+    "spatial_parameters-0-spatial_representation_type": "spatial_representation_type",
+    "spatial_parameters-0-spatial_reference_system": "spatial_reference_system",
+    "contact-0-individual_name": "contact_individual_name",
+    "contact-0-position_name": "contact_position_name",
+    "contact-0-role": "contact_role",
+    "contact-0-electronic_mail_address": "contact_electronic_mail_address",
+    "contact_address-0-delivery_point": "contact_address_delivery_point",
+    "contact_address-0-city": "contact_address_city",
+    "contact_address-0-administrative_area": "contact_address_administrative_area",
+    "contact_address-0-postal_code": "contact_address_postal_code",
+    "contact_information-0-voice": "contact_information_voice",
+    "contact_information-0-facsimile": "contact_information_facsimile",
+}
+
+
 class DCPRRequestRequiredFields(enum.Enum):
     DATASET_LANGUAGE = "en"
     DATASET_CHARACTER_SET = "ucs-2"
     METADATA_CHARACTER_SET = "ucs-2"
-    DISTRIBUTION_FORMAT_NAME = "format"
-    DISTRIBUTION_FORMAT_VERSION = "version"
+    DISTRIBUTION_FORMAT_NAME = "Electronic Metadata Record"
+    DISTRIBUTION_FORMAT_VERSION = "1.0"
     EQUIVALENT_SCALE = "10"
     ISO_TOPIC_CATEGORY = "location"
     LINEAGE_LEVEL = "001"
     LINEAGE_STATEMENT = "Formed from a DCPR request"
     LINEAGE_PROCESS_DESCRIPTION = "Formed from a DCPR request"
     METADATA_LANGUAGE = "en"
-    METADATA_STANDARD_NAME = "standard name"
-    METADATA_STANDARD_VERSION = "standard version"
+    METADATA_STANDARD_NAME = "SANS 1878"
+    METADATA_STANDARD_VERSION = "1.1"
     NOTES = "Default notes"
     PURPOSE = "Purpose"
     SPATIAL_REFERENCE_SYSTEM = "EPSG:4326"
@@ -253,4 +296,4 @@ class DCPRRequestRequiredFields(enum.Enum):
     STAMP_DATE_TYPE = "Creation"
     RESPONSIBLE_PARTY_INDIVIDUAL_NAME = "individual_name"
     RESPONSIBLE_PARTY_POSITION_NAME = "dataset custodian"
-    RESPONSIBLE_PARTY_ROLE = "owner"
+    RESPONSIBLE_PARTY_ROLE = "originator"

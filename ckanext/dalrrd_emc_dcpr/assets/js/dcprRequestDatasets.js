@@ -12,6 +12,7 @@ ckan.module('dcprRequestDatasets', function(jQuery, _){
         initialize: function() {
             jQuery.proxyAll(this, /_on/);
             this.el.on('click', this._onAddDatasetFieldset)
+
         },
 
         _onAddDatasetFieldset: function () {
