@@ -15,7 +15,6 @@
     <img src="{{ organization.image_display_url or h.url_for_static('/base/images/placeholder-organization.png') }}" alt="{{ organization.name }}" class="img-responsive media-image">
   {% endblock %}
   {% block title %}
-  {{ is_user_org_memeber }}
     <h2 class="media-heading">{{ organization.display_name }}</h2>
   {% endblock %}
   {% block description %}
