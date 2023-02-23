@@ -36,11 +36,11 @@ x-partial-ckan-volumes: &partial-ckan-volumes
     - ckan-storage:/home/appuser/data
 
 x-email-environment-values: &partial-email-environment-values
-  CKAN_SMTP_SERVER: ${CKAN_SMTP_SERVER}
-  CKAN_SMTP_STARTTLS: ${CKAN_SMTP_STARTTLS}
-  CKAN_SMTP_USER: ${CKAN_SMTP_USER}
-  CKAN_SMTP_PASSWORD: ${CKAN_SMTP_PASSWORD}
-  CKAN_SMTP_MAIL_FROM: ${CKAN_SMTP_MAIL_FROM}
+  CKAN_SMTP_SERVER: smtp-relay.sendinblue.com:587
+  CKAN_SMTP_STARTTLS: True
+  CKAN_SMTP_USER: homab3@gmail.com
+  CKAN_SMTP_PASSWORD: 0m3SaKjgX7CZLRFG
+  CKAN_SMTP_MAIL_FROM: <emc_dcpr@dalrrd.com>
 
 
 services:

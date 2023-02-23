@@ -142,14 +142,17 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             data_dict["fq"] = "+capacity:public " + data_dict["fq"]
 
         query = search.query_for(model.Package)
-        if context.get("ignore_auth") or c.userobj.sysadmin:
-            labels = None
-        else:
-            labels = lib_plugins.get_permission_labels().get_user_dataset_labels(
-                c.userobj
-            )
+        try:
+            if context.get("ignore_auth") or c.userobj.sysadmin:
+                labels = None
+            else:
+                labels = lib_plugins.get_permission_labels().get_user_dataset_labels(
+                    c.userobj
+                )
 
-        query.run(data_dict, permission_labels=labels)
+            query.run(data_dict, permission_labels=labels)
+        except:
+            query.run(data_dict, permission_labels=None)
 
         facets = query.facets
 
