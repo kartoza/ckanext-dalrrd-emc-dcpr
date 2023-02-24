@@ -178,17 +178,14 @@ def notify_dcpr_actors_of_relevant_status_change(context, activity_id: str):
                 logger.debug(f"{subject=}")
                 logger.debug(f"{body=}")
                 logger.debug(f"----------")
-                # email_notifications.send_notification(
-                #     {
-                #         "name": user_obj.name,
-                #         "display_name": user_obj.display_name,
-                #         "email": user_obj.email,
-                #     },
-                #     {
-                #         "subject": subject,
-                #         "body": body
-                #     },
-                # )
+                email_notifications.send_notification(
+                    {
+                        "name": user_obj.name,
+                        "display_name": user_obj.display_name,
+                        "email": user_obj.email,
+                    },
+                    {"subject": subject, "body": body},
+                )
     else:
         raise RuntimeError(f"Could not retrieve activity with id {activity_id!r}")
 
@@ -288,6 +285,7 @@ def _get_dcpr_rendered_messages(
     subject_template_path: str,
     body_template_path: str,
 ) -> typing.List[typing.Tuple[model.User, str, str]]:
+    logger.debug("render context:", render_context, "\n", "recipients:", recipients)
     jinja_env = email_notifications.get_jinja_env()
     subject_template = jinja_env.get_template(subject_template_path)
     body_template = jinja_env.get_template(body_template_path)

@@ -2,18 +2,27 @@ import json
 import logging
 import typing
 import datetime
-from urllib.parse import quote
+import uuid
+from urllib.parse import quote, urlparse, parse_qsl, urlencode
 from html import escape as html_escape
-
+from pathlib import Path
 from shapely import geometry
 from ckan import model
+from .model.saved_search import SavedSearches
 from ckan.plugins import toolkit
 from ckan.lib.helpers import build_nav_main as core_build_nav_main
+
+from ckan.logic import NotAuthorized
 
 from . import constants
 from .logic.action.emc import show_version
 from .constants import DCPRRequestStatus
 from .model.dcpr_request import DCPRRequest
+
+from ckan.common import c
+from ckan.lib.dictization.model_dictize import package_dictize
+from ckan.lib.dictization import table_dictize
+
 
 logger = logging.getLogger(__name__)
 
@@ -200,6 +209,8 @@ def build_pages_nav_main(*args):
         page_name = toolkit.request.path.split("/")[-1]
 
     for page in pages_list:
+        if page.get("title") == "About":
+            continue  # nsif staff decided they don't want about page.
         type_ = "blog" if page["page_type"] == "blog" else "pages"
         name = quote(page["name"])
         title = html_escape(page["title"])
@@ -211,7 +222,6 @@ def build_pages_nav_main(*args):
         else:
             li = toolkit.literal("<li>") + link + toolkit.literal("</li>")
         output = output + li
-
     return output
 
 
@@ -219,6 +229,15 @@ def get_featured_datasets():
     search_action = toolkit.get_action("package_search")
     result = search_action(data_dict={"q": "featured:true", "rows": 5})
     return result["results"]
+
+
+def get_featured_datasets_count():
+    """
+    used with facets count
+    """
+    search_action = toolkit.get_action("package_search")
+    result = search_action(data_dict={"q": "featured:true", "include_private": True})
+    return result["count"]
 
 
 def get_recently_modified_datasets():
@@ -233,20 +252,62 @@ def get_all_datasets_count(user_obj):
     solr active search
     https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/116
     """
-    search_action = toolkit.get_action("package_list")
+    # context = {"user":c.user, "auth_user_obj":c.userobj}
+    # return len(packages)
     # 32000 rows is the maximum of what can be retrieved
     # by ckan at once.
-    q = """ select count(distinct(id)) from package where state='active' """
-    result = model.Session.execute(q)
-    return result.fetchone()[0]
-    # if user_obj is not None:
-    #     result = search_action(context={"user": user_obj.id}, data_dict={})
-    #     package_count = len(result)
-    #     return package_count
-    # else:
-    #     result = search_action(data_dict={})
-    #     package_count = len(result)
-    #     return package_count
+    # the question becomes, do i want you to know the private datasets count ?
+    # q = """ select count(distinct(id)) from package where state='active' and type='dataset' """
+    # result = model.Session.execute(q)
+    # return result.fetchone()[0]
+
+    # this doesn't work
+    # results = toolkit.get_action("package_list")(context={"auth_user_obj": c.userobj}, data_dict={'include_private':True})
+
+    result = toolkit.get_action("package_search")(
+        data_dict={"q": "*:*", "include_private": True}
+    )
+    return result["count"]
+
+
+def get_org_public_records_count(org_id: str) -> int:
+    """
+    the default behavior is showing fixed
+    number of recoreds for orgs if the
+    user is not a part of them in org
+    list page, we are adjusting
+    """
+    query = model.Session.query(model.Package).filter(
+        model.Package.owner_org == org_id,
+        model.Package.private == "f",
+        model.Package.state == "active",
+    )
+    count = len(query.all())
+    return count
+
+
+def get_datasets_thumbnail(data_dict):
+    """
+    Generate thumbnails based on metadataset
+    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
+    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
+    """
+    data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
+    if data_dict.get("metadata_thumbnail"):
+        data_thumbnail = data_dict.get("metadata_thumbnail")
+    else:
+        data_resource = data_dict.get("resources")
+        for resource in data_resource:
+            if resource["format"].lower() == "wms":
+                wms_url = resource["url"]
+                parsed_url = dict(parse_qsl(urlparse(wms_url).query))
+                parsed_url["format"] = "image/png; mode=8bit"
+                data_thumbnail = "%s?%s" % (
+                    wms_url.split("?")[0],
+                    urlencode(parsed_url),
+                )
+                break
+    return data_thumbnail
 
 
 def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
@@ -324,6 +385,72 @@ def get_org_memberships(user_id: str):
         .order_by(model.Group.name)
     )
     return query.all()
+
+
+def get_public_dcpr_requests_count():
+    """
+    used by the dcpr facet
+    """
+    public_requests = toolkit.get_action("dcpr_request_list_public")(
+        {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+    )
+    return len(public_requests)
+
+
+def get_my_dcpr_requests_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        my_requests = toolkit.get_action("my_dcpr_request_list")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(my_requests)
+
+
+def get_under_preparation_dcpr_requests_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        requests = toolkit.get_action("dcpr_request_list_under_preparation")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(requests)
+
+
+def get_dcpr_requests_awaiting_csi_moderation_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        requests = toolkit.get_action("dcpr_request_list_awaiting_csi_moderation")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(requests)
+
+
+def get_dcpr_requests_awaiting_nsif_moderation_count():
+    """
+    used by the dcpr facet
+    """
+    try:
+        requests = toolkit.get_action("dcpr_request_list_awaiting_nsif_moderation")(
+            {"context": {"auth_user_obj": c.userobj}, "data_dict": {}}
+        )
+    except NotAuthorized:
+        return ""
+
+    return len(requests)
 
 
 def get_dcpr_requests_approved_by_nsif(request_origin):
@@ -428,3 +555,141 @@ def get_maintenance_custom_other_field_data(data_dict):
 
 def get_today_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d")
+
+
+def get_current_release():
+    """
+    get releases to website footer,
+    the release depends on the environment,
+    if it's staging it uses v*.*.*-rc, rather
+    if it's production v.*.*.*
+    """
+    current_file_path = Path(__file__)
+    releases_file_path = current_file_path.parent.joinpath("releases.txt")
+    with open(releases_file_path) as f:
+        releases = json.loads(f.read())
+        current_branch = _get_git_branch()
+        # this might change so main is release candidate
+        # and release branch is the latest release
+        if current_branch == "development":
+            return releases.get("latest_release_candidate")
+        elif current_branch == "main":
+            return releases.get("latest_release")
+        else:
+            return ""
+
+
+def _get_git_branch():
+    """
+    getting the current
+    branch name
+    """
+    return "development"
+
+
+def get_saved_searches():
+    """
+    returns saved searches
+    based on a user id
+    """
+    if c.userobj is None:
+        return []
+
+    user_id = c.userobj.id
+    if c.userobj.sysadmin:
+        q = f""" select saved_search_title, search_query, saved_search_date, saved_search_id, owner_user from saved_searches order by owner_user """
+    else:
+        q = f""" select saved_search_title, search_query, saved_search_date, saved_search_id from saved_searches where owner_user='{user_id}' order by saved_search_date desc """
+    rows = model.Session.execute(q)
+    saved_searches_list = []
+    for row in rows:
+        saved_searches_list.append(row)
+    # saved_searches_list = SavedSearches.get(SavedSearches,owner_user=user_id)
+    return saved_searches_list
+
+
+def get_user_name(user_id):
+    """
+    gets user name by it's id
+    """
+    user_obj = model.Session.query(model.User).filter_by(id=user_id).first()
+    return user_obj.name
+
+
+def get_user_id(user_name: str):
+    """
+    gets user id from it's name (the name is also unique)
+    """
+    user_obj = model.Session.query(model.User).filter_by(name=user_name).first()
+    return user_obj.id
+
+
+def get_user_name_from_url(url: str):
+    """
+    get user's name from url
+    """
+    return url.split("/user/")[1]
+
+
+def get_recent_news(number=5, exclude=None):
+    news_list = toolkit.get_action("ckanext_pages_list")(
+        None, {"order_publish_date": True, "private": False, "page_type": "news"}
+    )
+    new_list = []
+    for news in news_list:
+        if exclude and news["name"] == exclude:
+            continue
+        new_list.append(news)
+        if len(new_list) == number:
+            break
+
+    return new_list
+
+
+def get_seo_metatags(site_key):
+    """
+    get metatags value for SEO
+    """
+    data_dict = {
+        "site_author": toolkit.config.get(
+            "ckan.site_author",
+        ),
+        "site_description": toolkit.config.get(
+            "ckan.site_description",
+        ),
+        "site_keywords": toolkit.config.get(
+            "ckan.site_keywords",
+        ),
+    }
+    return data_dict[site_key]
+
+
+def get_year():
+    """
+    display current year in the
+    footer
+    """
+    return datetime.datetime.now().year
+
+
+def get_user_dashboard_packages(user_id):
+    """
+    the current behavior displays
+    all the avialable datastes to the
+    user, we need only the datasets
+    created by the user
+    """
+    # q = f""" select package.*, key, value from package join package_extra on package_id=package.id where package.creator_user_id='{user_id}' """
+    # rows = model.Session.execute(q)
+    # packages = []
+    # for row in rows:
+    #     packages.append(dict(row))
+    # return packages
+    query = model.Session.query(model.Package).filter(
+        model.Package.creator_user_id == user_id
+    )
+    packages = [
+        package_dictize(package, context={"user": user_id, "model": model})
+        for package in query.all()
+    ]
+    return packages

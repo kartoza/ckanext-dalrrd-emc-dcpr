@@ -63,6 +63,13 @@ dcpr_request_table = Table(
     Column("csi_moderation_notes", types.UnicodeText),
     Column("csi_moderation_additional_documents", types.UnicodeText),
     Column("csi_moderation_date", types.DateTime),
+    Column("organisation_level", types.UnicodeText),
+    Column("organisation_address", types.UnicodeText),
+    Column("contact_person_name", types.UnicodeText),
+    Column("contact_person_designation", types.UnicodeText),
+    Column("contact_person_email_address", types.UnicodeText),
+    Column("dcpr_contact_person_phone", types.UnicodeText),
+    Column("dcpr_contact_person_fax_number", types.UnicodeText),
 )
 
 dcpr_request_dataset_table = Table(
@@ -83,6 +90,9 @@ dcpr_request_dataset_table = Table(
     Column("data_usage_restrictions", types.UnicodeText),
     Column("capture_method", types.UnicodeText),
     Column("capture_method_detail", types.UnicodeText),
+    Column("topic_category", types.UnicodeText),
+    Column("dataset_characterset", types.UnicodeText),
+    Column("metadata_characterset", types.UnicodeText),
 )
 
 dcpr_request_notification_table = Table(
@@ -174,6 +184,72 @@ class DCPRRequestUrgency(enum.Enum):
     LOW = "Low"
     MEDIUM = "Medium"
     HIGH = "High"
+
+
+class DCPRCaptureMethod(enum.Enum):
+
+    AERIAL_PHOTOGRAPHY = "Aerial Photography"
+    DIGITIZING = "Digitizing"
+    GPS = "GPS coordinate capture"
+    REMOTE_SENSING = "Remote sensing"
+    SCANNING = "Scanning & vectorising"
+    SURVEY = "Survey (cadastral)"
+    SURVEY_QUESTIONNAIRE = "Survey (questionnaire)"
+
+
+class DCPRTOPICCATEGORY(enum.Enum):
+
+    Farming = "farming"
+    Biota = "biota"
+    Boundaries = "boundaries"
+    Climatology_Meteorology_Atmosphere = "climatologyMeteorologyAtmosphere"
+    Economy = "economy"
+    Elevation = "elevation"
+    Environment = "environment"
+    Geoscientific_Information = "geoscientificInformation"
+    Health = "health"
+    Imagery_Basemaps_Earth_Cover = "imageryBaseMapsEarthCover"
+    Intelligence_Millitary = "intelligenceMilitary"
+    Inland_Waters = "inlandWaters"
+    Location = "location"
+    Oceans = "oceans"
+    Planning_Cadastre = "planningCadastre"
+    Society = "society"
+    Structure = "structure"
+    Transportation = "transportation"
+    Utilities_Communication = "utilitiesCommuinication"
+
+
+class DCPRCHARACTERSET(enum.Enum):
+
+    UCS_2 = "ucs-2"
+    UCS_4 = "ucs-4"
+    UTF_7 = "utf-7"
+    UTF_8 = "utf-8"
+    UTF_16 = "utf-16"
+    ISO8859_1 = "8859part1"
+    ISO8859_2 = "8859part2"
+    ISO8859_3 = "8859part3"
+    ISO8859_4 = "8859part4"
+    ISO8859_5 = "8859part5"
+    ISO8859_6 = "8859part6"
+    ISO8859_7 = "8859part7"
+    ISO8859_8 = "8859part8"
+    ISO8859_9 = "8859part9"
+    ISO8859_10 = "8859part10"
+    ISO8859_11 = "8859part11"
+    ISO8859_13 = "8859part13"
+    ISO8859_14 = "8859part14"
+    ISO8859_15 = "8859part15"
+    ISO8859_16 = "8859part16"
+    jis = "jis"
+    shiftJIS = "shiftJIS"
+    eucJP = "eucJP"
+    ASCII = "usAscii"
+    ebcdic = "ebcdic"
+    eucKR = "eucKR"
+    big5 = "big5"
+    GB2312 = "GB2312"
 
 
 class DCPRRequestDataset(

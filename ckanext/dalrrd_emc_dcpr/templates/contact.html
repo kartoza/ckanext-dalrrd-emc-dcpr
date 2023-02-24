@@ -1,0 +1,52 @@
+{% extends "page.html" %}
+{% block subtitle %}{{ _("Contact Details") }}{% endblock %}
+{% block content %}
+    <div class="container">
+    <section class="py-5 border-bottom" xmlns="http://www.w3.org/1999/html">
+        <div class="text-center mb-5">
+            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-3"><i class="bi bi-envelope"></i></div>
+            <h1 class="fw-bolder contact-title">Contact Details</h1>
+        </div>
+        <div class="row gx-5 justify-content-center">
+            <div class="col-xs-6 col-sm-3">
+                    <h5 class="mb-0 fw-bolder" style="color:#ec971f">Director: NSIF</h5>
+                    <p class="text-muted">Ms Maroale (Mimi) Chauke</p>
+                    <p class="text-muted">Tel: +27 12 312 9643</p>
+                    <p class="text-muted">Mobile: 072 647 3935</p>
+                    <p class="text-muted">Email: <u style="color:#3F7752">maroale.chauke@dalrrd.gov.za</u></p>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                    <h5 class="mb-0 fw-bolder" style="color:#ec971f">Secretary: NSIF</h5>
+                    <p class="text-muted">Ms Serati Manele</p>
+                    <p class="text-muted">Tel: +27 12 312 8718</p>
+                    <p class="text-muted"><u style="color:#3F7752">Email: serati.mashamaite@dalrrd.gov.za</u></p>
+                    <h5 class="mb-0 fw-bolder" style="color:#ec971f">General Enquiries:</h5>
+                    <p class="text-muted">nsif@drdlr.gov.za</p>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+
+                    <h5 class="mb-0 fw-bolder" style="color:#ec971f">Subdirectorate: Policy and Standards Facilitation</h5>
+                    <p class="text-muted">VACANT</p>
+                    <p class="text-muted">Tel: +27 12 312 8718</p>
+                    <p class="text-muted">Email: <u style="color:#3F7752">NSIF@dalrrd.gov.za</u></p>
+                    <h5 class="mb-0 fw-bolder" style="color:#ec971f">Subdirectorate: External Client Support</h5>
+                    <p class="text-muted">Ms Nontobeko Nyuswa</p>
+                    <p class="text-muted">Tel: +27 12 312 9110</p>
+                    <p class="text-muted">Email: <u style="color:#3F7752">nontobeko.nyuswa@dalrrd.gov.za</u></p>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                    <h5 class="mb-0 fw-bolder" style="color:#ec971f">Sub-directorate: Spatial Information and Support </h5>
+                    <p class="text-muted">Mr Vutomi Ndlovu</p>
+                    <p class="text-muted">Tel: +27 12 312 9415</p>
+                    <p class="text-muted">Mobile: 084 400 6184</p>
+                    <p class="text-muted">Email: <u style="color:#3F7752">Vutomi.Ndlovu@dalrrd.gov.za</u></p>
+            </div>
+                </div>
+        </section>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{  super() }}
+    {% asset "ckanext-dalrrdemcdcpr/check-access-js" %}
+    {% asset "ckanext-dalrrdemcdcpr/xml-parser-js" %}
+{% endblock %}

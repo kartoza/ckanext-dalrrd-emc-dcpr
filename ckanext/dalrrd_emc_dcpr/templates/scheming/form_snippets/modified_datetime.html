@@ -1,0 +1,16 @@
+{#
+
+ckan scheming datetime form input separates the two fields,
+it causes tests to fail as the package_create searches for
+a filed with the same name given for the datetime field,
+here is another implementation that combines both fields.
+
+reference_date-0-reference
+#}
+
+{% import 'macros/form.html' as form %}
+
+{% call form.input_block(for=field.field_name, label=field.label, is_required=field.required, classes=field.classes if 'classes' in field else ['control-medium'])%}
+    <input type="datetime-local" id="{{ field.field_name }}" name="{{ field.field_name }}" value="{{ data.get(field.field_name) }}" class="form-control"/>
+    {%- snippet 'scheming/form_snippets/help_text.html', field=field.field_name -%}
+{% endcall %}

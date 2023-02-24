@@ -12,7 +12,7 @@ Alternatively, please visit its detail page and choose to become its NSIF review
 Once you are accepted as the reviewer, you will be able to provide NSIF review notes about it and will also be able to accept or reject the request on behalf of the NSIF.
 
 {%- elif activity_type.name == "ACCEPT_DCPR_REQUEST_NSIF" %}
-NSIF user {{ nsif_user_obj.name }} ({{ nsif_user_obj.email }}) has accepted the DCPR request on behalf of the NSIF.
+NSIF user {{ nsif_reviewer_obj.name }} ({{ nsif_reviewer_obj.email }}) has accepted the DCPR request on behalf of the NSIF.
 
 These are the NSIF review notes:
 

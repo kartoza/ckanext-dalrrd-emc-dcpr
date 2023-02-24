@@ -2,11 +2,13 @@
 
 
 ckan.module('emc-facets-active', function (jQuery, _) {
-
+    var searchInput = document.querySelector("#field-giant-search")
 
     return {
-        initialize: function () {
 
+        initialize: function () {
+            $.proxyAll(this,/_on/);
+            searchInput.addEventListener("change", this._onSearchInputValueChange)
             const filters = {
                 'organization': 'Organizations',
                 '_organization_limit': 'Organizations',
@@ -15,7 +17,8 @@ ckan.module('emc-facets-active', function (jQuery, _) {
                 'vocab_iso_topic_categories': 'ISOTopicCategories',
                 '_vocab_iso_topic_categories_limit': 'ISOTopicCategories',
                 'tags': 'Tags',
-                '_tags_limit': 'Tags'
+                '_tags_limit': 'Tags',
+                'featured': "FeaturedMetadatarecords"
             };
             const keys = Object.keys(filters);
 
@@ -34,6 +37,12 @@ ckan.module('emc-facets-active', function (jQuery, _) {
                     alert(head);
                 }
        }
+        },
+        _onSearchInputValueChange:function(e){
+            let searchUrl = this.el.get(0).href
+            let searchUrlSplit = searchUrl.split("&",2)[0]
+            let inputSearchTerm = searchUrlSplit.split("?q=",2)[1]
+            this.el.get(0).href = searchUrl.replace(inputSearchTerm, e.target.value)
         }
     }
 
@@ -61,5 +70,44 @@ ckan.module("emc-filter-expand", function ($){
         }
     }
 
+
+})
+
+ckan.module("emc-facets-pagination", function ($){
+
+    return{
+
+        initialize: function(){
+
+            $.proxyAll(this,/_on/);
+            this.el.on('click', this._showMoreFacets);
+
+        },
+
+        _showMoreFacets: function (e){
+            let self = this
+            let pagination = 10;
+            let ulClassname = '.'+self.dataset['classname']
+            let allItems = document.querySelectorAll(ulClassname)
+            let itemsNotShow = []
+            for(let i=0; i<allItems.length;i++){
+                if( allItems[i].style.display===''){
+                    itemsNotShow.push(allItems[i])
+                }
+            }
+            for (let i = 0; i < (pagination); i++) {
+                if(i<itemsNotShow.length){
+                    itemsNotShow[i].style.display= 'block';
+                }
+                else{
+                    self.style.display = 'none'
+                }
+            }
+
+        }
+
+
+
+    }
 
 })

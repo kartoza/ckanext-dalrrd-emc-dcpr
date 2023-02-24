@@ -12,13 +12,13 @@ This module reimplements the core CKAN email notifications in order to:
 import datetime as dt
 import logging
 import re
+import json
 
 from ckan import (
     logic,
     model,
 )
 from ckan.plugins import toolkit
-
 from ckanext.dalrrd_emc_dcpr.cli.utils import get_jinja_env
 
 logger = logging.getLogger(__name__)
@@ -54,9 +54,11 @@ def get_and_send_notifications_for_user(user) -> int:
     email_last_sent = model.Dashboard.get(user["id"]).email_last_sent
     activity_stream_last_viewed = model.Dashboard.get(
         user["id"]
-    ).activity_stream_last_viewed
+    ).activity_stream_last_viewed  # the dashboard database table only has userid, activity_stream_last_viewed, email_last_sent
 
-    since = max(email_notifications_since, email_last_sent, activity_stream_last_viewed)
+    since = max(
+        email_notifications_since, email_last_sent, activity_stream_last_viewed
+    )  # the youngest
 
     notifications = get_notifications(user, since)
     num_sent = 0
@@ -93,6 +95,7 @@ def send_notification(user, email_dict):
             email_dict["body"],
         )
     except ckan.lib.mailer.MailerException:
+        logger.error(ckan.lib.mailer.MailerException)
         raise
     else:
         logger.debug(f"Email sent!")

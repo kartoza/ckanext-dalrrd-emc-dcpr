@@ -13,9 +13,11 @@ def create_dcpr_request_schema(
     not_empty,
     unicode_safe,
     is_positive_integer,
+    natural_number_validator,
     isodate,
     convert_group_name_or_id_to_id,
     dcpr_end_date_after_start_date_validator,
+    email_validator,
 ):
     return {
         "proposed_project_name": [not_empty, not_missing, unicode_safe],
@@ -32,12 +34,19 @@ def create_dcpr_request_schema(
             dcpr_end_date_after_start_date_validator,
         ],
         "capture_end_date": [not_empty, isodate],
-        "cost": [not_missing, not_empty, is_positive_integer],
+        "cost": [not_missing, not_empty, natural_number_validator],
         "spatial_extent": [ignore_missing, unicode_safe],
-        "spatial_resolution": [ignore_missing, unicode_safe],
+        "spatial_resolution": [not_empty, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
         "additional_documents": [unicode_safe, ignore_missing],
         "datasets": create_dcpr_request_dataset_schema(),
+        "contact_person_name": [not_empty, unicode_safe],
+        "contact_person_designation": [ignore_missing, unicode_safe],
+        "contact_person_email_address": [ignore_missing, email_validator, unicode_safe],
+        "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
+        "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
+        "organisation_level": [not_empty, unicode_safe],
+        "organisation_address": [ignore_missing, unicode_safe],
     }
 
 
@@ -47,9 +56,11 @@ def update_dcpr_request_by_owner_schema(
     ignore_missing,
     isodate,
     is_positive_integer,
+    natural_number_validator,
     not_missing,
     not_empty,
     unicode_safe,
+    email_validator,
 ):
     return {
         "csi_reference_id": [not_missing, not_empty, unicode_safe],
@@ -63,12 +74,18 @@ def update_dcpr_request_by_owner_schema(
         "additional_project_context": [ignore_missing, unicode_safe],
         "capture_start_date": [ignore_missing, not_empty, isodate],
         "capture_end_date": [ignore_missing, not_empty, isodate],
-        "cost": [ignore_missing, not_empty, is_positive_integer],
+        "cost": [ignore_missing, not_empty, natural_number_validator],
         "spatial_extent": [ignore_missing, unicode_safe],
-        "spatial_resolution": [ignore_missing, unicode_safe],
+        "spatial_resolution": [not_empty, unicode_safe],
         "data_capture_urgency": [ignore_missing, unicode_safe],
         "additional_documents": [unicode_safe, ignore_missing],
         "datasets": create_dcpr_request_dataset_schema(),
+        "contact_person_name": [not_empty, unicode_safe],
+        "contact_person_designation": [ignore_missing, unicode_safe],
+        "contact_person_email_address": [ignore_missing, email_validator, unicode_safe],
+        "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
+        "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
+        "organisation_level": [not_empty, unicode_safe],
     }
 
 
@@ -138,15 +155,18 @@ def create_dcpr_request_dataset_schema(
     return {
         "dcpr_request_id": [ignore],
         "dataset_id": [ignore],
-        "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_purpose": [not_empty, not_missing, unicode_safe],
-        "dataset_custodian": [boolean_validator],
-        "data_type": [ignore_missing, unicode_safe],
-        "proposed_abstract": [ignore_missing, unicode_safe],
-        "lineage_statement": [ignore_missing, unicode_safe],
+        "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
+        "dataset_custodian": [ignore_missing],
+        "data_type": [not_empty, unicode_safe],
+        "proposed_abstract": [not_empty, unicode_safe],
+        "lineage_statement": [not_empty, unicode_safe],
         "associated_attributes": [ignore_missing, unicode_safe],
         "data_usage_restrictions": [ignore_missing, unicode_safe],
         "capture_method": [ignore_missing, unicode_safe],
+        "topic_category": [not_empty, not_missing, unicode_safe],
+        "dataset_characterset": [not_missing, unicode_safe],
+        "metadata_characterset": [not_missing, unicode_safe],
     }
 
 

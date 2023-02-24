@@ -105,11 +105,11 @@ def dcpr_request_create_auth(
 
     db_user = context["auth_user_obj"]
     result = {"success": False}
-    if db_user.sysadmin:
+    if db_user:
         result["success"] = True
-    else:
-        member_of_orgs = len(db_user.get_groups()) > 0
-        result = {"success": member_of_orgs}
+    # else:
+    #     member_of_orgs = len(db_user.get_groups()) > 0
+    #     result = {"success": member_of_orgs}
     return result
 
 

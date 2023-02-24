@@ -3,84 +3,231 @@
 {% asset "ckanext-dalrrdemcdcpr/dcpr-request-datasets-js" %}
 {% asset "ckanext-dalrrdemcdcpr/remove-dcpr-request-datasets-js" %}
 
-<form class="dataset-form" method="post" data-module="basic-form" novalidate>
+<form class="dataset-form request-edit" method="post" data-module="basic-form" novalidate>
     {% block errors %}{{ form.errors(error_summary) }}{% endblock %}
     <fieldset {% if not enable_owner_fieldset %}disabled{% endif %} id="dcpr-request-owner-fields">
         <legend>DCPR request owner fields</legend>
-        {% if not data.organization_id %}
-            {% call form.select(
-                "organization_id",
-                id="field-organization_id",
-                label=_("Organization"),
-                options=relevant_organizations,
-                selected=relevant_organizations[0].text,
-                is_required=true
+        <div class="form-information">
+            <h2>GENERAL INFORMATION</h2>
+{#
+            {% if not data.organization_id %}
+                {% call form.select(
+                    "organization_id",
+                    id="field-organization_id",
+                    label=_("Organization"),
+                    options=relevant_organizations,
+                    selected=relevant_organizations[0].text,
+                    is_required=true
+                ) %}
+                    {{ form.info(_('Organization that shall be responsible for this DCPR request - This field only shows organizations that the current user is a member of.')) }}
+                {% endcall %}
+            {% endif %}
+#}
+            {% call form.input(
+                'proposed_project_name',
+                label=_('Proposed project name'),
+                id='field-proposed_project_name',
+                placeholder=_('e.g. Data Request'),
+                value=data.proposed_project_name,
+                error=errors.proposed_project_name,
+                classes=['control-medium'],
+                is_required=True
             ) %}
-                {{ form.info(_('Organization that shall be responsible for this DCPR request - This field only shows organizations that the current user is a member of.')) }}
+                {{ form.info(_('Proposed name for the data capture project.')) }}
             {% endcall %}
-        {% endif %}
-        {% call form.input(
-            'proposed_project_name',
-            label=_('Proposed Project Name'),
-            id='field-proposed_project_name',
-            placeholder=_('e.g. Data Request'),
-            value=data.proposed_project_name,
-            error=errors.proposed_project_name,
-            classes=['control-medium'],
-            is_required=True
-        ) %}
-            {{ form.info(_('Proposed name for the data capture project.')) }}
-        {% endcall %}
-        {% call form.input(
-            'capture_start_date',
-            label=_('Capture start date'),
-            id='field-capture_start_date',
-            type='date',
-            placeholder=_('eg. 2022-01-01'),
-            value=data.capture_start_date,
-            error=errors.capture_start_date,
-            classes=['control-medium'],
-            is_required=True
-        ) %}
-            {{ form.info(_('Proposed start date of the data capture.')) }}
-        {% endcall %}
-        {% call form.input(
-            'capture_end_date',
-            label=_('Capture end date'),
-            id='field-capture_end_date',
-            type='date',
-            placeholder=_('eg. 2022-01-01'),
-            value=data.capture_end_date,
-            error=errors.capture_end_date,
-            classes=['control-medium'],
-            is_required=True
-        ) %}
-            {{ form.info(_('Proposed end date of the data capture.')) }}
-        {% endcall %}
-        {% call form.input(
-            'cost',
-            label=_('Estimated cost'),
-            id='field-cost',
-            type='number',
-            value=data.cost,
-            error=errors.cost,
-            classes=['control-medium'],
-            is_required=True
-        ) %}
-            {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
-        {% endcall %}
+
+            <div class="dcpr-org">
+                <div class="col-md-4">
+                    {% if not data.organization_id %}
+                        {% call form.select(
+                            "organization_id",
+                            id="field-organization_id",
+                            label=_("Organization"),
+                            options=relevant_organizations,
+                            selected=relevant_organizations[0].text,
+                            is_required=true
+                        ) %}
+                            {{ form.info(_('Organisation that shall be responsible for this DCPR request - This field only shows organizations that the current user is a member of.')) }}
+                        {% endcall %}
+                    {% endif %}
+                    </div>
+
+                <div class="col-md-4">
+                    {% set org_level_options = [{"text":"National","value":"national"},{"text":"Provincial","value":"provincial"},{"text":"Municipal","value":"municipal"},{"text":"Tribal Authority","value":"tribal_authority"}] %}
+                    {% call form.select(
+                        "organisation_level",
+                        id="field-organisation_level",
+                        label=_("Level of organisation"),
+                        options=org_level_options,
+                        selected=data.organisation_level,
+                    ) %}
+                        {{ form.info(_('Organisation level')) }}
+                    {% endcall %}
+                </div>
+
+                <div class="col-md-4">
+                    {% call form.input(
+                        'organisation_address',
+                        label=_('Organisation address'),
+                        id='field-organisation-address',
+                        value=data.organisation_address,
+                        error=errors.organisation_address_error,
+                        classes=['control-medium'],
+                    ) %}
+                        {{ form.info(_('Organisation address')) }}
+                    {% endcall %}
+                </div>
+
+
+            </div>
+
+            <div class="dcpr-contact">
+                <div class="col-md-4">
+                    {% call form.input(
+                        'contact_person_name',
+                        label=_('Contact person name'),
+                        id='field-contact-person-name',
+                        value=data.contact_person_name,
+                        error=errors.contact_person_error,
+                        classes=['control-medium'],
+                        is_required=True
+                    ) %}
+                        {{ form.info(_('Request contact person name')) }}
+                    {% endcall %}
+                </div>
+
+                <div class="col-md-4">
+                    {% call form.input(
+                        'contact_person_designation',
+                        label=_('Designation'),
+                        id='field-contact-person-designation',
+                        value=data.contact_person_designation,
+                        error=errors.contact_person_designation_error,
+                        classes=['control-medium'],
+                    ) %}
+                        {{ form.info(_('Request contact person designation')) }}
+                    {% endcall %}
+                </div>
+
+                <div class="col-md-4">
+                    {% call form.input(
+                        'dcpr_contact_person_phone',
+                        label=_('Phone number'),
+                        id='field-contact-person-phone',
+                        value=data.dcpr_contact_person_phone,
+                        error=errors.contact_person_phone_error,
+                        classes=['control-medium'],
+                    ) %}
+                        {{ form.info(_('Request contact person phone')) }}
+                    {% endcall %}
+                </div>
+
+                <div class="col-md-4">
+                    {% call form.input(
+                        'dcpr_contact_person_fax_number',
+                        label=_('Fax number'),
+                        id='field-contact-person-fax-number',
+                        value=data.dcpr_contact_person_fax_number,
+                        error=errors.contact_person_fax_error,
+                        classes=['control-medium'],
+                    ) %}
+                        {{ form.info(_('Request contact person fax')) }}
+                    {% endcall %}
+                </div>
+
+                <div class="col-md-4">
+                    {% call form.input(
+                        'contact_person_email_address',
+                        label=_('Email adderss'),
+                        id='field-contact-person-email-address',
+                        value=data.contact_person_email_address,
+                        error=errors.contact_person_email_address_error,
+                        classes=['control-medium'],
+                    ) %}
+                        {{ form.info(_('Request contact person email adderss')) }}
+                    {% endcall %}
+                </div>
+
+                <div class="col-md-4 dcpr-contact-filler">
+                    {% call form.input(
+                        'dcpr_buffer',
+                        label=_(''),
+                        id='field-dcpr-contact-buffer',
+                        value='',
+                        classes=['control-medium'],
+                    ) %}
+                        {{ form.info(_('Request contact person email adderss')) }}
+                    {% endcall %}
+                </div>
+
+            </div>
+            <div class="proposed-date">
+                <div class="col-md-4">
+                {% call form.input(
+                    'capture_start_date',
+                    label=_('Proposed capture start date'),
+                    id='field-capture_start_date',
+                    type='date',
+                    placeholder=_('eg. 2022-01-01'),
+                    value=data.capture_start_date,
+                    error=errors.capture_start_date,
+                    classes=['control-medium'],
+                    is_required=True
+                ) %}
+                    {{ form.info(_('Proposed start date of the data capture.')) }}
+                {% endcall %}
+                </div>
+                <div class="col-md-4">
+                {% call form.input(
+                    'capture_end_date',
+                    label=_('Proposed capture end date'),
+                    id='field-capture_end_date',
+                    type='date',
+                    placeholder=_('eg. 2022-01-01'),
+                    value=data.capture_end_date,
+                    error=errors.capture_end_date,
+                    classes=['control-medium'],
+                    is_required=True
+                ) %}
+                    {{ form.info(_('Proposed end date of the data capture.')) }}
+                {% endcall %}
+                </div>
+                <div class="col-md-4">
+                {% call form.input(
+                    'cost',
+                    label=_('Estimated cost in SA Rand'),
+                    id='field-cost',
+                    type='number',
+                    value=data.cost,
+                    error=errors.cost,
+                    classes=['control-medium'],
+                    is_required=True
+                ) %}
+                    {{ form.info(_('Estimated cost for the data capture project, expressed in South African Rand.')) }}
+                {% endcall %}
+                </div>
+            </div>
+        </div>
+        <div class="form-information">
+        <h2>DATA INFORMATION</h2>
         {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
+        <div class="proposed-data-info">
+        <div class="col-md-6">
         {% call form.input(
             'spatial_resolution',
             label=_('Spatial resolution'),
             id='field-spatial_resolution',
-            type='number',
+            type='text',
             value=data.spatial_resolution,
             error=errors.spatial_resolution,
-            classes=['control-medium']
+            classes=['control-medium'],
+            is_required=True
+
         ) %}
             {{ form.info(_('Spatial resolution that is proposed for the data capture.')) }}
         {% endcall %}
+        </div>
+        <div class="col-md-6">
         {% call form.select(
             'data_capture_urgency',
             label=_('Data capture urgency'),
@@ -92,6 +239,8 @@
         ) %}
             {{ form.info(_('Urgency of the data capture project.')) }}
         {% endcall %}
+        </div>
+        </div>
         {% call form.markdown(
             'additional_project_context',
             label=_('Additional project context'),
@@ -103,9 +252,10 @@
             {{ form.info(_('Additional information about the project and this DCPR request. Please include any relevant
             information for aiding the NSIF and CSI in their review and moderation process.')) }}
         {% endcall %}
-        {% if data.datasets %}
-            <legend>Dataset(s)</legend>
+        </div>
+        <legend>Dataset(s)</legend>
             <div class="list-datasets" data-module="removeDcprRequestDatasets">
+        {% if data.datasets %}
             {% for ds in data.datasets %}
                 {% set dataset_id = 'dataset'+ loop.index|string %}
                 {{ h.snippet(
@@ -114,30 +264,41 @@
                     lenght= data.datasets|length,
                     dataset_custodian=ds.dataset_custodian,
                     data_type=ds.data_type,
+                    dataset_purpose=ds.dataset_purpose,
                     proposed_dataset_title=ds.proposed_dataset_title,
                     proposed_abstract=ds.proposed_abstract,
-                    dataset_purpose=ds.dataset_purpose,
                     lineage_statement=ds.lineage_statement,
                     associated_attributes=ds.associated_attributes,
                     feature_description=ds.feature_description,
                     data_usage_restrictions=ds.data_usage_restrictions,
                     capture_method=ds.capture_method,
+                    topic_category = ds.topic_category,
+                    dataset_characterset=ds.dataset_characterset,
+                    metadata_characterset=ds.metadata_characterset,
                     dataset_custodian_error=errors.dataset_custodian,
                     data_type_error=errors.data_type,
                     proposed_dataset_title_error=errors.proposed_dataset_title,
                     proposed_abstract_error=errors.proposed_abstract,
-                    dataset_purpose_error=errors.dataset_purpose,
                     lineage_statement_error=errors.lineage_statement,
                     associated_attributes_error=errors.associated_attributes,
                     data_usage_restrictions_error=errors.data_usage_restrictions,
-                    capture_method_error=errors.capture_method
+                    capture_method_error=errors.capture_method,
+                    dataset_capture_method_options=dataset_capture_method_options,
+                    topic_category_error = errors.topic_category,
+                    dataset_characterset_error=errors.dataset_characterset,
+                    metadata_characterset_error=errors.metadata_characterset,
+
+
+
                 ) }}
             {% endfor %}
 
         {% else %}
             {{ h.snippet(
                     "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
-                    index=1, lenght=0
+                    index=1,
+                    lenght=0,
+                    dataset_capture_method_options=dataset_capture_method_options
             ) }}
         {% endif %}
 
@@ -152,8 +313,9 @@
         </div>
 
     </fieldset>
-    <fieldset {% if not enable_nsif_fieldset %}disabled{% endif %}>
-        <legend>NSIF reviewer fields (only enabled for CSI reviewer)</legend>
+    {%  if enable_nsif_fieldset %}
+    <fieldset>
+        <legend>NSIF reviewer field</legend>
         {% call form.markdown(
             'nsif_review_notes',
             label=_('NSIF review notes'),
@@ -165,8 +327,10 @@
             {{ form.info(_('DCPR review notes, as provided by the NSIF reviewers')) }}
         {% endcall %}
     </fieldset>
-    <fieldset {% if not enable_csi_fieldset %}disabled{% endif %}>
-        <legend>CSI reviewer fields (only enabled for CSI reviewer)</legend>
+   {% endif %}
+    {%  if enable_csi_fieldset %}
+    <fieldset>
+        <legend>CSI reviewer field</legend>
         {% call form.markdown(
             'csi_moderation_notes',
             label=_('CSI review notes'),
@@ -178,18 +342,15 @@
             {{ form.info(_('DCPR review notes, as provided by the CSI reviewers')) }}
         {% endcall %}
     </fieldset>
+    {% endif %}
     {% block form_actions %}
         {{ form.required_message() }}
         <div class="form-actions">
             {% if csi_reference_id and h.check_access("dcpr_request_delete_auth", {"csi_reference_id": csi_reference_id}) %}
-                {% link_for _('Delete DCPR request'),
-                    named_route="dcpr.dcpr_request_delete",
-                    csi_reference_id=csi_reference_id,
-                    class_='btn btn-danger',
-                    icon='trash'
-                %}
+                <a class="btn btn-danger" href="{% url_for 'dcpr.dcpr_request_delete', csi_reference_id=csi_reference_id %}" data-module="confirm-action"
+                data-module-content="{{ 'Are you sure you want to delete DCPR request - %s?' % (data.proposed_project_name) }}"><i class="fa fa-trash"></i>{{ _('Delete DCPR request') }}</a>
             {% endif %}
-            <input type="submit" class="btn btn-default" value="{{ _('Save') }}">
+            <input type="submit" class="btn btn-primary" value="{{ _('Submit form') }}">
 
         </div>
     {% endblock %}

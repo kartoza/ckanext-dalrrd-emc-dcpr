@@ -1,0 +1,30 @@
+{% ckan_extends %}
+{% block package_list %}
+
+{% if is_myself %}
+    {% set user_created_packages = h.get_user_dashboard_packages(c.userobj.id) %}
+    {% set returned_packages = user_created_packages  %}
+{% else %}
+    {% set user_name_from_url = h.get_user_name_from_url(url_for(request.endpoint, **request.view_args)) %}
+    {% set user_id = h.get_user_id(user_name_from_url)%}
+    {% set returned_packages = h.get_user_dashboard_packages(user_id)  %}
+{% endif %}
+
+{% if returned_packages | length > 1 %}
+  {% snippet 'snippets/package_list.html', packages= returned_packages %}
+{% else %}
+
+  {% if is_myself %}
+    <p class="empty">
+      {{ _('You haven\'t created any metadata records.') }}
+      {% if h.check_access('package_create') %}
+        {% link_for _('Create one now?'), named_route='dataset.new' %}
+      {% endif %}
+    </p>
+  {% else %}
+    <p class="empty">
+      {{ _('User hasn\'t created any metadata records.') }}
+    </p>
+  {% endif %}
+{% endif %}
+{% endblock %}

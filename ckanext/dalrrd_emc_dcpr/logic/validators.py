@@ -96,6 +96,18 @@ def emc_srs_validator(value: str) -> str:
     return value
 
 
+def lineage_source_srs_validator(value):
+    """ "
+    the difference from above method
+    that the lineage source srs can
+    be empty
+    """
+    if value == "":
+        return ""
+    else:
+        emc_srs_validator(value)
+
+
 def emc_version_validator(value):
     """
     check if the version is number or not

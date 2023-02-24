@@ -1,9 +1,7 @@
 """create error reports tables
-
-Revision ID: e4f399857598
-Revises: e996e739c44c
+Revision ID: 5d6f06036f61
+Revises: 9880e2b398a4
 Create Date: 2022-09-21 11:18:36.193379
-
 """
 import datetime as dt
 
@@ -12,10 +10,13 @@ from alembic import op
 from sqlalchemy import orm, types, Table, ForeignKey
 from ckan.model import core, domain_object, meta, types as _types
 
-
 # revision identifiers, used by Alembic.
-revision = "e4f399857598"
-down_revision = "e996e739c44c"
+revision = "5d6f06036f61"
+down_revision = "9880e2b398a4"
+branch_labels = None
+depends_on = None
+
+
 branch_labels = None
 depends_on = None
 

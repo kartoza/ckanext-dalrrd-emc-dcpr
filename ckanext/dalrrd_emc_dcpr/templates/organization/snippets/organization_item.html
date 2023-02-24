@@ -1,5 +1,13 @@
 {% ckan_extends %}
 
+{# org count is not showing right for non-users #}
+{% set is_user_org_memeber = h.emc_user_is_org_member(organization.id, c.userobj) %}
+{% if is_user_org_memeber == true or c.userobj.sysadmin %}
+  {% set package_count = organization.package_count %}
+{% else %}
+  {% set package_count = h.get_org_public_records_count(organization.id) %}
+{% endif %}
+
 {% block item %}
 <div class="media-organization-item col-sm-3 ">
 {% block item_inner %}
@@ -16,7 +24,7 @@
   {% endblock %}
   {% block datasets %}
     {% if organization.package_count %}
-      <strong class="count">{{ ungettext('{num} Metadata Record', '{num} Metadata Records', organization.package_count).format(num=organization.package_count) }}</strong>
+      <strong class="count">{{ ungettext('{num} Metadata Record', '{num} Metadata Records', organization.package_count).format(num=package_count) }}</strong>
     {% else %}
       <span class="count">{{ _('0 Metadata Records') }}</span>
     {% endif %}
