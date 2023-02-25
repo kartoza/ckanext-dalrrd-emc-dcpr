@@ -281,6 +281,7 @@ def get_org_public_records_count(org_id: str) -> int:
         model.Package.owner_org == org_id,
         model.Package.private == "f",
         model.Package.state == "active",
+        model.Package.type == "dataset",
     )
     count = len(query.all())
     return count
