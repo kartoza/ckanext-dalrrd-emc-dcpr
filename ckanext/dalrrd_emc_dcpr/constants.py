@@ -273,6 +273,16 @@ DATASET_SUBFIELDS_MAPPING = {
 }
 
 
+STATIC_METADATA_RECORD_FIELDS = {
+    "metadata_language_and_character_set-0-dataset_language": "en",
+    "metadata_language_and_character_set-0-metadata_language": "en",
+    "contact-0-role": "point of contact",
+}
+
+
+USED_ACTIONS_SUBFIELDS = {"contact_organisation": "contact-0-organisation_name"}
+
+
 class DCPRRequestRequiredFields(enum.Enum):
     DATASET_LANGUAGE = "en"
     DATASET_CHARACTER_SET = "ucs-2"
