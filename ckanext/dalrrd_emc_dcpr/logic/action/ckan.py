@@ -153,6 +153,7 @@ def _act_depending_on_package_visibility(
     remains_private = toolkit.asbool(data.get("private", True))
     data = add_static_fields(data)
     data = set_contact_org(data)
+
     if remains_private:
         result = action(context, data)
     else:

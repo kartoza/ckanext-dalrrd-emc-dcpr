@@ -52,12 +52,15 @@ def set_contact_org(data_dict):
     data_dict_cp: typing.Dict[str, list[str]] = deepcopy(data_dict)
     try:
         org_list: list[str] = data_dict_cp.get("owner_org")
+        if type(org_list) == str:
+            return data_dict
         owner_org = org_list[0]
         contact_org = org_list[1]
         data_dict["owner_org"] = owner_org
         data_dict[USED_ACTIONS_SUBFIELDS["contact_organisation"]] = contact_org
         return data_dict
-    except:
+    except Exception as e:
+        raise RuntimeError(e)
         pass
 
 
