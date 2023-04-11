@@ -59,7 +59,7 @@
                         id="field-organisation_level",
                         label=_("Level of organisation"),
                         options=org_level_options,
-                        selected=org_level_options[0].text,
+                        selected=data.organisation_level,
                     ) %}
                         {{ form.info(_('Organisation level')) }}
                     {% endcall %}
@@ -67,7 +67,7 @@
 
                 <div class="col-md-4">
                     {% call form.input(
-                        'organisation_adddress',
+                        'organisation_address',
                         label=_('Organisation address'),
                         id='field-organisation-address',
                         value=data.organisation_address,
@@ -87,7 +87,7 @@
                         'contact_person_name',
                         label=_('Contact person name'),
                         id='field-contact-person-name',
-                        value=data.contact_person,
+                        value=data.contact_person_name,
                         error=errors.contact_person_error,
                         classes=['control-medium'],
                         is_required=True
@@ -111,10 +111,10 @@
 
                 <div class="col-md-4">
                     {% call form.input(
-                        'contact_person_phone',
+                        'dcpr_contact_person_phone',
                         label=_('Phone number'),
                         id='field-contact-person-phone',
-                        value=data.contact_person_phone,
+                        value=data.dcpr_contact_person_phone,
                         error=errors.contact_person_phone_error,
                         classes=['control-medium'],
                     ) %}
@@ -124,10 +124,10 @@
 
                 <div class="col-md-4">
                     {% call form.input(
-                        'contact_person_fax_number',
+                        'dcpr_contact_person_fax_number',
                         label=_('Fax number'),
                         id='field-contact-person-fax-number',
-                        value=data.contact_person_fax,
+                        value=data.dcpr_contact_person_fax_number,
                         error=errors.contact_person_fax_error,
                         classes=['control-medium'],
                     ) %}
@@ -140,7 +140,7 @@
                         'contact_person_email_address',
                         label=_('Email adderss'),
                         id='field-contact-person-email-address',
-                        value=data.contact_email_address,
+                        value=data.contact_person_email_address,
                         error=errors.contact_person_email_address_error,
                         classes=['control-medium'],
                     ) %}
@@ -220,7 +220,9 @@
             type='text',
             value=data.spatial_resolution,
             error=errors.spatial_resolution,
-            classes=['control-medium']
+            classes=['control-medium'],
+            is_required=True
+
         ) %}
             {{ form.info(_('Spatial resolution that is proposed for the data capture.')) }}
         {% endcall %}
@@ -270,6 +272,9 @@
                     feature_description=ds.feature_description,
                     data_usage_restrictions=ds.data_usage_restrictions,
                     capture_method=ds.capture_method,
+                    topic_category = ds.topic_category,
+                    dataset_characterset=ds.dataset_characterset,
+                    metadata_characterset=ds.metadata_characterset,
                     dataset_custodian_error=errors.dataset_custodian,
                     data_type_error=errors.data_type,
                     proposed_dataset_title_error=errors.proposed_dataset_title,
@@ -278,7 +283,13 @@
                     associated_attributes_error=errors.associated_attributes,
                     data_usage_restrictions_error=errors.data_usage_restrictions,
                     capture_method_error=errors.capture_method,
-                    dataset_capture_method_options=dataset_capture_method_options
+                    dataset_capture_method_options=dataset_capture_method_options,
+                    topic_category_error = errors.topic_category,
+                    dataset_characterset_error=errors.dataset_characterset,
+                    metadata_characterset_error=errors.metadata_characterset,
+
+
+
                 ) }}
             {% endfor %}
 

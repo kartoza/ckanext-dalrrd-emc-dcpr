@@ -18,6 +18,7 @@ def handle_search(search_params):
     # \[.*\]
     # lstrip removes leading spaces
     search_param = search_params["fq"].lstrip()
+
     fq_list = skip_brackets(search_param)
 
     # fq_list = search_param.split()  # the default is space
@@ -60,10 +61,15 @@ def skip_brackets(search_param: str):
     """
     split the search param while
     skipping the spaces between
-    brackets
+    brackets and between
+    doubled quotes (e.g.
+    the sasdi theme
+    "Administrative boundaries 1"
+    )
     """
     lbracket, rbracket = "[", "]"
     brackets_num = 0
+    dbl_quotes_num = 0
     sep, sep_idx = " ", [0]
 
     for idx, char in enumerate(search_param):
@@ -73,7 +79,14 @@ def skip_brackets(search_param: str):
             brackets_num -= 1
         elif brackets_num < 0:
             return search_param
-        elif brackets_num == 0 and char == sep:
+
+        elif char == '"' and dbl_quotes_num == 0:
+            dbl_quotes_num += 1
+
+        elif char == '"' and dbl_quotes_num == 1:
+            dbl_quotes_num -= 1
+
+        elif brackets_num == 0 and dbl_quotes_num == 0 and char == sep:
             sep_idx.append(idx)
     # we need to slice
     sep_idx.append(len(search_param))

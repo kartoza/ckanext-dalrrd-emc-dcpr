@@ -17,36 +17,32 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column("dcpr_request_dataset", Column("organisation_level", Text())),
+    op.add_column("dcpr_request", Column("organisation_level", Text())),
 
-    op.add_column("dcpr_request_dataset", Column("organisation_adddress", Text())),
+    op.add_column("dcpr_request", Column("organisation_address", Text())),
 
-    op.add_column("dcpr_request_dataset", Column("contact_person_name", Text())),
+    op.add_column("dcpr_request", Column("contact_person_name", Text())),
 
-    op.add_column("dcpr_request_dataset", Column("contact_person_designation", Text())),
+    op.add_column("dcpr_request", Column("contact_person_designation", Text())),
 
-    op.add_column(
-        "dcpr_request_dataset", Column("contact_person_email_address", Text())
-    ),
+    op.add_column("dcpr_request", Column("contact_person_email_address", Text())),
 
-    op.add_column("dcpr_request_dataset", Column("dcpr_contact_person_phone", Text())),
+    op.add_column("dcpr_request", Column("dcpr_contact_person_phone", Text())),
 
-    op.add_column(
-        "dcpr_request_dataset", Column("dcpr_contact_person_fax_number", Text())
-    )
+    op.add_column("dcpr_request", Column("dcpr_contact_person_fax_number", Text()))
 
 
 def downgrade():
-    op.drop_column("dcpr_request_dataset", "organisation_level"),
+    op.drop_column("dcpr_request", "organisation_level"),
 
-    op.drop_column("dcpr_request_dataset", "organisation_adddress"),
+    op.drop_column("dcpr_request", "organisation_address"),
 
-    op.drop_column("dcpr_request_dataset", "contact_person_name"),
+    op.drop_column("dcpr_request", "contact_person_name"),
 
-    op.drop_column("dcpr_request_dataset", "contact_person_designation"),
+    op.drop_column("dcpr_request", "contact_person_designation"),
 
-    op.drop_column("dcpr_request_dataset", "contact_person_email_address"),
+    op.drop_column("dcpr_request", "contact_person_email_address"),
 
-    op.drop_column("dcpr_request_dataset", "dcpr_contact_person_phone"),
+    op.drop_column("dcpr_request", "dcpr_contact_person_phone"),
 
-    op.drop_column("dcpr_request_dataset", "dcpr_contact_person_fax_number")
+    op.drop_column("dcpr_request", "dcpr_contact_person_fax_number")
