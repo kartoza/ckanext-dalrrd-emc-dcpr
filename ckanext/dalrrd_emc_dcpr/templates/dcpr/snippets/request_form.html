@@ -42,12 +42,12 @@
                         {% call form.select(
                             "organization_id",
                             id="field-organization_id",
-                            label=_("Organization"),
+                            label=_("Organisation"),
                             options=relevant_organizations,
                             selected=relevant_organizations[0].text,
                             is_required=true
                         ) %}
-                            {{ form.info(_('Organisation that shall be responsible for this DCPR request - This field only shows organizations that the current user is a member of.')) }}
+                            {{ form.info(_('Organisation that shall be responsible for this DCPR request - This field only shows organisations that the current user is a member of.')) }}
                         {% endcall %}
                     {% endif %}
                     </div>
