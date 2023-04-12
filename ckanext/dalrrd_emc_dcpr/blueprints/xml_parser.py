@@ -14,6 +14,7 @@ from ..constants import (
 )
 from xml.parsers.expat import ExpatError
 import json
+from ..logic.action.actions_utils import add_static_fields
 
 # About this Blueprint:
 # -------------
@@ -109,7 +110,7 @@ def check_file_fields(xml_file) -> dict:
         root = handle_responsible_party_choices_fields(root)
         root = handle_numeric_choices(root)
         root = set_language_abbreviation(root)
-        # root = handle_date_fields(root)
+        root = add_static_fields(root)
         return create_ckan_dataset(root)
 
         # things went ok
