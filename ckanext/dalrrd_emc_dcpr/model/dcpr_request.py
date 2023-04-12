@@ -65,6 +65,7 @@ dcpr_request_table = Table(
     Column("csi_moderation_date", types.DateTime),
     Column("organisation_level", types.UnicodeText),
     Column("organisation_address", types.UnicodeText),
+    Column("organisation_role", types.UnicodeText),
     Column("contact_person_name", types.UnicodeText),
     Column("contact_person_designation", types.UnicodeText),
     Column("contact_person_email_address", types.UnicodeText),
@@ -80,6 +81,8 @@ dcpr_request_dataset_table = Table(
     ),
     Column("dcpr_request_id", ForeignKey("dcpr_request.csi_reference_id")),
     Column("dataset_custodian", types.Boolean, default=False),
+    Column("metadata_contact_organisation", types.UnicodeText),
+    Column("metadata_contact_name", types.UnicodeText),
     Column("data_type", types.UnicodeText),
     Column("proposed_dataset_title", types.UnicodeText, nullable=False),
     Column("proposed_abstract", types.UnicodeText),
@@ -93,6 +96,8 @@ dcpr_request_dataset_table = Table(
     Column("topic_category", types.UnicodeText),
     Column("dataset_characterset", types.UnicodeText),
     Column("metadata_characterset", types.UnicodeText),
+    Column("dataset_distribution_format_name", types.UnicodeText),
+    Column("dataset_distribution_format_version", types.UnicodeText),
 )
 
 dcpr_request_notification_table = Table(

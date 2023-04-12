@@ -754,6 +754,11 @@ def _unflatten_dcpr_request_datasets(flat_data_dict: typing.Dict) -> typing.Dict
         "topic_category",
         "dataset_characterset",
         "metadata_characterset",
+        "dataset_distribution_format_name",
+        "dataset_distribution_format_version",
+        "dataset_distribution_format_version",
+        "metadata_contact_organisation",
+        "metadata_contact_name",
     ]
     # how many datasets have been submitted?'
     first_ds_field_value = flat_data_dict.get(dataset_fields[0])

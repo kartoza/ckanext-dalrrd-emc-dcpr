@@ -46,6 +46,7 @@ def create_dcpr_request_schema(
         "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
         "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
         "organisation_level": [not_empty, unicode_safe],
+        "organisation_role": [unicode_safe],
         "organisation_address": [ignore_missing, unicode_safe],
     }
 
@@ -86,6 +87,7 @@ def update_dcpr_request_by_owner_schema(
         "dcpr_contact_person_phone": [ignore_missing, unicode_safe],
         "dcpr_contact_person_fax_number": [ignore_missing, unicode_safe],
         "organisation_level": [not_empty, unicode_safe],
+        "organisation_role": [unicode_safe],
     }
 
 
@@ -158,6 +160,8 @@ def create_dcpr_request_dataset_schema(
         "dataset_purpose": [not_empty, not_missing, unicode_safe],
         "proposed_dataset_title": [not_empty, not_missing, unicode_safe],
         "dataset_custodian": [ignore_missing],
+        "metadata_contact_organisation": [not_missing, unicode_safe],
+        "metadata_contact_name": [not_missing, unicode_safe],
         "data_type": [not_empty, unicode_safe],
         "proposed_abstract": [not_empty, unicode_safe],
         "lineage_statement": [not_empty, unicode_safe],
@@ -167,6 +171,8 @@ def create_dcpr_request_dataset_schema(
         "topic_category": [not_empty, not_missing, unicode_safe],
         "dataset_characterset": [not_missing, unicode_safe],
         "metadata_characterset": [not_missing, unicode_safe],
+        "dataset_distribution_format_name": [not_missing, unicode_safe],
+        "dataset_distribution_format_version": [not_missing, unicode_safe],
     }
 
 

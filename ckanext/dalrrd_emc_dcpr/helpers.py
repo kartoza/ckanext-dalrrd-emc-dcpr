@@ -632,6 +632,14 @@ def get_user_name_from_url(url: str):
     return url.split("/user/")[1]
 
 
+def get_org_name(org_id):
+    """
+    gets organisation name by it's id
+    """
+    org_obj = model.Session.query(model.Group).filter_by(id=org_id).first()
+    return org_obj.name
+
+
 def get_recent_news(number=5, exclude=None):
     news_list = toolkit.get_action("ckanext_pages_list")(
         None, {"order_publish_date": True, "private": False, "page_type": "news"}

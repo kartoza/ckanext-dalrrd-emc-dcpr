@@ -35,7 +35,6 @@ dataset_fields:
 
     - field_name: name
       label: Metadata standard name
-      validators: metadata_default_standard_name
       required: false
       help_text: >-
         Name(s) of metadata standard used, if multiple standards used, separate them by comma, leave
@@ -43,7 +42,6 @@ dataset_fields:
 
     - field_name: version
       label: Metadata standard version
-      validators: metadata_default_standard_version
       required: false
       help_text: >-
         Version(s) of metadata standard used, if multiple standards used, separate versions by comma, leave
@@ -79,12 +77,16 @@ dataset_fields:
       choices:
         - value: resource_provider
           label: resource provider
+        - value: custodian
+          label: Custodian
         - value: owner
           label: owner
+        - value: user
+          label: User
         - value: distributor
           label: distributor
         - value: originator
-          label: originator
+          label: Originator
         - value: point_of_contact
           label: point of contact
         - value: principal_investigator

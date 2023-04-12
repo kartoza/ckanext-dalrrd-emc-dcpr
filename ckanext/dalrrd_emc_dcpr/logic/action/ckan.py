@@ -8,8 +8,7 @@ from ckan.model.domain_object import DomainObject
 
 from ...model.user_extra_fields import UserExtraFields
 from .dataset_versioning_control import handle_versioning
-from .actions_utils import add_static_fields, set_contact_org
-from .add_named_url import handle_named_url
+from .actions_utils import *
 
 import datetime
 
@@ -92,8 +91,7 @@ def package_create(original_action, context, data_dict):
     Intercepts the core `package_create` action to check if package
      is being published after being created.
     """
-    named_url = handle_named_url(data_dict)
-    data_dict["name"] = named_url
+    data_dict = apply_pre_create_handlers(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
@@ -103,10 +101,7 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
-    # if package_state == "draft":
-    #     return _act_depending_on_package_visibility(original_action, context, data_dict)
-    # else:
-    #     handle_versioning(context, data_dict)
+    data_dict = apply_update_handlers(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
@@ -151,9 +146,6 @@ def _act_depending_on_package_visibility(
     action: typing.Callable, context: typing.Dict, data: typing.Dict
 ):
     remains_private = toolkit.asbool(data.get("private", True))
-    data = add_static_fields(data)
-    data = set_contact_org(data)
-
     if remains_private:
         result = action(context, data)
     else:
