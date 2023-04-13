@@ -155,6 +155,60 @@
         </table>
       </section>
 
+      <section id="granular-stats-by-date" class="module-content tab-content">
+          <h2>{{ _('Pull stats by date') }}</h2>
+            <div id="pull-stats-start-date-wrapper">
+              <label for="#pull-stats-starting-date"> Starting Date</label>
+              <input id="pull-stats-starting-date" type="date" name="pull_stats_starting_date">
+            </div>
+            <div id="pull-stats-end-date-wrapper">
+              <label for="#pull-stats-ending-date"> Ending Date</label>
+              <input id="pull-stats-ending-date" type="date" name="pull_stats_ending_date">
+            </div>
+          <button class="btn btn-primary pull-right stats_by_date_submission_btn">Pull Statistics</button>
+      </section>
+
+      <section id="granular-stats-by-area" class="module-content tab-content">
+        <h2>{{ _('Pull stats by geographic area') }}</h2>
+        <table class="table table-chunky table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>{{ _('User') }}</th>
+              <th class="metric">{{ _('Number of Datasets') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user, num_packages in top_packages_creators %}
+              <tr>
+                <td class="media">{{ h.linked_user(user) }}</td>
+                <td class="metric">{{ num_packages }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section id="granular-stats-owned-records" class="module-content tab-content">
+        <h2>{{ _('Pull stats about submitted records') }}</h2>
+        <table class="table table-chunky table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>{{ _('User') }}</th>
+              <th class="metric">{{ _('Number of Datasets') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user, num_packages in top_packages_creators %}
+              <tr>
+                <td class="media">{{ h.linked_user(user) }}</td>
+                <td class="metric">{{ num_packages }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+
 
 </article>
 {% endblock %}
@@ -170,6 +224,9 @@
         <li class="nav-item"><a href="#stats-top-tags" data-toggle="tab" data-bs-toggle="tab">{{ _('Top Tags') }}</a></li>
         <li class="nav-item"><a href="#stats-most-create" data-toggle="tab" data-bs-toggle="tab">{{ _('Users Creating Most Datasets') }}</a></li>
         <li class="nav-item"><a href="#stats-total-datasets" data-toggle="tab" data-bs-toggle="tab">{{ _('Total Number of Datasets') }}</a></li>
+        <li class="nav-item"><a href="#granular-stats-by-date" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats By Date') }}</a></li>
+        <li class="nav-item"><a href="#granular-stats-by-area" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats By Geographic Area') }}</a></li>
+        <li class="nav-item"><a href="#granular-stats-owned-records" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats About Owned Records') }}</a></li>
       </ul>
     </nav>
   </section>

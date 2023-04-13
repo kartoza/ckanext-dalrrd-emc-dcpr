@@ -238,10 +238,3 @@ def apply_update_handlers(data_dict: dict):
     data_dict = add_static_fields(data_dict)
     data_dict = set_contact_org(data_dict)
     data_dict = add_metadata_name_and_version(data_dict)
-    return data_dict
-
-
-# test_suite = {"contact-1-organization_role":"organization role value","lineage-0-statement":"lineage statement value",
-# "maintenance_information-3-maintenance_date":"maintenance information date", "reference_system_additional_info-0-temporal_reference":"temporal info"}
-
-# print(handle_repeating_subfields_naming(test_suite))

@@ -1215,3 +1215,27 @@ select[id$="field-dataset_custodian"]{
   background-color: #eee !important;
   opacity: 1 !important;
 }
+
+
+.stats_by_date_submission_btn{
+  margin-top: 10px;
+}
+
+#pull-stats-start-date-wrapper{
+  width: 100%;
+  margin:20px 0px 10px 0px;
+}
+
+#pull-stats-start-date-wrapper > input{
+  width: 100%;
+  height:25px;
+}
+
+#pull-stats-end-date-wrapper{
+  width: 100%;
+}
+
+#pull-stats-end-date-wrapper > input{
+  width: 100%;
+  height:25px;
+}
