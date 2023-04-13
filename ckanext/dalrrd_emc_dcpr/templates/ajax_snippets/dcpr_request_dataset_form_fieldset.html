@@ -155,14 +155,14 @@
     {% endcall %}
     {% call form.select(
             'dataset_custodian',
-            label=_('Organization is custodian?'),
-            options = option,
+            label=_('Organisation is custodian?'),
+            options = [{'value':'E1', "text":"submitted as E1 form"}, {'value':'E2', "text":"submitted as E2 form"}],
             selected= selected,
             id='ds{}-field-dataset_custodian'.format(index),
             classes=['dataset_custodian','organization_dataset_custodian'],
-            error=dataset_custodian_error,
+            error=dataset_custodian_error
         ) %}
-        {{ form.info(_('Whether the request is being made by an organization that is the dataset custodian.')) }}
+        {{ form.info(_('Whether the request is being made by an organisation that is the dataset custodian.')) }}
     {% endcall %}
 
     {% call form.input(
