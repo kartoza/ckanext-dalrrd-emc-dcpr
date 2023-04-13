@@ -321,16 +321,6 @@ dataset_fields:
       required: false
       form_snippet: null_form.html
 
-  - field_name: online_resource
-    label: Metadata record online information
-    preset: modified_repeating_subfields
-    repeating_label: Metadata record online information
-    repeating_subfields:
-    # this should be the same as the name of the record
-    - field_name: linkage
-      label: URL
-      help_text: location(address) for on-line access using a uniform resource locator address or similar addressing scheme
-
   - field_name: distribution_format
     label: Distribution format
     preset: modified_repeating_subfields

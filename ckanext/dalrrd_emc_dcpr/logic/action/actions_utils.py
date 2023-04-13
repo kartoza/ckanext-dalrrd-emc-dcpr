@@ -75,6 +75,17 @@ def add_static_fields(data_dict: dict) -> dict:
     and they don't change in value (e.g. metadata
     contact organisation role which is point of contact)
     """
+    contact = data_dict.get("contact")
+    metadata_and_charset = data_dict.get("metadata_language_and_character_set")
+    if contact is not None and type(contact) == list:
+        contact[0]["role"] = "Point of contact"
+        data_dict["contact"] = contact
+
+    if metadata_and_charset is not None and type(metadata_and_charset) == list:
+        metadata_and_charset[0]["dataset_language"] = "en"
+        metadata_and_charset[0]["metadata_language"] = "en"
+        data_dict["metadata_language_and_character_set"] = metadata_and_charset
+
     data_dict.update(STATIC_METADATA_RECORD_FIELDS)
     return data_dict
 
