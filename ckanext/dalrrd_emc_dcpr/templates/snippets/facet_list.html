@@ -22,7 +22,7 @@
 							'Tags': 'fa fa-tags',
 							'SASDI Themes': 'fa fa-bars',
 							'ISO Topic Categories': 'fa fa-filter',
-							'Harvest source': 'fa fa-cloud',
+							'Harvest sources': 'fa fa-cloud',
 							'DCPR Request': 'fa fa-file',
 							'Featured Metadata records': 'fa fa-star',
 						} %}
@@ -114,11 +114,11 @@
 				</nav>
                 {% if items|length > 10%}
                     <p class="module-footer show-more-button">
-                        <button class="read-more" data-module="emc-facets-pagination" data-classname="facet-inner-{{ item_id }}">{{ _('Show More {facet_type}').format(facet_type=title) }}</button>
+                        <button class="read-more" data-module="emc-facets-pagination" data-classname="facet-inner-{{ item_id }}">{{ _('Show More {facet_type}').format(facet_type=title|lower) }}</button>
                     </p>
                 {% endif %}
 			    {% else %}
-					<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
+					<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title|lower) }}</p>
 			    {% endif %}
 			{% endwith %}
 		    {% endblock %}
