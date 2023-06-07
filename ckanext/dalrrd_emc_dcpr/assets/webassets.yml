@@ -130,3 +130,9 @@ plotter-js:
   extra:
     preload:
       - ckanext-dalrrdemcdcpr/vendor-plot-js
+
+stats-pull-js:
+  output: ckanext-dalrrdemcdcpr/%(version)s_pull.js
+  contents:
+    - js/stats_pull.js
+  filter: rjsmin

@@ -46,6 +46,8 @@ from ..logic.action.error_report import create as report_create_actions
 from ..logic.action.error_report import update as report_update_actions
 from ..logic.action.error_report import get as report_get_actions
 from ..logic.action.error_report import delete as report_delete_actions
+from ..logic.action.miscellaneous import get as mis_get_actions
+
 
 from ..logic import (
     converters,
@@ -57,6 +59,7 @@ from ..logic.auth import pages as ckanext_pages_auth
 from ..logic.auth import dcpr as dcpr_auth
 from ..logic.auth import emc as emc_auth
 from ..logic.auth import error_report as error_report_auth
+from ..logic.auth import miscellaneous as mis_auth
 from ..model.user_extra_fields import UserExtraFields
 
 import ckanext.dalrrd_emc_dcpr.plugins.utils as utils
@@ -305,6 +308,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "my_error_report_list_auth": error_report_auth.my_error_report_list_auth,
             "rejected_error_reports_auth": error_report_auth.rejected_error_reports_auth,
             "error_report_delete_auth": error_report_auth.error_report_delete_auth,
+            "stats_public_records_list_auth": mis_auth.public_records_stats_auth,
         }
 
     def get_actions(self) -> typing.Dict[str, typing.Callable]:
@@ -355,6 +359,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "rejected_error_reports": report_get_actions.rejected_error_reports,
             "submitted_error_report_list": report_get_actions.submitted_error_report_list,
             "error_report_delete": report_delete_actions.error_report_delete,
+            "stats_list_public_records_by_date": mis_get_actions.stats_list_public_metadata_records_by_date,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:

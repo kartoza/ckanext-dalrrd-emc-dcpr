@@ -18,7 +18,6 @@ ckan.module("spatial_search", function($){
 
     return{
         initialize:function(){
-            console.log("spatial search loaded!")
             let _this = this
             if(document.readyState == "complete"){_this.mapper(); }
             else{window.addEventListener("load", (e)=>{
@@ -29,7 +28,7 @@ ckan.module("spatial_search", function($){
         mapper: function(){
             var _this = this
             let Lmap
-            if(path.includes("dataset/new") || path.includes("dcpr/request/new")){
+            if(path.includes("dataset/new") || path.includes("dcpr/request/new") || path.includes("stats")){
                 Lmap = LeafletMapFromExtentModule
             }
             else{
