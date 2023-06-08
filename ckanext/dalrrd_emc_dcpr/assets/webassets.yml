@@ -137,3 +137,9 @@ stats-pull-js:
   contents:
     - js/stats_pull.js
   filter: rjsmin
+
+fix-leaflet-partial-load:
+  output: ckanext-dalrrdemcdcpr/%(version)s_fix_leaflet_partial_load.js
+  contents:
+    - js/fix_leaflet_partial_load.js
+  filter: rjsmin

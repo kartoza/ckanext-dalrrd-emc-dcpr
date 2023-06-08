@@ -3,6 +3,7 @@
 {% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-css" %}
 {% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-js" %} {# this js asset is only one module per one file -> emcDatasetSpatialExtentMap #}
 {% asset "ckanext-dalrrdemcdcpr/spatial-search-js" %} {# get the south african boundaries (national, districts ..etc.) #}
+{% asset "ckanext-dalrrdemcdcpr/fix-leaflet-partial-load" %} {# fixes an issue with leaflet in the stats page #}
 
 {% set map_config = h.emc_get_common_map_config() %}
 {% set default_bounding_box = h.emc_default_bounding_box() %}

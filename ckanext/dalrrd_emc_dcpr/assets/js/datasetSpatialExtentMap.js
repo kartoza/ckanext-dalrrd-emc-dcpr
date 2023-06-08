@@ -31,11 +31,6 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
             this.formInputElement = document.getElementById(this.options.formInputId)
             jQuery.proxyAll(this, /_on/);
             this.el.ready(this._onReady);
-
-            document.querySelector("#mapArea").addEventListener("click", function(){
-                window.dispatchEvent(new Event('resize'));
-        })
-
         },
 
         _onReady: function() {

@@ -168,7 +168,7 @@
           <button class="btn btn-primary pull-right stats_by_date_submission_btn">Pull Statistics</button>
       </section>
 
-      <section id="granular-stats-by-area" class="module-content tab-content">
+      <section id="granular-stats-by-area" class="module-content tab-content" data-module="trigger_resize_window_for_leaflet">
         <h2>{{ _('Pull stats by geographic area') }}</h2>
 
           <!-- need a map here that takes an input and transforms it-->
@@ -212,7 +212,7 @@
         <li class="nav-item"><a href="#stats-most-create" data-toggle="tab" data-bs-toggle="tab">{{ _('Users Creating Most Datasets') }}</a></li>
         <li class="nav-item"><a href="#stats-total-datasets" data-toggle="tab" data-bs-toggle="tab">{{ _('Total Number of Datasets') }}</a></li>
         <li class="nav-item"><a href="#granular-stats-by-date" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats By Date') }}</a></li>
-        <li class="nav-item"><a id="mapArea" href="#granular-stats-by-area" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats By Geographic Area') }}</a></li>
+        <li class="nav-item"><a id="granularStatsByArea" href="#granular-stats-by-area" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats By Geographic Area') }}</a></li>
         <li class="nav-item"><a href="#granular-stats-owned-records" data-toggle="tab" data-bs-toggle="tab">{{ _('Pull Stats About Owned Records') }}</a></li>
       </ul>
     </nav>
