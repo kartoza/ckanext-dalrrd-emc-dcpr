@@ -428,6 +428,8 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "get_year": helpers.get_year,
             "get_user_dashboard_packages": helpers.get_user_dashboard_packages,
             "get_org_public_records_count": helpers.get_org_public_records_count,
+            # "get_common_map_config":helpers.get_common_map_config,
+            "emc_get_common_map_config": helpers.get_common_map_config,
         }
 
     def get_blueprint(self) -> typing.List[Blueprint]:

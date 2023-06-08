@@ -51,12 +51,12 @@ ckan.module("spatial_search", function($){
 
                 Lmap.options.minZoom = 4;
 
-
                 Lmap.eachLayer(lyr=>{
                     if( lyr instanceof L.TileLayer ) {
                         lyr.options.noWrap = true
                     }
-            })
+               })
+
                 let divisions = ["national", "provinces", "district_municipalities", "local_municipalities"]
                 let divisions_overlay = {}
                 divisions.forEach(division =>{
@@ -70,6 +70,7 @@ ckan.module("spatial_search", function($){
                             "opacity": 0.65
 
                         },
+
                         onEachFeature:function(feature, layer){
 
                             /* for reasons related to browser cache
@@ -118,21 +119,13 @@ ckan.module("spatial_search", function($){
                 // handle drawer
 
                 $("a.leaflet-draw-draw-rectangle").attr("title", "search with rectangle bounds")
-                // $("a.leaflet-draw-draw-rectangle").on("click", function(e){
-                // })
-
-
-
                 $("a.leaflet-draw-draw-rectangle").parent().append(
                     $("<a class='leaflet-draw-draw-circle'></a>")
                 )
-
                 $("a.leaflet-draw-draw-circle").attr("title", "search with circular buffer")
-
                 $('a.leaflet-draw-draw-circle').hover(function(e){
                     $(this).css({"cursor":"pointer"})
                 })
-
                 $('a.leaflet-draw-draw-circle').on('click', function(e){
                     $('body').toggleClass('dataset-map-expanded');
                     Lmap.invalidateSize();
@@ -141,7 +134,6 @@ ckan.module("spatial_search", function($){
                         drawerEnabled = false
                     }
                     else{
-                        console.log("drawer is enabled now!")
                         drawer = new L.Draw.Circle(Lmap)
                         drawer.enable()
                         drawerEnabled = true

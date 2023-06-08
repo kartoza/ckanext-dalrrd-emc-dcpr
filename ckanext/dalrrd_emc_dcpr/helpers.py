@@ -318,6 +318,13 @@ def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     return geometry.mapping(oriented_padded)
 
 
+def get_common_map_config():
+    """Get leaflet map config from ini file."""
+    # Change this implementation to use the config file
+    config = {"center": [-28.323724553546, 23.983154296875004], "zoom": 5}
+    return config
+
+
 def get_status_labels() -> typing.Dict:
     """Get status labels for the DCPR requests"""
     status_labels = {

@@ -29,16 +29,26 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
 
         initialize: function() {
             this.formInputElement = document.getElementById(this.options.formInputId)
-
             jQuery.proxyAll(this, /_on/);
             this.el.ready(this._onReady);
+
+            document.querySelector("#mapArea").addEventListener("click", function(){
+                window.dispatchEvent(new Event('resize'));
+        })
 
         },
 
         _onReady: function() {
-            this.map = L.map("dataset-spatial-extent-map-container", this.options.mapConfig, {
+            // setTimeout(function () {
+            //     console.log("Resizing map")
+            //     window.dispatchEvent(new Event('resize'));
+
+            //    }, 2000);
+            this.map = L.map("dataset-spatial-extent-map-container", {
                 attributionControl: false
             })
+            let lat_lng = new L.LatLng(this.options.mapConfig.center[0], this.options.mapConfig.center[1])
+            this.map.setView(lat_lng, this.options.mapConfig.zoom)
             this.map.pm.addControls({
                 position: "topleft",
                 drawMarker: false,
@@ -78,14 +88,13 @@ ckan.module("emcDatasetSpatialExtentMap", function(jQuery, _){
             this.rectangleLayer.on("pm:edit", this._onLayerEdit)
             this.rectangleLayer.on("pm:dragend", this._onLayerDrag)
             this.formInputElement.addEventListener("change", this._onBoundingBoxManuallyUpdated)
-
-            //this.map.addLayer(this.rectangleLayer)
             this.map.fitBounds(this.rectangleLayer.getBounds())
 
             LeafletMapFromExtentModule = this.map
         },
 
         _onRemove: function (event) {
+            // emptying form input when geoman rectangle is removed
             this.formInputElement.setAttribute("value", "")
         },
 
