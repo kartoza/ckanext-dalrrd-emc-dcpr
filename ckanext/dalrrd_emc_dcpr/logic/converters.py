@@ -99,56 +99,38 @@ def convert_choices_select_to_int(data_dict, context):
         raise toolkit.Invalid("select field should have a string value")
 
 
-def check_if_number(data_dict):
+def check_if_number(value):
     """
     check if the given value can be
     converted to a number
     """
     logger.debug("convert to real number ")
-    if data_dict == "":
+    if value == "":
         return ""
     try:
-        return float(data_dict)
+        return float(value)
     except:
         raise toolkit.Invalid("select field should be a number ")
 
 
-def check_if_int(data_dict):
+def check_if_int(value):
     """
     check if the given value can be
     converted to an integer
     """
     logger.debug("convert to int ")
-    if data_dict == "":
+    if value == "":
         return ""
     try:
-        return int(data_dict)
+        return int(value)
     except:
         raise toolkit.Invalid("select field should be an integer ")
 
 
-def convert_select_custom_choice_to_extra(data_dict):
+def convert_select_custom_choice_to_extra(value):
     """
     adding custom field to select options,
     currently appears as "__extras" in the
     database,
     """
-    return data_dict
-
-
-def default_metadata_standard_name(value):
-    """
-    returns SANS1878 as the default
-    metadata standard name.
-    """
-    if value == "":
-        return "SANS 1878-1:2011"
-
-
-def default_metadata_standard_version(value):
-    """
-    returns SANS1878 as the default
-    metadata standard name.
-    """
-    if value == "":
-        return "1.1"
+    return value

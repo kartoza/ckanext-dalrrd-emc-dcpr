@@ -318,6 +318,13 @@ def _pad_geospatial_extent(extent: typing.Dict, padding: float) -> typing.Dict:
     return geometry.mapping(oriented_padded)
 
 
+def get_common_map_config():
+    """Get leaflet map config from ini file."""
+    # Change this implementation to use the config file
+    config = {"center": [-28.323724553546, 23.983154296875004], "zoom": 5}
+    return config
+
+
 def get_status_labels() -> typing.Dict:
     """Get status labels for the DCPR requests"""
     status_labels = {
@@ -630,6 +637,14 @@ def get_user_name_from_url(url: str):
     get user's name from url
     """
     return url.split("/user/")[1]
+
+
+def get_org_name(org_id):
+    """
+    gets organisation name by it's id
+    """
+    org_obj = model.Session.query(model.Group).filter_by(id=org_id).first()
+    return org_obj.name
 
 
 def get_recent_news(number=5, exclude=None):

@@ -15,6 +15,8 @@ from ... import schema as dcpr_schema
 from ....model import dcpr_request
 from .... import dcpr_dictization
 from .. import create_dcpr_management_activity
+from ....constants import *
+from ckanext.dalrrd_emc_dcpr import helpers as h
 
 logger = logging.getLogger(__name__)
 
@@ -302,9 +304,6 @@ def create_package_from_dcpr_request(
             )
             for dataset in datasets or []:
                 data_dict = {}
-                package_name = dataset.proposed_dataset_title.lower().replace(" ", "")
-                # package_name = _remove_special_characters_from_package_url(package_name) # mechanism to ensure names are safe, chagne the behavior with multiple datasets
-                # data_dict["name"] = package_name
                 data_dict["title"] = dataset.proposed_dataset_title
                 data_dict["extras"] = [
                     {"key": "origin", "value": "DCPR"},
@@ -315,62 +314,72 @@ def create_package_from_dcpr_request(
                 data_dict["dataset_purpose"] = dataset.dataset_purpose
                 data_dict["owner_org"] = request_obj.organization_id
                 data_dict[
-                    "spatial_parameters-0-spatial_reference_system"
+                    DATASET_SUBFIELDS_MAPPING["spatial_reference_system"]
                 ] = DCPRRequestRequiredFields.SPATIAL_REFERENCE_SYSTEM.value
                 data_dict[
-                    "metadata_language_and_character_set-0-dataset_language"
+                    DATASET_SUBFIELDS_MAPPING["dataset_character_set"]
+                ] = dataset.dataset_characterset
+                data_dict[
+                    DATASET_SUBFIELDS_MAPPING["metadata_character_set"]
+                ] = dataset.metadata_characterset
+                data_dict[
+                    DATASET_SUBFIELDS_MAPPING["dataset_language"]
                 ] = DCPRRequestRequiredFields.DATASET_LANGUAGE.value
                 data_dict[
-                    "metadata_language_and_character_set-0-dataset_character_set"
-                ] = dataset.dataset_characterset
-                data_dict[
-                    "metadata_language_and_character_set-0-metadata_character_set"
-                ] = dataset.dataset_characterset
-                data_dict[
-                    "metadata_language_and_character_set-0-metadata_language"
+                    DATASET_SUBFIELDS_MAPPING["metadata_language"]
                 ] = DCPRRequestRequiredFields.METADATA_LANGUAGE.value
                 data_dict[
-                    "metadata_reference_date_and_stamp-0-reference"
+                    DATASET_SUBFIELDS_MAPPING["reference_date"]
                 ] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                data_dict[DATASET_SUBFIELDS_MAPPING["reference_datetype"]] = "1"
                 data_dict[
-                    "metadata_reference_date_and_stamp-0-reference_date_type"
-                ] = "1"
-                data_dict[
-                    "metadata_reference_date_and_stamp-0-stamp"
+                    DATASET_SUBFIELDS_MAPPING["stamp_date"]
                 ] = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                data_dict["metadata_reference_date_and_stamp-0-stamp_date_type"] = "1"
+                data_dict[DATASET_SUBFIELDS_MAPPING["stamp_datetype"]] = "1"
                 data_dict[
-                    "topic_and_sasdi_theme-0-iso_topic_category"
+                    DATASET_SUBFIELDS_MAPPING["topic_category"]
                 ] = dataset.topic_category
-                data_dict["lineage_statement"] = dataset.lineage_statement
                 data_dict[
-                    "spatial_parameters-0-equivalent_scale"
+                    DATASET_SUBFIELDS_MAPPING["lineage_statement"]
+                ] = dataset.lineage_statement
+                data_dict[
+                    DATASET_SUBFIELDS_MAPPING["equivalent_scale"]
                 ] = request_obj.spatial_resolution
                 data_dict[
-                    "spatial_parameters-0-spatial_representation_type"
+                    DATASET_SUBFIELDS_MAPPING["spatial_representation_type"]
                 ] = dataset.data_type
                 data_dict["notes"] = dataset.proposed_abstract
                 data_dict[
-                    "metadata_standard-0-name"
+                    DATASET_SUBFIELDS_MAPPING["metadata_standard_name"]
                 ] = DCPRRequestRequiredFields.METADATA_STANDARD_NAME.value
                 data_dict[
-                    "metadata_standard-0-version"
+                    DATASET_SUBFIELDS_MAPPING["metadata_standard_version"]
                 ] = DCPRRequestRequiredFields.METADATA_STANDARD_VERSION.value
                 data_dict[
-                    "distribution_format-0-name"
-                ] = DCPRRequestRequiredFields.DISTRIBUTION_FORMAT_NAME.value
+                    DATASET_SUBFIELDS_MAPPING["format_name"]
+                ] = dataset.dataset_distribution_format_name
                 data_dict[
-                    "distribution_format-0-version"
-                ] = DCPRRequestRequiredFields.DISTRIBUTION_FORMAT_VERSION.value
+                    DATASET_SUBFIELDS_MAPPING["format_version"]
+                ] = dataset.dataset_distribution_format_version
                 data_dict[
-                    "responsible_party-0-individual_name"
+                    DATASET_SUBFIELDS_MAPPING["responsible_party_individual_name"]
                 ] = request_obj.contact_person_name
                 data_dict[
-                    "responsible_party-0-position_name"
+                    DATASET_SUBFIELDS_MAPPING["responsible_party_position_name"]
                 ] = request_obj.contact_person_designation
                 data_dict[
-                    "responsible_party-0-role"
+                    DATASET_SUBFIELDS_MAPPING["responsible_party_role"]
                 ] = DCPRRequestRequiredFields.RESPONSIBLE_PARTY_ROLE.value
+                data_dict[
+                    DATASET_SUBFIELDS_MAPPING["contact_individual_name"]
+                ] = dataset.metadata_contact_name
+                data_dict[
+                    DATASET_SUBFIELDS_MAPPING["contact_organisation"]
+                ] = h.get_org_name(dataset.metadata_contact_organisation)
+                data_dict[
+                    DATASET_SUBFIELDS_MAPPING["contact_role"]
+                ] = "Point of contact"
+
                 result = toolkit.get_action("package_create")(context, data_dict)
         except toolkit.NotAuthorized:
             result = None

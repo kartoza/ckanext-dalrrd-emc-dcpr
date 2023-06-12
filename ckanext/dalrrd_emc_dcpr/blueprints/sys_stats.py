@@ -1,7 +1,7 @@
 """
 re-implement stats blueprint as it's not working
 """
-
+import json
 import datetime
 import logging
 from typing import Any, ClassVar, Optional, Union
@@ -9,10 +9,10 @@ from typing import Any, ClassVar, Optional, Union
 from sqlalchemy import Table, select, join, func, and_
 
 import ckan.model as model
+import ckan.lib.helpers as h
 
-from flask import Blueprint
+from flask import Blueprint, request
 from ckan.plugins import toolkit
-
 
 logger = logging.getLogger(__name__)
 
@@ -426,3 +426,143 @@ def get_num_packages_by_week():
         return weekly_numbers
 
     return num_packages()
+
+
+@stats_blueprint.route(
+    "/pull_stats_by_date", methods=["GET", "POST"], strict_slashes=False
+)
+def pull_stats_by_date():
+    """
+    fetch data about packages
+    filtered by a timespan
+    and downloads a document
+    holding these packages.
+
+    ----------------------
+
+    there should be an action
+    fetching the database and
+    having these auth rules
+    1. if the user is a system admin
+    or a csi-nsif member, downlad
+    without restrictions
+    2. if a user isn't,
+    download public records
+    only.
+    """
+    logger.debug("inside pull_states_by_date")
+    # we might need a context here
+    if request.is_json:
+        logger.debug("server got a json request")
+        # check if the requst has the right date filter, this is now is missing
+        req_data = request.get_json()
+        packages = toolkit.get_action("stats_list_public_records_by_date")(
+            context={},
+            data_dict={"start": req_data["start_date"], "end": req_data["end_date"]},
+        )
+        table = _filter_stats(
+            {
+                "filter_type": "date_filter",
+                "filter_params": {
+                    "start_date": req_data["start_date"],
+                    "end_date": req_data["end_date"],
+                },
+            },
+            packages,
+        )
+        if table is not None:
+            return json.dumps({"table": table})
+        else:
+            return {"success": False}
+    else:
+        logger.debug("server got data that isn't json formatted, aborting!")
+        # this should flash a message of failure
+        return {"sucess": False}
+
+
+def pull_stats_by_location():
+    """
+    fetch data about packages
+    filtered by a location
+    and downloads a document
+    holding these packages.
+    """
+    logger.debug("inside pull_states_by_location")
+    if request.is_json:
+        logger.debug("server got a json request")
+        # check if the requst has the right date filter, this is now is missing
+        req_data = request.get_json()
+        packages = toolkit.get_action("stats_list_public_records_by_location")(
+            context={}, data_dict={"location": req_data["location"]}
+        )
+        table = _filter_stats(
+            {
+                "filter_type": "location_filter",
+                "filter_params": {"location": req_data["location"]},
+            },
+            packages,
+        )
+        if table is not None:
+            return json.dumps({"table": table})
+        else:
+            return {"success": False}
+
+    else:
+        logger.debug("server got data that isn't json formatted, aborting!")
+        # this should flash a message of failure
+        return {"sucess": False}
+
+
+def _filter_stats(stats_filter: dict, packages: list):
+    """
+    applies filters and prepare a document
+    holding stats about a given set of
+    packages.
+    """
+    logger.debug("inside filters stats")
+    document_text = ""
+    filter_type = stats_filter.get("filter_type")
+    filter_params = stats_filter.get("filter_params")
+    if filter_type is None or filter_params is None:
+        return
+
+    if filter_type == "date_filter":
+        start_date = filter_params.get("start_date")
+        end_date = filter_params.get("end_date")
+        if start_date is None or end_date is None:
+            return
+
+        document_text = (
+            f"results showing datasets filtered by date from {start_date} to {end_date}"
+        )
+
+    if document_text:
+        return _prepare_stats_table(packages)
+    else:
+        return
+
+
+def _prepare_stats_table(packages: list):
+    """
+    prepare statistics HTML table
+    """
+    logger.debug("inisde _prepare_stats_table")
+    table_str = """
+        <table style="border-collapse:collapse;width:100%; border:1px solid #ddd; padding: 8px;">
+            <tr>
+                <th style="border:1px solid #ddd; padding: 8px;"> Metdata Record title </th>
+                <th style="border:1px solid #ddd; padding: 8px;"> Metadata Record user </th>
+                <th style="border:1px solid #ddd; padding: 8px;"> Metadata Record creation date </th>
+            </tr>
+                """
+    for package in packages:
+        table_str += f"""
+            <tr>
+                <td style="border:1px solid #ddd; padding: 8px;"> <a href="{request.url_root}dataset/{package.name}"> {package.title} </a></td>
+                <td style="border:1px solid #ddd; padding: 8px;"> {toolkit.h.get_user_name(package.creator_user_id)} </td>
+                <td style="border:1px solid #ddd; padding: 8px;"> {package.metadata_created} </td>
+            </tr>
+        """
+    table_str += """ </table> """
+    table_str = table_str.rstrip()
+    return table_str

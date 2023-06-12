@@ -263,6 +263,8 @@
                     index=loop.index,
                     lenght= data.datasets|length,
                     dataset_custodian=ds.dataset_custodian,
+                    metadata_contact_organisation=ds.metadata_contact_organisation,
+                    metadata_contact_name=ds.metadata_contact_name,
                     data_type=ds.data_type,
                     dataset_purpose=ds.dataset_purpose,
                     proposed_dataset_title=ds.proposed_dataset_title,
@@ -275,7 +277,11 @@
                     topic_category = ds.topic_category,
                     dataset_characterset=ds.dataset_characterset,
                     metadata_characterset=ds.metadata_characterset,
+                    dataset_distribution_format_name=ds.dataset_distribution_format_name,
+                    dataset_distribution_format_version=ds.dataset_distribution_format_version,
                     dataset_custodian_error=errors.dataset_custodian,
+                    metadata_contact_organisation_error=errors.metadata_contact_organisation,
+                    metadata_contact_name_error=errors.metadata_contact_name,
                     data_type_error=errors.data_type,
                     proposed_dataset_title_error=errors.proposed_dataset_title,
                     proposed_abstract_error=errors.proposed_abstract,
@@ -287,8 +293,9 @@
                     topic_category_error = errors.topic_category,
                     dataset_characterset_error=errors.dataset_characterset,
                     metadata_characterset_error=errors.metadata_characterset,
-
-
+                    dataset_distribution_format_name_error=errors.dataset_distribution_format_name,
+                    dataset_distribution_format_version_error=errors.dataset_distribution_format_version,
+                    relevant_organisations = relevant_organizations
 
                 ) }}
             {% endfor %}
@@ -298,7 +305,9 @@
                     "ajax_snippets/dcpr_request_dataset_form_fieldset.html",
                     index=1,
                     lenght=0,
-                    dataset_capture_method_options=dataset_capture_method_options
+                    dataset_capture_method_options=dataset_capture_method_options,
+                    relevant_organisations = relevant_organizations
+
             ) }}
         {% endif %}
 

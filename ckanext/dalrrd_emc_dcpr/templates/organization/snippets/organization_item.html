@@ -31,7 +31,12 @@
   {% endblock %}
   {% block capacity %}
     {% if show_capacity and organization.capacity %}
-    <p><span class="label label-default">{{ h.roles_translated().get(organization.capacity, organization.capacity) }}</span></p>
+
+    {# the client required admin to be labeled publisher #}
+    {%  set new_roles_translated = h.roles_translated()  %}
+    {% do new_roles_translated.update({"admin":"Publisher"})
+    %}
+    <p><span class="label label-default">{{ new_roles_translated.get(organization.capacity, organization.capacity) }}</span></p>
     {% endif %}
   {% endblock %}
   {% block link %}

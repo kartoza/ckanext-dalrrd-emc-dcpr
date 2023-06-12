@@ -1,10 +1,11 @@
 {% import "macros/form.html"  as form %}
 
-{% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-js" %}
 {% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-css" %}
-{% asset "ckanext-dalrrdemcdcpr/spatial-search-js" %}
+{% asset "ckanext-dalrrdemcdcpr/dataset-spatial-extent-map-js" %} {# this js asset is only one module per one file -> emcDatasetSpatialExtentMap #}
+{% asset "ckanext-dalrrdemcdcpr/spatial-search-js" %} {# get the south african boundaries (national, districts ..etc.) #}
+{% asset "ckanext-dalrrdemcdcpr/fix-leaflet-partial-load" %} {# fixes an issue with leaflet in the stats page #}
 
-{% set map_config = h.get_common_map_config() %}
+{% set map_config = h.emc_get_common_map_config() %}
 {% set default_bounding_box = h.emc_default_bounding_box() %}
 {% set field_bounding_box = h.emc_extent_to_bbox(data.get(field.field_name, None)) %}
 {% set input_id = ["field", field.field_name]|join("-") %}
@@ -21,14 +22,15 @@
     attrs=dict({"class": "form-control"}, **(field.get('form_attrs', {}))),
     is_required=False
 ) %}
+
     <div
-            class="dataset-spatial-extent-map"
-            data-module="emcDatasetSpatialExtentMap"
-            data-module-map-config="{{ h.dump_json(map_config) }}"
-            data-module-default-extent="{{ field_bounding_box or default_bounding_box }}"
-            data-module-form-input-id="{{ input_id }}"
+        class="dataset-spatial-extent-map"
+        data-module="emcDatasetSpatialExtentMap"
+        data-module-map-config="{{ h.dump_json(map_config) }}"
+        data-module-default-extent="{{ field_bounding_box or default_bounding_box }}"
+        data-module-form-input-id="{{ input_id }}"
     >
-        <div id="dataset-spatial-extent-map-container" data-module="spatial_search"></div>
+        <div id="dataset-spatial-extent-map-container" data-module="spatial_search" mapConfig="{{ map_config }}"></div>
         <div id="dataset-spatial-extent-map-attribution">
             {% snippet "spatial/snippets/map_attribution.html", map_config=map_config %}
         </div>

@@ -164,6 +164,34 @@
         ) %}
         {{ form.info(_('Whether the request is being made by an organisation that is the dataset custodian.')) }}
     {% endcall %}
+
+    {% call form.input(
+        'metadata_contact_name',
+        label=_('Metadata contact person name'),
+        id='ds{}-field-metadata_contact_name'.format(index),
+        value=metadata_contact_name,
+        error=metadata_contact_name_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Metadata contact person name')) }}
+    {% endcall %}
+
+
+    {% call form.select(
+        'metadata_contact_organisation',
+        label=_('Metadata contact organisation name'),
+        id='ds{}-field-metadata_contact_organisation'.format(index),
+        options=relevant_organisations,
+        selected=relevant_organisations[0].text,
+        error=metadata_contact_organisation_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Metadata contact organisation name')) }}
+    {% endcall %}
+
+
     {% call form.markdown(
                 'proposed_abstract',
                 label=_('Dataset abstract'),
@@ -250,6 +278,32 @@
         is_required=True
     ) %}
     {{ form.info(_('Metadata characterset')) }}
+    {% endcall %}
+
+
+    {% call form.input(
+        'dataset_distribution_format_name',
+        label=_('Dataset distribution format name'),
+        id='ds{}-field-dataset_distribution_format_name'.format(index),
+        value=dataset_distribution_format_name,
+        error=dataset_distribution_format_name_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Dataset distribution format name')) }}
+    {% endcall %}
+
+
+    {% call form.input(
+        'dataset_distribution_format_version',
+        label=_('Dataset distribution format version'),
+        id='ds{}-field-dataset_distribution_format_version'.format(index),
+        value=dataset_distribution_format_version,
+        error=dataset_distribution_format_version_error,
+        classes=['control-medium'],
+        is_required=True
+    ) %}
+    {{ form.info(_('Dataset distribution format version')) }}
     {% endcall %}
 
 

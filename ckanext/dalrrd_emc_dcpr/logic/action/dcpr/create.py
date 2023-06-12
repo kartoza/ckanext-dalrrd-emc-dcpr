@@ -91,6 +91,7 @@ def dcpr_request_create(context, data_dict):
                 ],
             }
         )
+
     toolkit.check_access("dcpr_request_create_auth", context, validated_data)
 
     # after validation of user-supplied data, enrich the data dict with additional
@@ -102,6 +103,8 @@ def dcpr_request_create(context, data_dict):
         }
     )
     logger.debug(f"{validated_data=}")
+    # add organisation role to be originator
+    validated_data.update({"organisation_role": "originator"})
     context["updated_by"] = "owner"
     request_obj = dcpr_dictization.dcpr_request_dict_save(validated_data, context)
     model.Session.commit()

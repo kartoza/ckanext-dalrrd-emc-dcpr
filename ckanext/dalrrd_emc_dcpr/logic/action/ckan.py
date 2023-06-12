@@ -8,8 +8,7 @@ from ckan.model.domain_object import DomainObject
 
 from ...model.user_extra_fields import UserExtraFields
 from .dataset_versioning_control import handle_versioning
-from .handle_repeating_subfields import handle_repeating_subfields_naming
-from .add_named_url import handle_named_url
+from .actions_utils import *
 
 import datetime
 
@@ -92,8 +91,7 @@ def package_create(original_action, context, data_dict):
     Intercepts the core `package_create` action to check if package
      is being published after being created.
     """
-    named_url = handle_named_url(data_dict)
-    data_dict["name"] = named_url
+    data_dict = apply_pre_create_handlers(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 
@@ -103,11 +101,7 @@ def package_update(original_action, context, data_dict):
     Intercepts the core `package_update` action to check if package is being published.
     """
     logger.debug(f"inside package_update action: {data_dict=}")
-    package_state = data_dict.get("state")
-    # if package_state == "draft":
-    #     return _act_depending_on_package_visibility(original_action, context, data_dict)
-    # else:
-    #     handle_versioning(context, data_dict)
+    data_dict = apply_update_handlers(data_dict)
     return _act_depending_on_package_visibility(original_action, context, data_dict)
 
 

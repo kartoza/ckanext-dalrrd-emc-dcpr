@@ -51,7 +51,6 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            c.notes AS abstract,
            concat_ws(', ', VARIADIC c.tags) AS keywords,
            NULL AS keywordstype,
-        --    NULL AS format,
            NULL AS source,
            c.metadata_modified AS date_modified,
            'http://purl.org/dc/dcmitype/Dataset' AS type,
@@ -96,7 +95,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
            NULL AS classification,
            NULL AS conditionapplyingtoaccessanduse,
 	       NULL AS edition,
-           cast(cast(c.extras->>'dataset_lineage' as json)->>0 as json)-> 'statement' AS lineage_statement,
+           c.extras->>'lineage' AS lineage,
            NULL AS responsiblepartyrole,
            NULL AS specificationtitle,
            NULL AS specificationdate,
@@ -170,6 +169,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS {{ view_name }} AS
             -- two things: return the distributor and work with renaming inisde array.
 
             --from "resource" as res where res.package_id = c.id) AS links,
+            NULL as links,
            -- temporal extent
            cast(cast(c.extras->>'reference_system_additional_info' as json)->>0 as json)-> 'description' AS reference_systems_additional_info
            --links
