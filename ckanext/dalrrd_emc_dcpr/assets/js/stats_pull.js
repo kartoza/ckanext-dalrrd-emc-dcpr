@@ -47,3 +47,19 @@ ckan.module('stats_by_date', function ($) {
         }
     }
 })
+
+
+ckan.module('stats_by_area', function ($) {
+    let area_input = $("#field-pull-stats-area")
+    let area_btn = $(".stats_by_area_submission_btn")
+
+    return{
+    initialize: function(){
+        area_btn.on("click",function(){
+            console.log("area btn clicked!")
+            let area = area_input.val()
+
+        })
+    }
+  }
+})

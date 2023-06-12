@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block primary_content %}
-  <article class="module" data-module="stats_by_date">
+  <article class="module" data-module="stats_by_date stats_by_area">
 
     <section id="stats-total-datasets" class="module-content tab-content active">
       <h2>{{ _('Total number of Datasets - per week') }}</h2>
@@ -172,7 +172,8 @@
         <h2>{{ _('Pull stats by geographic area') }}</h2>
 
           <!-- need a map here that takes an input and transforms it-->
-          {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "spatial_extent", "label": "Spatial extent"}, data={}, errors={} %}
+          {% snippet 'dcpr/snippets/requests_spatial_extent.html', field={"field_name": "pull-stats-area", "label": "Spatial extent"}, data={}, errors={} %}
+          <button class="btn btn-primary pull-right stats_by_area_submission_btn">Pull Statistics</button>
       </section>
 
       <section id="granular-stats-owned-records" class="module-content tab-content">
