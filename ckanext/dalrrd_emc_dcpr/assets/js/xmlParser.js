@@ -19,6 +19,7 @@ ckan.module("xml_parser",function($){
         initialize: function(){
             $.proxyAll(this,/_on/);
             this.el.on("change", this._onChange)
+            this.old_file = ""
         },
         _handleError:function(response) {
             if (!response.ok) {
@@ -28,11 +29,14 @@ ckan.module("xml_parser",function($){
         } ,
         _onChange:function(e){
             let the_input = document.getElementById('upload_input')
+            document.getElementById("upload_input").value = "";
             let _files = the_input.files
             let formData = new FormData();
             for(let _file of _files){
                 formData.append("xml_dataset_files",_file)
             }
+
+            this.old_file = _files
 
             let flash_box = document.getElementsByClassName("flash-messages")[0]
 
@@ -49,7 +53,7 @@ ckan.module("xml_parser",function($){
                 flash_box.append(info_or_err)
             }
 
-            fetch(window.location.href.split('?')[0]+'xml_parser/',{method:"POST", body:formData}).
+            fetch('/dataset/xml_parser/',{method:"POST", body:formData}).
             then(res => this._handleError(res)).
             then(res=>res.json()).then(
                 (data)=>{
