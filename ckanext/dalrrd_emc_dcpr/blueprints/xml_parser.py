@@ -43,6 +43,11 @@ def extract_files():
     return success after all files
     parsed.
     """
+
+    # if request.method == "POST":
+    #     logger.debug("is POST")
+    #     return jsonify({"response": "all packages were created", "status": 200})
+    
     # files = request.files.to_dict()
     global creator
     creator = c.userobj
@@ -64,13 +69,19 @@ def extract_files():
     # aggregate messages
     if len(err_msgs) > 0:
         res = {"info_msgs": info_msgs, "err_msgs": err_msgs}
-        send_email_to_creator(res)
+        try:
+            send_email_to_creator(res)
+        except:
+            pass
         return jsonify({"response": res})
 
     else:
         # only when all packages are created
         res = {"info_msgs": info_msgs, "err_msgs": err_msgs}
-        send_email_to_creator(res)
+        try:
+            send_email_to_creator(res)
+        except:
+            pass
         return jsonify({"response": "all packages were created", "status": 200})
 
 
