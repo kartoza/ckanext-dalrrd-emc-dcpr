@@ -22,7 +22,7 @@
 							'Tags': 'fa fa-tags',
 							'SASDI Themes': 'fa fa-bars',
 							'ISO Topic Categories': 'fa fa-filter',
-							'Harvest source': 'fa fa-cloud',
+							'Harvest Sources': 'fa fa-cloud',
 							'DCPR Request': 'fa fa-file',
 							'Featured Metadata records': 'fa fa-star',
 						} %}
@@ -118,7 +118,8 @@
                     </p>
                 {% endif %}
 			    {% else %}
-					<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title) }}</p>
+					<p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=title|lower) }}</p>
+					
 			    {% endif %}
 			{% endwith %}
 		    {% endblock %}
