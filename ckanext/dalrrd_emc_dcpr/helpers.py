@@ -11,6 +11,8 @@ from ckan import model
 from .model.saved_search import SavedSearches
 from ckan.plugins import toolkit
 from ckan.lib.helpers import build_nav_main as core_build_nav_main
+import ckan.lib.munge as munge
+import ckan.lib.helpers as h
 
 from ckan.logic import NotAuthorized
 
@@ -289,24 +291,22 @@ def get_org_public_records_count(org_id: str) -> int:
 def get_datasets_thumbnail(data_dict):
     """
     Generate thumbnails based on metadataset
-    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/400
-    https://github.com/kartoza/ckanext-dalrrd-emc-dcpr/issues/399
     """
-    data_thumbnail = "https://www.linkpicture.com/q/Rectangle-55.png"
+    data_thumbnail = "/images/org.png"
+    logger.debug(f"data dict from helper {data_dict['organization']['image_url']}")
     if data_dict.get("metadata_thumbnail"):
         data_thumbnail = data_dict.get("metadata_thumbnail")
     else:
-        data_resource = data_dict.get("resources")
-        for resource in data_resource:
-            if resource["format"].lower() == "wms":
-                wms_url = resource["url"]
-                parsed_url = dict(parse_qsl(urlparse(wms_url).query))
-                parsed_url["format"] = "image/png; mode=8bit"
-                data_thumbnail = "%s?%s" % (
-                    wms_url.split("?")[0],
-                    urlencode(parsed_url),
-                )
-                break
+        image_url = data_dict['organization']['image_url']
+        if image_url and not image_url.startswith('http'):
+            #munge here should not have an effect only doing it incase
+            #of potential vulnerability of dodgy api input
+            image_url = munge.munge_filename_legacy(image_url)
+            data_thumbnail = h.url_for_static(
+            'uploads/group/%s' % data_dict['organization']['image_url'],
+            qualified=True
+            )
+            logger.debug(f"image_url {data_thumbnail}")
     return data_thumbnail
 
 
