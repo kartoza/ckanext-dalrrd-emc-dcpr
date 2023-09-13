@@ -297,16 +297,30 @@ def get_datasets_thumbnail(data_dict):
     if data_dict.get("metadata_thumbnail"):
         data_thumbnail = data_dict.get("metadata_thumbnail")
     else:
-        image_url = data_dict['organization']['image_url']
-        if image_url and not image_url.startswith('http'):
-            #munge here should not have an effect only doing it incase
-            #of potential vulnerability of dodgy api input
-            image_url = munge.munge_filename_legacy(image_url)
-            data_thumbnail = h.url_for_static(
-            'uploads/group/%s' % data_dict['organization']['image_url'],
-            qualified=True
-            )
-            logger.debug(f"image_url {data_thumbnail}")
+        is_wms = False
+        data_resource = data_dict.get("resources")
+        for resource in data_resource:
+            if resource["format"].lower() == "wms":
+                wms_url = resource["url"]
+                parsed_url = dict(parse_qsl(urlparse(wms_url).query))
+                parsed_url["format"] = "image/png; mode=8bit"
+                data_thumbnail = "%s?%s" % (
+                    wms_url.split("?")[0],
+                    urlencode(parsed_url),
+                )
+                is_wms = True
+                break
+        if not is_wms:
+            image_url = data_dict['organization']['image_url']
+            if image_url and not image_url.startswith('http'):
+                #munge here should not have an effect only doing it incase
+                #of potential vulnerability of dodgy api input
+                image_url = munge.munge_filename_legacy(image_url)
+                data_thumbnail = h.url_for_static(
+                'uploads/group/%s' % data_dict['organization']['image_url'],
+                qualified=True
+                )
+        
     return data_thumbnail
 
 
