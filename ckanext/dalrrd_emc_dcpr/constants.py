@@ -180,6 +180,155 @@ DATASET_FULL_SET_OF_FIELDS = [
 ]
 
 
+SANS1878_FIELDS = [
+    "resTitle", #Dataset Title
+    "resRefDate", #Dataset reference date 
+    "citRespParty", #Dataset responsible party 
+    "rpIndName", #Responsible party name 
+    "rpOrgName", #Organisation name 
+    "rpPosName", #Position 
+    "role", #Role
+    "GeoBndBox", #Geographic location of the dataset 
+    "eastBL", #EX_GeograpgicBounding: eastBoundLongitude 
+    "westBL", #EX_GeograpgicBounding: westBoundLongitude
+    "northBL", #EX_GeograpgicBounding: northBoundLongitude
+    "southBL", #EX_GeograpgicBounding: southBoundLongitude
+    "dataLang", #Dataset language 
+    "dataChar", #Dataset character set
+    "tpCat", #Dataset topic category
+    "dataScale", #Spatial resolution of the dataset 
+    "idAbs", #Abstract describing the dataset 
+    "distInfo", #Distribution format 
+    "distFormat", #Distribution format 
+    "spatRpType", #Spatial representative type 
+    "RefSysInfo", #Reference system 
+    "dataLineage", #Lineage statement 
+    "statement", #Lineage statement 
+    "mdFileID", #Metadata file identifier
+    "mdStanName", #Metadata standard name 
+    "mdStanVer", #Metadata standard version 
+    "mdLang", #Metadata language 
+    "mdChar", #Metadata character set 
+    "mdContact", #Metadata point of contact 
+    "rpIndName", #Responsible person name 
+    "rpOrgName", #Responsible Organisation Name 
+    "rpPosName", #Responsible person Position
+    "role", #Responsible person role
+    "mdDateSt" #Metadata date stamp 
+]
+
+ESRI_QGIS_FIELDS = [
+    "citId", #Dataset Title
+    "date", #Dataset reference date 
+    "dataIdInfo", #Dataset responsible party 
+    "idCitation", #Responsible party name 
+    "citRespParty",  #Responsible party name 
+    "rpIndName", #Responsible party name 
+    "rpOrgName", #Organisation name 
+    "rpPosName", #Position 
+    "role", #Role
+    "GeoBndBox", #Geographic location of the dataset 
+    "eastBL", #EX_GeograpgicBounding: eastBoundLongitude 
+    "westBL", #EX_GeograpgicBounding: westBoundLongitude
+    "northBL", #EX_GeograpgicBounding: northBoundLongitude
+    "southBL", #EX_GeograpgicBounding: southBoundLongitude
+    "dataLang", #Dataset language 
+    "dataChar", #Dataset character set
+    "tpCat", #Dataset topic category
+    "dataScale", #Spatial resolution of the dataset 
+    "idAbs", #Abstract describing the dataset 
+    "distInfo", #Distribution format 
+    "distFormat", #Distribution format 
+    "formatName", #Distribution format 
+    "spatRpType", #Spatial representative type 
+    "RefSysInfo", #Reference system 
+    "dataLineage", #Lineage statement 
+    "statement", #Lineage statement 
+    "mdFileID", #Metadata file identifier
+    "Esri", #Metadata standard name 
+    "ArcGISstyle", #Metadata standard name 
+    "ArcGISFormat", #Metadata standard name 
+    "mdLang", #Metadata language 
+    "mdChar", #Metadata character set 
+    "mdContact", #Metadata point of contact 
+    "rpIndName", #Responsible person name 
+    "rpOrgName", #Responsible Organisation Name 
+    "rpPosName", #Responsible person Position
+    "role", #Responsible person role
+    "mdDateSt" #Metadata date stamp 
+]
+
+XML_SANS_DATASET_NAMING_MAPPING = {
+    "notes": "idAbs" ,
+    "owner_org": "rpOrgName" ,
+    "responsible_party-0-individual_name": "rpIndName" ,
+    "responsible_party-0-role": "RoleCd" ,
+    "responsible_party-0-position_name":"rpPosName" ,
+    "metadata_reference_date_and_stamp-0-reference":"createDate" ,
+    "topic_and_sasdi_theme-0-iso_topic_category":"TopicCatCd" ,
+    "lineage_statement":"statement" ,
+    "metadata_language_and_character_set-0-dataset_character_set":"CharSetCd" ,
+    "metadata_language_and_character_set-0-metadata_character_set":"CharSetCd" ,
+    "distribution_format-0-name":"formatName" ,
+    "distribution_format-0-version":"formatVer" ,
+    "spatial_parameters-0-equivalent_scale":"rfDenom" ,
+    "spatial_parameters-0-spatial_representation_type":"SpatRepTypCd" ,
+    "spatial_parameters-0-spatial_reference_system":"idVersion" ,
+    "metadata_reference_date_and_stamp-0-stamp":"mdDateSt" ,
+    "contact-0-individual_name":"rpIndName" ,
+    "contact-0-position_name":"rpPosName" ,
+}
+
+MISSING_FIELDS = {
+	"metadata_reference_date_and_stamp-0-reference_date_type": "Publication",
+	"private": "false",
+	"metadata_reference_date_and_stamp-0-stamp_date_type": "Creation",
+    "metadata_language_and_character_set-0-dataset_language":"en" ,
+    "metadata_language_and_character_set-0-metadata_language":"en" ,
+}
+
+ROLES = [
+    'resource_provider', 
+    'owner', 
+    'distributor', 
+    'originator', 
+    'point_of_contact', 
+    'principal_investigator', 
+    'processor', 
+    'publisher'
+]
+
+CHARSET = [
+    "ucs-2",
+    "ucs-4",
+    "utf-7",
+    "utf-8",
+    "utf-16",
+    "8859part1",
+    "8859part2",
+    "8859part3",
+    "8859part4",
+    "8859part5",
+    "8859part6",
+    "8859part7",
+    "8859part8",
+    "8859part9",
+    "8859part10",
+    "8859part11",
+    "8859part13",
+    "8859part14",
+    "8859part15",
+    "8859part16",
+    "jis",
+    "shiftJIS",
+    "eucJP",
+    "usAscii",
+    "ebcdic",
+    "eucKR",
+    "big5",
+    "GB2312"
+]
+
 XML_DATASET_NAMING_MAPPING = {
     "title": "title",
     "name": "name",
@@ -229,7 +378,6 @@ XML_DATASET_NAMING_MAPPING = {
     "ContactInformationFacsimile": "contact_information-0-facsimile",
 }
 
-
 # this is necessary to ensure consistancy with saeon extra names
 
 DATASET_SUBFIELDS_MAPPING = {
@@ -271,7 +419,6 @@ DATASET_SUBFIELDS_MAPPING = {
     "contact_information-0-voice": "contact_information_voice",
     "contact_information-0-facsimile": "contact_information_facsimile",
 }
-
 
 class DCPRRequestRequiredFields(enum.Enum):
     DATASET_LANGUAGE = "en"

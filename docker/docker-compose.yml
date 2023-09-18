@@ -66,11 +66,12 @@ services:
   # mohab comment, now there is a solr8 image working with ckan 2.9
   # need to check how it will be integrated.
   solr:
-    image: ckan/ckan-solr:2.9-solr8-spatial
-    volumes:
-      - type: bind
-        source: $PWD/solr/schema.xml
-        target: /opt/solr/server/solr/ckan/conf/schema.xml
+    build: https://github.com/kartoza/kartoza_ckan_solr.git#main
+    # volumes:
+    #   - type: bind
+    #     source: $PWD/solr/managed-schema
+    #     target: /opt/solr/server/solr/configsets/ckan/conf/managed-schema
+    
 
   redis:
     image: redis:6.2
