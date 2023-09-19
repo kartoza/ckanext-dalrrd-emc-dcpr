@@ -1334,7 +1334,7 @@ dataset_fields:
     required: true
     help_text: >-
       Bounding box for the metadata record, expressed as the geographic coordinates of the upper left and lower right
-      corners - This is a SANS 1878 mandatory field
+      corners - This is a SANS 1878 mandatory field. Order of the bounding box is as follows: (Northern Edge,  Western Edge. Southern Edge, Eastern Edge)
     preset: emc_dataset_spatial_extent
     display_snippet: null
 

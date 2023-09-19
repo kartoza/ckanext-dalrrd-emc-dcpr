@@ -209,6 +209,7 @@ def return_object_root(root):
                 if SANS_NAMING_MAPPING[elem] == 'idVersion':
                     res = re.split(r'(\s)', value)
                     res = [x for x in res if x != ' ']
+                    logger.debug(f"split text {res}")
                     value = f"{res[0]}{res[1]}"
                 ob_root[elem] = value
 
@@ -218,15 +219,15 @@ def return_object_root(root):
         
         #handle spatal box
         spatial_bbox = ""
-        for x in root.iter("eastBL"):
+        for x in root.iter("northBL"):
             spatial_bbox = spatial_bbox + x.text
         for x in root.iter("westBL"):
             spatial_bbox = spatial_bbox + "," + x.text
-        for x in root.iter("northBL"):
-            spatial_bbox = spatial_bbox + "," + x.text
         for x in root.iter("southBL"):
             spatial_bbox = spatial_bbox + "," + x.text
-
+        for x in root.iter("eastBL"):
+            spatial_bbox = spatial_bbox + "," + x.text
+        
         ob_root["spatial"] = spatial_bbox
 
         #add missing fields needed for ckan
