@@ -5,15 +5,22 @@ from ckan.common import c
 from ckan.logic import ValidationError
 from ckan.lib.mailer import mail_user, MailerException
 import xml.dom.minidom as dom
+from xml.etree import ElementTree as ET
 import logging
 from datetime import datetime
 from ..constants import (
     DATASET_MINIMAL_SET_OF_FIELDS as xml_minimum_set,
     DATASET_FULL_SET_OF_FIELDS as xml_full_set,
     XML_DATASET_NAMING_MAPPING as DATASET_NAMING_MAPPING,
+    XML_SANS_DATASET_NAMING_MAPPING as SANS_NAMING_MAPPING,
+    MISSING_FIELDS,
+    ISO_TOPIC_CATEGORIES,
+    ROLES,
+    CHARSET
 )
 from xml.parsers.expat import ExpatError
 import json
+import re
 
 # About this Blueprint:
 # -------------
@@ -136,7 +143,7 @@ def file_has_xml_dataset(xml_file):
     returns it.
     """
     try:
-        dom_ob = dom.parse(xml_file)
+        dom_ob = ET.parse(xml_file).getroot()
     except ExpatError:
         """
         this happens when the file is
@@ -144,8 +151,8 @@ def file_has_xml_dataset(xml_file):
         """
         return {"state": False, "msg": f"file {xml_file.filename} is empty!"}
 
-    root = dom_ob.firstChild
-    if root.hasChildNodes():
+    root = dom_ob
+    if root:
         """
         this will cause the same problem as above
         """
@@ -161,12 +168,74 @@ def return_object_root(root):
     tag_name:tag_value
     """
     ob_root = {}
-    for field in root.childNodes:
-        if field.nodeType != 3:
-            ob_root[field.tagName] = field.childNodes[0].data
+    logger.debug(f"root object {root}")
+    is_Esri = False
+    
+    for elem in root.iter():
+        if elem.tag == 'Esri':
+            is_Esri = True
+            break
+    
+    if not is_Esri:
+        #run normal if not exported from esri/qgis
+        num = 0
+        for field in root.iter():
+            if num > 0:
+                ob_root[field.tag] = field.text
+            num = num + 1
+    else:
+        for elem in SANS_NAMING_MAPPING:
+            logger.debug(f"sans fields {elem} {SANS_NAMING_MAPPING[elem]}")
+            for x in root.iter(SANS_NAMING_MAPPING[elem]):
+                value = x.text
+                if value is None:
+                    logger.debug(f"NONE_VALUES {elem} {SANS_NAMING_MAPPING[elem]}")
+                    _attr = dict(x.attrib)
+                    try:
+                        code_val = _attr['value']
+                        if SANS_NAMING_MAPPING[elem] == 'RoleCd':
+                            value = ROLES[int(code_val)]
+                        elif SANS_NAMING_MAPPING[elem] == 'TopicCatCd':
+                            value = ISO_TOPIC_CATEGORIES[int(code_val)]
+                        elif SANS_NAMING_MAPPING[elem] == 'CharSetCd':
+                            value = CHARSET[int(code_val)]
+                            if value == 'eucKR':
+                                value = "UTF-8"
+                        else:
+                            value = code_val
+                    except:
+                        pass
+                logger.debug(f'final val {value}')
+                if SANS_NAMING_MAPPING[elem] == 'idVersion':
+                    res = re.split(r'(\s)', value)
+                    res = [x for x in res if x != ' ']
+                    value = f"{res[0]}{res[1]}"
+                ob_root[elem] = value
 
+        #handle title
+        for x in root.iter('citId'):
+            ob_root["title"] = x[0].text
+        
+        #handle spatal box
+        spatial_bbox = ""
+        for x in root.iter("eastBL"):
+            spatial_bbox = spatial_bbox + x.text
+        for x in root.iter("westBL"):
+            spatial_bbox = spatial_bbox + "," + x.text
+        for x in root.iter("northBL"):
+            spatial_bbox = spatial_bbox + "," + x.text
+        for x in root.iter("southBL"):
+            spatial_bbox = spatial_bbox + "," + x.text
+
+        ob_root["spatial"] = spatial_bbox
+
+        #add missing fields needed for ckan
+        for field in MISSING_FIELDS:
+            ob_root[field] = MISSING_FIELDS[field]
+
+    logger.debug(f"final ob_root {ob_root}")
+ 
     return ob_root
-
 
 def maximum_fields_check(root_ob, file_name_reference: str):
     """
@@ -347,10 +416,10 @@ def set_language_abbreviation(root: dict) -> dict:
     if metadata_lang is not None:
         metadata_lang = metadata_lang.lower()
 
-    if dataset_lang == "english":
+    if dataset_lang == "english" or dataset_lang == "eng":
         root["metadata_language_and_character_set-0-dataset_language"] = "en"
 
-    if metadata_lang == "english":
+    if metadata_lang == "english" or metadata_lang == "eng":
         root["metadata_language_and_character_set-0-metadata_language"] = "en"
 
     return root
@@ -466,6 +535,7 @@ def check_fields_mapping() -> list:
     dataset_keys = list(DATASET_NAMING_MAPPING.keys())
     dataset_values = list(DATASET_NAMING_MAPPING.values())
     new_mapped_set = []
+    # logger.debug(f"dataset {dataset_values}")
     for item in xml_minimum_set:
         try:
             new_val_pos = dataset_values.index(item)
