@@ -295,7 +295,7 @@ dataset_fields:
     repeating_subfields:
 
     - field_name: delivery_point
-      label: delivery Point
+      label: Delivery Point
       required: false
       help_text: address line for positional information and services(e.g. address line for geodetic networks, control points, ..etc.)
 
@@ -322,12 +322,12 @@ dataset_fields:
       help_text: ISO 19115 Topic Category for the metadata record - This is a SANS 1878 mandatory field
       required: true
       choices_helper: emc_iso_topic_categories
-      validators: >-
-        ignore_missing
-        convert_to_tags(iso_topic_categories)
-      output_validators: >-
-        convert_from_tags(iso_topic_categories)
-        ignore_missing
+      # validators: >-
+      #   ignore_missing
+      #   convert_to_tags(iso_topic_categories)
+      # output_validators: >-
+      #   convert_from_tags(iso_topic_categories)
+      #   ignore_missing
       form_snippet: "vocab_select.html"
       display_snippet: "vocab_tag_display.html"
       # display_snippet: null
@@ -358,6 +358,7 @@ dataset_fields:
     label: Tags
     preset: emc_free_tags_tag_string_autocomplete
     form_snippet: tag_select.html
+    required: false
     help_text: >-
       Additional keywords useful for describing the metadata record. In order to optimize searchability, it is
       recommended to add at least three keywords
@@ -698,15 +699,18 @@ dataset_fields:
 
     - field_name: linkage
       label: URL
+      required: false
       help_text: location(address) for on-line access using a uniform resource locator address or similar addressing scheme
 
     - field_name: name
       label: Name
+      required: false
       form_placeholder: eg. January 2011 Gold Prices
       help_text: Name of the online resource
 
     - field_name: application_profile
       label: Application profile
+      required: false
       help_text: Name of an application profile that can be used with the resource
 
     - field_name: description
@@ -1330,7 +1334,7 @@ dataset_fields:
     required: true
     help_text: >-
       Bounding box for the metadata record, expressed as the geographic coordinates of the upper left and lower right
-      corners - This is a SANS 1878 mandatory field
+      corners - This is a SANS 1878 mandatory field. Order of the bounding box is as follows: (Northern Edge,  Western Edge. Southern Edge, Eastern Edge)
     preset: emc_dataset_spatial_extent
     display_snippet: null
 

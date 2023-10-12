@@ -49,7 +49,7 @@ ckan.module("xml_parser",function($){
                 flash_box.append(info_or_err)
             }
 
-            fetch(window.location.href.split('?')[0]+'xml_parser/',{method:"POST", body:formData}).
+            fetch('/dataset/xml_parser/',{method:"POST", body:formData}).
             then(res => this._handleError(res)).
             then(res=>res.json()).then(
                 (data)=>{
