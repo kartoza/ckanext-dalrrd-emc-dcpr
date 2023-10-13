@@ -1071,8 +1071,11 @@ footer {
 }
 
 .metadata-record-thumbnail img{
-  width: 100%;
+  width: 150px;
+  height: 150px;
   vertical-align: middle;
+  object-fit: cover !important;
+  display: inline;
 }
 
 .metadata-record-desc{
