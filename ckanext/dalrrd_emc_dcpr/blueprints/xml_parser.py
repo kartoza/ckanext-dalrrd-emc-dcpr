@@ -21,6 +21,8 @@ from ..constants import (
 from xml.parsers.expat import ExpatError
 import json
 import re
+import os
+
 
 # About this Blueprint:
 # -------------
@@ -64,15 +66,19 @@ def extract_files():
     err_msgs = []
     info_msgs = []
     for xml_file in xml_files:
-        check_result = check_file_fields(xml_file)
-        if check_result is None:
-            err_msgs.append(
-                f'something went wrong during "{xml_file.filename}" dataset creation!'
-            )
-        if check_result["state"] == False:
-            err_msgs.append(check_result["msg"])
+        logger.debug(f"file ext {xml_file.content_type}")
+        if xml_file.content_type == 'text/xml':
+            check_result = check_file_fields(xml_file)
+            if check_result is None:
+                err_msgs.append(
+                    f'something went wrong during "{xml_file.filename}" dataset creation!'
+                )
+            if check_result["state"] == False:
+                err_msgs.append(check_result["msg"])
+            else:
+                info_msgs.append(check_result["msg"])
         else:
-            info_msgs.append(check_result["msg"])
+            err_msgs.append("Only xml files are allowed")
     # aggregate messages
     if len(err_msgs) > 0:
         res = {"info_msgs": info_msgs, "err_msgs": err_msgs}
