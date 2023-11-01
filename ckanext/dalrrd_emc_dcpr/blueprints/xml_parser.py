@@ -66,7 +66,6 @@ def extract_files():
     err_msgs = []
     info_msgs = []
     for xml_file in xml_files:
-        logger.debug(f"file ext {xml_file.content_type}")
         if xml_file.content_type == 'text/xml':
             check_result = check_file_fields(xml_file)
             if check_result is None:
