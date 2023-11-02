@@ -34,6 +34,7 @@ from ..blueprints.news import news_blueprint
 from ..blueprints.error_report import error_report_blueprint
 from ..blueprints.contact import contact_blueprint
 from ..blueprints.sys_stats import stats_blueprint
+from .. blueprints.reset_password import reset_blueprint
 from ..cli import commands
 from ..cli.legacy_sasdi import commands as legacy_sasdi_commands
 from ..logic.action import ckan as ckan_actions
@@ -439,6 +440,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             error_report_blueprint,
             contact_blueprint,
             stats_blueprint,
+            reset_blueprint
         ]
 
     def dataset_facets(
@@ -452,7 +454,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
                 f"vocab_{constants.ISO_TOPIC_CATEGOY_VOCABULARY_NAME}"
             ] = toolkit._("ISO Topic Categories")
             # facets_dict["reference_date"] = toolkit._("Reference Date")
-            facets_dict["harvest_source_title"] = toolkit._("Harvest source")
+            facets_dict["harvest_source_title"] = toolkit._("Harvest Sources")
             facets_dict["dcpr_request"] = toolkit._("DCPR Request")
             facets_dict["featured"] = toolkit._("Featured Metadata records")
         return facets_dict
