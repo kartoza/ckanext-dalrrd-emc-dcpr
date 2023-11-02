@@ -30,10 +30,13 @@ ckan.module("spatial_search", function($){
             var _this = this
             let Lmap
             if(path.includes("dataset/new") || path.includes("dcpr/request/new")){
+                console.log("update")
                 Lmap = LeafletMapFromExtentModule
+                L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(Lmap);
             }
             else{
                 Lmap = window.map
+                L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(Lmap);
             }
             let getDivisionCaps = function(division){
                 let _caps = division.charAt(0).toUpperCase() + division.slice(1);
@@ -113,6 +116,8 @@ ckan.module("spatial_search", function($){
                     })
                     })).then(()=>{divisions_overlay[divisionCapsOb[unit_name]].addLayer(divisions_json[unit_name])})
                 }
+
+                
 
                 let layerControl = L.control.layers(divisions_overlay)
                 layerControl.addTo(Lmap);
