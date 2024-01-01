@@ -1,0 +1,108 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ _('Register') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{{ h.nav_link(_('Registration'), named_route='user.register') }}</li>
+{% endblock %}
+
+{% block primary_content %}
+<style>
+  #image-captcha{
+    margin-top: 10px;
+    box-shadow: 5px 5px 5px 5px gray;
+    width: 100px;
+    padding: 20px;
+    font-weight: 400;
+    padding-bottom: 0px;
+    height: 80px;
+    user-select: none;
+    text-decoration:line-through;
+    font-style: italic;
+    font-size: x-large;
+    border: red 2px solid;
+    margin-left: 10px;
+     
+} 
+
+#btn-submit{
+    box-shadow: 5px 5px 5px grey;
+    color: aqua;
+    margin: 10px;
+    background-color: brown;
+}
+</style>
+  <article class="module">
+    <div class="module-content">
+      {% block primary_content_inner %}
+      <h1 class="page-heading">
+        {% block page_heading %}{{ _('Register for an Account') }}{% endblock %}
+      </h1>
+      {{ form | safe }}
+      
+      {% endblock %}
+    </div>
+  </article>
+  <script>
+
+    
+
+    let captcha;
+    function generate() {
+    
+        // Clear old input
+        document.getElementById("usr-captcha").value = "";
+    
+        // Access the element to store
+        // the generated captcha
+        captcha = document.getElementById("image-captcha");
+        let uniquechar = "";
+    
+        const randomchar =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    
+        // Generate captcha for length of
+        // 5 with random character
+        for (let i = 1; i < 5; i++) {
+            uniquechar += randomchar.charAt(
+                Math.random() * randomchar.length)
+        }
+    
+        // Store generated input
+        captcha.innerHTML = uniquechar;
+    }
+    
+    function match() {
+        const usr_input = document
+            .getElementById("usr-captcha").value;
+    
+        // Check whether the input is equal
+        // to generated captcha or not
+        if (usr_input == captcha.innerHTML) {
+          $('#user-register-form').submit();
+        }
+        else {
+            let s = document.getElementById("key")
+                .innerHTML = "The captcha does not match. Please try again.";
+            generate();
+        }
+    }
+
+    generate()
+  </script>
+  
+{% endblock %}
+
+{% block secondary_content %}
+  {% block help %}
+  <section class="module module-narrow module-shallow">
+    {% block help_inner %}
+    <h2 class="module-heading">{{ _('Why Sign Up?') }}</h2>
+    <div class="module-content">
+      <p>{% trans %}Create datasets, groups and other exciting things{% endtrans %}</p>
+    </div>
+    {% endblock %}
+  </section>
+  {% endblock %}
+{% endblock %}
+

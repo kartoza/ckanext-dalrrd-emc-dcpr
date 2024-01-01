@@ -355,6 +355,7 @@ class DalrrdEmcDcprPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             "rejected_error_reports": report_get_actions.rejected_error_reports,
             "submitted_error_report_list": report_get_actions.submitted_error_report_list,
             "error_report_delete": report_delete_actions.error_report_delete,
+            "resource_create": ckan_actions.resource_create,
         }
 
     def get_validators(self) -> typing.Dict[str, typing.Callable]:
