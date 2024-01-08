@@ -14,14 +14,34 @@ import ckan.logic as logic
 import ckan.plugins as plugins
 import ckan.lib.navl.dictization_functions
 import ckan.lib.uploader as uploader
+import ckan.lib.dictization.model_save as model_save
+import ckan.lib.dictization.model_dictize as model_dictize
+import ckan.logic.schema as schema_
+from mimetypes import MimeTypes
 
 import datetime
 
+_validate = ckan.lib.navl.dictization_functions.validate
 logger = logging.getLogger(__name__)
 _get_or_bust = logic.get_or_bust
 _get_action = logic.get_action
 _check_access = logic.check_access
 ValidationError = logic.ValidationError
+NotFound = logic.NotFound
+
+mimeNotAllowed = [
+    "text/html", 
+    "application/java", 
+    "application/java-byte-code", 
+    "application/x-javascript", 
+    "application/javascript", 
+    "application/ecmascript", 
+    "text/javascript", 
+    "text/ecmascript",
+    "application/octet-stream",
+    "text/x-server-parsed-html",
+    "text/x-server-parsed-html"
+]
 
 @toolkit.chained_action
 def resource_create(original_action, context: dict, data_dict: dict) -> dict:
@@ -90,20 +110,6 @@ def resource_create(original_action, context: dict, data_dict: dict) -> dict:
     if 'mimetype' not in data_dict:
         if hasattr(upload, 'mimetype'):
             data_dict['mimetype'] = upload.mimetype
-
-    mimeNotAllowed = [
-                        "text/html", 
-                        "application/java", 
-                        "application/java-byte-code", 
-                        "application/x-javascript", 
-                        "application/javascript", 
-                        "application/ecmascript", 
-                        "text/javascript", 
-                        "text/ecmascript",
-                        "application/octet-stream",
-                        "text/x-server-parsed-html",
-                        "text/x-server-parsed-html"
-                    ]
 
     if upload.mimetype in mimeNotAllowed:
         raise ValidationError([f"Mimetype {upload.mimetype} is not allowed!"])
@@ -179,6 +185,15 @@ def user_update(original_action, context, data_dict):
 
     """
     original_result = original_action(context, data_dict)
+
+    mime = MimeTypes()
+    mime_type = mime.guess_type(original_result["image_url"])
+
+    logger.debug(f"mime_type update{mime_type}")
+    
+    if mime_type[0] in mimeNotAllowed:
+        raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
+
     user_id = original_result["id"]
     model = context["model"]
     user_obj = model.Session.query(model.User).filter_by(id=user_id).first()
@@ -201,6 +216,14 @@ def user_update(original_action, context, data_dict):
 def user_create(original_action, context, data_dict):
     """Intercepts the core `user_create` action to also create the extra_fields."""
     original_result = original_action(context, data_dict)
+    logger.debug(f"user create {original_action}")
+    # mime = MimeTypes()
+    # mime_type = mime.guess_type(original_result["image_url"])
+
+    # logger.debug(f"mime_type update{mime_type}")
+    
+    # if mime_type[0] in mimeNotAllowed:
+    #     raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
     user_id = original_result["id"]
     model = context["model"]
     extra = UserExtraFields(
@@ -220,6 +243,29 @@ def _dictize_user_extra_fields(user_extra_fields: UserExtraFields) -> typing.Dic
     del dictized_extra["user_id"]
     return dictized_extra
 
+@toolkit.chained_action
+def organization_create(original_action, context, data_dict):
+    original_result = original_action(context, data_dict)
+    # mime = MimeTypes()
+    # mime_type = mime.guess_type(original_result["image_url"])
+
+    # logger.debug(f"mime_type update{mime_type}")
+    
+    # if mime_type[0] in mimeNotAllowed:
+    #     raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
+    return original_result
+
+@toolkit.chained_action
+def organization_update(original_action, context, data_dict):
+    original_result = original_action(context, data_dict)
+    mime = MimeTypes()
+    mime_type = mime.guess_type(original_result["image_url"])
+
+    logger.debug(f"mime_type update{mime_type}")
+    
+    if mime_type[0] in mimeNotAllowed:
+        raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
+    return original_result
 
 @toolkit.chained_action
 def package_create(original_action, context, data_dict):
