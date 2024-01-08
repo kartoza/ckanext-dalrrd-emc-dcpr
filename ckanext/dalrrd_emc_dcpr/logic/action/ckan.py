@@ -216,13 +216,14 @@ def user_update(original_action, context, data_dict):
 def user_create(original_action, context, data_dict):
     """Intercepts the core `user_create` action to also create the extra_fields."""
     original_result = original_action(context, data_dict)
-    mime = MimeTypes()
-    mime_type = mime.guess_type(original_result["image_url"])
+    logger.debug(f"user create {original_action}")
+    # mime = MimeTypes()
+    # mime_type = mime.guess_type(original_result["image_url"])
 
-    logger.debug(f"mime_type update{mime_type}")
+    # logger.debug(f"mime_type update{mime_type}")
     
-    if mime_type[0] in mimeNotAllowed:
-        raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
+    # if mime_type[0] in mimeNotAllowed:
+    #     raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
     user_id = original_result["id"]
     model = context["model"]
     extra = UserExtraFields(
@@ -245,13 +246,13 @@ def _dictize_user_extra_fields(user_extra_fields: UserExtraFields) -> typing.Dic
 @toolkit.chained_action
 def organization_create(original_action, context, data_dict):
     original_result = original_action(context, data_dict)
-    mime = MimeTypes()
-    mime_type = mime.guess_type(original_result["image_url"])
+    # mime = MimeTypes()
+    # mime_type = mime.guess_type(original_result["image_url"])
 
-    logger.debug(f"mime_type update{mime_type}")
+    # logger.debug(f"mime_type update{mime_type}")
     
-    if mime_type[0] in mimeNotAllowed:
-        raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
+    # if mime_type[0] in mimeNotAllowed:
+    #     raise ValidationError([f"Mimetype {mime_type} is not allowed!"])
     return original_result
 
 @toolkit.chained_action
