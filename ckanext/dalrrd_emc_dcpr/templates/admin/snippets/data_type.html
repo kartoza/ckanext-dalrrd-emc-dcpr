@@ -16,18 +16,28 @@
 <div id="{{ ent_type }}" class="entities collapse in">
 	{% set truncate = truncate or 180 %}
 	{% set truncate_title = truncate_title or 80 %}
-	<ul class="{{ ent_type }}-list">
-    {% for entity in entities %}
+  <table class="table table-header table-hover table-bordered">
+    <thead>
+      <td>Metatdata Record</td>
+      <td>Reinstate</td>
+    </thead>
+    <tbody>
+      {% for entity in entities %}
       {% set title = entity.title or entity.name %}
-        <li>
-          {{ h.link_to(h.truncate(title, truncate_title), h.url_for(entity.type + '.read', id=entity.name)) }}
-        </li>
+       <tr>
+        <td>
+          <li>
+            {{ h.link_to(h.truncate(title, truncate_title), h.url_for(entity.type + '.read', id=entity.name)) }}
+          </li>
+        </td>
+        <td>
+          <button onclick="reinstate('{{entity.name}}', this)" class="btn btn-default">Reinstate</button>
+        </td>
+       </tr>
       {% else %}
-      <p>
-        {{ _(messages.empty[ent_type]).replace('organization', 'organisation').replace('datasets', 'metadata records') }}
-      </p>
     {% endfor %}
-  </ul>
+    </tbody>
+  </table>
 
 <!-- show button only if there is entity to purge -->
   {% if entities.first() %}
@@ -43,3 +53,20 @@
     </form>
   {% endif %}
 </div>
+
+<script>
+  function reinstate(package, e){
+    $.ajax({
+      type: 'GET',
+      url: `/publish/reinstate/${package}`,
+      contentType: 'application/json',
+      success: function(resultData) { 
+        alert("Metadata record has been reinstated")
+        e.disabled = true
+      },
+      error: function(resultData){
+          
+      }
+    });
+  }
+</script>
