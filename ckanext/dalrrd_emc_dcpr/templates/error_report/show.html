@@ -62,6 +62,12 @@
                 <td><span class="label label-default">{{ error_report.status }}</span></td>
             </tr>
             <tr>
+                {% if error_report.status in report_status %}
+                    <th scope="row" class="dataset-label">{{ _('Reason for rejection') }} </th>
+                    <td><span class="label label-default">{{ error_report.reason_for_reject }}</span></td>
+                {% endif %}
+            </tr>
+            <tr>
                 <th scope="row" class="dataset-label">{{ _("Error description") }}</th>
                 <td class="dataset-details">
                     {{ error_report.error_description }}

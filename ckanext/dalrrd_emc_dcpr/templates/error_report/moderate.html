@@ -13,7 +13,30 @@
                 <form id='error-report-confirmation-form' action="{{ action_url }}" method="post">
                     <button class="btn btn-default" type="submit" name="REQUEST_MODIFICATION" >{{ _('Move back to draft') }}</button>
                     <button class="btn btn-primary" type="submit" name="APPROVE" >{{ _('Approve error report') }}</button>
-                    <button class="btn btn-default" type="submit" name="REJECT" >{{ _('Reject error report') }}</button>
+                    <button class="btn btn-default" type="button" data-toggle="modal" data-target="#reject_form" >{{ _('Reject error report') }}</button>
+
+                    <div class="modal" id="reject_form" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">Reason for rejection</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <p>Please add the reason for rejecting this report</p>
+                              <textarea class="form-control" name="reason_for_reject" >
+
+                              </textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-default" type="submit" name="REJECT" >Submit</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                 </form>
             </p>
         </div>

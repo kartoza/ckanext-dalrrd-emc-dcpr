@@ -97,6 +97,7 @@ def error_report_nsif_moderate(
                 action_status[str(data_dict.get("action"))]
             ).value
             report_obj.nsif_moderation_date = dt.datetime.now(dt.timezone.utc)
+            report_obj.reason_for_reject = validated_data['__extras']['reason_for_reject']
 
         except (KeyError, ValueError):
             result = toolkit.abort(status_code=404, detail="Invalid moderation action")
