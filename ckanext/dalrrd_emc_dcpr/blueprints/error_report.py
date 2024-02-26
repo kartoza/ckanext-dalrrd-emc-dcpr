@@ -349,12 +349,19 @@ class ErrorReportModerateView(MethodView):
         return result
 
     def post(self, csi_reference_id: str):
+        logger.debug(f"submit error {request.form.get('reason_for_reject')}")
+        logger.debug(f"submit error {list(request.form.keys())}")
+        action = list(request.form.keys())[0]
+        if action == "reason_for_reject":
+            action = "REJECT"
         data_dict = {
             "csi_reference_id": csi_reference_id,
-            "action": list(request.form.keys())[0],
+            "action": action,
+            "reason_for_reject": request.form.get('reason_for_reject')
         }
         try:
             ckan_action = self.actions.get("nsif", {}).get("ckan_action")
+            logger.debug(f"ckan_Action {ckan_action}")
             logger.info(f" ckan action {ckan_action}")
             toolkit.get_action(ckan_action)(_prepare_context(), data_dict=data_dict)
         except toolkit.ObjectNotFound:

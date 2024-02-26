@@ -52,6 +52,7 @@ error_report_table = Table(
     Column("nsif_moderation_notes", types.UnicodeText),
     Column("nsif_review_additional_documents", types.UnicodeText),
     Column("nsif_moderation_date", types.DateTime),
+    Column("reason_for_reject", types.Text, nullable=True),
 )
 
 error_report_notification_table = Table(
